@@ -1,4 +1,16 @@
 {
+    "phpstan/phpstan": {
+        "version": "1.2.0"
+    },
+    "phpstan/phpstan-doctrine": {
+        "version": "1.0.2"
+    },
+    "phpstan/phpstan-phpunit": {
+        "version": "1.0.0"
+    },
+    "phpstan/phpstan-symfony": {
+        "version": "1.0.3"
+    },
     "psr/cache": {
         "version": "3.0.0"
     },
