@@ -39,7 +39,6 @@ class SourceFactoryTest extends WebTestCase
 
     /**
      * @dataProvider createDataProvider
-     *
      */
     public function testCreate(
         string $userId,
