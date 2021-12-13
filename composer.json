@@ -19,7 +19,9 @@
         "phpstan/phpstan-doctrine": "^1.0",
         "phpstan/phpstan-phpunit": "^1.0",
         "phpstan/phpstan-symfony": "^1.0",
-        "squizlabs/php_codesniffer": "^3.6"
+        "phpunit/phpunit": "^9.5",
+        "squizlabs/php_codesniffer": "^3.6",
+        "symfony/phpunit-bridge": "^6.0"
     },
     "config": {
         "allow-plugins": {
@@ -68,7 +70,14 @@
             "@cs-fixer-dry-run",
             "@cs-phpcs"
         ],
-        "static-analysis": "./vendor/bin/phpstan analyse --ansi"
+        "static-analysis": "./vendor/bin/phpstan analyse --ansi",
+        "test-unit": "./vendor/bin/phpunit --colors=always tests/Unit",
+        "test-functional": "./vendor/bin/phpunit --colors=always tests/Functional",
+        "test-integration": "./vendor/bin/phpunit --colors=always tests/Integration",
+        "test": [
+            "@test-unit",
+            "@test-functional"
+        ]
     },
     "conflict": {
         "symfony/symfony": "*"
