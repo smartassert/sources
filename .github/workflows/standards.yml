@@ -1,0 +1,19 @@
+name: Coding Standards
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+
+jobs:
+  php-cs-fixer:
+    name: PHP CS Fixer Dry Run
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Run
+        run: composer cs-fixer-dry-run
