@@ -225,6 +225,9 @@
             "phpcs.xml.dist"
         ]
     },
+    "symfony/browser-kit": {
+        "version": "v6.0.1"
+    },
     "symfony/cache": {
         "version": "v6.0.1"
     },
@@ -253,6 +256,9 @@
         "version": "v3.0.0"
     },
     "symfony/doctrine-bridge": {
+        "version": "v6.0.1"
+    },
+    "symfony/dom-crawler": {
         "version": "v6.0.1"
     },
     "symfony/dotenv": {
@@ -346,6 +352,9 @@
     "symfony/polyfill-php81": {
         "version": "v1.23.0"
     },
+    "symfony/polyfill-uuid": {
+        "version": "v1.23.0"
+    },
     "symfony/proxy-manager-bridge": {
         "version": "v6.0.1"
     },
@@ -374,6 +383,9 @@
     "symfony/string": {
         "version": "v6.0.1"
     },
+    "symfony/uid": {
+        "version": "v6.0.1"
+    },
     "symfony/var-dumper": {
         "version": "v6.0.1"
     },
@@ -385,6 +397,9 @@
     },
     "theseer/tokenizer": {
         "version": "1.2.1"
+    },
+    "webignition/encapsulating-request-resolver-bundle": {
+        "version": "0.2"
     },
     "webmozart/assert": {
         "version": "1.10.0"
