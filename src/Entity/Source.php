@@ -10,7 +10,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * @ORM\Entity(repositoryClass=SourceRepository::class)
  */
-class Source
+class Source implements \JsonSerializable
 {
     public const ID_LENGTH = 32;
 
@@ -72,5 +72,19 @@ class Source
     public function getAccessToken(): ?string
     {
         return $this->accessToken;
+    }
+
+    /**
+     * @return array{"id": string, "user_id": string, "host_url": string, "path": string, "access_token": string|null}
+     */
+    public function jsonSerialize(): array
+    {
+        return [
+            'id' => $this->id,
+            'user_id' => $this->userId,
+            'host_url' => $this->hostUrl,
+            'path' => $this->path,
+            'access_token' => $this->accessToken,
+        ];
     }
 }
