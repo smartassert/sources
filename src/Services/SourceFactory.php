@@ -6,6 +6,7 @@ namespace App\Services;
 
 use App\Entity\Source;
 use App\Repository\SourceRepository;
+use App\Request\CreateSourceRequest;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Uid\Ulid;
 
@@ -35,5 +36,15 @@ class SourceFactory
         $this->entityManager->flush();
 
         return $source;
+    }
+
+    public function createFromRequest(CreateSourceRequest $request): Source
+    {
+        return $this->create(
+            $request->getUserId(),
+            $request->getHostUrl(),
+            $request->getPath(),
+            $request->getAccessToken()
+        );
     }
 }

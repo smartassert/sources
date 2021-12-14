@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\Services;
 
+use App\Entity\Source;
 use App\Repository\SourceRepository;
+use App\Request\CreateSourceRequest;
 use App\Services\SourceFactory;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -48,14 +50,7 @@ class SourceFactoryTest extends WebTestCase
     ): void {
         $source = $this->factory->create($userId, $hostUrl, $path, $accessToken);
 
-        self::assertTrue(Ulid::isValid($source->getId()));
-        self::assertSame($userId, $source->getUserId());
-        self::assertSame($hostUrl, $source->getHostUrl());
-        self::assertSame($path, $source->getPath());
-        self::assertSame($accessToken, $source->getAccessToken());
-
-        $retrievedSource = $this->repository->find($source->getId());
-        self::assertSame($source, $retrievedSource);
+        $this->assertCreatedSource($source, $userId, $hostUrl, $path, $accessToken);
     }
 
     /**
@@ -75,6 +70,47 @@ class SourceFactoryTest extends WebTestCase
                 'hostUrl' => 'https://example.com/repository.git',
                 'path' => '/',
                 'accessToken ' => 'access-token',
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider createFromRequestDataProvider
+     */
+    public function testCreateFromRequest(CreateSourceRequest $request): void
+    {
+        $source = $this->factory->createFromRequest($request);
+
+        $this->assertCreatedSource(
+            $source,
+            $request->getUserId(),
+            $request->getHostUrl(),
+            $request->getPath(),
+            $request->getAccessToken()
+        );
+    }
+
+    /**
+     * @return array<mixed>
+     */
+    public function createFromRequestDataProvider(): array
+    {
+        return [
+            'empty access token' => [
+                'request' => new CreateSourceRequest(
+                    self::USER_ID,
+                    'https://example.com/repository.git',
+                    '/',
+                    null
+                ),
+            ],
+            'non-empty access token' => [
+                'request' => new CreateSourceRequest(
+                    self::USER_ID,
+                    'https://example.com/repository.git',
+                    '/',
+                    'access-token',
+                ),
             ],
         ];
     }
@@ -100,6 +136,23 @@ class SourceFactoryTest extends WebTestCase
         }
 
         self::assertCount(1, $this->repository->findAll());
+    }
+
+    private function assertCreatedSource(
+        Source $source,
+        string $expectedUserId,
+        string $expectedHostUrl,
+        string $expectedPath,
+        ?string $expectedAccessToken
+    ): void {
+        self::assertTrue(Ulid::isValid($source->getId()));
+        self::assertSame($expectedUserId, $source->getUserId());
+        self::assertSame($expectedHostUrl, $source->getHostUrl());
+        self::assertSame($expectedPath, $source->getPath());
+        self::assertSame($expectedAccessToken, $source->getAccessToken());
+
+        $retrievedSource = $this->repository->find($source->getId());
+        self::assertSame($source, $retrievedSource);
     }
 
     private function removeAllSources(): void
