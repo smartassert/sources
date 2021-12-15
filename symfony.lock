@@ -467,6 +467,9 @@
     "webignition/http-history-container": {
         "version": "2.4"
     },
+    "webignition/object-reflector": {
+        "version": "1.0"
+    },
     "webmozart/assert": {
         "version": "1.10.0"
     }

@@ -44,3 +44,8 @@ services:
     App\Services\UserTokenVerifier:
         arguments:
             $verificationUrl: '%user_token_verification_url%'
+
+    App\Security\TokenExtractor:
+        arguments:
+            $headerKey: 'Authorization'
+            $valuePrefix: 'Bearer '
