@@ -64,6 +64,8 @@ class SourcesControllerTest extends WebTestCase
         );
 
         $token = 'invalid-token';
+        $authHeaderName = AuthorizationProperties::DEFAULT_HEADER_NAME;
+        $authHeaderValue = AuthorizationProperties::DEFAULT_VALUE_PREFIX . $token;
 
         $this->client->request(
             'POST',
@@ -75,8 +77,7 @@ class SourcesControllerTest extends WebTestCase
             ],
             [],
             [
-                'HTTP_' . AuthorizationProperties::DEFAULT_HEADER_NAME =>
-                    AuthorizationProperties::DEFAULT_VALUE_PREFIX . $token,
+                'HTTP_' . $authHeaderName => $authHeaderValue,
             ]
         );
 
@@ -95,6 +96,8 @@ class SourcesControllerTest extends WebTestCase
     public function testCreateSuccess(string $userId, array $requestParameters, array $expected): void
     {
         $token = 'valid-token';
+        $authHeaderName = AuthorizationProperties::DEFAULT_HEADER_NAME;
+        $authHeaderValue = AuthorizationProperties::DEFAULT_VALUE_PREFIX . $token;
 
         $this->mockHandler->append(
             new Response(200, [], $userId)
@@ -106,8 +109,7 @@ class SourcesControllerTest extends WebTestCase
             $requestParameters,
             [],
             [
-                'HTTP_' . AuthorizationProperties::DEFAULT_HEADER_NAME =>
-                    AuthorizationProperties::DEFAULT_VALUE_PREFIX . $token,
+                'HTTP_' . $authHeaderName => $authHeaderValue,
             ]
         );
 
