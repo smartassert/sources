@@ -1,0 +1,16 @@
+security:
+    enable_authenticator_manager: true
+    providers:
+        user_provider:
+            id: App\Security\UserProvider
+    firewalls:
+        main:
+            pattern:  '^/'
+            stateless: true
+            custom_authenticators:
+                - App\Security\Authenticator
+            provider: user_provider
+            entry_point: App\Security\AuthenticationEntryPoint
+
+    access_control:
+        - { path: '^/', roles: ROLE_USER }

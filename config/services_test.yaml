@@ -3,5 +3,30 @@ services:
         autowire: true
         autoconfigure: true
 
+    webignition\HttpHistoryContainer\Container:
+        public: true
+
+    GuzzleHttp\Handler\MockHandler:
+        public: true
+        class: GuzzleHttp\Handler\MockHandler
+
+    GuzzleHttp\HandlerStack:
+        public: true
+        class: GuzzleHttp\HandlerStack
+        factory: ['GuzzleHttp\HandlerStack', 'create']
+        arguments:
+            $handler: '@GuzzleHttp\Handler\MockHandler'
+
     App\Services\SourceFactory:
+        public: true
+
+    App\Services\UserTokenVerifier:
+        public: true
+        arguments:
+            $verificationUrl: '%user_token_verification_url%'
+
+    App\Security\TokenExtractor:
+        public: true
+
+    App\Security\Authenticator:
         public: true

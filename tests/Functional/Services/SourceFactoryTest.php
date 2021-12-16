@@ -7,9 +7,11 @@ namespace App\Tests\Functional\Services;
 use App\Entity\Source;
 use App\Repository\SourceRepository;
 use App\Request\CreateSourceRequest;
+use App\Security\User;
 use App\Services\SourceFactory;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Uid\Ulid;
 
 class SourceFactoryTest extends WebTestCase
@@ -77,13 +79,13 @@ class SourceFactoryTest extends WebTestCase
     /**
      * @dataProvider createFromRequestDataProvider
      */
-    public function testCreateFromRequest(CreateSourceRequest $request): void
+    public function testCreateFromRequest(UserInterface $user, CreateSourceRequest $request): void
     {
-        $source = $this->factory->createFromRequest($request);
+        $source = $this->factory->createFromRequest($user, $request);
 
         $this->assertCreatedSource(
             $source,
-            $request->getUserId(),
+            $user->getUserIdentifier(),
             $request->getHostUrl(),
             $request->getPath(),
             $request->getAccessToken()
@@ -95,18 +97,20 @@ class SourceFactoryTest extends WebTestCase
      */
     public function createFromRequestDataProvider(): array
     {
+        $user = new User(self::USER_ID);
+
         return [
             'empty access token' => [
+                'user' => $user,
                 'request' => new CreateSourceRequest(
-                    self::USER_ID,
                     'https://example.com/repository.git',
                     '/',
                     null
                 ),
             ],
             'non-empty access token' => [
+                'user' => $user,
                 'request' => new CreateSourceRequest(
-                    self::USER_ID,
                     'https://example.com/repository.git',
                     '/',
                     'access-token',

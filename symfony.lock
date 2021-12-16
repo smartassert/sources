@@ -85,8 +85,23 @@
     "friendsofphp/proxy-manager-lts": {
         "version": "v1.0.5"
     },
+    "guzzlehttp/guzzle": {
+        "version": "7.4.1"
+    },
+    "guzzlehttp/promises": {
+        "version": "1.5.1"
+    },
+    "guzzlehttp/psr7": {
+        "version": "2.1.0"
+    },
+    "hamcrest/hamcrest-php": {
+        "version": "v2.0.1"
+    },
     "laminas/laminas-code": {
         "version": "4.5.0"
+    },
+    "mockery/mockery": {
+        "version": "1.4.4"
     },
     "myclabs/deep-copy": {
         "version": "1.10.2"
@@ -112,11 +127,17 @@
     "phpspec/prophecy": {
         "version": "v1.15.0"
     },
+    "phpstan/extension-installer": {
+        "version": "1.1.0"
+    },
     "phpstan/phpstan": {
         "version": "1.2.0"
     },
     "phpstan/phpstan-doctrine": {
         "version": "1.0.2"
+    },
+    "phpstan/phpstan-mockery": {
+        "version": "1.0.0"
     },
     "phpstan/phpstan-phpunit": {
         "version": "1.0.0"
@@ -162,8 +183,20 @@
     "psr/event-dispatcher": {
         "version": "1.0.0"
     },
+    "psr/http-client": {
+        "version": "1.0.1"
+    },
+    "psr/http-factory": {
+        "version": "1.0.1"
+    },
+    "psr/http-message": {
+        "version": "1.0.1"
+    },
     "psr/log": {
         "version": "3.0.0"
+    },
+    "ralouphie/getallheaders": {
+        "version": "3.0.3"
     },
     "sebastian/cli-parser": {
         "version": "1.0.1"
@@ -325,6 +358,9 @@
             "ref": "fadbfe33303a76e25cb63401050439aa9b1a9c7f"
         }
     },
+    "symfony/password-hasher": {
+        "version": "v6.0.1"
+    },
     "symfony/phpunit-bridge": {
         "version": "6.0",
         "recipe": {
@@ -355,6 +391,12 @@
     "symfony/polyfill-uuid": {
         "version": "v1.23.0"
     },
+    "symfony/property-access": {
+        "version": "v6.0.0"
+    },
+    "symfony/property-info": {
+        "version": "v6.0.0"
+    },
     "symfony/proxy-manager-bridge": {
         "version": "v6.0.1"
     },
@@ -373,6 +415,27 @@
     },
     "symfony/runtime": {
         "version": "v6.0.0"
+    },
+    "symfony/security-bundle": {
+        "version": "6.0",
+        "recipe": {
+            "repo": "github.com/symfony/recipes",
+            "branch": "master",
+            "version": "5.3",
+            "ref": "3307d76caa2d12fb10ade57975beb3d8975df396"
+        },
+        "files": [
+            "config/packages/security.yaml"
+        ]
+    },
+    "symfony/security-core": {
+        "version": "v6.0.1"
+    },
+    "symfony/security-csrf": {
+        "version": "v6.0.1"
+    },
+    "symfony/security-http": {
+        "version": "v6.0.1"
     },
     "symfony/service-contracts": {
         "version": "v3.0.0"
@@ -400,6 +463,12 @@
     },
     "webignition/encapsulating-request-resolver-bundle": {
         "version": "0.2"
+    },
+    "webignition/http-history-container": {
+        "version": "2.4"
+    },
+    "webignition/object-reflector": {
+        "version": "1.0"
     },
     "webmozart/assert": {
         "version": "1.10.0"
