@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "44e63d1982d329ca3f2689dfd2a0e83d",
+    "content-hash": "22015e6833e6cd7bb3b9efed6b233bd1",
     "packages": [
         {
             "name": "composer/package-versions-deprecated",
@@ -2002,6 +2002,70 @@
                 "source": "https://github.com/smartassert/users-client/tree/0.1"
             },
             "time": "2021-12-16T15:30:49+00:00"
+        },
+        {
+            "name": "smartassert/users-security-bundle",
+            "version": "0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/smartassert/UsersSecurityBundle.git",
+                "reference": "eb4bd0b7bbc337de2aa165cd9d6994a23eb3ce16"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/smartassert/UsersSecurityBundle/zipball/eb4bd0b7bbc337de2aa165cd9d6994a23eb3ce16",
+                "reference": "eb4bd0b7bbc337de2aa165cd9d6994a23eb3ce16",
+                "shasum": ""
+            },
+            "require": {
+                "ext-json": "*",
+                "php": ">=8.0.2",
+                "smartassert/users-client": "^0.1.0",
+                "symfony/config": "^6.0",
+                "symfony/dependency-injection": "^6.0",
+                "symfony/http-foundation": "^6.0",
+                "symfony/http-kernel": "^6.0",
+                "symfony/security-core": "^6.0",
+                "symfony/security-http": "^6.0",
+                "symfony/string": "^6.0",
+                "symfony/yaml": "^6.0"
+            },
+            "require-dev": {
+                "guzzlehttp/guzzle": "^7.4",
+                "mockery/mockery": "^1.4",
+                "phpstan/extension-installer": "^1.1",
+                "phpstan/phpstan": "^1.2",
+                "phpstan/phpstan-mockery": "^1.0",
+                "phpstan/phpstan-phpunit": "^1.0",
+                "phpunit/phpunit": "^9.5",
+                "squizlabs/php_codesniffer": "^3.6",
+                "webignition/object-reflector": "^1.0"
+            },
+            "type": "symfony-bundle",
+            "autoload": {
+                "psr-4": {
+                    "SmartAssert\\UsersSecurityBundle\\": ""
+                },
+                "exclude-from-classmap": [
+                    "/Tests/"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Jon Cram",
+                    "email": "webignition@gmail.com"
+                }
+            ],
+            "homepage": "https://github.com/smartassert/UsersSecurityBundle",
+            "support": {
+                "issues": "https://github.com/smartassert/UsersSecurityBundle/issues",
+                "source": "https://github.com/smartassert/UsersSecurityBundle/tree/0.1"
+            },
+            "time": "2021-12-16T17:21:52+00:00"
         },
         {
             "name": "symfony/cache",

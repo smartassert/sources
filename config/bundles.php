@@ -7,4 +7,5 @@ return [
     Symfony\Bundle\MakerBundle\MakerBundle::class => ['dev' => true],
     webignition\EncapsulatingRequestResolverBundle\EncapsulatingRequestResolverBundle::class => ['all' => true],
     Symfony\Bundle\SecurityBundle\SecurityBundle::class => ['all' => true],
+    SmartAssert\UsersSecurityBundle\UsersSecurityBundle::class => ['all' => true],
 ];
