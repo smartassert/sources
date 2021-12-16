@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Security;
 
-use App\Services\UserTokenVerifier;
+use SmartAssert\UsersClient\Client as UsersClient;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
@@ -19,7 +19,7 @@ class Authenticator extends AbstractAuthenticator
 {
     public function __construct(
         private TokenExtractor $tokenExtractor,
-        private UserTokenVerifier $userTokenVerifier,
+        private UsersClient $usersServiceClient
     ) {
     }
 
@@ -31,7 +31,7 @@ class Authenticator extends AbstractAuthenticator
     public function authenticate(Request $request): Passport
     {
         $token = (string) $this->tokenExtractor->extract($request);
-        $userId = $this->userTokenVerifier->verify($token);
+        $userId = $this->usersServiceClient->verifyApiToken($token);
         if (null === $userId) {
             throw new CustomUserMessageAuthenticationException('Invalid user token');
         }
