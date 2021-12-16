@@ -2,7 +2,7 @@ security:
     enable_authenticator_manager: true
     providers:
         user_provider:
-            id: App\Security\UserProvider
+            id: SmartAssert\UsersSecurityBundle\Security\UserProvider
     firewalls:
         main:
             pattern:  '^/'
