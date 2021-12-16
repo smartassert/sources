@@ -22,6 +22,3 @@ services:
 
     App\Security\TokenExtractor:
         public: true
-
-    App\Security\Authenticator:
-        public: true

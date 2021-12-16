@@ -8,7 +8,7 @@ security:
             pattern:  '^/'
             stateless: true
             custom_authenticators:
-                - App\Security\Authenticator
+                - SmartAssert\UsersSecurityBundle\Security\Authenticator
             provider: user_provider
             entry_point: App\Security\AuthenticationEntryPoint
 
