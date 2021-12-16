@@ -3,9 +3,6 @@
 
 # Put parameters here that don't need to change on each machine where the app is deployed
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
-parameters:
-    user_token_verification_url: '%env(USER_TOKEN_VERIFICATION_URL)%'
-
 services:
     # default configuration for services in *this* file
     _defaults:
@@ -41,11 +38,15 @@ services:
             $config:
                 handler: '@GuzzleHttp\HandlerStack'
 
-    App\Services\UserTokenVerifier:
-        arguments:
-            $verificationUrl: '%user_token_verification_url%'
-
     App\Security\AuthorizationRequestProperties:
         arguments:
             $headerKey: 'Authorization'
             $valuePrefix: 'Bearer '
+
+    SmartAssert\UsersClient\Routes:
+        arguments:
+            $baseUrl: '%env(USERS_SERVICE_BASE_URL)%'
+
+    SmartAssert\UsersClient\RequestBuilder:
+
+    SmartAssert\UsersClient\Client:

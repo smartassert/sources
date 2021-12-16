@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Tests\Functional\Security;
 
 use App\Security\Authenticator;
-use App\Services\UserTokenVerifier;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
+use SmartAssert\UsersClient\Client as UsersServiceClient;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Exception\CustomUserMessageAuthenticationException;
@@ -46,13 +46,8 @@ class AuthenticatorTest extends WebTestCase
             $requestHeaders['HTTP_AUTHORIZATION'] = 'Bearer ' . $userToken;
         }
 
-        $userTokenVerifier = $this->createUserTokenVerifier((string) $userToken, null);
-        ObjectReflector::setProperty(
-            $this->authenticator,
-            Authenticator::class,
-            'userTokenVerifier',
-            $userTokenVerifier
-        );
+        $usersServiceClient = $this->createUsersServiceClient((string) $userToken, null);
+        $this->setUsersServiceClientOnAuthenticator($usersServiceClient);
 
         self::expectExceptionObject(
             new CustomUserMessageAuthenticationException('Invalid user token')
@@ -79,13 +74,8 @@ class AuthenticatorTest extends WebTestCase
 
     public function testAuthenticateSuccess(): void
     {
-        $userTokenVerifier = $this->createUserTokenVerifier(self::USER_TOKEN, self::USER_ID);
-        ObjectReflector::setProperty(
-            $this->authenticator,
-            Authenticator::class,
-            'userTokenVerifier',
-            $userTokenVerifier
-        );
+        $usersServiceClient = $this->createUsersServiceClient(self::USER_TOKEN, self::USER_ID);
+        $this->setUsersServiceClientOnAuthenticator($usersServiceClient);
 
         $passport = $this->authenticator->authenticate(new Request(server: [
             'HTTP_AUTHORIZATION' => 'Bearer ' . self::USER_TOKEN
@@ -95,15 +85,25 @@ class AuthenticatorTest extends WebTestCase
         self::assertEquals($expectedPassport, $passport);
     }
 
-    private function createUserTokenVerifier(string $token, ?string $returnValue): UserTokenVerifier
+    private function createUsersServiceClient(string $token, ?string $returnValue): UsersServiceClient
     {
-        $verifier = \Mockery::mock(UserTokenVerifier::class);
-        $verifier
-            ->shouldReceive('verify')
+        $client = \Mockery::mock(UsersServiceClient::class);
+        $client
+            ->shouldReceive('verifyApiToken')
             ->with($token)
             ->andReturn($returnValue)
         ;
 
-        return $verifier;
+        return $client;
+    }
+
+    private function setUsersServiceClientOnAuthenticator(UsersServiceClient $client): void
+    {
+        ObjectReflector::setProperty(
+            $this->authenticator,
+            Authenticator::class,
+            'usersServiceClient',
+            $client
+        );
     }
 }

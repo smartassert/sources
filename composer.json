@@ -13,6 +13,7 @@
         "doctrine/orm": "^2.10",
         "psr/http-client": "^1.0",
         "psr/http-message": "^1.0",
+        "smartassert/users-client": "^0.1.0",
         "symfony/console": "6.0.*",
         "symfony/dotenv": "6.0.*",
         "symfony/flex": "^2",
