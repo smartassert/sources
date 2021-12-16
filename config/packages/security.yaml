@@ -10,7 +10,7 @@ security:
             custom_authenticators:
                 - SmartAssert\UsersSecurityBundle\Security\Authenticator
             provider: user_provider
-            entry_point: App\Security\AuthenticationEntryPoint
+            entry_point: SmartAssert\UsersSecurityBundle\Security\AuthenticationEntryPoint
 
     access_control:
         - { path: '^/', roles: ROLE_USER }
