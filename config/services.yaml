@@ -38,11 +38,6 @@ services:
             $config:
                 handler: '@GuzzleHttp\HandlerStack'
 
-    App\Security\AuthorizationRequestProperties:
-        arguments:
-            $headerKey: 'Authorization'
-            $valuePrefix: 'Bearer '
-
     SmartAssert\UsersClient\Routes:
         arguments:
             $baseUrl: '%env(USERS_SERVICE_BASE_URL)%'
