@@ -26,20 +26,16 @@ class CreateSourceRequestTest extends TestCase
         return [
             'empty' => [
                 'request' => new Request(),
-                'expected' => new CreateSourceRequest('', '', '', null)
+                'expected' => new CreateSourceRequest('', '', null)
             ],
             'user id, host url, path present, access token missing' => [
                 'request' => new Request(
                     request: [
                         CreateSourceRequest::KEY_POST_HOST_URL => 'https://example.com/repository.git',
                         CreateSourceRequest::KEY_POST_PATH => '/path/to/source',
-                    ],
-                    attributes: [
-                        CreateSourceRequest::KEY_ATTRIBUTE_USER_ID => '01FPWXES6PCCY06X26TTMXWTVX'
                     ]
                 ),
                 'expected' => new CreateSourceRequest(
-                    '01FPWXES6PCCY06X26TTMXWTVX',
                     'https://example.com/repository.git',
                     '/path/to/source',
                     null
@@ -51,13 +47,9 @@ class CreateSourceRequestTest extends TestCase
                         CreateSourceRequest::KEY_POST_HOST_URL => 'https://example.com/repository.git',
                         CreateSourceRequest::KEY_POST_PATH => '/path/to/source',
                         CreateSourceRequest::KEY_POST_ACCESS_TOKEN => 'e2d940b51d53c18a73dfe939b95002f9',
-                    ],
-                    attributes: [
-                        CreateSourceRequest::KEY_ATTRIBUTE_USER_ID => '01FPWXES6PCCY06X26TTMXWTVX'
                     ]
                 ),
                 'expected' => new CreateSourceRequest(
-                    '01FPWXES6PCCY06X26TTMXWTVX',
                     'https://example.com/repository.git',
                     '/path/to/source',
                     'e2d940b51d53c18a73dfe939b95002f9'

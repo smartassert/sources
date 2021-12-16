@@ -8,6 +8,8 @@ use App\Entity\Source;
 use App\Repository\SourceRepository;
 use App\Request\CreateSourceRequest;
 use Doctrine\ORM\EntityManagerInterface;
+use GuzzleHttp\Handler\MockHandler;
+use GuzzleHttp\Psr7\Response;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Uid\Ulid;
@@ -17,6 +19,7 @@ class SourcesControllerTest extends WebTestCase
     private KernelBrowser $client;
     private EntityManagerInterface $entityManager;
     private SourceRepository $repository;
+    private MockHandler $mockHandler;
 
     protected function setUp(): void
     {
@@ -32,7 +35,28 @@ class SourcesControllerTest extends WebTestCase
         \assert($repository instanceof SourceRepository);
         $this->repository = $repository;
 
+        $mockHandler = self::getContainer()->get(MockHandler::class);
+        \assert($mockHandler instanceof MockHandler);
+        $this->mockHandler = $mockHandler;
+
         $this->removeAllSources();
+    }
+
+    public function testCreateUnauthorizedUser(): void
+    {
+        $this->mockHandler->append(
+            new Response(401)
+        );
+
+        $this->client->request('POST', '/', [
+            CreateSourceRequest::KEY_POST_HOST_URL => 'https://example.com/repository.git',
+            CreateSourceRequest::KEY_POST_PATH => '/',
+            CreateSourceRequest::KEY_POST_ACCESS_TOKEN => md5((string) rand()),
+        ]);
+
+        $response = $this->client->getResponse();
+
+        self::assertSame(401, $response->getStatusCode());
     }
 
     /**
@@ -43,7 +67,11 @@ class SourcesControllerTest extends WebTestCase
      */
     public function testCreate(string $userId, array $requestParameters, array $expected): void
     {
-        $this->client->request('POST', '/' . $userId, $requestParameters);
+        $this->mockHandler->append(
+            new Response(200, [], $userId)
+        );
+
+        $this->client->request('POST', '/', $requestParameters);
 
         $response = $this->client->getResponse();
 
