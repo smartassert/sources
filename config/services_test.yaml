@@ -19,9 +19,3 @@ services:
 
     App\Services\SourceFactory:
         public: true
-
-    App\Security\TokenExtractor:
-        public: true
-
-    App\Security\Authenticator:
-        public: true
