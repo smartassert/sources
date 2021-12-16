@@ -9,10 +9,16 @@ use App\Repository\SourceRepository;
 use App\Request\CreateSourceRequest;
 use Doctrine\ORM\EntityManagerInterface;
 use GuzzleHttp\Handler\MockHandler;
+use GuzzleHttp\HandlerStack;
+use GuzzleHttp\Middleware;
 use GuzzleHttp\Psr7\Response;
+use Psr\Http\Message\RequestInterface;
+use SmartAssert\UsersClient\Routes;
+use SmartAssert\UsersSecurityBundle\Security\AuthorizationProperties;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Uid\Ulid;
+use webignition\HttpHistoryContainer\Container as HttpHistoryContainer;
 
 class SourcesControllerTest extends WebTestCase
 {
@@ -20,6 +26,7 @@ class SourcesControllerTest extends WebTestCase
     private EntityManagerInterface $entityManager;
     private SourceRepository $repository;
     private MockHandler $mockHandler;
+    private HttpHistoryContainer $httpHistoryContainer;
 
     protected function setUp(): void
     {
@@ -39,6 +46,14 @@ class SourcesControllerTest extends WebTestCase
         \assert($mockHandler instanceof MockHandler);
         $this->mockHandler = $mockHandler;
 
+        $httpHistoryContainer = self::getContainer()->get(HttpHistoryContainer::class);
+        \assert($httpHistoryContainer instanceof HttpHistoryContainer);
+        $this->httpHistoryContainer = $httpHistoryContainer;
+
+        $handlerStack = self::getContainer()->get(HandlerStack::class);
+        \assert($handlerStack instanceof HandlerStack);
+        $handlerStack->push(Middleware::history($this->httpHistoryContainer), 'history');
+
         $this->removeAllSources();
     }
 
@@ -48,15 +63,27 @@ class SourcesControllerTest extends WebTestCase
             new Response(401)
         );
 
-        $this->client->request('POST', '/', [
-            CreateSourceRequest::KEY_POST_HOST_URL => 'https://example.com/repository.git',
-            CreateSourceRequest::KEY_POST_PATH => '/',
-            CreateSourceRequest::KEY_POST_ACCESS_TOKEN => md5((string) rand()),
-        ]);
+        $token = 'invalid-token';
+
+        $this->client->request(
+            'POST',
+            '/',
+            [
+                CreateSourceRequest::KEY_POST_HOST_URL => 'https://example.com/repository.git',
+                CreateSourceRequest::KEY_POST_PATH => '/',
+                CreateSourceRequest::KEY_POST_ACCESS_TOKEN => md5((string) rand()),
+            ],
+            [],
+            [
+                'HTTP_' . AuthorizationProperties::DEFAULT_HEADER_NAME =>
+                    AuthorizationProperties::DEFAULT_VALUE_PREFIX . $token,
+            ]
+        );
 
         $response = $this->client->getResponse();
 
         self::assertSame(401, $response->getStatusCode());
+        $this->assertAuthorizationRequestIsMade($token);
     }
 
     /**
@@ -65,17 +92,29 @@ class SourcesControllerTest extends WebTestCase
      * @param array<mixed> $requestParameters
      * @param array<mixed> $expected
      */
-    public function testCreate(string $userId, array $requestParameters, array $expected): void
+    public function testCreateSuccess(string $userId, array $requestParameters, array $expected): void
     {
+        $token = 'valid-token';
+
         $this->mockHandler->append(
             new Response(200, [], $userId)
         );
 
-        $this->client->request('POST', '/', $requestParameters);
+        $this->client->request(
+            'POST',
+            '/',
+            $requestParameters,
+            [],
+            [
+                'HTTP_' . AuthorizationProperties::DEFAULT_HEADER_NAME =>
+                    AuthorizationProperties::DEFAULT_VALUE_PREFIX . $token,
+            ]
+        );
 
         $response = $this->client->getResponse();
 
         self::assertSame(200, $response->getStatusCode());
+        $this->assertAuthorizationRequestIsMade($token);
 
         $repository = self::getContainer()->get(SourceRepository::class);
         \assert($repository instanceof SourceRepository);
@@ -134,6 +173,25 @@ class SourcesControllerTest extends WebTestCase
                 ],
             ],
         ];
+    }
+
+    private function assertAuthorizationRequestIsMade(string $token): void
+    {
+        $request = $this->httpHistoryContainer->getTransactions()->getRequests()->getLast();
+        \assert($request instanceof RequestInterface);
+
+        $usersServiceBaseUrl = self::getContainer()->getParameter('users_security_bundle_base_url');
+        \assert(is_string($usersServiceBaseUrl));
+
+        $expectedUrl = $usersServiceBaseUrl . Routes::DEFAULT_VERIFY_API_TOKEN_PATH;
+
+        self::assertSame($expectedUrl, (string) $request->getUri());
+
+        $authorizationHeader = $request->getHeaderLine(AuthorizationProperties::DEFAULT_HEADER_NAME);
+
+        $expectedAuthorizationHeader = AuthorizationProperties::DEFAULT_VALUE_PREFIX . $token;
+
+        self::assertSame($expectedAuthorizationHeader, $authorizationHeader);
     }
 
     private function removeAllSources(): void
