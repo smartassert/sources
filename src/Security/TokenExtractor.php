@@ -10,24 +10,25 @@ use Symfony\Component\String\UnicodeString;
 class TokenExtractor
 {
     public function __construct(
-        private string $headerKey,
-        private string $valuePrefix,
+        private AuthorizationRequestProperties $authorizationRequestProperties,
     ) {
     }
 
     public function extract(Request $request): ?string
     {
         $headers = $request->headers;
-        $authorizationHeader = $headers->get($this->headerKey);
+        $authorizationHeader = $headers->get($this->authorizationRequestProperties->getHeaderKey());
         if (null === $authorizationHeader) {
             return null;
         }
 
+        $valuePrefix = $this->authorizationRequestProperties->getValuePrefix();
+
         $authorizationHeaderString = new UnicodeString($authorizationHeader);
-        if (false === $authorizationHeaderString->startsWith($this->valuePrefix)) {
+        if (false === $authorizationHeaderString->startsWith($valuePrefix)) {
             return null;
         }
 
-        return (string) $authorizationHeaderString->trimPrefix($this->valuePrefix);
+        return (string) $authorizationHeaderString->trimPrefix($valuePrefix);
     }
 }

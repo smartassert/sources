@@ -27,9 +27,6 @@ services:
 
     App\Security\TokenExtractor:
         public: true
-        arguments:
-            $headerKey: 'Authorization'
-            $valuePrefix: 'Bearer '
 
     App\Security\Authenticator:
         public: true

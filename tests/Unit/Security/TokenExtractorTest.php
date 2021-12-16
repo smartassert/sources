@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\Security;
 
+use App\Security\AuthorizationRequestProperties;
 use App\Security\TokenExtractor;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
@@ -23,10 +24,10 @@ class TokenExtractorTest extends TestCase
      */
     public function extractDataProvider(): array
     {
-        $defaultTokenExtractor = new TokenExtractor(
+        $defaultTokenExtractor = new TokenExtractor(new AuthorizationRequestProperties(
             'Authorization',
             'Bearer '
-        );
+        ));
 
         return [
             'authorization header not present' => [
