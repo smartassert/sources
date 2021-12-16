@@ -8,6 +8,7 @@ use App\Entity\Source;
 use App\Repository\SourceRepository;
 use App\Request\CreateSourceRequest;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Uid\Ulid;
 
 class SourceFactory
@@ -38,10 +39,10 @@ class SourceFactory
         return $source;
     }
 
-    public function createFromRequest(CreateSourceRequest $request): Source
+    public function createFromRequest(UserInterface $user, CreateSourceRequest $request): Source
     {
         return $this->create(
-            $request->getUserId(),
+            $user->getUserIdentifier(),
             $request->getHostUrl(),
             $request->getPath(),
             $request->getAccessToken()
