@@ -41,11 +41,3 @@ services:
         arguments:
             $config:
                 handler: '@GuzzleHttp\HandlerStack'
-
-    SmartAssert\UsersClient\Routes:
-        arguments:
-            $baseUrl: '%env(USERS_SERVICE_BASE_URL)%'
-
-    SmartAssert\UsersClient\RequestBuilder:
-
-    SmartAssert\UsersClient\Client:
