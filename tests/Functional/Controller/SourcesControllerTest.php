@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Functional\Controller;
 
 use App\Entity\Source;
+use App\Entity\SourceType;
 use App\Repository\SourceRepository;
 use App\Request\CreateSourceRequest;
 use Doctrine\ORM\EntityManagerInterface;
@@ -155,9 +156,11 @@ class SourcesControllerTest extends WebTestCase
                 ],
                 'expected' => [
                     'user_id' => $userId,
+                    'type' => SourceType::TYPE_GIT,
                     'host_url' => $hostUrl,
                     'path' => $path,
                     'access_token' => null,
+                    'ref' => null,
                 ],
             ],
             'access token present' => [
@@ -169,9 +172,11 @@ class SourcesControllerTest extends WebTestCase
                 ],
                 'expected' => [
                     'user_id' => $userId,
+                    'type' => SourceType::TYPE_GIT,
                     'host_url' => $hostUrl,
                     'path' => $path,
                     'access_token' => $accessToken,
+                    'ref' => null,
                 ],
             ],
         ];

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Functional\Services;
 
 use App\Entity\Source;
+use App\Entity\SourceType;
 use App\Repository\SourceRepository;
 use App\Request\CreateSourceRequest;
 use App\Services\SourceFactory;
@@ -43,14 +44,17 @@ class SourceFactoryTest extends WebTestCase
 
     /**
      * @dataProvider createDataProvider
+     *
+     * @param SourceType::TYPE_* $sourceTypeName
      */
     public function testCreate(
         string $userId,
+        string $sourceTypeName,
         string $hostUrl,
         string $path,
         ?string $accessToken
     ): void {
-        $source = $this->factory->create($userId, $hostUrl, $path, $accessToken);
+        $source = $this->factory->create($userId, $sourceTypeName, $hostUrl, $path, $accessToken);
 
         $this->assertCreatedSource($source, $userId, $hostUrl, $path, $accessToken);
     }
@@ -63,12 +67,14 @@ class SourceFactoryTest extends WebTestCase
         return [
             'empty access token' => [
                 'userId' => self::USER_ID,
+                'sourceTypeName' => SourceType::TYPE_GIT,
                 'hostUrl' => 'https://example.com/repository.git',
                 'path' => '/',
                 'accessToken ' => null,
             ],
             'non-empty access token' => [
                 'userId' => self::USER_ID,
+                'sourceTypeName' => SourceType::TYPE_GIT,
                 'hostUrl' => 'https://example.com/repository.git',
                 'path' => '/',
                 'accessToken ' => 'access-token',
@@ -127,7 +133,7 @@ class SourceFactoryTest extends WebTestCase
         $hostUrl = 'https://example.com/repository.git';
         $path = '/path';
 
-        $source = $this->factory->create($userId, $hostUrl, $path, null);
+        $source = $this->factory->create($userId, SourceType::TYPE_GIT, $hostUrl, $path, null);
         self::assertCount(1, $this->repository->findAll());
 
         $accessTokenVariants = [null, 'access token one', 'access token two'];
@@ -135,7 +141,7 @@ class SourceFactoryTest extends WebTestCase
         foreach ($accessTokenVariants as $accessTokenVariant) {
             self::assertSame(
                 $source,
-                $this->factory->create($userId, $hostUrl, $path, $accessTokenVariant)
+                $this->factory->create($userId, SourceType::TYPE_GIT, $hostUrl, $path, $accessTokenVariant)
             );
         }
 
