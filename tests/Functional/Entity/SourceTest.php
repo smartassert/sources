@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace App\Tests\Functional\Entity;
 
 use App\Entity\Source;
+use App\Entity\SourceType;
 use App\Repository\SourceRepository;
+use App\Repository\SourceTypeRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
@@ -13,6 +15,7 @@ class SourceTest extends WebTestCase
 {
     private EntityManagerInterface $entityManager;
     private SourceRepository $repository;
+    private SourceTypeRepository $sourceTypeRepository;
 
     protected function setUp(): void
     {
@@ -26,6 +29,10 @@ class SourceTest extends WebTestCase
         \assert($repository instanceof SourceRepository);
         $this->repository = $repository;
 
+        $sourceTypeRepository = self::getContainer()->get(SourceTypeRepository::class);
+        \assert($sourceTypeRepository instanceof SourceTypeRepository);
+        $this->sourceTypeRepository = $sourceTypeRepository;
+
         $this->removeAllSources();
     }
 
@@ -35,10 +42,13 @@ class SourceTest extends WebTestCase
 
         $sourceId = '01FPSVJMEBWJCVJGWN3WDVT2Q8';
         $userId = '01FPSVJ7ZT85X73BW05EK9B3XG';
+        $type = $this->sourceTypeRepository->findOneByName(SourceType::TYPE_GIT);
+        \assert($type instanceof SourceType);
 
         $source = new Source(
             $sourceId,
             $userId,
+            $type,
             'https://github.com/example/example.git',
             '/',
             null

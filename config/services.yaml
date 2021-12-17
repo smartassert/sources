@@ -41,3 +41,15 @@ services:
         arguments:
             $config:
                 handler: '@GuzzleHttp\HandlerStack'
+
+    App\Repository\SourceTypeRepository:
+        public: true
+
+    Doctrine\ORM\EntityManagerInterface:
+        public: true
+        alias: 'doctrine.orm.default_entity_manager'
+
+    Doctrine\Migrations\Version\DbalMigrationFactory: ~
+    App\Migrations\Factory\MigrationFactoryDecorator:
+        decorates: Doctrine\Migrations\Version\DbalMigrationFactory
+        arguments: ['@App\Migrations\Factory\MigrationFactoryDecorator.inner', '@service_container']

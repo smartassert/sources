@@ -5,7 +5,10 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Entity\Source;
+use App\Entity\SourceType;
+use App\Exception\InvalidSourceTypeException;
 use App\Repository\SourceRepository;
+use App\Repository\SourceTypeRepository;
 use App\Request\CreateSourceRequest;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -16,11 +19,22 @@ class SourceFactory
     public function __construct(
         private EntityManagerInterface $entityManager,
         private SourceRepository $repository,
+        private SourceTypeRepository $sourceTypeRepository,
     ) {
     }
 
-    public function create(string $userId, string $hostUrl, string $path, ?string $accessToken): Source
-    {
+    /**
+     * @param SourceType::TYPE_* $typeName
+     *
+     * @throws InvalidSourceTypeException
+     */
+    public function create(
+        string $userId,
+        string $typeName,
+        string $hostUrl,
+        string $path,
+        ?string $accessToken
+    ): Source {
         $source = $this->repository->findOneBy([
             'userId' => $userId,
             'hostUrl' => $hostUrl,
@@ -31,7 +45,12 @@ class SourceFactory
             return $source;
         }
 
-        $source = new Source((string) new Ulid(), $userId, $hostUrl, $path, $accessToken);
+        $type = $this->sourceTypeRepository->findOneByName($typeName);
+        if (null === $type) {
+            throw new InvalidSourceTypeException($typeName);
+        }
+
+        $source = new Source((string) new Ulid(), $userId, $type, $hostUrl, $path, $accessToken);
 
         $this->entityManager->persist($source);
         $this->entityManager->flush();
@@ -43,6 +62,7 @@ class SourceFactory
     {
         return $this->create(
             $user->getUserIdentifier(),
+            SourceType::TYPE_GIT,
             $request->getHostUrl(),
             $request->getPath(),
             $request->getAccessToken()
