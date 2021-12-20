@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\Controller;
 
-use App\Entity\SourceInterface;
 use App\Controller\SourceController;
+use App\Entity\SourceInterface;
 use App\Repository\GitSourceRepository;
 use App\Repository\SourceRepository;
 use App\Request\CreateGitSourceRequest;
