@@ -11,7 +11,7 @@ use App\Entity\SourceInterface;
 use App\Repository\FileSourceRepository;
 use App\Repository\GitSourceRepository;
 use App\Repository\RunSourceRepository;
-use App\Request\CreateSourceRequest;
+use App\Request\CreateGitSourceRequest;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Uid\Ulid;
@@ -83,7 +83,7 @@ class SourceFactory
         return $source;
     }
 
-    public function createFromRequest(UserInterface $user, CreateSourceRequest $request): GitSource
+    public function createGitSourceFromRequest(UserInterface $user, CreateGitSourceRequest $request): GitSource
     {
         return $this->createGitSource(
             $user->getUserIdentifier(),
