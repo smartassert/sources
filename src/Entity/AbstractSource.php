@@ -17,7 +17,7 @@ use Doctrine\ORM\Mapping as ORM;
     SourceTypeInterface::TYPE_FILE => FileSource::class,
     SourceTypeInterface::TYPE_RUN => RunSource::class,
 ])]
-abstract class AbstractSource
+abstract class AbstractSource implements SourceInterface
 {
     public const ID_LENGTH = 32;
     public const TYPE_DISCRIMINATOR_LENGTH = 32;
