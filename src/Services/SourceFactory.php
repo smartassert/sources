@@ -7,8 +7,10 @@ namespace App\Services;
 use App\Entity\AbstractSource;
 use App\Entity\FileSource;
 use App\Entity\GitSource;
+use App\Entity\RunSource;
 use App\Repository\FileSourceRepository;
 use App\Repository\GitSourceRepository;
+use App\Repository\RunSourceRepository;
 use App\Request\CreateSourceRequest;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -20,6 +22,7 @@ class SourceFactory
         private EntityManagerInterface $entityManager,
         private GitSourceRepository $gitSourceRepository,
         private FileSourceRepository $fileSourceRepository,
+        private RunSourceRepository $runSourceRepository,
     ) {
     }
 
@@ -53,6 +56,22 @@ class SourceFactory
         }
 
         $source = new FileSource($this->generateId(), $userId, $label);
+        $this->persist($source);
+
+        return $source;
+    }
+
+    public function createRunSource(string $userId, FileSource|GitSource $parent): RunSource
+    {
+        $source = $this->runSourceRepository->findOneBy([
+            'parent' => $parent,
+        ]);
+
+        if ($source instanceof RunSource) {
+            return $source;
+        }
+
+        $source = new RunSource($this->generateId(), $userId, $parent);
         $this->persist($source);
 
         return $source;

@@ -7,6 +7,7 @@ namespace App\Tests\Functional\Repository;
 use App\Entity\AbstractSource;
 use App\Entity\FileSource;
 use App\Entity\GitSource;
+use App\Entity\RunSource;
 use App\Repository\SourceRepository;
 use App\Services\SourceFactory;
 use Doctrine\ORM\EntityManagerInterface;
@@ -84,6 +85,13 @@ class SourceRepositoryTest extends WebTestCase
             FileSource::class => [
                 'entity' => function (SourceFactory $factory) {
                     return $factory->createFileSource(self::USER_ID, 'source label');
+                },
+            ],
+            RunSource::class => [
+                'entity' => function (SourceFactory $factory) {
+                    $parent = $factory->createFileSource(self::USER_ID, 'source label');
+
+                    return $factory->createRunSource(self::USER_ID, $parent);
                 },
             ],
         ];
