@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\Services;
 
-use App\Entity\AbstractSource;
 use App\Entity\FileSource;
 use App\Entity\GitSource;
 use App\Entity\RunSource;
+use App\Entity\SourceInterface;
 use App\Repository\SourceRepository;
 use App\Request\CreateSourceRequest;
 use App\Services\SourceFactory;
@@ -257,7 +257,7 @@ class SourceFactoryTest extends WebTestCase
         self::assertEqualsCanonicalizing($expectedParameters, $source->getParameters());
     }
 
-    private function assertCreatedSource(AbstractSource $source, string $expectedUserId): void
+    private function assertCreatedSource(SourceInterface $source, string $expectedUserId): void
     {
         self::assertTrue(Ulid::isValid($source->getId()));
         self::assertSame($expectedUserId, $source->getUserId());

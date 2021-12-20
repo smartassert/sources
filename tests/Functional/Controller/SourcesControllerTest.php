@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\Controller;
 
-use App\Entity\AbstractSource;
+use App\Entity\SourceInterface;
 use App\Entity\SourceTypeInterface;
 use App\Repository\GitSourceRepository;
 use App\Repository\SourceRepository;
@@ -130,9 +130,8 @@ class SourcesControllerTest extends WebTestCase
             'accessToken' => $requestParameters[CreateSourceRequest::KEY_POST_ACCESS_TOKEN] ?? null,
         ]);
 
-        self::assertInstanceOf(AbstractSource::class, $source);
-
-        \assert($source instanceof AbstractSource);
+        self::assertInstanceOf(SourceInterface::class, $source);
+        \assert($source instanceof SourceInterface);
         $expected['id'] = $source->getId();
 
         self::assertEqualsCanonicalizing($expected, json_decode((string) $response->getContent(), true));
