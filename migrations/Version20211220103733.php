@@ -23,7 +23,6 @@ final class Version20211220103733 extends AbstractMigration
                 host_url VARCHAR(255) NOT NULL, 
                 path VARCHAR(255) NOT NULL, 
                 access_token VARCHAR(255) DEFAULT NULL, 
-                ref VARCHAR(255) DEFAULT NULL, 
                 PRIMARY KEY(id)
             )
         ');

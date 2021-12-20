@@ -161,7 +161,6 @@ class SourcesControllerTest extends WebTestCase
                     'host_url' => $hostUrl,
                     'path' => $path,
                     'access_token' => null,
-                    'ref' => null,
                 ],
             ],
             'access token present' => [
@@ -177,7 +176,6 @@ class SourcesControllerTest extends WebTestCase
                     'host_url' => $hostUrl,
                     'path' => $path,
                     'access_token' => $accessToken,
-                    'ref' => null,
                 ],
             ],
         ];
