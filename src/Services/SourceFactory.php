@@ -61,17 +61,23 @@ class SourceFactory
         return $source;
     }
 
-    public function createRunSource(string $userId, FileSource|GitSource $parent): RunSource
+    /**
+     * @param array<string, string> $parameters
+     */
+    public function createRunSource(string $userId, FileSource|GitSource $parent, array $parameters = []): RunSource
     {
+        ksort($parameters);
+
         $source = $this->runSourceRepository->findOneBy([
             'parent' => $parent,
+            'parameters' => $parameters,
         ]);
 
         if ($source instanceof RunSource) {
             return $source;
         }
 
-        $source = new RunSource($this->generateId(), $userId, $parent);
+        $source = new RunSource($this->generateId(), $userId, $parent, $parameters);
         $this->persist($source);
 
         return $source;

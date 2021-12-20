@@ -104,10 +104,11 @@ class SourceFactoryTest extends WebTestCase
     public function testCreateRunSource(string $userId): void
     {
         $parent = $this->factory->createFileSource($userId, 'file source label');
+        $parameters = ['ref' => 'v0.1'];
 
-        $source = $this->factory->createRunSource($userId, $parent);
+        $source = $this->factory->createRunSource($userId, $parent, $parameters);
 
-        $this->assertCreatedRunSource($source, $userId, $parent);
+        $this->assertCreatedRunSource($source, $userId, $parent, $parameters);
     }
 
     /**
@@ -165,7 +166,7 @@ class SourceFactoryTest extends WebTestCase
         ];
     }
 
-    public function testCreateWhenSourceAlreadyExists(): void
+    public function testCreateGitSourceAlreadyExists(): void
     {
         self::assertCount(0, $this->repository->findAll());
 
@@ -186,6 +187,36 @@ class SourceFactoryTest extends WebTestCase
         }
 
         self::assertCount(1, $this->repository->findAll());
+    }
+
+    public function testCreateFileSourceAlreadyExists(): void
+    {
+        self::assertCount(0, $this->repository->findAll());
+
+        $userId = self::USER_ID;
+        $label = 'https://example.com/repository.git';
+
+        $this->factory->createFileSource($userId, $label);
+        $this->factory->createFileSource($userId, $label);
+        self::assertCount(1, $this->repository->findAll());
+    }
+
+    public function testCreateRunSourceAlreadyExists(): void
+    {
+        $userId = self::USER_ID;
+
+        self::assertCount(0, $this->repository->findAll());
+
+        $parent = $this->factory->createFileSource($userId, 'file source label');
+
+        self::assertCount(1, $this->repository->findAll());
+
+        $label = 'https://example.com/repository.git';
+        $parameters = ['ref' => 'v0.1'];
+
+        $this->factory->createRunSource($userId, $parent, $parameters);
+        $this->factory->createRunSource($userId, $parent, $parameters);
+        self::assertCount(2, $this->repository->findAll());
     }
 
     private function assertCreatedGitSource(
@@ -215,11 +246,13 @@ class SourceFactoryTest extends WebTestCase
     private function assertCreatedRunSource(
         RunSource $source,
         string $expectedUserId,
-        FileSource|GitSource $expectedParent
+        FileSource|GitSource $expectedParent,
+        array $expectedParameters
     ): void {
         $this->assertCreatedSource($source, $expectedUserId);
 
         self::assertEquals($expectedParent, $source->getParent());
+        self::assertEqualsCanonicalizing($expectedParameters, $source->getParameters());
     }
 
     private function assertCreatedSource(AbstractSource $source, string $expectedUserId): void
