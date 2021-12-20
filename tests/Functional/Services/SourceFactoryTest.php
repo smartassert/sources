@@ -7,6 +7,7 @@ namespace App\Tests\Functional\Services;
 use App\Entity\AbstractSource;
 use App\Entity\FileSource;
 use App\Entity\GitSource;
+use App\Entity\RunSource;
 use App\Repository\SourceRepository;
 use App\Request\CreateSourceRequest;
 use App\Services\SourceFactory;
@@ -93,6 +94,30 @@ class SourceFactoryTest extends WebTestCase
             'default' => [
                 'userId' => self::USER_ID,
                 'label' => 'source label',
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider createFileSourceDataProvider
+     */
+    public function testCreateRunSource(string $userId): void
+    {
+        $parent = $this->factory->createFileSource($userId, 'file source label');
+
+        $source = $this->factory->createRunSource($userId, $parent);
+
+        $this->assertCreatedRunSource($source, $userId, $parent);
+    }
+
+    /**
+     * @return array<mixed>
+     */
+    public function createRunSourceDataProvider(): array
+    {
+        return [
+            'default' => [
+                'userId' => self::USER_ID,
             ],
         ];
     }
@@ -185,6 +210,16 @@ class SourceFactoryTest extends WebTestCase
         $this->assertCreatedSource($source, $expectedUserId);
 
         self::assertSame($expectedLabel, $source->getLabel());
+    }
+
+    private function assertCreatedRunSource(
+        RunSource $source,
+        string $expectedUserId,
+        FileSource|GitSource $expectedParent
+    ): void {
+        $this->assertCreatedSource($source, $expectedUserId);
+
+        self::assertEquals($expectedParent, $source->getParent());
     }
 
     private function assertCreatedSource(AbstractSource $source, string $expectedUserId): void
