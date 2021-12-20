@@ -5,8 +5,9 @@ declare(strict_types=1);
 namespace App\Tests\Functional\Controller;
 
 use App\Entity\SourceInterface;
+use App\Controller\SourceController;
 use App\Repository\GitSourceRepository;
-use App\Request\CreateSourceRequest;
+use App\Request\CreateGitSourceRequest;
 use App\Tests\Services\SourceRemover;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
@@ -62,11 +63,10 @@ class SourcesControllerTest extends WebTestCase
 
         $this->client->request(
             'POST',
-            '/',
+            SourceController::ROUTE_GIT_SOURCE_CREATE,
             [
-                CreateSourceRequest::KEY_POST_HOST_URL => 'https://example.com/repository.git',
-                CreateSourceRequest::KEY_POST_PATH => '/',
-                CreateSourceRequest::KEY_POST_ACCESS_TOKEN => md5((string) rand()),
+                CreateGitSourceRequest::KEY_POST_HOST_URL => 'https://example.com/repository.git',
+                CreateGitSourceRequest::KEY_POST_PATH => '/',
             ],
             [],
             [
@@ -81,12 +81,12 @@ class SourcesControllerTest extends WebTestCase
     }
 
     /**
-     * @dataProvider createDataProvider
+     * @dataProvider createGitSourceDataProvider
      *
      * @param array<mixed> $requestParameters
      * @param array<mixed> $expected
      */
-    public function testCreateSuccess(string $userId, array $requestParameters, array $expected): void
+    public function testCreateGitSourceSuccess(string $userId, array $requestParameters, array $expected): void
     {
         $token = 'valid-token';
         $authHeaderName = AuthorizationProperties::DEFAULT_HEADER_NAME;
@@ -98,7 +98,7 @@ class SourcesControllerTest extends WebTestCase
 
         $this->client->request(
             'POST',
-            '/',
+            SourceController::ROUTE_GIT_SOURCE_CREATE,
             $requestParameters,
             [],
             [
@@ -116,9 +116,9 @@ class SourcesControllerTest extends WebTestCase
 
         $source = $repository->findOneBy([
             'userId' => $userId,
-            'hostUrl' => $requestParameters[CreateSourceRequest::KEY_POST_HOST_URL],
-            'path' => $requestParameters[CreateSourceRequest::KEY_POST_PATH],
-            'accessToken' => $requestParameters[CreateSourceRequest::KEY_POST_ACCESS_TOKEN] ?? null,
+            'hostUrl' => $requestParameters[CreateGitSourceRequest::KEY_POST_HOST_URL],
+            'path' => $requestParameters[CreateGitSourceRequest::KEY_POST_PATH],
+            'accessToken' => $requestParameters[CreateGitSourceRequest::KEY_POST_ACCESS_TOKEN] ?? null,
         ]);
 
         self::assertInstanceOf(SourceInterface::class, $source);
@@ -131,7 +131,7 @@ class SourcesControllerTest extends WebTestCase
     /**
      * @return array<mixed>
      */
-    public function createDataProvider(): array
+    public function createGitSourceDataProvider(): array
     {
         $userId = (string) new Ulid();
         $hostUrl = 'https://example.com/repository.git';
@@ -142,8 +142,8 @@ class SourcesControllerTest extends WebTestCase
             'access token missing' => [
                 'userId' => $userId,
                 'requestParameters' => [
-                    CreateSourceRequest::KEY_POST_HOST_URL => $hostUrl,
-                    CreateSourceRequest::KEY_POST_PATH => $path
+                    CreateGitSourceRequest::KEY_POST_HOST_URL => $hostUrl,
+                    CreateGitSourceRequest::KEY_POST_PATH => $path
                 ],
                 'expected' => [
                     'user_id' => $userId,
@@ -156,9 +156,9 @@ class SourcesControllerTest extends WebTestCase
             'access token present' => [
                 'userId' => $userId,
                 'requestParameters' => [
-                    CreateSourceRequest::KEY_POST_HOST_URL => $hostUrl,
-                    CreateSourceRequest::KEY_POST_PATH => $path,
-                    CreateSourceRequest::KEY_POST_ACCESS_TOKEN => $accessToken,
+                    CreateGitSourceRequest::KEY_POST_HOST_URL => $hostUrl,
+                    CreateGitSourceRequest::KEY_POST_PATH => $path,
+                    CreateGitSourceRequest::KEY_POST_ACCESS_TOKEN => $accessToken,
                 ],
                 'expected' => [
                     'user_id' => $userId,
