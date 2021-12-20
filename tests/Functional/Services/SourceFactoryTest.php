@@ -4,22 +4,23 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\Services;
 
+use App\Entity\AbstractSource;
+use App\Entity\FileSource;
 use App\Entity\GitSource;
-use App\Entity\SourceTypeInterface;
 use App\Repository\SourceRepository;
 use App\Request\CreateSourceRequest;
-use App\Services\GitSourceFactory;
+use App\Services\SourceFactory;
 use Doctrine\ORM\EntityManagerInterface;
 use SmartAssert\UsersSecurityBundle\Security\User;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Uid\Ulid;
 
-class GitSourceFactoryTest extends WebTestCase
+class SourceFactoryTest extends WebTestCase
 {
     private const USER_ID = '01FPSVJ7ZT85X73BW05EK9B3XG';
 
-    private GitSourceFactory $factory;
+    private SourceFactory $factory;
     private EntityManagerInterface $entityManager;
     private SourceRepository $repository;
 
@@ -27,8 +28,8 @@ class GitSourceFactoryTest extends WebTestCase
     {
         parent::setUp();
 
-        $factory = self::getContainer()->get(GitSourceFactory::class);
-        \assert($factory instanceof GitSourceFactory);
+        $factory = self::getContainer()->get(SourceFactory::class);
+        \assert($factory instanceof SourceFactory);
         $this->factory = $factory;
 
         $entityManager = self::getContainer()->get(EntityManagerInterface::class);
@@ -43,34 +44,55 @@ class GitSourceFactoryTest extends WebTestCase
     }
 
     /**
-     * @dataProvider createDataProvider
+     * @dataProvider createGitSourceDataProvider
      */
-    public function testCreate(string $userId, string $hostUrl, string $path, ?string $accessToken): void
+    public function testCreateGitSource(string $userId, string $hostUrl, string $path, ?string $accessToken): void
     {
-        $source = $this->factory->create($userId, $hostUrl, $path, $accessToken);
+        $source = $this->factory->createGitSource($userId, $hostUrl, $path, $accessToken);
 
-        $this->assertCreatedSource($source, $userId, $hostUrl, $path, $accessToken);
+        $this->assertCreatedGitSource($source, $userId, $hostUrl, $path, $accessToken);
     }
 
     /**
      * @return array<mixed>
      */
-    public function createDataProvider(): array
+    public function createGitSourceDataProvider(): array
     {
         return [
             'empty access token' => [
                 'userId' => self::USER_ID,
-                'sourceTypeName' => SourceTypeInterface::TYPE_GIT,
                 'hostUrl' => 'https://example.com/repository.git',
                 'path' => '/',
                 'accessToken ' => null,
             ],
             'non-empty access token' => [
                 'userId' => self::USER_ID,
-                'sourceTypeName' => SourceTypeInterface::TYPE_GIT,
                 'hostUrl' => 'https://example.com/repository.git',
                 'path' => '/',
                 'accessToken ' => 'access-token',
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider createFileSourceDataProvider
+     */
+    public function testCreateFileSource(string $userId, string $label): void
+    {
+        $source = $this->factory->createFileSource($userId, $label);
+
+        $this->assertCreatedFileSource($source, $userId, $label);
+    }
+
+    /**
+     * @return array<mixed>
+     */
+    public function createFileSourceDataProvider(): array
+    {
+        return [
+            'default' => [
+                'userId' => self::USER_ID,
+                'label' => 'source label',
             ],
         ];
     }
@@ -82,7 +104,7 @@ class GitSourceFactoryTest extends WebTestCase
     {
         $source = $this->factory->createFromRequest($user, $request);
 
-        $this->assertCreatedSource(
+        $this->assertCreatedGitSource(
             $source,
             $user->getUserIdentifier(),
             $request->getHostUrl(),
@@ -118,7 +140,7 @@ class GitSourceFactoryTest extends WebTestCase
         ];
     }
 
-    public function testCreateGitSourceWhenSourceAlreadyExists(): void
+    public function testCreateWhenSourceAlreadyExists(): void
     {
         self::assertCount(0, $this->repository->findAll());
 
@@ -126,7 +148,7 @@ class GitSourceFactoryTest extends WebTestCase
         $hostUrl = 'https://example.com/repository.git';
         $path = '/path';
 
-        $source = $this->factory->create($userId, $hostUrl, $path, null);
+        $source = $this->factory->createGitSource($userId, $hostUrl, $path, null);
         self::assertCount(1, $this->repository->findAll());
 
         $accessTokenVariants = [null, 'access token one', 'access token two'];
@@ -134,25 +156,41 @@ class GitSourceFactoryTest extends WebTestCase
         foreach ($accessTokenVariants as $accessTokenVariant) {
             self::assertSame(
                 $source,
-                $this->factory->create($userId, $hostUrl, $path, $accessTokenVariant)
+                $this->factory->createGitSource($userId, $hostUrl, $path, $accessTokenVariant)
             );
         }
 
         self::assertCount(1, $this->repository->findAll());
     }
 
-    private function assertCreatedSource(
+    private function assertCreatedGitSource(
         GitSource $source,
         string $expectedUserId,
         string $expectedHostUrl,
         string $expectedPath,
         ?string $expectedAccessToken
     ): void {
-        self::assertTrue(Ulid::isValid($source->getId()));
-        self::assertSame($expectedUserId, $source->getUserId());
+        $this->assertCreatedSource($source, $expectedUserId);
+
         self::assertSame($expectedHostUrl, $source->getHostUrl());
         self::assertSame($expectedPath, $source->getPath());
         self::assertSame($expectedAccessToken, $source->getAccessToken());
+    }
+
+    private function assertCreatedFileSource(
+        FileSource $source,
+        string $expectedUserId,
+        string $expectedLabel
+    ): void {
+        $this->assertCreatedSource($source, $expectedUserId);
+
+        self::assertSame($expectedLabel, $source->getLabel());
+    }
+
+    private function assertCreatedSource(AbstractSource $source, string $expectedUserId): void
+    {
+        self::assertTrue(Ulid::isValid($source->getId()));
+        self::assertSame($expectedUserId, $source->getUserId());
     }
 
     private function removeAllSources(): void

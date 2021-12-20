@@ -61,7 +61,7 @@ class GitSource extends AbstractSource implements \JsonSerializable
      * @return array{
      *     "id": string,
      *     "user_id": string,
-     *     "type": 'git',
+     *     "type": SourceTypeInterface::TYPE_GIT,
      *     "host_url": string,
      *     "path": string,
      *     "access_token": string|null,

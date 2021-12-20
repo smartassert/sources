@@ -7,6 +7,6 @@ namespace App\Entity;
 interface SourceTypeInterface
 {
     public const TYPE_GIT = 'git';
-    public const TYPE_LOCAL = 'local';
+    public const TYPE_FILE = 'file';
     public const TYPE_RUN = 'run';
 }

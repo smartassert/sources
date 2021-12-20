@@ -5,9 +5,10 @@ declare(strict_types=1);
 namespace App\Tests\Functional\Repository;
 
 use App\Entity\AbstractSource;
+use App\Entity\FileSource;
 use App\Entity\GitSource;
 use App\Repository\SourceRepository;
-use App\Services\GitSourceFactory;
+use App\Services\SourceFactory;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
@@ -15,7 +16,7 @@ class SourceRepositoryTest extends WebTestCase
 {
     private const USER_ID = '01FPSVJ7ZT85X73BW05EK9B3XG';
 
-    private GitSourceFactory $gitSourceFactory;
+    private SourceFactory $sourceFactory;
     private EntityManagerInterface $entityManager;
     private SourceRepository $repository;
 
@@ -23,9 +24,9 @@ class SourceRepositoryTest extends WebTestCase
     {
         parent::setUp();
 
-        $gitSourceFactory = self::getContainer()->get(GitSourceFactory::class);
-        \assert($gitSourceFactory instanceof GitSourceFactory);
-        $this->gitSourceFactory = $gitSourceFactory;
+        $gitSourceFactory = self::getContainer()->get(SourceFactory::class);
+        \assert($gitSourceFactory instanceof SourceFactory);
+        $this->sourceFactory = $gitSourceFactory;
 
         $entityManager = self::getContainer()->get(EntityManagerInterface::class);
         \assert($entityManager instanceof EntityManagerInterface);
@@ -41,11 +42,11 @@ class SourceRepositoryTest extends WebTestCase
     /**
      * @dataProvider persistAndRetrieveDataProvider
      *
-     * @param callable(GitSourceFactory): AbstractSource $sourceCreator
+     * @param callable(SourceFactory): AbstractSource $sourceCreator
      */
-    public function testPersistAndRetrieveGitSource(callable $sourceCreator): void
+    public function testPersistAndRetrieveSource(callable $sourceCreator): void
     {
-        $source = $sourceCreator($this->gitSourceFactory);
+        $source = $sourceCreator($this->sourceFactory);
 
         $this->entityManager->persist($source);
         $this->entityManager->flush();
@@ -71,13 +72,18 @@ class SourceRepositoryTest extends WebTestCase
     {
         return [
             GitSource::class => [
-                'entity' => function (GitSourceFactory $gitSourceFactory) {
-                    return $gitSourceFactory->create(
+                'entity' => function (SourceFactory $factory) {
+                    return $factory->createGitSource(
                         self::USER_ID,
                         'https://example.com/repository.git',
                         '/',
                         null
                     );
+                },
+            ],
+            FileSource::class => [
+                'entity' => function (SourceFactory $factory) {
+                    return $factory->createFileSource(self::USER_ID, 'source label');
                 },
             ],
         ];
