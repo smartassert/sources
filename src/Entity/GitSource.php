@@ -24,13 +24,12 @@ class GitSource extends AbstractSource implements \JsonSerializable
     public function __construct(
         string $id,
         string $userId,
-        SourceType $type,
         string $hostUrl,
         string $path = '/',
         ?string $accessToken = null,
         ?string $ref = null
     ) {
-        parent::__construct($id, $userId, $type);
+        parent::__construct($id, $userId, SourceTypeInterface::TYPE_GIT);
 
         $this->hostUrl = $hostUrl;
         $this->path = $path;
@@ -62,7 +61,7 @@ class GitSource extends AbstractSource implements \JsonSerializable
      * @return array{
      *     "id": string,
      *     "user_id": string,
-     *     "type": SourceType::TYPE_*,
+     *     "type": SourceTypeInterface::TYPE_*,
      *     "host_url": string,
      *     "path": string,
      *     "access_token": string|null,
@@ -74,7 +73,7 @@ class GitSource extends AbstractSource implements \JsonSerializable
         return [
             'id' => $this->id,
             'user_id' => $this->getUserId(),
-            'type' => $this->getType()->getName(),
+            'type' => $this->getType(),
             'host_url' => $this->hostUrl,
             'path' => $this->path,
             'access_token' => $this->accessToken,

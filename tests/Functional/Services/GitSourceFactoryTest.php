@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Functional\Services;
 
 use App\Entity\GitSource;
-use App\Entity\SourceType;
+use App\Entity\SourceTypeInterface;
 use App\Repository\SourceRepository;
 use App\Request\CreateSourceRequest;
 use App\Services\GitSourceFactory;
@@ -60,14 +60,14 @@ class GitSourceFactoryTest extends WebTestCase
         return [
             'empty access token' => [
                 'userId' => self::USER_ID,
-                'sourceTypeName' => SourceType::TYPE_GIT,
+                'sourceTypeName' => SourceTypeInterface::TYPE_GIT,
                 'hostUrl' => 'https://example.com/repository.git',
                 'path' => '/',
                 'accessToken ' => null,
             ],
             'non-empty access token' => [
                 'userId' => self::USER_ID,
-                'sourceTypeName' => SourceType::TYPE_GIT,
+                'sourceTypeName' => SourceTypeInterface::TYPE_GIT,
                 'hostUrl' => 'https://example.com/repository.git',
                 'path' => '/',
                 'accessToken ' => 'access-token',
@@ -149,7 +149,7 @@ class GitSourceFactoryTest extends WebTestCase
         ?string $expectedAccessToken
     ): void {
         self::assertTrue(Ulid::isValid($source->getId()));
-        self::assertSame(SourceType::TYPE_GIT, $source->getType()->getName());
+        self::assertSame(SourceTypeInterface::TYPE_GIT, $source->getType());
         self::assertSame($expectedUserId, $source->getUserId());
         self::assertSame($expectedHostUrl, $source->getHostUrl());
         self::assertSame($expectedPath, $source->getPath());
