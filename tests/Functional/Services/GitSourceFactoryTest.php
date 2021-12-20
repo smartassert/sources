@@ -4,22 +4,22 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\Services;
 
-use App\Entity\Source;
+use App\Entity\GitSource;
 use App\Entity\SourceType;
 use App\Repository\SourceRepository;
 use App\Request\CreateSourceRequest;
-use App\Services\SourceFactory;
+use App\Services\GitSourceFactory;
 use Doctrine\ORM\EntityManagerInterface;
 use SmartAssert\UsersSecurityBundle\Security\User;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Uid\Ulid;
 
-class SourceFactoryTest extends WebTestCase
+class GitSourceFactoryTest extends WebTestCase
 {
     private const USER_ID = '01FPSVJ7ZT85X73BW05EK9B3XG';
 
-    private SourceFactory $factory;
+    private GitSourceFactory $factory;
     private EntityManagerInterface $entityManager;
     private SourceRepository $repository;
 
@@ -27,8 +27,8 @@ class SourceFactoryTest extends WebTestCase
     {
         parent::setUp();
 
-        $factory = self::getContainer()->get(SourceFactory::class);
-        \assert($factory instanceof SourceFactory);
+        $factory = self::getContainer()->get(GitSourceFactory::class);
+        \assert($factory instanceof GitSourceFactory);
         $this->factory = $factory;
 
         $entityManager = self::getContainer()->get(EntityManagerInterface::class);
@@ -44,17 +44,10 @@ class SourceFactoryTest extends WebTestCase
 
     /**
      * @dataProvider createDataProvider
-     *
-     * @param SourceType::TYPE_* $sourceTypeName
      */
-    public function testCreate(
-        string $userId,
-        string $sourceTypeName,
-        string $hostUrl,
-        string $path,
-        ?string $accessToken
-    ): void {
-        $source = $this->factory->create($userId, $sourceTypeName, $hostUrl, $path, $accessToken);
+    public function testCreate(string $userId, string $hostUrl, string $path, ?string $accessToken): void
+    {
+        $source = $this->factory->create($userId, $hostUrl, $path, $accessToken);
 
         $this->assertCreatedSource($source, $userId, $hostUrl, $path, $accessToken);
     }
@@ -125,7 +118,7 @@ class SourceFactoryTest extends WebTestCase
         ];
     }
 
-    public function testCreateWhenSourceAlreadyExists(): void
+    public function testCreateGitSourceWhenSourceAlreadyExists(): void
     {
         self::assertCount(0, $this->repository->findAll());
 
@@ -133,7 +126,7 @@ class SourceFactoryTest extends WebTestCase
         $hostUrl = 'https://example.com/repository.git';
         $path = '/path';
 
-        $source = $this->factory->create($userId, SourceType::TYPE_GIT, $hostUrl, $path, null);
+        $source = $this->factory->create($userId, $hostUrl, $path, null);
         self::assertCount(1, $this->repository->findAll());
 
         $accessTokenVariants = [null, 'access token one', 'access token two'];
@@ -141,7 +134,7 @@ class SourceFactoryTest extends WebTestCase
         foreach ($accessTokenVariants as $accessTokenVariant) {
             self::assertSame(
                 $source,
-                $this->factory->create($userId, SourceType::TYPE_GIT, $hostUrl, $path, $accessTokenVariant)
+                $this->factory->create($userId, $hostUrl, $path, $accessTokenVariant)
             );
         }
 
@@ -149,20 +142,18 @@ class SourceFactoryTest extends WebTestCase
     }
 
     private function assertCreatedSource(
-        Source $source,
+        GitSource $source,
         string $expectedUserId,
         string $expectedHostUrl,
         string $expectedPath,
         ?string $expectedAccessToken
     ): void {
         self::assertTrue(Ulid::isValid($source->getId()));
+        self::assertSame(SourceType::TYPE_GIT, $source->getType()->getName());
         self::assertSame($expectedUserId, $source->getUserId());
         self::assertSame($expectedHostUrl, $source->getHostUrl());
         self::assertSame($expectedPath, $source->getPath());
         self::assertSame($expectedAccessToken, $source->getAccessToken());
-
-        $retrievedSource = $this->repository->find($source->getId());
-        self::assertSame($source, $retrievedSource);
     }
 
     private function removeAllSources(): void

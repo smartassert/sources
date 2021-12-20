@@ -8,7 +8,7 @@ use App\Entity\SourceType;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\AbstractMigration;
 
-final class Version20211217143256 extends AbstractMigration
+final class Version20211220103730 extends AbstractMigration
 {
     public function getDescription(): string
     {
@@ -25,7 +25,7 @@ final class Version20211217143256 extends AbstractMigration
                 PRIMARY KEY(id)
             )
         ');
-        $this->addSql('CREATE UNIQUE INDEX UNIQ_8D54D22A5E237E06 ON source_type (name)');
+        $this->addSql('CREATE UNIQUE INDEX uniq_8d54d22a5e237e06 ON source_type (name)');
     }
 
     public function down(Schema $schema): void
