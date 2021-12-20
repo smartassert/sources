@@ -9,7 +9,7 @@ use App\Entity\GitSource;
 use App\Entity\RunSource;
 use App\Entity\SourceInterface;
 use App\Repository\SourceRepository;
-use App\Request\CreateSourceRequest;
+use App\Request\CreateGitSourceRequest;
 use App\Services\SourceFactory;
 use Doctrine\ORM\EntityManagerInterface;
 use SmartAssert\UsersSecurityBundle\Security\User;
@@ -124,11 +124,11 @@ class SourceFactoryTest extends WebTestCase
     }
 
     /**
-     * @dataProvider createFromRequestDataProvider
+     * @dataProvider createGitSourceFromRequestDataProvider
      */
-    public function testCreateFromRequest(UserInterface $user, CreateSourceRequest $request): void
+    public function testCreateGitSourceFromRequest(UserInterface $user, CreateGitSourceRequest $request): void
     {
-        $source = $this->factory->createFromRequest($user, $request);
+        $source = $this->factory->createGitSourceFromRequest($user, $request);
 
         $this->assertCreatedGitSource(
             $source,
@@ -142,25 +142,36 @@ class SourceFactoryTest extends WebTestCase
     /**
      * @return array<mixed>
      */
-    public function createFromRequestDataProvider(): array
+    public function createGitSourceFromRequestDataProvider(): array
     {
         $user = new User(self::USER_ID);
 
         return [
-            'empty access token' => [
+            'empty access token, empty ref' => [
                 'user' => $user,
-                'request' => new CreateSourceRequest(
+                'request' => new CreateGitSourceRequest(
                     'https://example.com/repository.git',
                     '/',
+                    null,
                     null
                 ),
             ],
-            'non-empty access token' => [
+            'non-empty access token, empty ref' => [
                 'user' => $user,
-                'request' => new CreateSourceRequest(
+                'request' => new CreateGitSourceRequest(
                     'https://example.com/repository.git',
                     '/',
                     'access-token',
+                    null,
+                ),
+            ],
+            'non-empty access token, non-empty ref' => [
+                'user' => $user,
+                'request' => new CreateGitSourceRequest(
+                    'https://example.com/repository.git',
+                    '/',
+                    'access-token',
+                    'ref',
                 ),
             ],
         ];
