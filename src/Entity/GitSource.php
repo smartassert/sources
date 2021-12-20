@@ -18,23 +18,18 @@ class GitSource extends AbstractSource implements \JsonSerializable
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private ?string $accessToken;
 
-    #[ORM\Column(type: 'string', length: 255, nullable: true)]
-    private ?string $ref;
-
     public function __construct(
         string $id,
         string $userId,
         string $hostUrl,
         string $path = '/',
-        ?string $accessToken = null,
-        ?string $ref = null
+        ?string $accessToken = null
     ) {
         parent::__construct($id, $userId);
 
         $this->hostUrl = $hostUrl;
         $this->path = $path;
         $this->accessToken = $accessToken;
-        $this->ref = $ref;
     }
 
     public function getHostUrl(): string
@@ -52,11 +47,6 @@ class GitSource extends AbstractSource implements \JsonSerializable
         return $this->accessToken;
     }
 
-    public function getRef(): ?string
-    {
-        return $this->ref;
-    }
-
     /**
      * @return array{
      *     "id": string,
@@ -64,8 +54,7 @@ class GitSource extends AbstractSource implements \JsonSerializable
      *     "type": SourceTypeInterface::TYPE_GIT,
      *     "host_url": string,
      *     "path": string,
-     *     "access_token": string|null,
-     *     "ref": string|null
+     *     "access_token": string|null
      * }
      */
     public function jsonSerialize(): array
@@ -76,8 +65,7 @@ class GitSource extends AbstractSource implements \JsonSerializable
             'type' => SourceTypeInterface::TYPE_GIT,
             'host_url' => $this->hostUrl,
             'path' => $this->path,
-            'access_token' => $this->accessToken,
-            'ref' => $this->ref,
+            'access_token' => $this->accessToken
         ];
     }
 }
