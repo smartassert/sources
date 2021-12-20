@@ -254,7 +254,7 @@ class SourceFactoryTest extends WebTestCase
         $this->assertCreatedSource($source, $expectedUserId);
 
         self::assertEquals($expectedParent, $source->getParent());
-        self::assertEqualsCanonicalizing($expectedParameters, $source->getParameters());
+        self::assertEquals($expectedParameters, $source->getParameters());
     }
 
     private function assertCreatedSource(SourceInterface $source, string $expectedUserId): void
