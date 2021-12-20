@@ -149,7 +149,6 @@ class GitSourceFactoryTest extends WebTestCase
         ?string $expectedAccessToken
     ): void {
         self::assertTrue(Ulid::isValid($source->getId()));
-        self::assertSame(SourceTypeInterface::TYPE_GIT, $source->getType());
         self::assertSame($expectedUserId, $source->getUserId());
         self::assertSame($expectedHostUrl, $source->getHostUrl());
         self::assertSame($expectedPath, $source->getPath());

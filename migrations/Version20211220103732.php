@@ -22,11 +22,9 @@ final class Version20211220103732 extends AbstractMigration
                 id VARCHAR(32) NOT NULL, 
                 user_id VARCHAR(32) NOT NULL, 
                 type VARCHAR(32) NOT NULL, 
-                type_discriminator VARCHAR(32) NOT NULL,
                 PRIMARY KEY(id)
             )
         ');
-        $this->addSql('CREATE INDEX type_idx ON source (type)');
     }
 
     public function down(Schema $schema): void
