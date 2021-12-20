@@ -133,7 +133,7 @@ class SourcesControllerTest extends WebTestCase
         \assert($source instanceof SourceInterface);
         $expected['id'] = $source->getId();
 
-        self::assertEqualsCanonicalizing($expected, json_decode((string) $response->getContent(), true));
+        self::assertEquals($expected, json_decode((string) $response->getContent(), true));
     }
 
     /**
