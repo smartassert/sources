@@ -31,7 +31,7 @@ class FileSource extends AbstractSource implements \JsonSerializable
      * @return array{
      *     "id": string,
      *     "user_id": string,
-     *     "type": SourceTypeInterface::TYPE_FILE,
+     *     "type": SourceInterface::TYPE_FILE,
      *     "label": string
      * }
      */
@@ -40,7 +40,7 @@ class FileSource extends AbstractSource implements \JsonSerializable
         return [
             'id' => $this->id,
             'user_id' => $this->getUserId(),
-            'type' => SourceTypeInterface::TYPE_FILE,
+            'type' => SourceInterface::TYPE_FILE,
             'label' => $this->label
         ];
     }
