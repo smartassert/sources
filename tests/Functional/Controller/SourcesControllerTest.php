@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Functional\Controller;
 
 use App\Entity\AbstractSource;
-use App\Entity\SourceType;
+use App\Entity\SourceTypeInterface;
 use App\Repository\GitSourceRepository;
 use App\Repository\SourceRepository;
 use App\Request\CreateSourceRequest;
@@ -157,7 +157,7 @@ class SourcesControllerTest extends WebTestCase
                 ],
                 'expected' => [
                     'user_id' => $userId,
-                    'type' => SourceType::TYPE_GIT,
+                    'type' => SourceTypeInterface::TYPE_GIT,
                     'host_url' => $hostUrl,
                     'path' => $path,
                     'access_token' => null,
@@ -173,7 +173,7 @@ class SourcesControllerTest extends WebTestCase
                 ],
                 'expected' => [
                     'user_id' => $userId,
-                    'type' => SourceType::TYPE_GIT,
+                    'type' => SourceTypeInterface::TYPE_GIT,
                     'host_url' => $hostUrl,
                     'path' => $path,
                     'access_token' => $accessToken,
