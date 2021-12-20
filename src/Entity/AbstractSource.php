@@ -14,6 +14,7 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\DiscriminatorColumn(name: 'type', type: 'string', length: self::TYPE_DISCRIMINATOR_LENGTH)]
 #[ORM\DiscriminatorMap([
     SourceTypeInterface::TYPE_GIT => GitSource::class,
+    SourceTypeInterface::TYPE_FILE => FileSource::class,
 ])]
 abstract class AbstractSource
 {

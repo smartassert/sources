@@ -17,5 +17,5 @@ services:
         arguments:
             $handler: '@GuzzleHttp\Handler\MockHandler'
 
-    App\Services\SourceFactory:
+    App\Services\FileSourceFactory:
         public: true
