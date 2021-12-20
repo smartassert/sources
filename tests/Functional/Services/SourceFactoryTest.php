@@ -211,7 +211,6 @@ class SourceFactoryTest extends WebTestCase
 
         self::assertCount(1, $this->repository->findAll());
 
-        $label = 'https://example.com/repository.git';
         $parameters = ['ref' => 'v0.1'];
 
         $this->factory->createRunSource($userId, $parent, $parameters);
@@ -243,6 +242,9 @@ class SourceFactoryTest extends WebTestCase
         self::assertSame($expectedLabel, $source->getLabel());
     }
 
+    /**
+     * @param array<string, string> $expectedParameters
+     */
     private function assertCreatedRunSource(
         RunSource $source,
         string $expectedUserId,
