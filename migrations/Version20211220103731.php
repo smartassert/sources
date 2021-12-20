@@ -15,7 +15,7 @@ use Doctrine\ORM\EntityManagerInterface;
     'setSourceTypeRepository' => SourceTypeRepository::class,
     'setEntityManager' => EntityManagerInterface::class
 ])]
-final class Version20211217143257 extends AbstractMigration
+final class Version20211220103731 extends AbstractMigration
 {
     private EntityManagerInterface $entityManager;
     private SourceTypeRepository $sourceTypeRepository;
