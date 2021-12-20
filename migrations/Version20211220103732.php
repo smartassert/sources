@@ -4,14 +4,15 @@ declare(strict_types=1);
 
 namespace DoctrineMigrations;
 
+use App\Entity\AbstractSource;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\AbstractMigration;
 
-final class Version20211213120807 extends AbstractMigration
+final class Version20211220103732 extends AbstractMigration
 {
     public function getDescription(): string
     {
-        return 'Create source table';
+        return 'Create table for ' . AbstractSource::class;
     }
 
     public function up(Schema $schema): void
@@ -20,9 +21,7 @@ final class Version20211213120807 extends AbstractMigration
             CREATE TABLE source (
                 id VARCHAR(32) NOT NULL, 
                 user_id VARCHAR(32) NOT NULL, 
-                host_url VARCHAR(255) NOT NULL, 
-                path VARCHAR(255) NOT NULL, 
-                access_token VARCHAR(255) DEFAULT NULL, 
+                type VARCHAR(32) NOT NULL, 
                 PRIMARY KEY(id)
             )
         ');

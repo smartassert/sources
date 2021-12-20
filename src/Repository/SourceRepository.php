@@ -4,22 +4,22 @@ declare(strict_types=1);
 
 namespace App\Repository;
 
-use App\Entity\Source;
+use App\Entity\AbstractSource;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @method null|Source find($id, $lockMode = null, $lockVersion = null)
- * @method null|Source findOneBy(array $criteria, array $orderBy = null)
- * @method Source[]    findAll()
- * @method Source[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method null|AbstractSource find($id, $lockMode = null, $lockVersion = null)
+ * @method null|AbstractSource findOneBy(array $criteria, array $orderBy = null)
+ * @method AbstractSource[]    findAll()
+ * @method AbstractSource[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  *
- * @extends ServiceEntityRepository<Source>
+ * @extends ServiceEntityRepository<AbstractSource>
  */
 class SourceRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, Source::class);
+        parent::__construct($registry, AbstractSource::class);
     }
 }

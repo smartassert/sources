@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\Controller;
 
-use App\Entity\Source;
+use App\Entity\AbstractSource;
+use App\Entity\SourceTypeInterface;
+use App\Repository\GitSourceRepository;
 use App\Repository\SourceRepository;
 use App\Request\CreateSourceRequest;
 use Doctrine\ORM\EntityManagerInterface;
@@ -118,8 +120,8 @@ class SourcesControllerTest extends WebTestCase
         self::assertSame(200, $response->getStatusCode());
         $this->assertAuthorizationRequestIsMade($token);
 
-        $repository = self::getContainer()->get(SourceRepository::class);
-        \assert($repository instanceof SourceRepository);
+        $repository = self::getContainer()->get(GitSourceRepository::class);
+        \assert($repository instanceof GitSourceRepository);
 
         $source = $repository->findOneBy([
             'userId' => $userId,
@@ -128,9 +130,9 @@ class SourcesControllerTest extends WebTestCase
             'accessToken' => $requestParameters[CreateSourceRequest::KEY_POST_ACCESS_TOKEN] ?? null,
         ]);
 
-        self::assertInstanceOf(Source::class, $source);
+        self::assertInstanceOf(AbstractSource::class, $source);
 
-        \assert($source instanceof Source);
+        \assert($source instanceof AbstractSource);
         $expected['id'] = $source->getId();
 
         self::assertEqualsCanonicalizing($expected, json_decode((string) $response->getContent(), true));
@@ -155,9 +157,11 @@ class SourcesControllerTest extends WebTestCase
                 ],
                 'expected' => [
                     'user_id' => $userId,
+                    'type' => SourceTypeInterface::TYPE_GIT,
                     'host_url' => $hostUrl,
                     'path' => $path,
                     'access_token' => null,
+                    'ref' => null,
                 ],
             ],
             'access token present' => [
@@ -169,9 +173,11 @@ class SourcesControllerTest extends WebTestCase
                 ],
                 'expected' => [
                     'user_id' => $userId,
+                    'type' => SourceTypeInterface::TYPE_GIT,
                     'host_url' => $hostUrl,
                     'path' => $path,
                     'access_token' => $accessToken,
+                    'ref' => null,
                 ],
             ],
         ];
