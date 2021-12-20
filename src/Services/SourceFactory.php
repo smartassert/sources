@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use App\Entity\AbstractSource;
 use App\Entity\FileSource;
 use App\Entity\GitSource;
 use App\Entity\RunSource;
+use App\Entity\SourceInterface;
 use App\Repository\FileSourceRepository;
 use App\Repository\GitSourceRepository;
 use App\Repository\RunSourceRepository;
@@ -98,7 +98,7 @@ class SourceFactory
         return (string) new Ulid();
     }
 
-    private function persist(AbstractSource $source): void
+    private function persist(SourceInterface $source): void
     {
         $this->entityManager->persist($source);
         $this->entityManager->flush();

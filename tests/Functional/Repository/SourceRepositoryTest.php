@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\Repository;
 
-use App\Entity\AbstractSource;
 use App\Entity\FileSource;
 use App\Entity\GitSource;
 use App\Entity\RunSource;
+use App\Entity\SourceInterface;
 use App\Repository\SourceRepository;
 use App\Services\SourceFactory;
 use Doctrine\ORM\EntityManagerInterface;
@@ -43,7 +43,7 @@ class SourceRepositoryTest extends WebTestCase
     /**
      * @dataProvider persistAndRetrieveDataProvider
      *
-     * @param callable(SourceFactory): AbstractSource $sourceCreator
+     * @param callable(SourceFactory): SourceInterface $sourceCreator
      */
     public function testPersistAndRetrieveSource(callable $sourceCreator): void
     {

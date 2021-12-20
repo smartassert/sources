@@ -51,7 +51,7 @@ class RunSource extends AbstractSource implements \JsonSerializable
      * @return array{
      *     "id": string,
      *     "user_id": string,
-     *     "type": SourceTypeInterface::TYPE_RUN,
+     *     "type": SourceInterface::TYPE_RUN,
      *     "parent": string,
      *     "parameters": array<string, string>
      * }
@@ -61,7 +61,7 @@ class RunSource extends AbstractSource implements \JsonSerializable
         return [
             'id' => $this->id,
             'user_id' => $this->getUserId(),
-            'type' => SourceTypeInterface::TYPE_RUN,
+            'type' => SourceInterface::TYPE_RUN,
             'parent' => $this->parent->getId(),
             'parameters' => $this->parameters,
         ];
