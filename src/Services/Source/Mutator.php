@@ -7,7 +7,7 @@ namespace App\Services\Source;
 use App\Entity\GitSource;
 use App\Request\GitSourceRequest;
 
-class SourceMutator
+class Mutator
 {
     public function __construct(
         private SourceStore $store,

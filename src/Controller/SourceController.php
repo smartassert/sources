@@ -8,7 +8,7 @@ use App\Entity\GitSource;
 use App\Repository\SourceRepository;
 use App\Request\GitSourceRequest;
 use App\Services\Source\Factory;
-use App\Services\Source\SourceMutator;
+use App\Services\Source\Mutator;
 use App\Services\Source\SourceStore;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -46,7 +46,7 @@ class SourceController
         string $sourceId,
         Request $request,
         SourceRepository $repository,
-        SourceMutator $sourceMutator,
+        Mutator $mutator,
         UserInterface $user,
     ): JsonResponse {
         $source = $repository->find($sourceId);
@@ -62,7 +62,7 @@ class SourceController
             return new JsonResponse(null, 404);
         }
 
-        $source = $sourceMutator->updateGitSource($source, GitSourceRequest::create($request));
+        $source = $mutator->updateGitSource($source, GitSourceRequest::create($request));
 
         return new JsonResponse($source);
     }
