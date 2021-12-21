@@ -24,11 +24,10 @@ class RunSource extends AbstractSource implements \JsonSerializable
      */
     public function __construct(
         string $id,
-        string $userId,
         FileSource|GitSource $parent,
         array $parameters = []
     ) {
-        parent::__construct($id, $userId);
+        parent::__construct($id, $parent->getUserId());
 
         $this->parent = $parent;
         $this->parameters = $parameters;
