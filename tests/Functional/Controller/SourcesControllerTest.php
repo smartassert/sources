@@ -60,7 +60,10 @@ class SourcesControllerTest extends WebTestCase
         }
     }
 
-    public function testCreateUnauthorizedUser(): void
+    /**
+     * @dataProvider requestForUnauthorizedUserDataProvider
+     */
+    public function testRequestForUnauthorizedUser(string $method, string $uri): void
     {
         $this->mockHandler->append(
             new Response(401)
@@ -71,12 +74,9 @@ class SourcesControllerTest extends WebTestCase
         $authHeaderValue = AuthorizationProperties::DEFAULT_VALUE_PREFIX . $token;
 
         $this->client->request(
-            'POST',
-            SourceController::ROUTE_GIT_SOURCE_CREATE,
-            [
-                GitSourceRequest::KEY_POST_HOST_URL => 'https://example.com/repository.git',
-                GitSourceRequest::KEY_POST_PATH => '/',
-            ],
+            $method,
+            $uri,
+            [],
             [],
             [
                 'HTTP_' . $authHeaderName => $authHeaderValue,
@@ -90,6 +90,62 @@ class SourcesControllerTest extends WebTestCase
     }
 
     /**
+     * @return array<mixed>
+     */
+    public function requestForUnauthorizedUserDataProvider(): array
+    {
+        return [
+            'create git source' => [
+                'method' => 'POST',
+                'uri' => SourceController::ROUTE_GIT_SOURCE_CREATE,
+            ],
+            'get source' => [
+                'method' => 'GET',
+                'uri' => SourceController::ROUTE_SOURCE . new Ulid(),
+            ],
+            'update source' => [
+                'method' => 'PUT',
+                'uri' => SourceController::ROUTE_SOURCE . new Ulid(),
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider requestSourceNotFoundDataProvider
+     */
+    public function testRequestSourceNotFound(string $method, string $uri): void
+    {
+        $this->mockHandler->append(
+            new Response(200, [], (string) new Ulid())
+        );
+
+        $this->client->request($method, $uri);
+
+        $response = $this->client->getResponse();
+        self::assertSame(404, $response->getStatusCode());
+    }
+
+    /**
+     * @return array<mixed>
+     */
+    public function requestSourceNotFoundDataProvider(): array
+    {
+        $sourceId = (string) new Ulid();
+        $sourceUrl = SourceController::ROUTE_SOURCE . $sourceId;
+
+        return [
+            'get source' => [
+                'method' => 'GET',
+                'uri' => $sourceUrl,
+            ],
+            'update source' => [
+                'method' => 'PUT',
+                'uri' => $sourceUrl,
+            ],
+        ];
+    }
+
+    /**
      * @dataProvider createGitSourceDataProvider
      *
      * @param array<mixed> $requestParameters
@@ -97,10 +153,7 @@ class SourcesControllerTest extends WebTestCase
      */
     public function testCreateGitSourceSuccess(string $userId, array $requestParameters, array $expected): void
     {
-        $token = 'valid-token';
-        $authHeaderName = AuthorizationProperties::DEFAULT_HEADER_NAME;
-        $authHeaderValue = AuthorizationProperties::DEFAULT_VALUE_PREFIX . $token;
-
+        $authorizationToken = 'valid-token';
         $this->mockHandler->append(
             new Response(200, [], $userId)
         );
@@ -110,15 +163,13 @@ class SourcesControllerTest extends WebTestCase
             SourceController::ROUTE_GIT_SOURCE_CREATE,
             $requestParameters,
             [],
-            [
-                'HTTP_' . $authHeaderName => $authHeaderValue,
-            ]
+            $this->createAuthorizationHeader($authorizationToken),
         );
 
         $response = $this->client->getResponse();
 
         self::assertSame(200, $response->getStatusCode());
-        $this->assertAuthorizationRequestIsMade($token);
+        $this->assertAuthorizationRequestIsMade($authorizationToken);
 
         $repository = self::getContainer()->get(GitSourceRepository::class);
         \assert($repository instanceof GitSourceRepository);
@@ -188,10 +239,7 @@ class SourcesControllerTest extends WebTestCase
      */
     public function testGetSuccess(callable $sourceCreator, string $userId, array $expectedResponseData): void
     {
-        $token = 'valid-token';
-        $authHeaderName = AuthorizationProperties::DEFAULT_HEADER_NAME;
-        $authHeaderValue = AuthorizationProperties::DEFAULT_VALUE_PREFIX . $token;
-
+        $authorizationToken = 'valid-token';
         $source = $sourceCreator($this->entityManager);
 
         $this->mockHandler->append(
@@ -203,14 +251,12 @@ class SourcesControllerTest extends WebTestCase
             SourceController::ROUTE_SOURCE . $source->getId(),
             [],
             [],
-            [
-                'HTTP_' . $authHeaderName => $authHeaderValue,
-            ]
+            $this->createAuthorizationHeader($authorizationToken)
         );
 
         $response = $this->client->getResponse();
         self::assertSame(200, $response->getStatusCode());
-        $this->assertAuthorizationRequestIsMade($token);
+        $this->assertAuthorizationRequestIsMade($authorizationToken);
         self::assertInstanceOf(JsonResponse::class, $response);
 
         $responseData = json_decode((string) $response->getContent(), true);
@@ -307,21 +353,6 @@ class SourcesControllerTest extends WebTestCase
         ];
     }
 
-    public function testUpdateSourceNotFound(): void
-    {
-        $userId = (string) new Ulid();
-        $sourceId = (string) new Ulid();
-
-        $this->mockHandler->append(
-            new Response(200, [], $userId)
-        );
-
-        $this->client->request('PUT', SourceController::ROUTE_SOURCE . $sourceId);
-
-        $response = $this->client->getResponse();
-        self::assertSame(404, $response->getStatusCode());
-    }
-
     /**
      * @dataProvider updateSuccessDataProvider
      *
@@ -335,10 +366,7 @@ class SourcesControllerTest extends WebTestCase
         array $requestData,
         array $expectedResponseData
     ): void {
-        $token = 'valid-token';
-        $authHeaderName = AuthorizationProperties::DEFAULT_HEADER_NAME;
-        $authHeaderValue = AuthorizationProperties::DEFAULT_VALUE_PREFIX . $token;
-
+        $authorizationToken = 'valid-token';
         $source = $sourceCreator($this->entityManager);
 
         $this->mockHandler->append(
@@ -350,14 +378,12 @@ class SourcesControllerTest extends WebTestCase
             SourceController::ROUTE_SOURCE . $source->getId(),
             $requestData,
             [],
-            [
-                'HTTP_' . $authHeaderName => $authHeaderValue,
-            ]
+            $this->createAuthorizationHeader($authorizationToken)
         );
 
         $response = $this->client->getResponse();
         self::assertSame(200, $response->getStatusCode());
-        $this->assertAuthorizationRequestIsMade($token);
+        $this->assertAuthorizationRequestIsMade($authorizationToken);
         self::assertInstanceOf(JsonResponse::class, $response);
 
         $responseData = json_decode((string) $response->getContent(), true);
@@ -428,5 +454,18 @@ class SourcesControllerTest extends WebTestCase
         $expectedAuthorizationHeader = AuthorizationProperties::DEFAULT_VALUE_PREFIX . $token;
 
         self::assertSame($expectedAuthorizationHeader, $authorizationHeader);
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    private function createAuthorizationHeader(string $token): array
+    {
+        $authHeaderName = AuthorizationProperties::DEFAULT_HEADER_NAME;
+        $authHeaderValue = AuthorizationProperties::DEFAULT_VALUE_PREFIX . $token;
+
+        return [
+            'HTTP_' . $authHeaderName => $authHeaderValue,
+        ];
     }
 }
