@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use App\Entity\GitSource;
-use App\Repository\SourceRepository;
+use App\Repository\SourceRepository as Repository;
 use App\Request\GitSourceRequest;
 use App\Services\Source\Factory;
 use App\Services\Source\Mutator;
@@ -27,7 +27,7 @@ class SourceController
     }
 
     #[Route(self::ROUTE_SOURCE . '{sourceId<[A-Z90-9]{26}>}', name: 'get', methods: ['GET'])]
-    public function get(string $sourceId, SourceRepository $repository, UserInterface $user): JsonResponse
+    public function get(string $sourceId, Repository $repository, UserInterface $user): JsonResponse
     {
         $source = $repository->find($sourceId);
         if (null === $source) {
@@ -45,7 +45,7 @@ class SourceController
     public function update(
         string $sourceId,
         Request $request,
-        SourceRepository $repository,
+        Repository $repository,
         Mutator $mutator,
         UserInterface $user,
     ): JsonResponse {
@@ -68,12 +68,8 @@ class SourceController
     }
 
     #[Route(self::ROUTE_SOURCE . '{sourceId<[A-Z90-9]{26}>}', name: 'delete', methods: ['DELETE'])]
-    public function delete(
-        string $sourceId,
-        SourceRepository $repository,
-        UserInterface $user,
-        Store $store
-    ): JsonResponse {
+    public function delete(string $sourceId, Repository $repository, UserInterface $user, Store $store): JsonResponse
+    {
         $source = $repository->find($sourceId);
         if (null === $source) {
             return new JsonResponse(null, 404);
