@@ -9,15 +9,17 @@ use App\Entity\GitSource;
 use App\Entity\RunSource;
 use App\Entity\SourceInterface;
 use App\Repository\SourceRepository;
+use App\Services\SourcePersister;
 use App\Tests\Services\SourceRemover;
-use App\Tests\Services\TestSourcePersister;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Uid\Ulid;
 
 class RunSourceTest extends WebTestCase
 {
     private SourceRepository $repository;
-    private TestSourcePersister $sourcePersister;
+    private SourcePersister $sourcePersister;
+    private EntityManagerInterface $entityManager;
 
     protected function setUp(): void
     {
@@ -27,9 +29,13 @@ class RunSourceTest extends WebTestCase
         \assert($repository instanceof SourceRepository);
         $this->repository = $repository;
 
-        $sourcePersister = self::getContainer()->get(TestSourcePersister::class);
-        \assert($sourcePersister instanceof TestSourcePersister);
+        $sourcePersister = self::getContainer()->get(SourcePersister::class);
+        \assert($sourcePersister instanceof SourcePersister);
         $this->sourcePersister = $sourcePersister;
+
+        $entityManager = self::getContainer()->get(EntityManagerInterface::class);
+        \assert($entityManager instanceof EntityManagerInterface);
+        $this->entityManager = $entityManager;
 
         $sourceRemover = self::getContainer()->get(SourceRemover::class);
         if ($sourceRemover instanceof SourceRemover) {
@@ -55,8 +61,8 @@ class RunSourceTest extends WebTestCase
 
         $this->sourcePersister->persist($runSource);
         $this->sourcePersister->remove($parent);
-        $this->sourcePersister->detach($parent);
-        $this->sourcePersister->detach($runSource);
+        $this->entityManager->detach($parent);
+        $this->entityManager->detach($runSource);
 
         $retrievedRunSource = $this->repository->find($runSourceId);
 
