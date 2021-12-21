@@ -11,7 +11,7 @@ use App\Entity\SourceInterface;
 use App\Repository\FileSourceRepository;
 use App\Repository\GitSourceRepository;
 use App\Repository\RunSourceRepository;
-use App\Request\CreateGitSourceRequest;
+use App\Request\GitSourceRequest;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Uid\Ulid;
@@ -39,6 +39,17 @@ class SourceFactory
         }
 
         $source = new GitSource($this->generateId(), $userId, $hostUrl, $path, $accessToken);
+        $this->persist($source);
+
+        return $source;
+    }
+
+    public function updateGitSource(GitSource $source, GitSourceRequest $request): GitSource
+    {
+        $source->setHostUrl($request->getHostUrl());
+        $source->setPath($request->getPath());
+        $source->setAccessToken($request->getAccessToken());
+
         $this->persist($source);
 
         return $source;
@@ -83,7 +94,7 @@ class SourceFactory
         return $source;
     }
 
-    public function createGitSourceFromRequest(UserInterface $user, CreateGitSourceRequest $request): GitSource
+    public function createGitSourceFromRequest(UserInterface $user, GitSourceRequest $request): GitSource
     {
         return $this->createGitSource(
             $user->getUserIdentifier(),
