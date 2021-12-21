@@ -7,7 +7,7 @@ namespace App\Request;
 use Symfony\Component\HttpFoundation\Request;
 use webignition\EncapsulatingRequestResolverBundle\Model\EncapsulatingRequestInterface;
 
-class CreateGitSourceRequest implements EncapsulatingRequestInterface
+class GitSourceRequest implements EncapsulatingRequestInterface
 {
     public const KEY_POST_HOST_URL = 'host-url';
     public const KEY_POST_PATH = 'path';
@@ -20,12 +20,12 @@ class CreateGitSourceRequest implements EncapsulatingRequestInterface
     ) {
     }
 
-    public static function create(Request $request): CreateGitSourceRequest
+    public static function create(Request $request): GitSourceRequest
     {
         $accessToken = $request->request->get(self::KEY_POST_ACCESS_TOKEN);
         $accessToken = is_string($accessToken) || null === $accessToken ? $accessToken : null;
 
-        return new CreateGitSourceRequest(
+        return new GitSourceRequest(
             (string) $request->request->get(self::KEY_POST_HOST_URL),
             (string) $request->request->get(self::KEY_POST_PATH),
             $accessToken
