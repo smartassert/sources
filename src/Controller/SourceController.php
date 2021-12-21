@@ -28,11 +28,15 @@ class SourceController
     }
 
     #[Route(self::ROUTE_SOURCE . '{sourceId<[A-Z90-9]{26}>}', name: 'get', methods: ['GET'])]
-    public function get(string $sourceId, SourceRepository $repository): JsonResponse
+    public function get(string $sourceId, SourceRepository $repository, UserInterface $user): JsonResponse
     {
         $source = $repository->find($sourceId);
         if (null === $source) {
             return new JsonResponse(null, 404);
+        }
+
+        if ($user->getUserIdentifier() !== $source->getUserId()) {
+            return new JsonResponse(null, 401);
         }
 
         return new JsonResponse($source);
@@ -43,11 +47,16 @@ class SourceController
         string $sourceId,
         Request $request,
         SourceRepository $repository,
-        SourceFactory $sourceFactory
+        SourceFactory $sourceFactory,
+        UserInterface $user,
     ): JsonResponse {
         $source = $repository->find($sourceId);
         if (null === $source) {
             return new JsonResponse(null, 404);
+        }
+
+        if ($user->getUserIdentifier() !== $source->getUserId()) {
+            return new JsonResponse(null, 401);
         }
 
         if (!$source instanceof GitSource) {

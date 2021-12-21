@@ -23,11 +23,14 @@ use SmartAssert\UsersSecurityBundle\Security\AuthorizationProperties;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 use Symfony\Component\Uid\Ulid;
 use webignition\HttpHistoryContainer\Container as HttpHistoryContainer;
 
 class SourcesControllerTest extends WebTestCase
 {
+    private const AUTHORIZATION_TOKEN = 'authorization-token';
+
     private KernelBrowser $client;
     private EntityManagerInterface $entityManager;
     private SourceRepository $repository;
@@ -72,24 +75,18 @@ class SourcesControllerTest extends WebTestCase
             new Response(401)
         );
 
-        $token = 'invalid-token';
-        $authHeaderName = AuthorizationProperties::DEFAULT_HEADER_NAME;
-        $authHeaderValue = AuthorizationProperties::DEFAULT_VALUE_PREFIX . $token;
-
         $this->client->request(
-            $method,
-            $uri,
-            [],
-            [],
-            [
-                'HTTP_' . $authHeaderName => $authHeaderValue,
-            ]
+            method: $method,
+            uri: $uri,
+            server: $this->createRequestServerPropertiesFromHeaders(
+                $this->createAuthorizationHeader()
+            )
         );
 
         $response = $this->client->getResponse();
 
         self::assertSame(401, $response->getStatusCode());
-        $this->assertAuthorizationRequestIsMade($token);
+        $this->assertAuthorizationRequestIsMade();
     }
 
     /**
@@ -114,36 +111,53 @@ class SourcesControllerTest extends WebTestCase
     }
 
     /**
-     * @dataProvider requestSourceNotFoundDataProvider
+     * @dataProvider requestSourceDataProvider
      */
-    public function testRequestSourceNotFound(string $method, string $uri): void
+    public function testRequestSourceNotFound(string $method): void
     {
+        $sourceId = (string) new Ulid();
+
         $this->mockHandler->append(
             new Response(200, [], (string) new Ulid())
         );
 
-        $this->client->request($method, $uri);
-
-        $response = $this->client->getResponse();
+        $response = $this->makeAuthorizedSourceRequest($method, $sourceId);
         self::assertSame(404, $response->getStatusCode());
+    }
+
+    /**
+     * @dataProvider requestSourceDataProvider
+     */
+    public function testRequestInvalidSourceUser(string $method): void
+    {
+        $sourceId = (string) new Ulid();
+
+        $sourceUserId = (string) new Ulid();
+        $requestUserId = (string) new Ulid();
+        $label = 'source label';
+
+        $source = new FileSource($sourceId, $sourceUserId, $label);
+        $this->entityManager->persist($source);
+
+        $this->mockHandler->append(
+            new Response(200, [], $requestUserId)
+        );
+
+        $response = $this->makeAuthorizedSourceRequest($method, $sourceId);
+        self::assertSame(401, $response->getStatusCode());
     }
 
     /**
      * @return array<mixed>
      */
-    public function requestSourceNotFoundDataProvider(): array
+    public function requestSourceDataProvider(): array
     {
-        $sourceId = (string) new Ulid();
-        $sourceUrl = SourceController::ROUTE_SOURCE . $sourceId;
-
         return [
             'get source' => [
                 'method' => 'GET',
-                'uri' => $sourceUrl,
             ],
             'update source' => [
                 'method' => 'PUT',
-                'uri' => $sourceUrl,
             ],
         ];
     }
@@ -156,7 +170,6 @@ class SourcesControllerTest extends WebTestCase
      */
     public function testCreateGitSourceSuccess(string $userId, array $requestParameters, array $expected): void
     {
-        $authorizationToken = 'valid-token';
         $this->mockHandler->append(
             new Response(200, [], $userId)
         );
@@ -166,13 +179,15 @@ class SourcesControllerTest extends WebTestCase
             SourceController::ROUTE_GIT_SOURCE_CREATE,
             $requestParameters,
             [],
-            $this->createAuthorizationHeader($authorizationToken),
+            $this->createRequestServerPropertiesFromHeaders(
+                $this->createAuthorizationHeader()
+            ),
         );
 
         $response = $this->client->getResponse();
 
         self::assertSame(200, $response->getStatusCode());
-        $this->assertAuthorizationRequestIsMade($authorizationToken);
+        $this->assertAuthorizationRequestIsMade();
 
         $repository = self::getContainer()->get(GitSourceRepository::class);
         \assert($repository instanceof GitSourceRepository);
@@ -242,24 +257,16 @@ class SourcesControllerTest extends WebTestCase
      */
     public function testGetSuccess(callable $sourceCreator, string $userId, array $expectedResponseData): void
     {
-        $authorizationToken = 'valid-token';
         $source = $sourceCreator($this->entityManager);
 
         $this->mockHandler->append(
             new Response(200, [], $userId)
         );
 
-        $this->client->request(
-            'GET',
-            SourceController::ROUTE_SOURCE . $source->getId(),
-            [],
-            [],
-            $this->createAuthorizationHeader($authorizationToken)
-        );
+        $response = $this->makeAuthorizedSourceRequest('GET', $source->getId());
 
-        $response = $this->client->getResponse();
         self::assertSame(200, $response->getStatusCode());
-        $this->assertAuthorizationRequestIsMade($authorizationToken);
+        $this->assertAuthorizationRequestIsMade();
         self::assertInstanceOf(JsonResponse::class, $response);
 
         $responseData = json_decode((string) $response->getContent(), true);
@@ -360,7 +367,7 @@ class SourcesControllerTest extends WebTestCase
      * @dataProvider updateSuccessDataProvider
      *
      * @param callable(EntityManagerInterface): SourceInterface $sourceCreator
-     * @param array<mixed>                                      $requestData
+     * @param array<string, string>                             $requestData
      * @param array<mixed>                                      $expectedResponseData
      */
     public function testUpdateSuccess(
@@ -369,24 +376,16 @@ class SourcesControllerTest extends WebTestCase
         array $requestData,
         array $expectedResponseData
     ): void {
-        $authorizationToken = 'valid-token';
         $source = $sourceCreator($this->entityManager);
 
         $this->mockHandler->append(
             new Response(200, [], $userId)
         );
 
-        $this->client->request(
-            'PUT',
-            SourceController::ROUTE_SOURCE . $source->getId(),
-            $requestData,
-            [],
-            $this->createAuthorizationHeader($authorizationToken)
-        );
+        $response = $this->makeAuthorizedSourceRequest('PUT', $source->getId(), $requestData);
 
-        $response = $this->client->getResponse();
         self::assertSame(200, $response->getStatusCode());
-        $this->assertAuthorizationRequestIsMade($authorizationToken);
+        $this->assertAuthorizationRequestIsMade();
         self::assertInstanceOf(JsonResponse::class, $response);
 
         $responseData = json_decode((string) $response->getContent(), true);
@@ -440,7 +439,7 @@ class SourcesControllerTest extends WebTestCase
         ];
     }
 
-    private function assertAuthorizationRequestIsMade(string $token): void
+    private function assertAuthorizationRequestIsMade(): void
     {
         $request = $this->httpHistoryContainer->getTransactions()->getRequests()->getLast();
         \assert($request instanceof RequestInterface);
@@ -454,7 +453,7 @@ class SourcesControllerTest extends WebTestCase
 
         $authorizationHeader = $request->getHeaderLine(AuthorizationProperties::DEFAULT_HEADER_NAME);
 
-        $expectedAuthorizationHeader = AuthorizationProperties::DEFAULT_VALUE_PREFIX . $token;
+        $expectedAuthorizationHeader = AuthorizationProperties::DEFAULT_VALUE_PREFIX . self::AUTHORIZATION_TOKEN;
 
         self::assertSame($expectedAuthorizationHeader, $authorizationHeader);
     }
@@ -473,13 +472,59 @@ class SourcesControllerTest extends WebTestCase
     /**
      * @return array<string, string>
      */
-    private function createAuthorizationHeader(string $token): array
+    private function createAuthorizationHeader(): array
     {
         $authHeaderName = AuthorizationProperties::DEFAULT_HEADER_NAME;
-        $authHeaderValue = AuthorizationProperties::DEFAULT_VALUE_PREFIX . $token;
+        $authHeaderValue = AuthorizationProperties::DEFAULT_VALUE_PREFIX . self::AUTHORIZATION_TOKEN;
 
         return [
-            'HTTP_' . $authHeaderName => $authHeaderValue,
+            $authHeaderName => $authHeaderValue,
         ];
+    }
+
+    /**
+     * @param array<string, string> $headers
+     *
+     * @return array<string, string>
+     */
+    private function createRequestServerPropertiesFromHeaders(array $headers): array
+    {
+        $server = [];
+        foreach ($headers as $key => $value) {
+            $server['HTTP_' . $key] = $value;
+        }
+
+        return $server;
+    }
+
+    /**
+     * @param array<string, string> $parameters
+     */
+    private function makeAuthorizedSourceRequest(
+        string $method,
+        string $sourceId,
+        array $parameters = []
+    ): SymfonyResponse {
+        return $this->makeSourceRequest($method, $sourceId, $this->createAuthorizationHeader(), $parameters);
+    }
+
+    /**
+     * @param array<string, string> $headers
+     * @param array<string, string> $parameters
+     */
+    private function makeSourceRequest(
+        string $method,
+        string $sourceId,
+        array $headers = [],
+        array $parameters = []
+    ): SymfonyResponse {
+        $this->client->request(
+            method: $method,
+            uri: SourceController::ROUTE_SOURCE . $sourceId,
+            parameters: $parameters,
+            server: $this->createRequestServerPropertiesFromHeaders($headers)
+        );
+
+        return $this->client->getResponse();
     }
 }
