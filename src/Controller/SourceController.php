@@ -9,6 +9,7 @@ use App\Repository\SourceRepository;
 use App\Request\GitSourceRequest;
 use App\Services\SourceFactory;
 use App\Services\SourceMutator;
+use App\Services\SourceStore;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
@@ -67,5 +68,26 @@ class SourceController
         $source = $sourceMutator->updateGitSource($source, GitSourceRequest::create($request));
 
         return new JsonResponse($source);
+    }
+
+    #[Route(self::ROUTE_SOURCE . '{sourceId<[A-Z90-9]{26}>}', name: 'delete', methods: ['DELETE'])]
+    public function delete(
+        string $sourceId,
+        SourceRepository $repository,
+        UserInterface $user,
+        SourceStore $store
+    ): JsonResponse {
+        $source = $repository->find($sourceId);
+        if (null === $source) {
+            return new JsonResponse(null, 404);
+        }
+
+        if ($user->getUserIdentifier() !== $source->getUserId()) {
+            return new JsonResponse(null, 401);
+        }
+
+        $store->remove($source);
+
+        return new JsonResponse(null, 200);
     }
 }
