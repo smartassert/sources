@@ -9,7 +9,7 @@ use App\Entity\GitSource;
 use App\Entity\RunSource;
 use App\Entity\SourceInterface;
 use App\Repository\SourceRepository;
-use App\Request\CreateGitSourceRequest;
+use App\Request\GitSourceRequest;
 use App\Request\UpdateGitSourceRequest;
 use App\Services\SourceFactory;
 use Doctrine\ORM\EntityManagerInterface;
@@ -127,7 +127,7 @@ class SourceFactoryTest extends WebTestCase
     /**
      * @dataProvider createGitSourceFromRequestDataProvider
      */
-    public function testCreateGitSourceFromRequest(UserInterface $user, CreateGitSourceRequest $request): void
+    public function testCreateGitSourceFromRequest(UserInterface $user, GitSourceRequest $request): void
     {
         $source = $this->factory->createGitSourceFromRequest($user, $request);
 
@@ -152,11 +152,11 @@ class SourceFactoryTest extends WebTestCase
         return [
             'empty access token' => [
                 'user' => $user,
-                'request' => new CreateGitSourceRequest($hostUrl, $path, null),
+                'request' => new GitSourceRequest($hostUrl, $path, null),
             ],
             'non-empty access token' => [
                 'user' => $user,
-                'request' => new CreateGitSourceRequest($hostUrl, $path, 'access-token'),
+                'request' => new GitSourceRequest($hostUrl, $path, 'access-token'),
             ],
         ];
     }

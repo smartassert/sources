@@ -11,7 +11,7 @@ use App\Entity\RunSource;
 use App\Entity\SourceInterface;
 use App\Repository\GitSourceRepository;
 use App\Repository\SourceRepository;
-use App\Request\CreateGitSourceRequest;
+use App\Request\GitSourceRequest;
 use App\Request\UpdateGitSourceRequest;
 use Doctrine\ORM\EntityManagerInterface;
 use GuzzleHttp\Handler\MockHandler;
@@ -78,8 +78,8 @@ class SourcesControllerTest extends WebTestCase
             'POST',
             SourceController::ROUTE_GIT_SOURCE_CREATE,
             [
-                CreateGitSourceRequest::KEY_POST_HOST_URL => 'https://example.com/repository.git',
-                CreateGitSourceRequest::KEY_POST_PATH => '/',
+                GitSourceRequest::KEY_POST_HOST_URL => 'https://example.com/repository.git',
+                GitSourceRequest::KEY_POST_PATH => '/',
             ],
             [],
             [
@@ -129,9 +129,9 @@ class SourcesControllerTest extends WebTestCase
 
         $source = $repository->findOneBy([
             'userId' => $userId,
-            'hostUrl' => $requestParameters[CreateGitSourceRequest::KEY_POST_HOST_URL],
-            'path' => $requestParameters[CreateGitSourceRequest::KEY_POST_PATH],
-            'accessToken' => $requestParameters[CreateGitSourceRequest::KEY_POST_ACCESS_TOKEN] ?? null,
+            'hostUrl' => $requestParameters[GitSourceRequest::KEY_POST_HOST_URL],
+            'path' => $requestParameters[GitSourceRequest::KEY_POST_PATH],
+            'accessToken' => $requestParameters[GitSourceRequest::KEY_POST_ACCESS_TOKEN] ?? null,
         ]);
 
         self::assertInstanceOf(SourceInterface::class, $source);
@@ -155,8 +155,8 @@ class SourcesControllerTest extends WebTestCase
             'access token missing' => [
                 'userId' => $userId,
                 'requestParameters' => [
-                    CreateGitSourceRequest::KEY_POST_HOST_URL => $hostUrl,
-                    CreateGitSourceRequest::KEY_POST_PATH => $path
+                    GitSourceRequest::KEY_POST_HOST_URL => $hostUrl,
+                    GitSourceRequest::KEY_POST_PATH => $path
                 ],
                 'expected' => [
                     'user_id' => $userId,
@@ -169,9 +169,9 @@ class SourcesControllerTest extends WebTestCase
             'access token present' => [
                 'userId' => $userId,
                 'requestParameters' => [
-                    CreateGitSourceRequest::KEY_POST_HOST_URL => $hostUrl,
-                    CreateGitSourceRequest::KEY_POST_PATH => $path,
-                    CreateGitSourceRequest::KEY_POST_ACCESS_TOKEN => $accessToken,
+                    GitSourceRequest::KEY_POST_HOST_URL => $hostUrl,
+                    GitSourceRequest::KEY_POST_PATH => $path,
+                    GitSourceRequest::KEY_POST_ACCESS_TOKEN => $accessToken,
                 ],
                 'expected' => [
                     'user_id' => $userId,

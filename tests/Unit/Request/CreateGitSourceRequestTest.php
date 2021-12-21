@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\Request;
 
-use App\Request\CreateGitSourceRequest;
+use App\Request\GitSourceRequest;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -13,9 +13,9 @@ class CreateGitSourceRequestTest extends TestCase
     /**
      * @dataProvider createDataProvider
      */
-    public function testCreate(Request $request, CreateGitSourceRequest $expected): void
+    public function testCreate(Request $request, GitSourceRequest $expected): void
     {
-        self::assertEquals($expected, CreateGitSourceRequest::create($request));
+        self::assertEquals($expected, GitSourceRequest::create($request));
     }
 
     /**
@@ -30,26 +30,26 @@ class CreateGitSourceRequestTest extends TestCase
         return [
             'empty' => [
                 'request' => new Request(),
-                'expected' => new CreateGitSourceRequest('', '', null)
+                'expected' => new GitSourceRequest('', '', null)
             ],
             'user id, host url, path present, access token missing' => [
                 'request' => new Request(
                     request: [
-                        CreateGitSourceRequest::KEY_POST_HOST_URL => $hostUrl,
-                        CreateGitSourceRequest::KEY_POST_PATH => $path,
+                        GitSourceRequest::KEY_POST_HOST_URL => $hostUrl,
+                        GitSourceRequest::KEY_POST_PATH => $path,
                     ]
                 ),
-                'expected' => new CreateGitSourceRequest($hostUrl, $path, null)
+                'expected' => new GitSourceRequest($hostUrl, $path, null)
             ],
             'user id, host url, path  access token present' => [
                 'request' => new Request(
                     request: [
-                        CreateGitSourceRequest::KEY_POST_HOST_URL => $hostUrl,
-                        CreateGitSourceRequest::KEY_POST_PATH => $path,
-                        CreateGitSourceRequest::KEY_POST_ACCESS_TOKEN => $accessToken,
+                        GitSourceRequest::KEY_POST_HOST_URL => $hostUrl,
+                        GitSourceRequest::KEY_POST_PATH => $path,
+                        GitSourceRequest::KEY_POST_ACCESS_TOKEN => $accessToken,
                     ]
                 ),
-                'expected' => new CreateGitSourceRequest($hostUrl, $path, $accessToken)
+                'expected' => new GitSourceRequest($hostUrl, $path, $accessToken)
             ],
         ];
     }
