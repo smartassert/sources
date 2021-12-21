@@ -6,9 +6,8 @@ namespace App\Tests\Functional\Controller;
 
 use App\Entity\SourceInterface;
 use App\Repository\GitSourceRepository;
-use App\Repository\SourceRepository;
 use App\Request\CreateSourceRequest;
-use Doctrine\ORM\EntityManagerInterface;
+use App\Tests\Services\SourceRemover;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Middleware;
@@ -24,8 +23,6 @@ use webignition\HttpHistoryContainer\Container as HttpHistoryContainer;
 class SourcesControllerTest extends WebTestCase
 {
     private KernelBrowser $client;
-    private EntityManagerInterface $entityManager;
-    private SourceRepository $repository;
     private MockHandler $mockHandler;
     private HttpHistoryContainer $httpHistoryContainer;
 
@@ -34,14 +31,6 @@ class SourcesControllerTest extends WebTestCase
         parent::setUp();
 
         $this->client = static::createClient();
-
-        $entityManager = self::getContainer()->get(EntityManagerInterface::class);
-        \assert($entityManager instanceof EntityManagerInterface);
-        $this->entityManager = $entityManager;
-
-        $repository = self::getContainer()->get(SourceRepository::class);
-        \assert($repository instanceof SourceRepository);
-        $this->repository = $repository;
 
         $mockHandler = self::getContainer()->get(MockHandler::class);
         \assert($mockHandler instanceof MockHandler);
@@ -55,7 +44,10 @@ class SourcesControllerTest extends WebTestCase
         \assert($handlerStack instanceof HandlerStack);
         $handlerStack->push(Middleware::history($this->httpHistoryContainer), 'history');
 
-        $this->removeAllSources();
+        $sourceRemover = self::getContainer()->get(SourceRemover::class);
+        if ($sourceRemover instanceof SourceRemover) {
+            $sourceRemover->removeAll();
+        }
     }
 
     public function testCreateUnauthorizedUser(): void
@@ -196,16 +188,5 @@ class SourcesControllerTest extends WebTestCase
         $expectedAuthorizationHeader = AuthorizationProperties::DEFAULT_VALUE_PREFIX . $token;
 
         self::assertSame($expectedAuthorizationHeader, $authorizationHeader);
-    }
-
-    private function removeAllSources(): void
-    {
-        $sources = $this->repository->findAll();
-
-        foreach ($sources as $source) {
-            $this->entityManager->remove($source);
-        }
-
-        $this->entityManager->flush();
     }
 }
