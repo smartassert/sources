@@ -23,55 +23,33 @@ class CreateGitSourceRequestTest extends TestCase
      */
     public function createDataProvider(): array
     {
+        $hostUrl = 'https://example.com/repository.git';
+        $path = '/path/to/source';
+        $accessToken = 'e2d940b51d53c18a73dfe939b95002f9';
+
         return [
             'empty' => [
                 'request' => new Request(),
-                'expected' => new CreateGitSourceRequest('', '', null, null)
+                'expected' => new CreateGitSourceRequest('', '', null)
             ],
-            'user id, host url, path present, access token missing, ref missing' => [
+            'user id, host url, path present, access token missing' => [
                 'request' => new Request(
                     request: [
-                        CreateGitSourceRequest::KEY_POST_HOST_URL => 'https://example.com/repository.git',
-                        CreateGitSourceRequest::KEY_POST_PATH => '/path/to/source',
+                        CreateGitSourceRequest::KEY_POST_HOST_URL => $hostUrl,
+                        CreateGitSourceRequest::KEY_POST_PATH => $path,
                     ]
                 ),
-                'expected' => new CreateGitSourceRequest(
-                    'https://example.com/repository.git',
-                    '/path/to/source',
-                    null,
-                    null
-                )
+                'expected' => new CreateGitSourceRequest($hostUrl, $path, null)
             ],
-            'user id, host url, path  access token present, ref missing' => [
+            'user id, host url, path  access token present' => [
                 'request' => new Request(
                     request: [
-                        CreateGitSourceRequest::KEY_POST_HOST_URL => 'https://example.com/repository.git',
-                        CreateGitSourceRequest::KEY_POST_PATH => '/path/to/source',
-                        CreateGitSourceRequest::KEY_POST_ACCESS_TOKEN => 'e2d940b51d53c18a73dfe939b95002f9',
+                        CreateGitSourceRequest::KEY_POST_HOST_URL => $hostUrl,
+                        CreateGitSourceRequest::KEY_POST_PATH => $path,
+                        CreateGitSourceRequest::KEY_POST_ACCESS_TOKEN => $accessToken,
                     ]
                 ),
-                'expected' => new CreateGitSourceRequest(
-                    'https://example.com/repository.git',
-                    '/path/to/source',
-                    'e2d940b51d53c18a73dfe939b95002f9',
-                    null
-                )
-            ],
-            'user id, host url, path  access token present, ref present' => [
-                'request' => new Request(
-                    request: [
-                        CreateGitSourceRequest::KEY_POST_HOST_URL => 'https://example.com/repository.git',
-                        CreateGitSourceRequest::KEY_POST_PATH => '/path/to/source',
-                        CreateGitSourceRequest::KEY_POST_ACCESS_TOKEN => 'e2d940b51d53c18a73dfe939b95002f9',
-                        CreateGitSourceRequest::KEY_POST_REF => 'v0.1',
-                    ]
-                ),
-                'expected' => new CreateGitSourceRequest(
-                    'https://example.com/repository.git',
-                    '/path/to/source',
-                    'e2d940b51d53c18a73dfe939b95002f9',
-                    'v0.1'
-                )
+                'expected' => new CreateGitSourceRequest($hostUrl, $path, $accessToken)
             ],
         ];
     }

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Request;
 
-use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
 use webignition\EncapsulatingRequestResolverBundle\Model\EncapsulatingRequestInterface;
 
@@ -23,8 +22,8 @@ class CreateGitSourceRequest implements EncapsulatingRequestInterface
 
     public static function create(Request $request): CreateGitSourceRequest
     {
-        $accessToken = self::getStringValueOrNull($request->request, self::KEY_POST_ACCESS_TOKEN);
-        $accessToken = '';
+        $accessToken = $request->request->get(self::KEY_POST_ACCESS_TOKEN);
+        $accessToken = is_string($accessToken) || null === $accessToken ? $accessToken : null;
 
         return new CreateGitSourceRequest(
             (string) $request->request->get(self::KEY_POST_HOST_URL),
@@ -46,12 +45,5 @@ class CreateGitSourceRequest implements EncapsulatingRequestInterface
     public function getAccessToken(): ?string
     {
         return $this->accessToken;
-    }
-
-    private static function getStringValueOrNull(ParameterBag $parameterBag, string $key): ?string
-    {
-        $value = $parameterBag->get($key);
-
-        return is_string($value) || null === $value ? $value : null;
     }
 }

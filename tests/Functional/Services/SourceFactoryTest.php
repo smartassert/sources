@@ -145,34 +145,17 @@ class SourceFactoryTest extends WebTestCase
     public function createGitSourceFromRequestDataProvider(): array
     {
         $user = new User(self::USER_ID);
+        $hostUrl = 'https://example.com/repository.git';
+        $path = '/';
 
         return [
-            'empty access token, empty ref' => [
+            'empty access token' => [
                 'user' => $user,
-                'request' => new CreateGitSourceRequest(
-                    'https://example.com/repository.git',
-                    '/',
-                    null,
-                    null
-                ),
+                'request' => new CreateGitSourceRequest($hostUrl, $path, null),
             ],
-            'non-empty access token, empty ref' => [
+            'non-empty access token' => [
                 'user' => $user,
-                'request' => new CreateGitSourceRequest(
-                    'https://example.com/repository.git',
-                    '/',
-                    'access-token',
-                    null,
-                ),
-            ],
-            'non-empty access token, non-empty ref' => [
-                'user' => $user,
-                'request' => new CreateGitSourceRequest(
-                    'https://example.com/repository.git',
-                    '/',
-                    'access-token',
-                    'ref',
-                ),
+                'request' => new CreateGitSourceRequest($hostUrl, $path, 'access-token'),
             ],
         ];
     }
