@@ -12,6 +12,7 @@ use App\Entity\SourceInterface;
 use App\Repository\GitSourceRepository;
 use App\Repository\SourceRepository;
 use App\Request\CreateGitSourceRequest;
+use App\Request\UpdateGitSourceRequest;
 use Doctrine\ORM\EntityManagerInterface;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
@@ -191,6 +192,10 @@ class SourcesControllerTest extends WebTestCase
      */
     public function testGetSuccess(callable $sourceCreator, string $userId, array $expectedResponseData): void
     {
+        $token = 'valid-token';
+        $authHeaderName = AuthorizationProperties::DEFAULT_HEADER_NAME;
+        $authHeaderValue = AuthorizationProperties::DEFAULT_VALUE_PREFIX . $token;
+
         $source = $sourceCreator($this->entityManager);
 
         $this->mockHandler->append(
@@ -199,14 +204,17 @@ class SourcesControllerTest extends WebTestCase
 
         $this->client->request(
             'GET',
-            SourceController::ROUTE_SOURCE_GET . $source->getId(),
+            SourceController::ROUTE_SOURCE . $source->getId(),
             [],
             [],
-            []
+            [
+                'HTTP_' . $authHeaderName => $authHeaderValue,
+            ]
         );
 
         $response = $this->client->getResponse();
         self::assertSame(200, $response->getStatusCode());
+        $this->assertAuthorizationRequestIsMade($token);
         self::assertInstanceOf(JsonResponse::class, $response);
 
         $responseData = json_decode((string) $response->getContent(), true);
@@ -298,6 +306,110 @@ class SourcesControllerTest extends WebTestCase
                     'type' => SourceInterface::TYPE_RUN,
                     'parent' => $fileSourceId,
                     'parameters' => [],
+                ],
+            ],
+        ];
+    }
+
+    public function testUpdateSourceNotFound(): void
+    {
+        $userId = (string) new Ulid();
+        $sourceId = (string) new Ulid();
+
+        $this->mockHandler->append(
+            new Response(200, [], $userId)
+        );
+
+        $this->client->request('PUT', SourceController::ROUTE_SOURCE . $sourceId);
+
+        $response = $this->client->getResponse();
+        self::assertSame(404, $response->getStatusCode());
+    }
+
+    /**
+     * @dataProvider updateSuccessDataProvider
+     *
+     * @param callable(EntityManagerInterface): SourceInterface $sourceCreator
+     * @param array<mixed>                                      $requestData
+     * @param array<mixed>                                      $expectedResponseData
+     */
+    public function testUpdateSuccess(
+        callable $sourceCreator,
+        string $userId,
+        array $requestData,
+        array $expectedResponseData
+    ): void {
+        $token = 'valid-token';
+        $authHeaderName = AuthorizationProperties::DEFAULT_HEADER_NAME;
+        $authHeaderValue = AuthorizationProperties::DEFAULT_VALUE_PREFIX . $token;
+
+        $source = $sourceCreator($this->entityManager);
+
+        $this->mockHandler->append(
+            new Response(200, [], $userId)
+        );
+
+        $this->client->request(
+            'PUT',
+            SourceController::ROUTE_SOURCE . $source->getId(),
+            $requestData,
+            [],
+            [
+                'HTTP_' . $authHeaderName => $authHeaderValue,
+            ]
+        );
+
+        $response = $this->client->getResponse();
+        self::assertSame(200, $response->getStatusCode());
+        $this->assertAuthorizationRequestIsMade($token);
+        self::assertInstanceOf(JsonResponse::class, $response);
+
+        $responseData = json_decode((string) $response->getContent(), true);
+        self::assertEquals($expectedResponseData, $responseData);
+    }
+
+    /**
+     * @return array<mixed>
+     */
+    public function updateSuccessDataProvider(): array
+    {
+        $gitSourceId = (string) new Ulid();
+        $userId = (string) new Ulid();
+        $hostUrl = 'https://example.com/repository.git';
+        $path = '/';
+        $accessToken = md5((string) rand());
+        $newHostUrl = 'https://new.example.com/repository.git';
+        $newPath = '/new';
+
+        return [
+            SourceInterface::TYPE_GIT => [
+                'sourceCreator' => function (
+                    EntityManagerInterface $entityManager
+                ) use (
+                    $gitSourceId,
+                    $userId,
+                    $hostUrl,
+                    $path,
+                    $accessToken
+                ) {
+                    $source = new GitSource($gitSourceId, $userId, $hostUrl, $path, $accessToken);
+                    $entityManager->persist($source);
+
+                    return $source;
+                },
+                'userId' => $userId,
+                'requestData' => [
+                    UpdateGitSourceRequest::KEY_POST_HOST_URL => $newHostUrl,
+                    UpdateGitSourceRequest::KEY_POST_PATH => $newPath,
+                    UpdateGitSourceRequest::KEY_POST_ACCESS_TOKEN => null,
+                ],
+                'expectedResponseData' => [
+                    'id' => $gitSourceId,
+                    'user_id' => $userId,
+                    'type' => SourceInterface::TYPE_GIT,
+                    'host_url' => $newHostUrl,
+                    'path' => $newPath,
+                    'access_token' => null,
                 ],
             ],
         ];
