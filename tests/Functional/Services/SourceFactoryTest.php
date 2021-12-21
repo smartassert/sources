@@ -11,7 +11,7 @@ use App\Entity\SourceInterface;
 use App\Repository\SourceRepository;
 use App\Request\CreateSourceRequest;
 use App\Services\SourceFactory;
-use Doctrine\ORM\EntityManagerInterface;
+use App\Tests\Services\SourceRemover;
 use SmartAssert\UsersSecurityBundle\Security\User;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -22,7 +22,6 @@ class SourceFactoryTest extends WebTestCase
     private const USER_ID = '01FPSVJ7ZT85X73BW05EK9B3XG';
 
     private SourceFactory $factory;
-    private EntityManagerInterface $entityManager;
     private SourceRepository $repository;
 
     protected function setUp(): void
@@ -33,15 +32,14 @@ class SourceFactoryTest extends WebTestCase
         \assert($factory instanceof SourceFactory);
         $this->factory = $factory;
 
-        $entityManager = self::getContainer()->get(EntityManagerInterface::class);
-        \assert($entityManager instanceof EntityManagerInterface);
-        $this->entityManager = $entityManager;
-
         $repository = self::getContainer()->get(SourceRepository::class);
         \assert($repository instanceof SourceRepository);
         $this->repository = $repository;
 
-        $this->removeAllSources();
+        $sourceRemover = self::getContainer()->get(SourceRemover::class);
+        if ($sourceRemover instanceof SourceRemover) {
+            $sourceRemover->removeAll();
+        }
     }
 
     /**
@@ -261,16 +259,5 @@ class SourceFactoryTest extends WebTestCase
     {
         self::assertTrue(Ulid::isValid($source->getId()));
         self::assertSame($expectedUserId, $source->getUserId());
-    }
-
-    private function removeAllSources(): void
-    {
-        $sources = $this->repository->findAll();
-
-        foreach ($sources as $source) {
-            $this->entityManager->remove($source);
-        }
-
-        $this->entityManager->flush();
     }
 }

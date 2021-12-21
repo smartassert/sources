@@ -10,6 +10,7 @@ use App\Entity\RunSource;
 use App\Entity\SourceInterface;
 use App\Repository\SourceRepository;
 use App\Services\SourceFactory;
+use App\Tests\Services\SourceRemover;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
@@ -37,7 +38,10 @@ class SourceRepositoryTest extends WebTestCase
         \assert($repository instanceof SourceRepository);
         $this->repository = $repository;
 
-        $this->removeAllSources();
+        $sourceRemover = self::getContainer()->get(SourceRemover::class);
+        if ($sourceRemover instanceof SourceRemover) {
+            $sourceRemover->removeAll();
+        }
     }
 
     /**
@@ -62,8 +66,6 @@ class SourceRepositoryTest extends WebTestCase
 
         \assert(!is_null($retrievedSource));
         self::assertNotSame(spl_object_id($source), spl_object_id($retrievedSource));
-
-        $this->removeAllSources();
     }
 
     /**
@@ -95,15 +97,5 @@ class SourceRepositoryTest extends WebTestCase
                 },
             ],
         ];
-    }
-
-    private function removeAllSources(): void
-    {
-        $sources = $this->repository->findAll();
-        foreach ($sources as $source) {
-            $this->entityManager->remove($source);
-        }
-
-        $this->entityManager->flush();
     }
 }

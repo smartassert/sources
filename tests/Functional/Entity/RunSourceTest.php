@@ -8,7 +8,7 @@ use App\Entity\FileSource;
 use App\Entity\GitSource;
 use App\Entity\RunSource;
 use App\Entity\SourceInterface;
-use App\Repository\SourceRepository;
+use App\Tests\Services\SourceRemover;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Uid\Ulid;
@@ -16,7 +16,6 @@ use Symfony\Component\Uid\Ulid;
 class RunSourceTest extends WebTestCase
 {
     private EntityManagerInterface $entityManager;
-    private SourceRepository $repository;
 
     protected function setUp(): void
     {
@@ -26,11 +25,10 @@ class RunSourceTest extends WebTestCase
         \assert($entityManager instanceof EntityManagerInterface);
         $this->entityManager = $entityManager;
 
-        $repository = self::getContainer()->get(SourceRepository::class);
-        \assert($repository instanceof SourceRepository);
-        $this->repository = $repository;
-
-        $this->removeAllSources();
+        $sourceRemover = self::getContainer()->get(SourceRemover::class);
+        if ($sourceRemover instanceof SourceRemover) {
+            $sourceRemover->removeAll();
+        }
     }
 
     /**
@@ -80,15 +78,5 @@ class RunSourceTest extends WebTestCase
                 ),
             ],
         ];
-    }
-
-    private function removeAllSources(): void
-    {
-        $sources = $this->repository->findAll();
-        foreach ($sources as $source) {
-            $this->entityManager->remove($source);
-        }
-
-        $this->entityManager->flush();
     }
 }
