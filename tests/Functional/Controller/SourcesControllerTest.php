@@ -63,7 +63,10 @@ class SourcesControllerTest extends WebTestCase
         $this->removeAllSources();
     }
 
-    public function testCreateUnauthorizedUser(): void
+    /**
+     * @dataProvider requestForUnauthorizedUserDataProvider
+     */
+    public function testRequestForUnauthorizedUser(string $method, string $uri): void
     {
         $this->mockHandler->append(
             new Response(401)
@@ -74,12 +77,9 @@ class SourcesControllerTest extends WebTestCase
         $authHeaderValue = AuthorizationProperties::DEFAULT_VALUE_PREFIX . $token;
 
         $this->client->request(
-            'POST',
-            SourceController::ROUTE_GIT_SOURCE_CREATE,
-            [
-                GitSourceRequest::KEY_POST_HOST_URL => 'https://example.com/repository.git',
-                GitSourceRequest::KEY_POST_PATH => '/',
-            ],
+            $method,
+            $uri,
+            [],
             [],
             [
                 'HTTP_' . $authHeaderName => $authHeaderValue,
@@ -90,6 +90,27 @@ class SourcesControllerTest extends WebTestCase
 
         self::assertSame(401, $response->getStatusCode());
         $this->assertAuthorizationRequestIsMade($token);
+    }
+
+    /**
+     * @return array<mixed>
+     */
+    public function requestForUnauthorizedUserDataProvider(): array
+    {
+        return [
+            'create git source' => [
+                'method' => 'POST',
+                'uri' => SourceController::ROUTE_GIT_SOURCE_CREATE,
+            ],
+            'get source' => [
+                'method' => 'GET',
+                'uri' => SourceController::ROUTE_SOURCE . new Ulid(),
+            ],
+            'update source' => [
+                'method' => 'PUT',
+                'uri' => SourceController::ROUTE_SOURCE . new Ulid(),
+            ],
+        ];
     }
 
     /**
