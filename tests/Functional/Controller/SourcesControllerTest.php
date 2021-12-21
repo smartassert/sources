@@ -10,6 +10,7 @@ use App\Entity\GitSource;
 use App\Entity\RunSource;
 use App\Entity\SourceInterface;
 use App\Repository\GitSourceRepository;
+use App\Repository\SourceRepository;
 use App\Request\GitSourceRequest;
 use App\Services\SourceStore;
 use App\Tests\Services\SourceRemover;
@@ -34,6 +35,7 @@ class SourcesControllerTest extends WebTestCase
     private KernelBrowser $client;
     private MockHandler $mockHandler;
     private HttpHistoryContainer $httpHistoryContainer;
+    private SourceRepository $repository;
     private SourceStore $store;
 
     protected function setUp(): void
@@ -57,6 +59,10 @@ class SourcesControllerTest extends WebTestCase
         $store = self::getContainer()->get(SourceStore::class);
         \assert($store instanceof SourceStore);
         $this->store = $store;
+
+        $repository = self::getContainer()->get(SourceRepository::class);
+        \assert($repository instanceof SourceRepository);
+        $this->repository = $repository;
 
         $sourceRemover = self::getContainer()->get(SourceRemover::class);
         if ($sourceRemover instanceof SourceRemover) {
@@ -103,6 +109,10 @@ class SourcesControllerTest extends WebTestCase
             ],
             'update source' => [
                 'method' => 'PUT',
+                'uri' => SourceController::ROUTE_SOURCE . new Ulid(),
+            ],
+            'delete source' => [
+                'method' => 'DELETE',
                 'uri' => SourceController::ROUTE_SOURCE . new Ulid(),
             ],
         ];
@@ -156,6 +166,9 @@ class SourcesControllerTest extends WebTestCase
             ],
             'update source' => [
                 'method' => 'PUT',
+            ],
+            'delete source' => [
+                'method' => 'DELETE',
             ],
         ];
     }
@@ -427,6 +440,76 @@ class SourcesControllerTest extends WebTestCase
                     'path' => $newPath,
                     'access_token' => null,
                 ],
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider deleteSuccessDataProvider
+     *
+     * @param callable(SourceStore): SourceInterface $sourceCreator
+     */
+    public function testDeleteSuccess(callable $sourceCreator, string $userId, int $expectedRepositoryCount): void
+    {
+        $source = $sourceCreator($this->store);
+        self::assertGreaterThan(0, $this->repository->count([]));
+
+        $this->mockHandler->append(
+            new Response(200, [], $userId)
+        );
+
+        $response = $this->makeAuthorizedSourceRequest('DELETE', $source->getId());
+
+        self::assertSame(200, $response->getStatusCode());
+        $this->assertAuthorizationRequestIsMade();
+        self::assertInstanceOf(JsonResponse::class, $response);
+        self::assertSame($expectedRepositoryCount, $this->repository->count([]));
+    }
+
+    /**
+     * @return array<mixed>
+     */
+    public function deleteSuccessDataProvider(): array
+    {
+        $userId = (string) new Ulid();
+
+        return [
+            SourceInterface::TYPE_FILE => [
+                'sourceCreator' => function (SourceStore $store) use ($userId) {
+                    $source = new FileSource((string) new Ulid(), $userId, 'label');
+                    $store->add($source);
+
+                    return $source;
+                },
+                'userId' => $userId,
+                'expectedRepositoryCount' => 0,
+            ],
+            SourceInterface::TYPE_GIT => [
+                'sourceCreator' => function (SourceStore $store) use ($userId) {
+                    $source = new GitSource(
+                        (string) new Ulid(),
+                        $userId,
+                        'https://example.com/repository.git'
+                    );
+                    $store->add($source);
+
+                    return $source;
+                },
+                'userId' => $userId,
+                'expectedRepositoryCount' => 0,
+            ],
+            SourceInterface::TYPE_RUN => [
+                'sourceCreator' => function (SourceStore $store) use ($userId) {
+                    $parent = new FileSource((string) new Ulid(), $userId, 'label');
+                    $store->add($parent);
+
+                    $source = new RunSource((string) new Ulid(), $parent);
+                    $store->add($source);
+
+                    return $source;
+                },
+                'userId' => $userId,
+                'expectedRepositoryCount' => 1,
             ],
         ];
     }
