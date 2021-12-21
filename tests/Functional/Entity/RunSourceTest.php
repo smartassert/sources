@@ -8,18 +8,30 @@ use App\Entity\FileSource;
 use App\Entity\GitSource;
 use App\Entity\RunSource;
 use App\Entity\SourceInterface;
-use App\Tests\Services\SourceRemover;
+use App\Repository\SourceRepository;
+use App\Services\Source\Store;
+use App\Tests\Services\Source\SourceRemover;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Uid\Ulid;
 
 class RunSourceTest extends WebTestCase
 {
+    private SourceRepository $repository;
+    private Store $store;
     private EntityManagerInterface $entityManager;
 
     protected function setUp(): void
     {
         parent::setUp();
+
+        $repository = self::getContainer()->get(SourceRepository::class);
+        \assert($repository instanceof SourceRepository);
+        $this->repository = $repository;
+
+        $store = self::getContainer()->get(Store::class);
+        \assert($store instanceof Store);
+        $this->store = $store;
 
         $entityManager = self::getContainer()->get(EntityManagerInterface::class);
         \assert($entityManager instanceof EntityManagerInterface);
@@ -36,27 +48,23 @@ class RunSourceTest extends WebTestCase
      */
     public function testDeleteParent(FileSource|GitSource $parent): void
     {
-        $this->entityManager->persist($parent);
-        $this->entityManager->flush();
+        $this->store->add($parent);
 
         $runSourceId = (string) new Ulid();
         $runSource = new RunSource($runSourceId, $parent);
 
-        $this->entityManager->persist($runSource);
-        $this->entityManager->flush();
+        $this->store->add($runSource);
         self::assertSame($parent, $runSource->getParent());
 
         $runSource->unsetParent();
         self::assertNull($runSource->getParent());
 
-        $this->entityManager->persist($runSource);
-        $this->entityManager->remove($parent);
-        $this->entityManager->flush();
-
+        $this->store->add($runSource);
+        $this->store->remove($parent);
         $this->entityManager->detach($parent);
         $this->entityManager->detach($runSource);
 
-        $retrievedRunSource = $this->entityManager->find(RunSource::class, $runSourceId);
+        $retrievedRunSource = $this->repository->find($runSourceId);
 
         self::assertEquals($runSource, $retrievedRunSource);
     }

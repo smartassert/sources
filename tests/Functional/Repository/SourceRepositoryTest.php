@@ -9,8 +9,9 @@ use App\Entity\GitSource;
 use App\Entity\RunSource;
 use App\Entity\SourceInterface;
 use App\Repository\SourceRepository;
-use App\Services\SourceFactory;
-use App\Tests\Services\SourceRemover;
+use App\Services\Source\Factory;
+use App\Services\Source\Store;
+use App\Tests\Services\Source\SourceRemover;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
@@ -18,25 +19,30 @@ class SourceRepositoryTest extends WebTestCase
 {
     private const USER_ID = '01FPSVJ7ZT85X73BW05EK9B3XG';
 
-    private SourceFactory $sourceFactory;
-    private EntityManagerInterface $entityManager;
+    private Factory $factory;
     private SourceRepository $repository;
+    private Store $store;
+    private EntityManagerInterface $entityManager;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $gitSourceFactory = self::getContainer()->get(SourceFactory::class);
-        \assert($gitSourceFactory instanceof SourceFactory);
-        $this->sourceFactory = $gitSourceFactory;
-
-        $entityManager = self::getContainer()->get(EntityManagerInterface::class);
-        \assert($entityManager instanceof EntityManagerInterface);
-        $this->entityManager = $entityManager;
+        $factory = self::getContainer()->get(Factory::class);
+        \assert($factory instanceof Factory);
+        $this->factory = $factory;
 
         $repository = self::getContainer()->get(SourceRepository::class);
         \assert($repository instanceof SourceRepository);
         $this->repository = $repository;
+
+        $store = self::getContainer()->get(Store::class);
+        \assert($store instanceof Store);
+        $this->store = $store;
+
+        $entityManager = self::getContainer()->get(EntityManagerInterface::class);
+        \assert($entityManager instanceof EntityManagerInterface);
+        $this->entityManager = $entityManager;
 
         $sourceRemover = self::getContainer()->get(SourceRemover::class);
         if ($sourceRemover instanceof SourceRemover) {
@@ -47,17 +53,14 @@ class SourceRepositoryTest extends WebTestCase
     /**
      * @dataProvider persistAndRetrieveDataProvider
      *
-     * @param callable(SourceFactory): SourceInterface $sourceCreator
+     * @param callable(Factory): SourceInterface $sourceCreator
      */
     public function testPersistAndRetrieveSource(callable $sourceCreator): void
     {
-        $source = $sourceCreator($this->sourceFactory);
-
-        $this->entityManager->persist($source);
-        $this->entityManager->flush();
-
+        $source = $sourceCreator($this->factory);
         $sourceId = $source->getId();
 
+        $this->store->add($source);
         $this->entityManager->detach($source);
 
         $retrievedSource = $this->repository->find($sourceId);
@@ -75,7 +78,7 @@ class SourceRepositoryTest extends WebTestCase
     {
         return [
             GitSource::class => [
-                'entity' => function (SourceFactory $factory) {
+                'entity' => function (Factory $factory) {
                     return $factory->createGitSource(
                         self::USER_ID,
                         'https://example.com/repository.git',
@@ -85,12 +88,12 @@ class SourceRepositoryTest extends WebTestCase
                 },
             ],
             FileSource::class => [
-                'entity' => function (SourceFactory $factory) {
+                'entity' => function (Factory $factory) {
                     return $factory->createFileSource(self::USER_ID, 'source label');
                 },
             ],
             RunSource::class => [
-                'entity' => function (SourceFactory $factory) {
+                'entity' => function (Factory $factory) {
                     $parent = $factory->createFileSource(self::USER_ID, 'source label');
 
                     return $factory->createRunSource($parent);

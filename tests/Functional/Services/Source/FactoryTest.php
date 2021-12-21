@@ -2,34 +2,34 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Functional\Services;
+namespace App\Tests\Functional\Services\Source;
 
 use App\Entity\FileSource;
 use App\Entity\GitSource;
 use App\Entity\RunSource;
 use App\Entity\SourceInterface;
 use App\Repository\SourceRepository;
-use App\Request\CreateSourceRequest;
-use App\Services\SourceFactory;
-use App\Tests\Services\SourceRemover;
+use App\Request\GitSourceRequest;
+use App\Services\Source\Factory;
+use App\Tests\Services\Source\SourceRemover;
 use SmartAssert\UsersSecurityBundle\Security\User;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Uid\Ulid;
 
-class SourceFactoryTest extends WebTestCase
+class FactoryTest extends WebTestCase
 {
     private const USER_ID = '01FPSVJ7ZT85X73BW05EK9B3XG';
 
-    private SourceFactory $factory;
+    private Factory $factory;
     private SourceRepository $repository;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $factory = self::getContainer()->get(SourceFactory::class);
-        \assert($factory instanceof SourceFactory);
+        $factory = self::getContainer()->get(Factory::class);
+        \assert($factory instanceof Factory);
         $this->factory = $factory;
 
         $repository = self::getContainer()->get(SourceRepository::class);
@@ -122,11 +122,11 @@ class SourceFactoryTest extends WebTestCase
     }
 
     /**
-     * @dataProvider createFromRequestDataProvider
+     * @dataProvider createGitSourceFromRequestDataProvider
      */
-    public function testCreateFromRequest(UserInterface $user, CreateSourceRequest $request): void
+    public function testCreateGitSourceFromRequest(UserInterface $user, GitSourceRequest $request): void
     {
-        $source = $this->factory->createFromRequest($user, $request);
+        $source = $this->factory->createGitSourceFromRequest($user, $request);
 
         $this->assertCreatedGitSource(
             $source,
@@ -140,26 +140,20 @@ class SourceFactoryTest extends WebTestCase
     /**
      * @return array<mixed>
      */
-    public function createFromRequestDataProvider(): array
+    public function createGitSourceFromRequestDataProvider(): array
     {
         $user = new User(self::USER_ID);
+        $hostUrl = 'https://example.com/repository.git';
+        $path = '/';
 
         return [
             'empty access token' => [
                 'user' => $user,
-                'request' => new CreateSourceRequest(
-                    'https://example.com/repository.git',
-                    '/',
-                    null
-                ),
+                'request' => new GitSourceRequest($hostUrl, $path, null),
             ],
             'non-empty access token' => [
                 'user' => $user,
-                'request' => new CreateSourceRequest(
-                    'https://example.com/repository.git',
-                    '/',
-                    'access-token',
-                ),
+                'request' => new GitSourceRequest($hostUrl, $path, 'access-token'),
             ],
         ];
     }

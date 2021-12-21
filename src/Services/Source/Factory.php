@@ -2,24 +2,22 @@
 
 declare(strict_types=1);
 
-namespace App\Services;
+namespace App\Services\Source;
 
 use App\Entity\FileSource;
 use App\Entity\GitSource;
 use App\Entity\RunSource;
-use App\Entity\SourceInterface;
 use App\Repository\FileSourceRepository;
 use App\Repository\GitSourceRepository;
 use App\Repository\RunSourceRepository;
-use App\Request\CreateSourceRequest;
-use Doctrine\ORM\EntityManagerInterface;
+use App\Request\GitSourceRequest;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Uid\Ulid;
 
-class SourceFactory
+class Factory
 {
     public function __construct(
-        private EntityManagerInterface $entityManager,
+        private Store $store,
         private GitSourceRepository $gitSourceRepository,
         private FileSourceRepository $fileSourceRepository,
         private RunSourceRepository $runSourceRepository,
@@ -39,7 +37,7 @@ class SourceFactory
         }
 
         $source = new GitSource($this->generateId(), $userId, $hostUrl, $path, $accessToken);
-        $this->persist($source);
+        $this->store->add($source);
 
         return $source;
     }
@@ -56,7 +54,7 @@ class SourceFactory
         }
 
         $source = new FileSource($this->generateId(), $userId, $label);
-        $this->persist($source);
+        $this->store->add($source);
 
         return $source;
     }
@@ -78,12 +76,12 @@ class SourceFactory
         }
 
         $source = new RunSource($this->generateId(), $parent, $parameters);
-        $this->persist($source);
+        $this->store->add($source);
 
         return $source;
     }
 
-    public function createFromRequest(UserInterface $user, CreateSourceRequest $request): GitSource
+    public function createGitSourceFromRequest(UserInterface $user, GitSourceRequest $request): GitSource
     {
         return $this->createGitSource(
             $user->getUserIdentifier(),
@@ -96,11 +94,5 @@ class SourceFactory
     private function generateId(): string
     {
         return (string) new Ulid();
-    }
-
-    private function persist(SourceInterface $source): void
-    {
-        $this->entityManager->persist($source);
-        $this->entityManager->flush();
     }
 }
