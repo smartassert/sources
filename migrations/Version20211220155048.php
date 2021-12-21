@@ -20,7 +20,7 @@ final class Version20211220155048 extends AbstractMigration
         $this->addSql('
             CREATE TABLE run_source (
                 id VARCHAR(32) NOT NULL, 
-                parent_id VARCHAR(32) NOT NULL, 
+                parent_id VARCHAR(32), 
                 parameters TEXT DEFAULT NULL,
                 PRIMARY KEY(id)
             )
