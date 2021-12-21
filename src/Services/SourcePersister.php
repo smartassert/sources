@@ -10,7 +10,7 @@ use Doctrine\ORM\EntityManagerInterface;
 class SourcePersister
 {
     public function __construct(
-        private EntityManagerInterface $entityManager,
+        protected EntityManagerInterface $entityManager,
     ) {
     }
 

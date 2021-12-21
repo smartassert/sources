@@ -8,27 +8,27 @@ use App\Entity\FileSource;
 use App\Entity\GitSource;
 use App\Entity\RunSource;
 use App\Entity\SourceInterface;
-use App\Services\SourcePersister;
+use App\Repository\SourceRepository;
 use App\Tests\Services\SourceRemover;
-use Doctrine\ORM\EntityManagerInterface;
+use App\Tests\Services\TestSourcePersister;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Uid\Ulid;
 
 class RunSourceTest extends WebTestCase
 {
-    private EntityManagerInterface $entityManager;
-    private SourcePersister $sourcePersister;
+    private SourceRepository $repository;
+    private TestSourcePersister $sourcePersister;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $entityManager = self::getContainer()->get(EntityManagerInterface::class);
-        \assert($entityManager instanceof EntityManagerInterface);
-        $this->entityManager = $entityManager;
+        $repository = self::getContainer()->get(SourceRepository::class);
+        \assert($repository instanceof SourceRepository);
+        $this->repository = $repository;
 
-        $sourcePersister = self::getContainer()->get(SourcePersister::class);
-        \assert($sourcePersister instanceof SourcePersister);
+        $sourcePersister = self::getContainer()->get(TestSourcePersister::class);
+        \assert($sourcePersister instanceof TestSourcePersister);
         $this->sourcePersister = $sourcePersister;
 
         $sourceRemover = self::getContainer()->get(SourceRemover::class);
@@ -55,11 +55,10 @@ class RunSourceTest extends WebTestCase
 
         $this->sourcePersister->persist($runSource);
         $this->sourcePersister->remove($parent);
+        $this->sourcePersister->detach($parent);
+        $this->sourcePersister->detach($runSource);
 
-        $this->entityManager->detach($parent);
-        $this->entityManager->detach($runSource);
-
-        $retrievedRunSource = $this->entityManager->find(RunSource::class, $runSourceId);
+        $retrievedRunSource = $this->repository->find($runSourceId);
 
         self::assertEquals($runSource, $retrievedRunSource);
     }
