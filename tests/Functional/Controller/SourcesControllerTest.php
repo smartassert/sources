@@ -121,10 +121,7 @@ class SourcesControllerTest extends WebTestCase
      */
     public function testCreateGitSourceSuccess(string $userId, array $requestParameters, array $expected): void
     {
-        $token = 'valid-token';
-        $authHeaderName = AuthorizationProperties::DEFAULT_HEADER_NAME;
-        $authHeaderValue = AuthorizationProperties::DEFAULT_VALUE_PREFIX . $token;
-
+        $authorizationToken = 'valid-token';
         $this->mockHandler->append(
             new Response(200, [], $userId)
         );
@@ -134,15 +131,13 @@ class SourcesControllerTest extends WebTestCase
             SourceController::ROUTE_GIT_SOURCE_CREATE,
             $requestParameters,
             [],
-            [
-                'HTTP_' . $authHeaderName => $authHeaderValue,
-            ]
+            $this->createAuthorizationHeader($authorizationToken),
         );
 
         $response = $this->client->getResponse();
 
         self::assertSame(200, $response->getStatusCode());
-        $this->assertAuthorizationRequestIsMade($token);
+        $this->assertAuthorizationRequestIsMade($authorizationToken);
 
         $repository = self::getContainer()->get(GitSourceRepository::class);
         \assert($repository instanceof GitSourceRepository);
@@ -212,10 +207,7 @@ class SourcesControllerTest extends WebTestCase
      */
     public function testGetSuccess(callable $sourceCreator, string $userId, array $expectedResponseData): void
     {
-        $token = 'valid-token';
-        $authHeaderName = AuthorizationProperties::DEFAULT_HEADER_NAME;
-        $authHeaderValue = AuthorizationProperties::DEFAULT_VALUE_PREFIX . $token;
-
+        $authorizationToken = 'valid-token';
         $source = $sourceCreator($this->entityManager);
 
         $this->mockHandler->append(
@@ -227,14 +219,12 @@ class SourcesControllerTest extends WebTestCase
             SourceController::ROUTE_SOURCE . $source->getId(),
             [],
             [],
-            [
-                'HTTP_' . $authHeaderName => $authHeaderValue,
-            ]
+            $this->createAuthorizationHeader($authorizationToken)
         );
 
         $response = $this->client->getResponse();
         self::assertSame(200, $response->getStatusCode());
-        $this->assertAuthorizationRequestIsMade($token);
+        $this->assertAuthorizationRequestIsMade($authorizationToken);
         self::assertInstanceOf(JsonResponse::class, $response);
 
         $responseData = json_decode((string) $response->getContent(), true);
@@ -359,10 +349,7 @@ class SourcesControllerTest extends WebTestCase
         array $requestData,
         array $expectedResponseData
     ): void {
-        $token = 'valid-token';
-        $authHeaderName = AuthorizationProperties::DEFAULT_HEADER_NAME;
-        $authHeaderValue = AuthorizationProperties::DEFAULT_VALUE_PREFIX . $token;
-
+        $authorizationToken = 'valid-token';
         $source = $sourceCreator($this->entityManager);
 
         $this->mockHandler->append(
@@ -374,14 +361,12 @@ class SourcesControllerTest extends WebTestCase
             SourceController::ROUTE_SOURCE . $source->getId(),
             $requestData,
             [],
-            [
-                'HTTP_' . $authHeaderName => $authHeaderValue,
-            ]
+            $this->createAuthorizationHeader($authorizationToken)
         );
 
         $response = $this->client->getResponse();
         self::assertSame(200, $response->getStatusCode());
-        $this->assertAuthorizationRequestIsMade($token);
+        $this->assertAuthorizationRequestIsMade($authorizationToken);
         self::assertInstanceOf(JsonResponse::class, $response);
 
         $responseData = json_decode((string) $response->getContent(), true);
@@ -463,5 +448,18 @@ class SourcesControllerTest extends WebTestCase
         }
 
         $this->entityManager->flush();
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    private function createAuthorizationHeader(string $token): array
+    {
+        $authHeaderName = AuthorizationProperties::DEFAULT_HEADER_NAME;
+        $authHeaderValue = AuthorizationProperties::DEFAULT_VALUE_PREFIX . $token;
+
+        return [
+            'HTTP_' . $authHeaderName => $authHeaderValue,
+        ];
     }
 }
