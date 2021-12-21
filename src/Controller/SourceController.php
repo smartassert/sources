@@ -20,16 +20,24 @@ class SourceController
     public const ROUTE_GIT_SOURCE_CREATE = '/git';
     public const ROUTE_SOURCE = '/';
 
+    public function __construct(
+        private Factory $factory,
+        private Repository $repository,
+        private Store $store,
+        private Mutator $mutator
+    ) {
+    }
+
     #[Route(self::ROUTE_GIT_SOURCE_CREATE, name: 'create_git', methods: ['POST'])]
-    public function createGitSource(UserInterface $user, GitSourceRequest $request, Factory $factory): JsonResponse
+    public function createGitSource(UserInterface $user, GitSourceRequest $request): JsonResponse
     {
-        return new JsonResponse($factory->createGitSourceFromRequest($user, $request));
+        return new JsonResponse($this->factory->createGitSourceFromRequest($user, $request));
     }
 
     #[Route(self::ROUTE_SOURCE . '{sourceId<[A-Z90-9]{26}>}', name: 'get', methods: ['GET'])]
-    public function get(string $sourceId, Repository $repository, UserInterface $user): JsonResponse
+    public function get(string $sourceId, UserInterface $user): JsonResponse
     {
-        $source = $repository->find($sourceId);
+        $source = $this->repository->find($sourceId);
         if (null === $source) {
             return new JsonResponse(null, 404);
         }
@@ -42,14 +50,9 @@ class SourceController
     }
 
     #[Route(self::ROUTE_SOURCE . '{sourceId<[A-Z90-9]{26}>}', name: 'update', methods: ['PUT'])]
-    public function update(
-        string $sourceId,
-        Request $request,
-        Repository $repository,
-        Mutator $mutator,
-        UserInterface $user,
-    ): JsonResponse {
-        $source = $repository->find($sourceId);
+    public function update(string $sourceId, Request $request, UserInterface $user): JsonResponse
+    {
+        $source = $this->repository->find($sourceId);
         if (null === $source) {
             return new JsonResponse(null, 404);
         }
@@ -62,15 +65,15 @@ class SourceController
             return new JsonResponse(null, 404);
         }
 
-        $source = $mutator->updateGitSource($source, GitSourceRequest::create($request));
+        $source = $this->mutator->updateGitSource($source, GitSourceRequest::create($request));
 
         return new JsonResponse($source);
     }
 
     #[Route(self::ROUTE_SOURCE . '{sourceId<[A-Z90-9]{26}>}', name: 'delete', methods: ['DELETE'])]
-    public function delete(string $sourceId, Repository $repository, UserInterface $user, Store $store): JsonResponse
+    public function delete(string $sourceId, UserInterface $user): JsonResponse
     {
-        $source = $repository->find($sourceId);
+        $source = $this->repository->find($sourceId);
         if (null === $source) {
             return new JsonResponse(null, 404);
         }
@@ -79,7 +82,7 @@ class SourceController
             return new JsonResponse(null, 401);
         }
 
-        $store->remove($source);
+        $this->store->remove($source);
 
         return new JsonResponse(null, 200);
     }
