@@ -19,4 +19,10 @@ class SourcePersister
         $this->entityManager->persist($source);
         $this->entityManager->flush();
     }
+
+    public function remove(SourceInterface $source): void
+    {
+        $this->entityManager->remove($source);
+        $this->entityManager->flush();
+    }
 }

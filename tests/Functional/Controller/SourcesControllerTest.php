@@ -11,8 +11,8 @@ use App\Entity\RunSource;
 use App\Entity\SourceInterface;
 use App\Repository\GitSourceRepository;
 use App\Request\GitSourceRequest;
+use App\Services\SourcePersister;
 use App\Tests\Services\SourceRemover;
-use Doctrine\ORM\EntityManagerInterface;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Middleware;
@@ -34,17 +34,13 @@ class SourcesControllerTest extends WebTestCase
     private KernelBrowser $client;
     private MockHandler $mockHandler;
     private HttpHistoryContainer $httpHistoryContainer;
-    private EntityManagerInterface $entityManager;
+    private SourcePersister $sourcePersister;
 
     protected function setUp(): void
     {
         parent::setUp();
 
         $this->client = static::createClient();
-
-        $entityManager = self::getContainer()->get(EntityManagerInterface::class);
-        \assert($entityManager instanceof EntityManagerInterface);
-        $this->entityManager = $entityManager;
 
         $mockHandler = self::getContainer()->get(MockHandler::class);
         \assert($mockHandler instanceof MockHandler);
@@ -57,6 +53,10 @@ class SourcesControllerTest extends WebTestCase
         $handlerStack = self::getContainer()->get(HandlerStack::class);
         \assert($handlerStack instanceof HandlerStack);
         $handlerStack->push(Middleware::history($this->httpHistoryContainer), 'history');
+
+        $sourcePersister = self::getContainer()->get(SourcePersister::class);
+        \assert($sourcePersister instanceof SourcePersister);
+        $this->sourcePersister = $sourcePersister;
 
         $sourceRemover = self::getContainer()->get(SourceRemover::class);
         if ($sourceRemover instanceof SourceRemover) {
@@ -135,7 +135,7 @@ class SourcesControllerTest extends WebTestCase
         $label = 'source label';
 
         $source = new FileSource($sourceId, $sourceUserId, $label);
-        $this->entityManager->persist($source);
+        $this->sourcePersister->persist($source);
 
         $this->mockHandler->append(
             new Response(200, [], $requestUserId)
@@ -250,12 +250,12 @@ class SourcesControllerTest extends WebTestCase
     /**
      * @dataProvider getSuccessDataProvider
      *
-     * @param callable(EntityManagerInterface): SourceInterface $sourceCreator
-     * @param array<mixed>                                      $expectedResponseData
+     * @param callable(SourcePersister): SourceInterface $sourceCreator
+     * @param array<mixed>                               $expectedResponseData
      */
     public function testGetSuccess(callable $sourceCreator, string $userId, array $expectedResponseData): void
     {
-        $source = $sourceCreator($this->entityManager);
+        $source = $sourceCreator($this->sourcePersister);
 
         $this->mockHandler->append(
             new Response(200, [], $userId)
@@ -288,7 +288,7 @@ class SourcesControllerTest extends WebTestCase
         return [
             SourceInterface::TYPE_GIT => [
                 'sourceCreator' => function (
-                    EntityManagerInterface $entityManager
+                    SourcePersister $sourcePersister
                 ) use (
                     $gitSourceId,
                     $userId,
@@ -297,7 +297,7 @@ class SourcesControllerTest extends WebTestCase
                     $accessToken
                 ) {
                     $source = new GitSource($gitSourceId, $userId, $hostUrl, $path, $accessToken);
-                    $entityManager->persist($source);
+                    $sourcePersister->persist($source);
 
                     return $source;
                 },
@@ -313,14 +313,14 @@ class SourcesControllerTest extends WebTestCase
             ],
             SourceInterface::TYPE_FILE => [
                 'sourceCreator' => function (
-                    EntityManagerInterface $entityManager
+                    SourcePersister $sourcePersister
                 ) use (
                     $fileSourceId,
                     $userId,
                     $label
                 ) {
                     $source = new FileSource($fileSourceId, $userId, $label);
-                    $entityManager->persist($source);
+                    $sourcePersister->persist($source);
 
                     return $source;
                 },
@@ -334,7 +334,7 @@ class SourcesControllerTest extends WebTestCase
             ],
             SourceInterface::TYPE_RUN => [
                 'sourceCreator' => function (
-                    EntityManagerInterface $entityManager
+                    SourcePersister $sourcePersister
                 ) use (
                     $fileSourceId,
                     $runSourceId,
@@ -342,10 +342,10 @@ class SourcesControllerTest extends WebTestCase
                     $label
                 ) {
                     $parent = new FileSource($fileSourceId, $userId, $label);
-                    $entityManager->persist($parent);
+                    $sourcePersister->persist($parent);
 
                     $source = new RunSource($runSourceId, $parent);
-                    $entityManager->persist($source);
+                    $sourcePersister->persist($source);
 
                     return $source;
                 },
@@ -364,9 +364,9 @@ class SourcesControllerTest extends WebTestCase
     /**
      * @dataProvider updateSuccessDataProvider
      *
-     * @param callable(EntityManagerInterface): SourceInterface $sourceCreator
-     * @param array<string, string>                             $requestData
-     * @param array<mixed>                                      $expectedResponseData
+     * @param callable(SourcePersister): SourceInterface $sourceCreator
+     * @param array<string, string>                      $requestData
+     * @param array<mixed>                               $expectedResponseData
      */
     public function testUpdateSuccess(
         callable $sourceCreator,
@@ -374,7 +374,7 @@ class SourcesControllerTest extends WebTestCase
         array $requestData,
         array $expectedResponseData
     ): void {
-        $source = $sourceCreator($this->entityManager);
+        $source = $sourceCreator($this->sourcePersister);
 
         $this->mockHandler->append(
             new Response(200, [], $userId)
@@ -406,7 +406,7 @@ class SourcesControllerTest extends WebTestCase
         return [
             SourceInterface::TYPE_GIT => [
                 'sourceCreator' => function (
-                    EntityManagerInterface $entityManager
+                    SourcePersister $sourcePersister
                 ) use (
                     $gitSourceId,
                     $userId,
@@ -415,7 +415,7 @@ class SourcesControllerTest extends WebTestCase
                     $accessToken
                 ) {
                     $source = new GitSource($gitSourceId, $userId, $hostUrl, $path, $accessToken);
-                    $entityManager->persist($source);
+                    $sourcePersister->persist($source);
 
                     return $source;
                 },
