@@ -10,7 +10,7 @@ use App\Entity\RunSource;
 use App\Entity\SourceInterface;
 use App\Repository\SourceRepository;
 use App\Services\SourceFactory;
-use App\Services\SourcePersister;
+use App\Services\SourceStore;
 use App\Tests\Services\SourceRemover;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -21,7 +21,7 @@ class SourceRepositoryTest extends WebTestCase
 
     private SourceFactory $sourceFactory;
     private SourceRepository $repository;
-    private SourcePersister $sourcePersister;
+    private SourceStore $store;
     private EntityManagerInterface $entityManager;
 
     protected function setUp(): void
@@ -36,9 +36,9 @@ class SourceRepositoryTest extends WebTestCase
         \assert($repository instanceof SourceRepository);
         $this->repository = $repository;
 
-        $sourcePersister = self::getContainer()->get(SourcePersister::class);
-        \assert($sourcePersister instanceof SourcePersister);
-        $this->sourcePersister = $sourcePersister;
+        $store = self::getContainer()->get(SourceStore::class);
+        \assert($store instanceof SourceStore);
+        $this->store = $store;
 
         $entityManager = self::getContainer()->get(EntityManagerInterface::class);
         \assert($entityManager instanceof EntityManagerInterface);
@@ -60,7 +60,7 @@ class SourceRepositoryTest extends WebTestCase
         $source = $sourceCreator($this->sourceFactory);
         $sourceId = $source->getId();
 
-        $this->sourcePersister->persist($source);
+        $this->store->add($source);
         $this->entityManager->detach($source);
 
         $retrievedSource = $this->repository->find($sourceId);

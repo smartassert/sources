@@ -17,7 +17,7 @@ use Symfony\Component\Uid\Ulid;
 class SourceFactory
 {
     public function __construct(
-        private SourcePersister $persister,
+        private SourceStore $store,
         private GitSourceRepository $gitSourceRepository,
         private FileSourceRepository $fileSourceRepository,
         private RunSourceRepository $runSourceRepository,
@@ -37,7 +37,7 @@ class SourceFactory
         }
 
         $source = new GitSource($this->generateId(), $userId, $hostUrl, $path, $accessToken);
-        $this->persister->persist($source);
+        $this->store->add($source);
 
         return $source;
     }
@@ -54,7 +54,7 @@ class SourceFactory
         }
 
         $source = new FileSource($this->generateId(), $userId, $label);
-        $this->persister->persist($source);
+        $this->store->add($source);
 
         return $source;
     }
@@ -76,7 +76,7 @@ class SourceFactory
         }
 
         $source = new RunSource($this->generateId(), $parent, $parameters);
-        $this->persister->persist($source);
+        $this->store->add($source);
 
         return $source;
     }

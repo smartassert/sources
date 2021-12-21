@@ -7,14 +7,14 @@ namespace App\Services;
 use App\Entity\SourceInterface;
 use Doctrine\ORM\EntityManagerInterface;
 
-class SourcePersister
+class SourceStore
 {
     public function __construct(
         protected EntityManagerInterface $entityManager,
     ) {
     }
 
-    public function persist(SourceInterface $source): void
+    public function add(SourceInterface $source): void
     {
         $this->entityManager->persist($source);
         $this->entityManager->flush();

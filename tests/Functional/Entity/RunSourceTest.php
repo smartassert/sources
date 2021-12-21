@@ -9,7 +9,7 @@ use App\Entity\GitSource;
 use App\Entity\RunSource;
 use App\Entity\SourceInterface;
 use App\Repository\SourceRepository;
-use App\Services\SourcePersister;
+use App\Services\SourceStore;
 use App\Tests\Services\SourceRemover;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -18,7 +18,7 @@ use Symfony\Component\Uid\Ulid;
 class RunSourceTest extends WebTestCase
 {
     private SourceRepository $repository;
-    private SourcePersister $sourcePersister;
+    private SourceStore $store;
     private EntityManagerInterface $entityManager;
 
     protected function setUp(): void
@@ -29,9 +29,9 @@ class RunSourceTest extends WebTestCase
         \assert($repository instanceof SourceRepository);
         $this->repository = $repository;
 
-        $sourcePersister = self::getContainer()->get(SourcePersister::class);
-        \assert($sourcePersister instanceof SourcePersister);
-        $this->sourcePersister = $sourcePersister;
+        $store = self::getContainer()->get(SourceStore::class);
+        \assert($store instanceof SourceStore);
+        $this->store = $store;
 
         $entityManager = self::getContainer()->get(EntityManagerInterface::class);
         \assert($entityManager instanceof EntityManagerInterface);
@@ -48,19 +48,19 @@ class RunSourceTest extends WebTestCase
      */
     public function testDeleteParent(FileSource|GitSource $parent): void
     {
-        $this->sourcePersister->persist($parent);
+        $this->store->add($parent);
 
         $runSourceId = (string) new Ulid();
         $runSource = new RunSource($runSourceId, $parent);
 
-        $this->sourcePersister->persist($runSource);
+        $this->store->add($runSource);
         self::assertSame($parent, $runSource->getParent());
 
         $runSource->unsetParent();
         self::assertNull($runSource->getParent());
 
-        $this->sourcePersister->persist($runSource);
-        $this->sourcePersister->remove($parent);
+        $this->store->add($runSource);
+        $this->store->remove($parent);
         $this->entityManager->detach($parent);
         $this->entityManager->detach($runSource);
 

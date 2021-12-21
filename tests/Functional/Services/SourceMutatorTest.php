@@ -7,7 +7,7 @@ namespace App\Tests\Functional\Services;
 use App\Entity\GitSource;
 use App\Request\GitSourceRequest;
 use App\Services\SourceMutator;
-use App\Services\SourcePersister;
+use App\Services\SourceStore;
 use App\Tests\Services\SourceRemover;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Uid\Ulid;
@@ -15,7 +15,7 @@ use Symfony\Component\Uid\Ulid;
 class SourceMutatorTest extends WebTestCase
 {
     private SourceMutator $mutator;
-    private SourcePersister $sourcePersister;
+    private SourceStore $store;
 
     protected function setUp(): void
     {
@@ -25,9 +25,9 @@ class SourceMutatorTest extends WebTestCase
         \assert($mutator instanceof SourceMutator);
         $this->mutator = $mutator;
 
-        $sourcePersister = self::getContainer()->get(SourcePersister::class);
-        \assert($sourcePersister instanceof SourcePersister);
-        $this->sourcePersister = $sourcePersister;
+        $store = self::getContainer()->get(SourceStore::class);
+        \assert($store instanceof SourceStore);
+        $this->store = $store;
 
         $sourceRemover = self::getContainer()->get(SourceRemover::class);
         if ($sourceRemover instanceof SourceRemover) {
@@ -40,7 +40,7 @@ class SourceMutatorTest extends WebTestCase
      */
     public function testUpdateGitSource(GitSource $source, GitSourceRequest $request, GitSource $expected): void
     {
-        $this->sourcePersister->persist($source);
+        $this->store->add($source);
 
         $mutatedSource = $this->mutator->updateGitSource($source, $request);
 
