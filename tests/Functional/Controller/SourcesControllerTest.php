@@ -5,6 +5,9 @@ declare(strict_types=1);
 namespace App\Tests\Functional\Controller;
 
 use App\Controller\SourceController;
+use App\Entity\FileSource;
+use App\Entity\GitSource;
+use App\Entity\RunSource;
 use App\Entity\SourceInterface;
 use App\Repository\GitSourceRepository;
 use App\Request\CreateGitSourceRequest;
@@ -18,6 +21,7 @@ use SmartAssert\UsersClient\Routes;
 use SmartAssert\UsersSecurityBundle\Security\AuthorizationProperties;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Uid\Ulid;
 use webignition\HttpHistoryContainer\Container as HttpHistoryContainer;
 
@@ -166,6 +170,126 @@ class SourcesControllerTest extends WebTestCase
                     'host_url' => $hostUrl,
                     'path' => $path,
                     'access_token' => $accessToken,
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider getSuccessDataProvider
+     *
+     * @param callable(EntityManagerInterface): SourceInterface $sourceCreator
+     * @param array<mixed>                                      $expectedResponseData
+     */
+    public function testGetSuccess(callable $sourceCreator, string $userId, array $expectedResponseData): void
+    {
+        $source = $sourceCreator($this->entityManager);
+
+        $this->mockHandler->append(
+            new Response(200, [], $userId)
+        );
+
+        $this->client->request(
+            'GET',
+            SourceController::ROUTE_SOURCE_GET . $source->getId(),
+            [],
+            [],
+            []
+        );
+
+        $response = $this->client->getResponse();
+        self::assertSame(200, $response->getStatusCode());
+        self::assertInstanceOf(JsonResponse::class, $response);
+
+        $responseData = json_decode((string) $response->getContent(), true);
+        self::assertEquals($expectedResponseData, $responseData);
+    }
+
+    /**
+     * @return array<mixed>
+     */
+    public function getSuccessDataProvider(): array
+    {
+        $gitSourceId = (string) new Ulid();
+        $fileSourceId = (string) new Ulid();
+        $runSourceId = (string) new Ulid();
+        $userId = (string) new Ulid();
+        $hostUrl = 'https://example.com/repository.git';
+        $path = '/';
+        $accessToken = md5((string) rand());
+        $label = 'file source label';
+
+        return [
+            SourceInterface::TYPE_GIT => [
+                'sourceCreator' => function (
+                    EntityManagerInterface $entityManager
+                ) use (
+                    $gitSourceId,
+                    $userId,
+                    $hostUrl,
+                    $path,
+                    $accessToken
+                ) {
+                    $source = new GitSource($gitSourceId, $userId, $hostUrl, $path, $accessToken);
+                    $entityManager->persist($source);
+
+                    return $source;
+                },
+                'userId' => $userId,
+                'expectedResponseData' => [
+                    'id' => $gitSourceId,
+                    'user_id' => $userId,
+                    'type' => SourceInterface::TYPE_GIT,
+                    'host_url' => $hostUrl,
+                    'path' => $path,
+                    'access_token' => $accessToken,
+                ],
+            ],
+            SourceInterface::TYPE_FILE => [
+                'sourceCreator' => function (
+                    EntityManagerInterface $entityManager
+                ) use (
+                    $fileSourceId,
+                    $userId,
+                    $label
+                ) {
+                    $source = new FileSource($fileSourceId, $userId, $label);
+                    $entityManager->persist($source);
+
+                    return $source;
+                },
+                'userId' => $userId,
+                'expectedResponseData' => [
+                    'id' => $fileSourceId,
+                    'user_id' => $userId,
+                    'type' => SourceInterface::TYPE_FILE,
+                    'label' => $label,
+                ],
+            ],
+            SourceInterface::TYPE_RUN => [
+                'sourceCreator' => function (
+                    EntityManagerInterface $entityManager
+                ) use (
+                    $fileSourceId,
+                    $runSourceId,
+                    $userId,
+                    $label
+                ) {
+                    $parent = new FileSource($fileSourceId, $userId, $label);
+                    $entityManager->persist($parent);
+
+                    $source = new RunSource($runSourceId, $parent);
+                    $entityManager->persist($source);
+
+                    return $source;
+                },
+                'userId' => $userId,
+                'expectedResponseData' => [
+                    'id' => $runSourceId,
+                    'user_id' => $userId,
+                    'type' => SourceInterface::TYPE_RUN,
+                    'parent' => $fileSourceId,
+                    'parameters' => [],
                 ],
             ],
         ];
