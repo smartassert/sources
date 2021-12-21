@@ -37,6 +37,21 @@ class GitSource extends AbstractSource implements \JsonSerializable
         return $this->hostUrl;
     }
 
+    public function setHostUrl(string $hostUrl): void
+    {
+        $this->hostUrl = $hostUrl;
+    }
+
+    public function setPath(string $path): void
+    {
+        $this->path = $path;
+    }
+
+    public function setAccessToken(?string $accessToken): void
+    {
+        $this->accessToken = $accessToken;
+    }
+
     public function getPath(): string
     {
         return $this->path;
