@@ -11,8 +11,8 @@ use App\Entity\RunSource;
 use App\Entity\SourceInterface;
 use App\Repository\GitSourceRepository;
 use App\Request\GitSourceRequest;
-use Doctrine\ORM\EntityManagerInterface;
 use App\Tests\Services\SourceRemover;
+use Doctrine\ORM\EntityManagerInterface;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Middleware;
@@ -34,6 +34,7 @@ class SourcesControllerTest extends WebTestCase
     private KernelBrowser $client;
     private MockHandler $mockHandler;
     private HttpHistoryContainer $httpHistoryContainer;
+    private EntityManagerInterface $entityManager;
 
     protected function setUp(): void
     {
