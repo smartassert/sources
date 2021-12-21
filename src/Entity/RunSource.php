@@ -10,8 +10,8 @@ use Doctrine\ORM\Mapping as ORM;
 class RunSource extends AbstractSource implements \JsonSerializable
 {
     #[ORM\OneToOne(targetEntity: AbstractSource::class, cascade: ['persist', 'remove'])]
-    #[ORM\JoinColumn(nullable: false)]
-    private FileSource|GitSource $parent;
+    #[ORM\JoinColumn(nullable: true)]
+    private FileSource|GitSource|null $parent;
 
     /**
      * @var array<string, string>
@@ -33,9 +33,14 @@ class RunSource extends AbstractSource implements \JsonSerializable
         $this->parameters = $parameters;
     }
 
-    public function getParent(): FileSource|GitSource
+    public function getParent(): FileSource|GitSource|null
     {
         return $this->parent;
+    }
+
+    public function unsetParent(): void
+    {
+        $this->parent = null;
     }
 
     /**
@@ -51,7 +56,7 @@ class RunSource extends AbstractSource implements \JsonSerializable
      *     "id": string,
      *     "user_id": string,
      *     "type": SourceInterface::TYPE_RUN,
-     *     "parent": string,
+     *     "parent": string|null,
      *     "parameters": array<string, string>
      * }
      */
@@ -61,7 +66,7 @@ class RunSource extends AbstractSource implements \JsonSerializable
             'id' => $this->id,
             'user_id' => $this->getUserId(),
             'type' => SourceInterface::TYPE_RUN,
-            'parent' => $this->parent->getId(),
+            'parent' => $this->parent?->getId(),
             'parameters' => $this->parameters,
         ];
     }
