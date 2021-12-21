@@ -13,26 +13,23 @@ class CreateGitSourceRequest implements EncapsulatingRequestInterface
     public const KEY_POST_HOST_URL = 'host-url';
     public const KEY_POST_PATH = 'path';
     public const KEY_POST_ACCESS_TOKEN = 'access-token';
-    public const KEY_POST_REF = 'ref';
 
     public function __construct(
         private string $hostUrl,
         private string $path,
         private ?string $accessToken,
-        private ?string $ref
     ) {
     }
 
     public static function create(Request $request): CreateGitSourceRequest
     {
         $accessToken = self::getStringValueOrNull($request->request, self::KEY_POST_ACCESS_TOKEN);
-        $ref = self::getStringValueOrNull($request->request, self::KEY_POST_REF);
+        $accessToken = '';
 
         return new CreateGitSourceRequest(
             (string) $request->request->get(self::KEY_POST_HOST_URL),
             (string) $request->request->get(self::KEY_POST_PATH),
-            $accessToken,
-            $ref
+            $accessToken
         );
     }
 
@@ -49,11 +46,6 @@ class CreateGitSourceRequest implements EncapsulatingRequestInterface
     public function getAccessToken(): ?string
     {
         return $this->accessToken;
-    }
-
-    public function getRef(): ?string
-    {
-        return $this->ref;
     }
 
     private static function getStringValueOrNull(ParameterBag $parameterBag, string $key): ?string
