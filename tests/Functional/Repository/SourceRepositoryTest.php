@@ -11,7 +11,7 @@ use App\Entity\SourceInterface;
 use App\Repository\SourceRepository;
 use App\Services\SourceFactory;
 use App\Tests\Services\SourceRemover;
-use Doctrine\ORM\EntityManagerInterface;
+use App\Tests\Services\TestSourcePersister;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 class SourceRepositoryTest extends WebTestCase
@@ -19,8 +19,8 @@ class SourceRepositoryTest extends WebTestCase
     private const USER_ID = '01FPSVJ7ZT85X73BW05EK9B3XG';
 
     private SourceFactory $sourceFactory;
-    private EntityManagerInterface $entityManager;
     private SourceRepository $repository;
+    private TestSourcePersister $sourcePersister;
 
     protected function setUp(): void
     {
@@ -30,13 +30,13 @@ class SourceRepositoryTest extends WebTestCase
         \assert($gitSourceFactory instanceof SourceFactory);
         $this->sourceFactory = $gitSourceFactory;
 
-        $entityManager = self::getContainer()->get(EntityManagerInterface::class);
-        \assert($entityManager instanceof EntityManagerInterface);
-        $this->entityManager = $entityManager;
-
         $repository = self::getContainer()->get(SourceRepository::class);
         \assert($repository instanceof SourceRepository);
         $this->repository = $repository;
+
+        $sourcePersister = self::getContainer()->get(TestSourcePersister::class);
+        \assert($sourcePersister instanceof TestSourcePersister);
+        $this->sourcePersister = $sourcePersister;
 
         $sourceRemover = self::getContainer()->get(SourceRemover::class);
         if ($sourceRemover instanceof SourceRemover) {
@@ -52,13 +52,10 @@ class SourceRepositoryTest extends WebTestCase
     public function testPersistAndRetrieveSource(callable $sourceCreator): void
     {
         $source = $sourceCreator($this->sourceFactory);
-
-        $this->entityManager->persist($source);
-        $this->entityManager->flush();
-
         $sourceId = $source->getId();
 
-        $this->entityManager->detach($source);
+        $this->sourcePersister->persist($source);
+        $this->sourcePersister->detach($source);
 
         $retrievedSource = $this->repository->find($sourceId);
         self::assertInstanceOf($source::class, $retrievedSource);

@@ -7,19 +7,17 @@ namespace App\Services;
 use App\Entity\FileSource;
 use App\Entity\GitSource;
 use App\Entity\RunSource;
-use App\Entity\SourceInterface;
 use App\Repository\FileSourceRepository;
 use App\Repository\GitSourceRepository;
 use App\Repository\RunSourceRepository;
 use App\Request\GitSourceRequest;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Uid\Ulid;
 
 class SourceFactory
 {
     public function __construct(
-        private EntityManagerInterface $entityManager,
+        private SourcePersister $persister,
         private GitSourceRepository $gitSourceRepository,
         private FileSourceRepository $fileSourceRepository,
         private RunSourceRepository $runSourceRepository,
@@ -39,18 +37,7 @@ class SourceFactory
         }
 
         $source = new GitSource($this->generateId(), $userId, $hostUrl, $path, $accessToken);
-        $this->persist($source);
-
-        return $source;
-    }
-
-    public function updateGitSource(GitSource $source, GitSourceRequest $request): GitSource
-    {
-        $source->setHostUrl($request->getHostUrl());
-        $source->setPath($request->getPath());
-        $source->setAccessToken($request->getAccessToken());
-
-        $this->persist($source);
+        $this->persister->persist($source);
 
         return $source;
     }
@@ -67,7 +54,7 @@ class SourceFactory
         }
 
         $source = new FileSource($this->generateId(), $userId, $label);
-        $this->persist($source);
+        $this->persister->persist($source);
 
         return $source;
     }
@@ -89,7 +76,7 @@ class SourceFactory
         }
 
         $source = new RunSource($this->generateId(), $parent, $parameters);
-        $this->persist($source);
+        $this->persister->persist($source);
 
         return $source;
     }
@@ -107,11 +94,5 @@ class SourceFactory
     private function generateId(): string
     {
         return (string) new Ulid();
-    }
-
-    private function persist(SourceInterface $source): void
-    {
-        $this->entityManager->persist($source);
-        $this->entityManager->flush();
     }
 }

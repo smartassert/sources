@@ -19,3 +19,6 @@ services:
 
     App\Tests\Services\SourceRemover:
         public: true
+
+    App\Tests\Services\TestSourcePersister:
+        public: true
