@@ -12,6 +12,7 @@ use App\Repository\SourceRepository;
 use App\Request\GitSourceRequest;
 use App\Services\SourceFactory;
 use App\Tests\Services\SourceRemover;
+use Doctrine\ORM\EntityManagerInterface;
 use SmartAssert\UsersSecurityBundle\Security\User;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -23,6 +24,7 @@ class SourceFactoryTest extends WebTestCase
 
     private SourceFactory $factory;
     private SourceRepository $repository;
+    private EntityManagerInterface $entityManager;
 
     protected function setUp(): void
     {
@@ -35,6 +37,10 @@ class SourceFactoryTest extends WebTestCase
         $repository = self::getContainer()->get(SourceRepository::class);
         \assert($repository instanceof SourceRepository);
         $this->repository = $repository;
+
+        $entityManager = self::getContainer()->get(EntityManagerInterface::class);
+        \assert($entityManager instanceof EntityManagerInterface);
+        $this->entityManager = $entityManager;
 
         $sourceRemover = self::getContainer()->get(SourceRemover::class);
         if ($sourceRemover instanceof SourceRemover) {
