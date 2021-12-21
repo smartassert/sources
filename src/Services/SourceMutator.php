@@ -10,7 +10,7 @@ use App\Request\GitSourceRequest;
 class SourceMutator
 {
     public function __construct(
-        private SourcePersister $persister,
+        private SourceStore $store,
     ) {
     }
 
@@ -20,7 +20,7 @@ class SourceMutator
         $source->setPath($request->getPath());
         $source->setAccessToken($request->getAccessToken());
 
-        $this->persister->persist($source);
+        $this->store->add($source);
 
         return $source;
     }
