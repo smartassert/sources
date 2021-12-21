@@ -14,7 +14,7 @@ use App\Request\GitSourceRequest;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Uid\Ulid;
 
-class SourceFactory
+class Factory
 {
     public function __construct(
         private SourceStore $store,

@@ -10,26 +10,26 @@ use App\Entity\RunSource;
 use App\Entity\SourceInterface;
 use App\Repository\SourceRepository;
 use App\Request\GitSourceRequest;
-use App\Services\Source\SourceFactory;
+use App\Services\Source\Factory;
 use App\Tests\Services\Source\SourceRemover;
 use SmartAssert\UsersSecurityBundle\Security\User;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Uid\Ulid;
 
-class SourceFactoryTest extends WebTestCase
+class FactoryTest extends WebTestCase
 {
     private const USER_ID = '01FPSVJ7ZT85X73BW05EK9B3XG';
 
-    private SourceFactory $factory;
+    private Factory $factory;
     private SourceRepository $repository;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $factory = self::getContainer()->get(SourceFactory::class);
-        \assert($factory instanceof SourceFactory);
+        $factory = self::getContainer()->get(Factory::class);
+        \assert($factory instanceof Factory);
         $this->factory = $factory;
 
         $repository = self::getContainer()->get(SourceRepository::class);

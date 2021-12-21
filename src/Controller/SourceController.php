@@ -7,7 +7,7 @@ namespace App\Controller;
 use App\Entity\GitSource;
 use App\Repository\SourceRepository;
 use App\Request\GitSourceRequest;
-use App\Services\Source\SourceFactory;
+use App\Services\Source\Factory;
 use App\Services\Source\SourceMutator;
 use App\Services\Source\SourceStore;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -21,12 +21,9 @@ class SourceController
     public const ROUTE_SOURCE = '/';
 
     #[Route(self::ROUTE_GIT_SOURCE_CREATE, name: 'create_git', methods: ['POST'])]
-    public function createGitSource(
-        UserInterface $user,
-        GitSourceRequest $request,
-        SourceFactory $sourceFactory
-    ): JsonResponse {
-        return new JsonResponse($sourceFactory->createGitSourceFromRequest($user, $request));
+    public function createGitSource(UserInterface $user, GitSourceRequest $request, Factory $factory): JsonResponse
+    {
+        return new JsonResponse($factory->createGitSourceFromRequest($user, $request));
     }
 
     #[Route(self::ROUTE_SOURCE . '{sourceId<[A-Z90-9]{26}>}', name: 'get', methods: ['GET'])]
