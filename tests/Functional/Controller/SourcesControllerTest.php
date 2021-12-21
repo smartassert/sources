@@ -114,6 +114,41 @@ class SourcesControllerTest extends WebTestCase
     }
 
     /**
+     * @dataProvider requestSourceNotFoundDataProvider
+     */
+    public function testRequestSourceNotFound(string $method, string $uri): void
+    {
+        $this->mockHandler->append(
+            new Response(200, [], (string) new Ulid())
+        );
+
+        $this->client->request($method, $uri);
+
+        $response = $this->client->getResponse();
+        self::assertSame(404, $response->getStatusCode());
+    }
+
+    /**
+     * @return array<mixed>
+     */
+    public function requestSourceNotFoundDataProvider(): array
+    {
+        $sourceId = (string) new Ulid();
+        $sourceUrl = SourceController::ROUTE_SOURCE . $sourceId;
+
+        return [
+            'get source' => [
+                'method' => 'GET',
+                'uri' => $sourceUrl,
+            ],
+            'update source' => [
+                'method' => 'PUT',
+                'uri' => $sourceUrl,
+            ],
+        ];
+    }
+
+    /**
      * @dataProvider createGitSourceDataProvider
      *
      * @param array<mixed> $requestParameters
@@ -319,21 +354,6 @@ class SourcesControllerTest extends WebTestCase
                 ],
             ],
         ];
-    }
-
-    public function testUpdateSourceNotFound(): void
-    {
-        $userId = (string) new Ulid();
-        $sourceId = (string) new Ulid();
-
-        $this->mockHandler->append(
-            new Response(200, [], $userId)
-        );
-
-        $this->client->request('PUT', SourceController::ROUTE_SOURCE . $sourceId);
-
-        $response = $this->client->getResponse();
-        self::assertSame(404, $response->getStatusCode());
     }
 
     /**
