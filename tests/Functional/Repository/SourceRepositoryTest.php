@@ -9,9 +9,9 @@ use App\Entity\GitSource;
 use App\Entity\RunSource;
 use App\Entity\SourceInterface;
 use App\Repository\SourceRepository;
-use App\Services\SourceFactory;
-use App\Services\SourceStore;
-use App\Tests\Services\SourceRemover;
+use App\Services\Source\SourceFactory;
+use App\Services\Source\SourceStore;
+use App\Tests\Services\Source\SourceRemover;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 

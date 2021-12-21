@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Functional\Services;
+namespace App\Tests\Functional\Services\Source;
 
 use App\Entity\GitSource;
 use App\Request\GitSourceRequest;
-use App\Services\SourceMutator;
-use App\Services\SourceStore;
-use App\Tests\Services\SourceRemover;
+use App\Services\Source\SourceMutator;
+use App\Services\Source\SourceStore;
+use App\Tests\Services\Source\SourceRemover;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Uid\Ulid;
 

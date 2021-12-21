@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Services;
+namespace App\Services\Source;
 
 use App\Entity\GitSource;
 use App\Request\GitSourceRequest;

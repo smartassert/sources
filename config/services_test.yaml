@@ -17,5 +17,5 @@ services:
         arguments:
             $handler: '@GuzzleHttp\Handler\MockHandler'
 
-    App\Tests\Services\SourceRemover:
+    App\Tests\Services\Source\SourceRemover:
         public: true
