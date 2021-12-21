@@ -17,7 +17,7 @@ use Symfony\Component\Uid\Ulid;
 class Factory
 {
     public function __construct(
-        private SourceStore $store,
+        private Store $store,
         private GitSourceRepository $gitSourceRepository,
         private FileSourceRepository $fileSourceRepository,
         private RunSourceRepository $runSourceRepository,

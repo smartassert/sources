@@ -10,7 +10,7 @@ use App\Entity\RunSource;
 use App\Entity\SourceInterface;
 use App\Repository\SourceRepository;
 use App\Services\Source\Factory;
-use App\Services\Source\SourceStore;
+use App\Services\Source\Store;
 use App\Tests\Services\Source\SourceRemover;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -21,7 +21,7 @@ class SourceRepositoryTest extends WebTestCase
 
     private Factory $factory;
     private SourceRepository $repository;
-    private SourceStore $store;
+    private Store $store;
     private EntityManagerInterface $entityManager;
 
     protected function setUp(): void
@@ -36,8 +36,8 @@ class SourceRepositoryTest extends WebTestCase
         \assert($repository instanceof SourceRepository);
         $this->repository = $repository;
 
-        $store = self::getContainer()->get(SourceStore::class);
-        \assert($store instanceof SourceStore);
+        $store = self::getContainer()->get(Store::class);
+        \assert($store instanceof Store);
         $this->store = $store;
 
         $entityManager = self::getContainer()->get(EntityManagerInterface::class);

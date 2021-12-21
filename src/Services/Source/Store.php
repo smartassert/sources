@@ -8,7 +8,7 @@ use App\Entity\RunSource;
 use App\Entity\SourceInterface;
 use Doctrine\ORM\EntityManagerInterface;
 
-class SourceStore
+class Store
 {
     public function __construct(
         protected EntityManagerInterface $entityManager,

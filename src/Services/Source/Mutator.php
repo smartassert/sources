@@ -10,7 +10,7 @@ use App\Request\GitSourceRequest;
 class Mutator
 {
     public function __construct(
-        private SourceStore $store,
+        private Store $store,
     ) {
     }
 

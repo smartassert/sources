@@ -9,7 +9,7 @@ use App\Repository\SourceRepository;
 use App\Request\GitSourceRequest;
 use App\Services\Source\Factory;
 use App\Services\Source\Mutator;
-use App\Services\Source\SourceStore;
+use App\Services\Source\Store;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
@@ -72,7 +72,7 @@ class SourceController
         string $sourceId,
         SourceRepository $repository,
         UserInterface $user,
-        SourceStore $store
+        Store $store
     ): JsonResponse {
         $source = $repository->find($sourceId);
         if (null === $source) {

@@ -9,22 +9,22 @@ use App\Entity\GitSource;
 use App\Entity\RunSource;
 use App\Entity\SourceInterface;
 use App\Repository\SourceRepository;
-use App\Services\Source\SourceStore;
+use App\Services\Source\Store;
 use App\Tests\Services\Source\SourceRemover;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Uid\Ulid;
 
-class SourceStoreTest extends WebTestCase
+class StoreTest extends WebTestCase
 {
-    private SourceStore $store;
+    private Store $store;
     private SourceRepository $repository;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $store = self::getContainer()->get(SourceStore::class);
-        \assert($store instanceof SourceStore);
+        $store = self::getContainer()->get(Store::class);
+        \assert($store instanceof Store);
         $this->store = $store;
 
         $repository = self::getContainer()->get(SourceRepository::class);
@@ -40,7 +40,7 @@ class SourceStoreTest extends WebTestCase
     /**
      * @dataProvider removeDataProvider
      *
-     * @param callable(SourceStore): SourceInterface $sourceCreator
+     * @param callable(Store): SourceInterface $sourceCreator
      */
     public function testRemoveNonEncapsulatingSource(callable $sourceCreator): void
     {
@@ -60,7 +60,7 @@ class SourceStoreTest extends WebTestCase
     {
         return [
             FileSource::class => [
-                'sourceCreator' => function (SourceStore $store): SourceInterface {
+                'sourceCreator' => function (Store $store): SourceInterface {
                     $source = new FileSource((string) new Ulid(), (string) new Ulid(), 'label');
                     $store->add($source);
 
@@ -68,7 +68,7 @@ class SourceStoreTest extends WebTestCase
                 },
             ],
             GitSource::class => [
-                'sourceCreator' => function (SourceStore $store): SourceInterface {
+                'sourceCreator' => function (Store $store): SourceInterface {
                     $source = new GitSource(
                         (string) new Ulid(),
                         (string) new Ulid(),
@@ -81,7 +81,7 @@ class SourceStoreTest extends WebTestCase
                 },
             ],
             RunSource::class => [
-                'sourceCreator' => function (SourceStore $store): SourceInterface {
+                'sourceCreator' => function (Store $store): SourceInterface {
                     $parent = new FileSource((string) new Ulid(), (string) new Ulid(), 'label');
                     $source = new RunSource((string) new Ulid(), $parent);
                     $source->unsetParent();
