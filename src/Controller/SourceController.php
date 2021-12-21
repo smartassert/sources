@@ -7,7 +7,6 @@ namespace App\Controller;
 use App\Entity\GitSource;
 use App\Repository\SourceRepository;
 use App\Request\GitSourceRequest;
-use App\Request\UpdateGitSourceRequest;
 use App\Services\SourceFactory;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -55,7 +54,7 @@ class SourceController
             return new JsonResponse(null, 404);
         }
 
-        $source = $sourceFactory->updateGitSource($source, UpdateGitSourceRequest::create($request));
+        $source = $sourceFactory->updateGitSource($source, GitSourceRequest::create($request));
 
         return new JsonResponse($source);
     }

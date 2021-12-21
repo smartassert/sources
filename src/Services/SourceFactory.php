@@ -12,7 +12,6 @@ use App\Repository\FileSourceRepository;
 use App\Repository\GitSourceRepository;
 use App\Repository\RunSourceRepository;
 use App\Request\GitSourceRequest;
-use App\Request\UpdateGitSourceRequest;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Uid\Ulid;
@@ -45,7 +44,7 @@ class SourceFactory
         return $source;
     }
 
-    public function updateGitSource(GitSource $source, UpdateGitSourceRequest $request): GitSource
+    public function updateGitSource(GitSource $source, GitSourceRequest $request): GitSource
     {
         $source->setHostUrl($request->getHostUrl());
         $source->setPath($request->getPath());

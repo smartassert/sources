@@ -12,7 +12,6 @@ use App\Entity\SourceInterface;
 use App\Repository\GitSourceRepository;
 use App\Repository\SourceRepository;
 use App\Request\GitSourceRequest;
-use App\Request\UpdateGitSourceRequest;
 use Doctrine\ORM\EntityManagerInterface;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
@@ -399,9 +398,9 @@ class SourcesControllerTest extends WebTestCase
                 },
                 'userId' => $userId,
                 'requestData' => [
-                    UpdateGitSourceRequest::KEY_POST_HOST_URL => $newHostUrl,
-                    UpdateGitSourceRequest::KEY_POST_PATH => $newPath,
-                    UpdateGitSourceRequest::KEY_POST_ACCESS_TOKEN => null,
+                    GitSourceRequest::KEY_POST_HOST_URL => $newHostUrl,
+                    GitSourceRequest::KEY_POST_PATH => $newPath,
+                    GitSourceRequest::KEY_POST_ACCESS_TOKEN => null,
                 ],
                 'expectedResponseData' => [
                     'id' => $gitSourceId,
