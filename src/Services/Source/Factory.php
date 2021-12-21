@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Services;
+namespace App\Services\Source;
 
 use App\Entity\FileSource;
 use App\Entity\GitSource;
@@ -14,10 +14,10 @@ use App\Request\GitSourceRequest;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Uid\Ulid;
 
-class SourceFactory
+class Factory
 {
     public function __construct(
-        private SourceStore $store,
+        private Store $store,
         private GitSourceRepository $gitSourceRepository,
         private FileSourceRepository $fileSourceRepository,
         private RunSourceRepository $runSourceRepository,

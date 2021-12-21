@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Services;
+namespace App\Tests\Services\Source;
 
 use App\Repository\SourceRepository;
 use Doctrine\ORM\EntityManagerInterface;

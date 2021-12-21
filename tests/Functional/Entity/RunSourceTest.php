@@ -9,8 +9,8 @@ use App\Entity\GitSource;
 use App\Entity\RunSource;
 use App\Entity\SourceInterface;
 use App\Repository\SourceRepository;
-use App\Services\SourceStore;
-use App\Tests\Services\SourceRemover;
+use App\Services\Source\Store;
+use App\Tests\Services\Source\SourceRemover;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Uid\Ulid;
@@ -18,7 +18,7 @@ use Symfony\Component\Uid\Ulid;
 class RunSourceTest extends WebTestCase
 {
     private SourceRepository $repository;
-    private SourceStore $store;
+    private Store $store;
     private EntityManagerInterface $entityManager;
 
     protected function setUp(): void
@@ -29,8 +29,8 @@ class RunSourceTest extends WebTestCase
         \assert($repository instanceof SourceRepository);
         $this->repository = $repository;
 
-        $store = self::getContainer()->get(SourceStore::class);
-        \assert($store instanceof SourceStore);
+        $store = self::getContainer()->get(Store::class);
+        \assert($store instanceof Store);
         $this->store = $store;
 
         $entityManager = self::getContainer()->get(EntityManagerInterface::class);

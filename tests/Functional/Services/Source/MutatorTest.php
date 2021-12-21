@@ -2,31 +2,31 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Functional\Services;
+namespace App\Tests\Functional\Services\Source;
 
 use App\Entity\GitSource;
 use App\Request\GitSourceRequest;
-use App\Services\SourceMutator;
-use App\Services\SourceStore;
-use App\Tests\Services\SourceRemover;
+use App\Services\Source\Mutator;
+use App\Services\Source\Store;
+use App\Tests\Services\Source\SourceRemover;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Uid\Ulid;
 
-class SourceMutatorTest extends WebTestCase
+class MutatorTest extends WebTestCase
 {
-    private SourceMutator $mutator;
-    private SourceStore $store;
+    private Mutator $mutator;
+    private Store $store;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $mutator = self::getContainer()->get(SourceMutator::class);
-        \assert($mutator instanceof SourceMutator);
+        $mutator = self::getContainer()->get(Mutator::class);
+        \assert($mutator instanceof Mutator);
         $this->mutator = $mutator;
 
-        $store = self::getContainer()->get(SourceStore::class);
-        \assert($store instanceof SourceStore);
+        $store = self::getContainer()->get(Store::class);
+        \assert($store instanceof Store);
         $this->store = $store;
 
         $sourceRemover = self::getContainer()->get(SourceRemover::class);

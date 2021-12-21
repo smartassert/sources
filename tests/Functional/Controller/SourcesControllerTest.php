@@ -12,8 +12,8 @@ use App\Entity\SourceInterface;
 use App\Repository\GitSourceRepository;
 use App\Repository\SourceRepository;
 use App\Request\GitSourceRequest;
-use App\Services\SourceStore;
-use App\Tests\Services\SourceRemover;
+use App\Services\Source\Store;
+use App\Tests\Services\Source\SourceRemover;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Middleware;
@@ -36,7 +36,7 @@ class SourcesControllerTest extends WebTestCase
     private MockHandler $mockHandler;
     private HttpHistoryContainer $httpHistoryContainer;
     private SourceRepository $repository;
-    private SourceStore $store;
+    private Store $store;
 
     protected function setUp(): void
     {
@@ -56,8 +56,8 @@ class SourcesControllerTest extends WebTestCase
         \assert($handlerStack instanceof HandlerStack);
         $handlerStack->push(Middleware::history($this->httpHistoryContainer), 'history');
 
-        $store = self::getContainer()->get(SourceStore::class);
-        \assert($store instanceof SourceStore);
+        $store = self::getContainer()->get(Store::class);
+        \assert($store instanceof Store);
         $this->store = $store;
 
         $repository = self::getContainer()->get(SourceRepository::class);
@@ -263,8 +263,8 @@ class SourcesControllerTest extends WebTestCase
     /**
      * @dataProvider getSuccessDataProvider
      *
-     * @param callable(SourceStore): SourceInterface $sourceCreator
-     * @param array<mixed>                           $expectedResponseData
+     * @param callable(Store): SourceInterface $sourceCreator
+     * @param array<mixed>                     $expectedResponseData
      */
     public function testGetSuccess(callable $sourceCreator, string $userId, array $expectedResponseData): void
     {
@@ -301,7 +301,7 @@ class SourcesControllerTest extends WebTestCase
         return [
             SourceInterface::TYPE_GIT => [
                 'sourceCreator' => function (
-                    SourceStore $store
+                    Store $store
                 ) use (
                     $gitSourceId,
                     $userId,
@@ -325,7 +325,7 @@ class SourcesControllerTest extends WebTestCase
                 ],
             ],
             SourceInterface::TYPE_FILE => [
-                'sourceCreator' => function (SourceStore $store) use ($fileSourceId, $userId, $label) {
+                'sourceCreator' => function (Store $store) use ($fileSourceId, $userId, $label) {
                     $source = new FileSource($fileSourceId, $userId, $label);
                     $store->add($source);
 
@@ -341,7 +341,7 @@ class SourcesControllerTest extends WebTestCase
             ],
             SourceInterface::TYPE_RUN => [
                 'sourceCreator' => function (
-                    SourceStore $store
+                    Store $store
                 ) use (
                     $fileSourceId,
                     $runSourceId,
@@ -371,9 +371,9 @@ class SourcesControllerTest extends WebTestCase
     /**
      * @dataProvider updateSuccessDataProvider
      *
-     * @param callable(SourceStore): SourceInterface $sourceCreator
-     * @param array<string, string>                  $requestData
-     * @param array<mixed>                           $expectedResponseData
+     * @param callable(Store): SourceInterface $sourceCreator
+     * @param array<string, string>            $requestData
+     * @param array<mixed>                     $expectedResponseData
      */
     public function testUpdateSuccess(
         callable $sourceCreator,
@@ -413,7 +413,7 @@ class SourcesControllerTest extends WebTestCase
         return [
             SourceInterface::TYPE_GIT => [
                 'sourceCreator' => function (
-                    SourceStore $store
+                    Store $store
                 ) use (
                     $gitSourceId,
                     $userId,
@@ -447,7 +447,7 @@ class SourcesControllerTest extends WebTestCase
     /**
      * @dataProvider deleteSuccessDataProvider
      *
-     * @param callable(SourceStore): SourceInterface $sourceCreator
+     * @param callable(Store): SourceInterface $sourceCreator
      */
     public function testDeleteSuccess(callable $sourceCreator, string $userId, int $expectedRepositoryCount): void
     {
@@ -475,7 +475,7 @@ class SourcesControllerTest extends WebTestCase
 
         return [
             SourceInterface::TYPE_FILE => [
-                'sourceCreator' => function (SourceStore $store) use ($userId) {
+                'sourceCreator' => function (Store $store) use ($userId) {
                     $source = new FileSource((string) new Ulid(), $userId, 'label');
                     $store->add($source);
 
@@ -485,7 +485,7 @@ class SourcesControllerTest extends WebTestCase
                 'expectedRepositoryCount' => 0,
             ],
             SourceInterface::TYPE_GIT => [
-                'sourceCreator' => function (SourceStore $store) use ($userId) {
+                'sourceCreator' => function (Store $store) use ($userId) {
                     $source = new GitSource(
                         (string) new Ulid(),
                         $userId,
@@ -499,7 +499,7 @@ class SourcesControllerTest extends WebTestCase
                 'expectedRepositoryCount' => 0,
             ],
             SourceInterface::TYPE_RUN => [
-                'sourceCreator' => function (SourceStore $store) use ($userId) {
+                'sourceCreator' => function (Store $store) use ($userId) {
                     $parent = new FileSource((string) new Ulid(), $userId, 'label');
                     $store->add($parent);
 
