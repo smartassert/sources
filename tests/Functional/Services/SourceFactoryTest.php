@@ -12,7 +12,6 @@ use App\Repository\SourceRepository;
 use App\Request\GitSourceRequest;
 use App\Services\SourceFactory;
 use App\Tests\Services\SourceRemover;
-use Doctrine\ORM\EntityManagerInterface;
 use SmartAssert\UsersSecurityBundle\Security\User;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -24,7 +23,6 @@ class SourceFactoryTest extends WebTestCase
 
     private SourceFactory $factory;
     private SourceRepository $repository;
-    private EntityManagerInterface $entityManager;
 
     protected function setUp(): void
     {
@@ -37,10 +35,6 @@ class SourceFactoryTest extends WebTestCase
         $repository = self::getContainer()->get(SourceRepository::class);
         \assert($repository instanceof SourceRepository);
         $this->repository = $repository;
-
-        $entityManager = self::getContainer()->get(EntityManagerInterface::class);
-        \assert($entityManager instanceof EntityManagerInterface);
-        $this->entityManager = $entityManager;
 
         $sourceRemover = self::getContainer()->get(SourceRemover::class);
         if ($sourceRemover instanceof SourceRemover) {
@@ -185,57 +179,6 @@ class SourceFactoryTest extends WebTestCase
         }
 
         self::assertCount(1, $this->repository->findAll());
-    }
-
-    /**
-     * @dataProvider updateGitSourceDataProvider
-     */
-    public function testUpdateGitSource(GitSource $source, GitSourceRequest $request, GitSource $expected): void
-    {
-        $this->entityManager->persist($source);
-        $this->entityManager->flush();
-
-        $mutatedSource = $this->factory->updateGitSource($source, $request);
-
-        self::assertEquals($expected, $mutatedSource);
-    }
-
-    /**
-     * @return array<mixed>
-     */
-    public function updateGitSourceDataProvider(): array
-    {
-        $id = (string) new Ulid();
-        $userId = (string) new Ulid();
-        $hostUrl = 'https://example.com/repository.git';
-        $path = '/path';
-        $accessToken = 'access token';
-        $newHostUrl = 'https://new.example.com/repository.git';
-        $newPath = '/path/new';
-        $newAccessToken = 'new access token';
-
-        return [
-            'no changes with null access token' => [
-                'source' => new GitSource($id, $userId, $hostUrl, $path, null),
-                'request' => new GitSourceRequest($hostUrl, $path, null),
-                'expected' => new GitSource($id, $userId, $hostUrl, $path, null),
-            ],
-            'no changes with non-null access token' => [
-                'source' => new GitSource($id, $userId, $hostUrl, $path, $accessToken),
-                'request' => new GitSourceRequest($hostUrl, $path, $accessToken),
-                'expected' => new GitSource($id, $userId, $hostUrl, $path, $accessToken),
-            ],
-            'changes' => [
-                'source' => new GitSource($id, $userId, $hostUrl, $path, $accessToken),
-                'request' => new GitSourceRequest($newHostUrl, $newPath, $newAccessToken),
-                'expected' => new GitSource($id, $userId, $newHostUrl, $newPath, $newAccessToken),
-            ],
-            'nullify access token' => [
-                'source' => new GitSource($id, $userId, $hostUrl, $path, $accessToken),
-                'request' => new GitSourceRequest($hostUrl, $path, null),
-                'expected' => new GitSource($id, $userId, $hostUrl, $path, null),
-            ],
-        ];
     }
 
     public function testCreateFileSourceAlreadyExists(): void

@@ -8,6 +8,7 @@ use App\Entity\GitSource;
 use App\Repository\SourceRepository;
 use App\Request\GitSourceRequest;
 use App\Services\SourceFactory;
+use App\Services\SourceMutator;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
@@ -47,7 +48,7 @@ class SourceController
         string $sourceId,
         Request $request,
         SourceRepository $repository,
-        SourceFactory $sourceFactory,
+        SourceMutator $sourceMutator,
         UserInterface $user,
     ): JsonResponse {
         $source = $repository->find($sourceId);
@@ -63,7 +64,7 @@ class SourceController
             return new JsonResponse(null, 404);
         }
 
-        $source = $sourceFactory->updateGitSource($source, GitSourceRequest::create($request));
+        $source = $sourceMutator->updateGitSource($source, GitSourceRequest::create($request));
 
         return new JsonResponse($source);
     }
