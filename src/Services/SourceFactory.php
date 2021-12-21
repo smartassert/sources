@@ -64,7 +64,7 @@ class SourceFactory
     /**
      * @param array<string, string> $parameters
      */
-    public function createRunSource(string $userId, FileSource|GitSource $parent, array $parameters = []): RunSource
+    public function createRunSource(FileSource|GitSource $parent, array $parameters = []): RunSource
     {
         ksort($parameters);
 
@@ -77,7 +77,7 @@ class SourceFactory
             return $source;
         }
 
-        $source = new RunSource($this->generateId(), $userId, $parent, $parameters);
+        $source = new RunSource($this->generateId(), $parent, $parameters);
         $this->persist($source);
 
         return $source;

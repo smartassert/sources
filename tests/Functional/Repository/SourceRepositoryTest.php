@@ -91,7 +91,7 @@ class SourceRepositoryTest extends WebTestCase
                 'entity' => function (SourceFactory $factory) {
                     $parent = $factory->createFileSource(self::USER_ID, 'source label');
 
-                    return $factory->createRunSource(self::USER_ID, $parent);
+                    return $factory->createRunSource($parent);
                 },
             ],
         ];

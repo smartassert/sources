@@ -106,7 +106,7 @@ class SourceFactoryTest extends WebTestCase
         $parent = $this->factory->createFileSource($userId, 'file source label');
         $parameters = ['ref' => 'v0.1'];
 
-        $source = $this->factory->createRunSource($userId, $parent, $parameters);
+        $source = $this->factory->createRunSource($parent, $parameters);
 
         $this->assertCreatedRunSource($source, $userId, $parent, $parameters);
     }
@@ -213,8 +213,8 @@ class SourceFactoryTest extends WebTestCase
 
         $parameters = ['ref' => 'v0.1'];
 
-        $this->factory->createRunSource($userId, $parent, $parameters);
-        $this->factory->createRunSource($userId, $parent, $parameters);
+        $this->factory->createRunSource($parent, $parameters);
+        $this->factory->createRunSource($parent, $parameters);
         self::assertCount(2, $this->repository->findAll());
     }
 
