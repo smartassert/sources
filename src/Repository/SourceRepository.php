@@ -5,9 +5,12 @@ declare(strict_types=1);
 namespace App\Repository;
 
 use App\Entity\AbstractSource;
+use App\Entity\FileSource;
+use App\Entity\GitSource;
 use App\Entity\SourceInterface;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * @method null|SourceInterface find($id, $lockMode = null, $lockVersion = null)
@@ -22,5 +25,65 @@ class SourceRepository extends ServiceEntityRepository
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, AbstractSource::class);
+    }
+
+    /**
+     * @param array<SourceInterface::TYPE_*> $types
+     *
+     * @return array<FileSource|GitSource>
+     */
+    public function findByUserAndType(UserInterface $user, array $types): array
+    {
+        $queryBuilder = $this->createQueryBuilder('Source')
+            ->where('Source.userId = :UserId')
+            ->andWhere(implode(' OR ', $this->createTypePredicates($types)))
+            ->setParameter('UserId', $user->getUserIdentifier())
+        ;
+
+        $typeParameters = $this->createTypeParameters($types);
+        foreach ($typeParameters as $key => $value) {
+            $queryBuilder->setParameter($key, $value);
+        }
+
+        $query = $queryBuilder->getQuery();
+
+        $result = $query->execute();
+        if (!is_array($result)) {
+            return [];
+        }
+
+        return array_filter($result, function ($item) {
+            return $item instanceof FileSource || $item instanceof GitSource;
+        });
+    }
+
+    /**
+     * @param array<SourceInterface::TYPE_*> $types
+     *
+     * @return string[]
+     */
+    private function createTypePredicates(array $types): array
+    {
+        $predicates = [];
+        foreach ($types as $typeIndex => $type) {
+            $predicates[] = 'Source INSTANCE OF :Type' . $typeIndex;
+        }
+
+        return $predicates;
+    }
+
+    /**
+     * @param array<SourceInterface::TYPE_*> $types
+     *
+     * @return string[]
+     */
+    private function createTypeParameters(array $types): array
+    {
+        $parameters = [];
+        foreach ($types as $typeIndex => $type) {
+            $parameters[':Type' . $typeIndex] = $type;
+        }
+
+        return $parameters;
     }
 }

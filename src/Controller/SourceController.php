@@ -7,6 +7,7 @@ namespace App\Controller;
 use App\Entity\FileSource;
 use App\Entity\GitSource;
 use App\Entity\SourceInterface;
+use App\Repository\SourceRepository;
 use App\Request\FileSourceRequest;
 use App\Request\GitSourceRequest;
 use App\Services\Source\Factory;
@@ -22,11 +23,13 @@ class SourceController
     public const ROUTE_GIT_SOURCE_CREATE = '/git';
     public const ROUTE_FILE_SOURCE_CREATE = '/file';
     public const ROUTE_SOURCE = '/';
+    public const ROUTE_SOURCE_LIST = '/list';
 
     public function __construct(
         private Factory $factory,
         private Store $store,
-        private Mutator $mutator
+        private Mutator $mutator,
+        private SourceRepository $repository,
     ) {
     }
 
@@ -76,8 +79,17 @@ class SourceController
         return $this->doAction($source, $user, function (SourceInterface $source): JsonResponse {
             $this->store->remove($source);
 
-            return new JsonResponse(null, 200);
+            return new JsonResponse();
         });
+    }
+
+    #[Route(self::ROUTE_SOURCE_LIST, name: 'list', methods: ['GET'])]
+    public function list(UserInterface $user): JsonResponse
+    {
+        return new JsonResponse($this->repository->findByUserAndType($user, [
+            SourceInterface::TYPE_FILE,
+            SourceInterface::TYPE_GIT,
+        ]));
     }
 
     /**

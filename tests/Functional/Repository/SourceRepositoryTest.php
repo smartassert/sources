@@ -13,7 +13,10 @@ use App\Services\Source\Factory;
 use App\Services\Source\Store;
 use App\Tests\Services\Source\SourceRemover;
 use Doctrine\ORM\EntityManagerInterface;
+use SmartAssert\UsersSecurityBundle\Security\User;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Uid\Ulid;
 
 class SourceRepositoryTest extends WebTestCase
 {
@@ -98,6 +101,133 @@ class SourceRepositoryTest extends WebTestCase
 
                     return $factory->createRunSource($parent);
                 },
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider findByUserAndTypeDataProvider
+     *
+     * @param SourceInterface[]              $sources
+     * @param array<SourceInterface::TYPE_*> $types
+     * @param SourceInterface[]              $expected
+     */
+    public function testFindByUserAndType(array $sources, UserInterface $user, array $types, array $expected): void
+    {
+        foreach ($sources as $source) {
+            $this->store->add($source);
+        }
+
+        self::assertEquals($expected, $this->repository->findByUserAndType($user, $types));
+    }
+
+    /**
+     * @return array<mixed>
+     */
+    public function findByUserAndTypeDataProvider(): array
+    {
+        $userId = (string) new Ulid();
+        $user = new User($userId);
+
+        $userFileSources = [
+            new FileSource((string) new Ulid(), $userId, 'file source label'),
+        ];
+
+        $userGitSources = [
+            new GitSource((string) new Ulid(), $userId, 'https://example.com/repository.git'),
+        ];
+
+        $userRunSources = [
+            new RunSource((string) new Ulid(), $userFileSources[0]),
+            new RunSource((string) new Ulid(), $userGitSources[0]),
+        ];
+
+        return [
+            'no sources' => [
+                'sources' => [],
+                'user' => $user,
+                'types' => [
+                    SourceInterface::TYPE_FILE,
+                    SourceInterface::TYPE_GIT,
+                    SourceInterface::TYPE_RUN,
+                ],
+                'expected' => [],
+            ],
+            'has file, git and run sources, no user match' => [
+                'sources' => [
+                    new FileSource((string) new Ulid(), (string) new Ulid(), 'file source label'),
+                    new GitSource((string) new Ulid(), (string) new Ulid(), 'https://example.com/repository.git'),
+                    new RunSource(
+                        (string) new Ulid(),
+                        new FileSource((string) new Ulid(), (string) new Ulid(), 'file source label'),
+                    ),
+                ],
+                'user' => $user,
+                'types' => [
+                    SourceInterface::TYPE_FILE,
+                    SourceInterface::TYPE_GIT,
+                    SourceInterface::TYPE_RUN,
+                ],
+                'expected' => [],
+            ],
+            'has file and git sources for correct user only' => [
+                'sources' => [
+                    $userFileSources[0],
+                    $userGitSources[0],
+                ],
+                'user' => $user,
+                'types' => [
+                    SourceInterface::TYPE_FILE,
+                    SourceInterface::TYPE_GIT,
+                ],
+                'expected' => [
+                    $userFileSources[0],
+                    $userGitSources[0],
+                ],
+            ],
+            'has file, git and run sources for correct user only' => [
+                'sources' => [
+                    $userFileSources[0],
+                    $userGitSources[0],
+                    $userRunSources[0],
+                    $userRunSources[1],
+                ],
+                'user' => $user,
+                'types' => [
+                    SourceInterface::TYPE_FILE,
+                    SourceInterface::TYPE_GIT,
+                ],
+                'expected' => [
+                    $userFileSources[0],
+                    $userGitSources[0],
+                ],
+            ],
+            'has file, git and run sources for mixed users' => [
+                'sources' => [
+                    $userFileSources[0],
+                    new FileSource((string) new Ulid(), (string) new Ulid(), 'file source label'),
+                    $userGitSources[0],
+                    new GitSource((string) new Ulid(), (string) new Ulid(), 'https://example.com/repository.git'),
+                    $userRunSources[0],
+                    $userRunSources[1],
+                    new RunSource(
+                        (string) new Ulid(),
+                        new FileSource((string) new Ulid(), (string) new Ulid(), 'file source label')
+                    ),
+                    new RunSource(
+                        (string) new Ulid(),
+                        new GitSource((string) new Ulid(), (string) new Ulid(), 'https://example.com/repository.git')
+                    )
+                ],
+                'user' => $user,
+                'types' => [
+                    SourceInterface::TYPE_FILE,
+                    SourceInterface::TYPE_GIT,
+                ],
+                'expected' => [
+                    $userFileSources[0],
+                    $userGitSources[0],
+                ],
             ],
         ];
     }
