@@ -27,6 +27,13 @@ class FileSource extends AbstractSource implements \JsonSerializable
         return $this->label;
     }
 
+    public function setLabel(string $label): self
+    {
+        $this->label = $label;
+
+        return $this;
+    }
+
     /**
      * @return array{
      *     "id": string,

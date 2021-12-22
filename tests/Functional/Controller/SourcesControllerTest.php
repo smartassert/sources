@@ -481,7 +481,29 @@ class SourcesControllerTest extends WebTestCase
         $newHostUrl = 'https://new.example.com/repository.git';
         $newPath = '/new';
 
+        $fileSourceId = (string) new Ulid();
+        $label = 'file source label';
+        $newLabel = 'new file source label';
+
         return [
+            SourceInterface::TYPE_FILE => [
+                'sourceCreator' => function (Store $store) use ($fileSourceId, $userId, $label) {
+                    $source = new FileSource($fileSourceId, $userId, $label);
+                    $store->add($source);
+
+                    return $source;
+                },
+                'userId' => $userId,
+                'requestData' => [
+                    FileSourceRequest::KEY_POST_LABEL => $newLabel,
+                ],
+                'expectedResponseData' => [
+                    'id' => $fileSourceId,
+                    'user_id' => $userId,
+                    'type' => SourceInterface::TYPE_FILE,
+                    'label' => $newLabel,
+                ],
+            ],
             SourceInterface::TYPE_GIT => [
                 'sourceCreator' => function (
                     Store $store
