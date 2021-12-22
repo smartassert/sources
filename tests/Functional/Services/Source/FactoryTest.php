@@ -9,6 +9,7 @@ use App\Entity\GitSource;
 use App\Entity\RunSource;
 use App\Entity\SourceInterface;
 use App\Repository\SourceRepository;
+use App\Request\FileSourceRequest;
 use App\Request\GitSourceRequest;
 use App\Services\Source\Factory;
 use App\Tests\Services\Source\SourceRemover;
@@ -92,6 +93,32 @@ class FactoryTest extends WebTestCase
             'default' => [
                 'userId' => self::USER_ID,
                 'label' => 'source label',
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider createFileSourceFromRequestDataProvider
+     */
+    public function testCreateFileSourceFromRequest(UserInterface $user, FileSourceRequest $request): void
+    {
+        $source = $this->factory->createFileSourceFromRequest($user, $request);
+
+        $this->assertCreatedFileSource($source, $user->getUserIdentifier(), $request->getLabel());
+    }
+
+    /**
+     * @return array<mixed>
+     */
+    public function createFileSourceFromRequestDataProvider(): array
+    {
+        $user = new User(self::USER_ID);
+        $label = 'file source label';
+
+        return [
+            'default' => [
+                'user' => $user,
+                'request' => new FileSourceRequest($label),
             ],
         ];
     }

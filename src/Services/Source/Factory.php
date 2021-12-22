@@ -10,6 +10,7 @@ use App\Entity\RunSource;
 use App\Repository\FileSourceRepository;
 use App\Repository\GitSourceRepository;
 use App\Repository\RunSourceRepository;
+use App\Request\FileSourceRequest;
 use App\Request\GitSourceRequest;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Uid\Ulid;
@@ -89,6 +90,11 @@ class Factory
             $request->getPath(),
             $request->getAccessToken()
         );
+    }
+
+    public function createFileSourceFromRequest(UserInterface $user, FileSourceRequest $request): FileSource
+    {
+        return $this->createFileSource($user->getUserIdentifier(), $request->getLabel());
     }
 
     private function generateId(): string
