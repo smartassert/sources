@@ -6,6 +6,7 @@ namespace App\Controller;
 
 use App\Entity\GitSource;
 use App\Entity\SourceInterface;
+use App\Request\FileSourceRequest;
 use App\Request\GitSourceRequest;
 use App\Services\Source\Factory;
 use App\Services\Source\Mutator;
@@ -18,6 +19,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 class SourceController
 {
     public const ROUTE_GIT_SOURCE_CREATE = '/git';
+    public const ROUTE_FILE_SOURCE_CREATE = '/file';
     public const ROUTE_SOURCE = '/';
 
     public function __construct(
@@ -31,6 +33,12 @@ class SourceController
     public function createGitSource(UserInterface $user, GitSourceRequest $request): JsonResponse
     {
         return new JsonResponse($this->factory->createGitSourceFromRequest($user, $request));
+    }
+
+    #[Route(self::ROUTE_FILE_SOURCE_CREATE, name: 'create_file', methods: ['POST'])]
+    public function createFileSource(UserInterface $user, FileSourceRequest $request): JsonResponse
+    {
+        return new JsonResponse($this->factory->createFileSourceFromRequest($user, $request));
     }
 
     #[Route(self::ROUTE_SOURCE . '{sourceId<[A-Z90-9]{26}>}', name: 'get', methods: ['GET'])]

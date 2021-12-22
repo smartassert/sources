@@ -9,8 +9,10 @@ use App\Entity\FileSource;
 use App\Entity\GitSource;
 use App\Entity\RunSource;
 use App\Entity\SourceInterface;
+use App\Repository\FileSourceRepository;
 use App\Repository\GitSourceRepository;
 use App\Repository\SourceRepository;
+use App\Request\FileSourceRequest;
 use App\Request\GitSourceRequest;
 use App\Services\Source\Store;
 use App\Tests\Services\Source\SourceRemover;
@@ -102,6 +104,10 @@ class SourcesControllerTest extends WebTestCase
             'create git source' => [
                 'method' => 'POST',
                 'uri' => SourceController::ROUTE_GIT_SOURCE_CREATE,
+            ],
+            'create file source' => [
+                'method' => 'POST',
+                'uri' => SourceController::ROUTE_FILE_SOURCE_CREATE,
             ],
             'get source' => [
                 'method' => 'GET',
@@ -255,6 +261,71 @@ class SourcesControllerTest extends WebTestCase
                     'host_url' => $hostUrl,
                     'path' => $path,
                     'access_token' => $accessToken,
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider createFileSourceDataProvider
+     *
+     * @param array<mixed> $requestParameters
+     * @param array<mixed> $expected
+     */
+    public function testCreateFileSourceSuccess(string $userId, array $requestParameters, array $expected): void
+    {
+        $this->mockHandler->append(
+            new Response(200, [], $userId)
+        );
+
+        $this->client->request(
+            'POST',
+            SourceController::ROUTE_FILE_SOURCE_CREATE,
+            $requestParameters,
+            [],
+            $this->createRequestServerPropertiesFromHeaders(
+                $this->createAuthorizationHeader()
+            ),
+        );
+
+        $response = $this->client->getResponse();
+
+        self::assertSame(200, $response->getStatusCode());
+        $this->assertAuthorizationRequestIsMade();
+
+        $repository = self::getContainer()->get(FileSourceRepository::class);
+        \assert($repository instanceof FileSourceRepository);
+
+        $source = $repository->findOneBy([
+            'userId' => $userId,
+            'label' => $requestParameters[FileSourceRequest::KEY_POST_LABEL],
+        ]);
+
+        self::assertInstanceOf(SourceInterface::class, $source);
+        \assert($source instanceof SourceInterface);
+        $expected['id'] = $source->getId();
+
+        self::assertEquals($expected, json_decode((string) $response->getContent(), true));
+    }
+
+    /**
+     * @return array<mixed>
+     */
+    public function createFileSourceDataProvider(): array
+    {
+        $userId = (string) new Ulid();
+        $label = 'file source label';
+
+        return [
+            'default' => [
+                'userId' => $userId,
+                'requestParameters' => [
+                    FileSourceRequest::KEY_POST_LABEL => $label
+                ],
+                'expected' => [
+                    'user_id' => $userId,
+                    'type' => SourceInterface::TYPE_FILE,
+                    'label' => $label,
                 ],
             ],
         ];
