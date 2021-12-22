@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\Services\Source;
 
+use App\Entity\FileSource;
 use App\Entity\GitSource;
+use App\Request\FileSourceRequest;
 use App\Request\GitSourceRequest;
 use App\Services\Source\Mutator;
 use App\Services\Source\Store;
@@ -81,6 +83,42 @@ class MutatorTest extends WebTestCase
                 'source' => new GitSource($id, $userId, $hostUrl, $path, $accessToken),
                 'request' => new GitSourceRequest($hostUrl, $path, null),
                 'expected' => new GitSource($id, $userId, $hostUrl, $path, null),
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider updateFileSourceDataProvider
+     */
+    public function testUpdateFileSource(FileSource $source, FileSourceRequest $request, FileSource $expected): void
+    {
+        $this->store->add($source);
+
+        $mutatedSource = $this->mutator->updateFileSource($source, $request);
+
+        self::assertEquals($expected, $mutatedSource);
+    }
+
+    /**
+     * @return array<mixed>
+     */
+    public function updateFileSourceDataProvider(): array
+    {
+        $id = (string) new Ulid();
+        $userId = (string) new Ulid();
+        $label = 'file source label';
+        $newLabel = 'new file source label';
+
+        return [
+            'no changes' => [
+                'source' => new FileSource($id, $userId, $label),
+                'request' => new FileSourceRequest($label),
+                'expected' => new FileSource($id, $userId, $label),
+            ],
+            'changes' => [
+                'source' => new FileSource($id, $userId, $label),
+                'request' => new FileSourceRequest($newLabel),
+                'expected' => new FileSource($id, $userId, $newLabel),
             ],
         ];
     }

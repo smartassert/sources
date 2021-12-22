@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use App\Entity\FileSource;
 use App\Entity\GitSource;
 use App\Entity\SourceInterface;
 use App\Request\FileSourceRequest;
@@ -53,13 +54,19 @@ class SourceController
     public function update(?SourceInterface $source, Request $request, UserInterface $user): JsonResponse
     {
         return $this->doAction($source, $user, function (SourceInterface $source) use ($request): JsonResponse {
-            if (!$source instanceof GitSource) {
-                return new JsonResponse(null, 404);
+            if ($source instanceof FileSource) {
+                $source = $this->mutator->updateFileSource($source, FileSourceRequest::create($request));
+
+                return new JsonResponse($source);
             }
 
-            $source = $this->mutator->updateGitSource($source, GitSourceRequest::create($request));
+            if ($source instanceof GitSource) {
+                $source = $this->mutator->updateGitSource($source, GitSourceRequest::create($request));
 
-            return new JsonResponse($source);
+                return new JsonResponse($source);
+            }
+
+            return new JsonResponse(null, 404);
         });
     }
 
