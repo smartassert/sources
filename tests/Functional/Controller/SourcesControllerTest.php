@@ -121,6 +121,10 @@ class SourcesControllerTest extends WebTestCase
                 'method' => 'DELETE',
                 'uri' => SourceController::ROUTE_SOURCE . new Ulid(),
             ],
+            'list sources' => [
+                'method' => 'GET',
+                'uri' => SourceController::ROUTE_SOURCE_LIST,
+            ],
         ];
     }
 
@@ -182,8 +186,8 @@ class SourcesControllerTest extends WebTestCase
     /**
      * @dataProvider createGitSourceDataProvider
      *
-     * @param array<mixed> $requestParameters
-     * @param array<mixed> $expected
+     * @param array<string, string> $requestParameters
+     * @param array<mixed>          $expected
      */
     public function testCreateGitSourceSuccess(string $userId, array $requestParameters, array $expected): void
     {
@@ -191,17 +195,11 @@ class SourcesControllerTest extends WebTestCase
             new Response(200, [], $userId)
         );
 
-        $this->client->request(
+        $response = $this->makeAuthorizedRequest(
             'POST',
             SourceController::ROUTE_GIT_SOURCE_CREATE,
-            $requestParameters,
-            [],
-            $this->createRequestServerPropertiesFromHeaders(
-                $this->createAuthorizationHeader()
-            ),
+            $requestParameters
         );
-
-        $response = $this->client->getResponse();
 
         self::assertSame(200, $response->getStatusCode());
         $this->assertAuthorizationRequestIsMade();
@@ -269,8 +267,8 @@ class SourcesControllerTest extends WebTestCase
     /**
      * @dataProvider createFileSourceDataProvider
      *
-     * @param array<mixed> $requestParameters
-     * @param array<mixed> $expected
+     * @param array<string, string> $requestParameters
+     * @param array<mixed>          $expected
      */
     public function testCreateFileSourceSuccess(string $userId, array $requestParameters, array $expected): void
     {
@@ -278,17 +276,11 @@ class SourcesControllerTest extends WebTestCase
             new Response(200, [], $userId)
         );
 
-        $this->client->request(
+        $response = $this->makeAuthorizedRequest(
             'POST',
             SourceController::ROUTE_FILE_SOURCE_CREATE,
-            $requestParameters,
-            [],
-            $this->createRequestServerPropertiesFromHeaders(
-                $this->createAuthorizationHeader()
-            ),
+            $requestParameters
         );
-
-        $response = $this->client->getResponse();
 
         self::assertSame(200, $response->getStatusCode());
         $this->assertAuthorizationRequestIsMade();
@@ -607,6 +599,119 @@ class SourcesControllerTest extends WebTestCase
         ];
     }
 
+    /**
+     * @dataProvider listSuccessDataProvider
+     *
+     * @param SourceInterface[] $sources
+     * @param array<mixed>      $expectedResponseData
+     */
+    public function testListSuccess(array $sources, string $userId, array $expectedResponseData): void
+    {
+        foreach ($sources as $source) {
+            $this->store->add($source);
+        }
+
+        $this->mockHandler->append(
+            new Response(200, [], $userId)
+        );
+
+        $response = $this->makeAuthorizedRequest('GET', SourceController::ROUTE_SOURCE_LIST);
+
+        self::assertSame(200, $response->getStatusCode());
+        $this->assertAuthorizationRequestIsMade();
+        self::assertInstanceOf(JsonResponse::class, $response);
+
+        $responseData = json_decode((string) $response->getContent(), true);
+        self::assertEquals($expectedResponseData, $responseData);
+    }
+
+    /**
+     * @return array<mixed>
+     */
+    public function listSuccessDataProvider(): array
+    {
+        $userId = (string) new Ulid();
+        $userFileSources = [
+            new FileSource((string) new Ulid(), $userId, 'file source label'),
+        ];
+
+        $userGitSources = [
+            new GitSource((string) new Ulid(), $userId, 'https://example.com/repository.git'),
+        ];
+
+        $userRunSources = [
+            new RunSource((string) new Ulid(), $userFileSources[0]),
+            new RunSource((string) new Ulid(), $userGitSources[0]),
+        ];
+
+        return [
+            'no sources' => [
+                'sources' => [],
+                'userId' => $userId,
+                'expectedResponseData' => [],
+            ],
+            'has file, git and run sources, no user match' => [
+                'sources' => [
+                    new FileSource((string) new Ulid(), (string) new Ulid(), 'file source label'),
+                    new GitSource((string) new Ulid(), (string) new Ulid(), 'https://example.com/repository.git'),
+                    new RunSource(
+                        (string) new Ulid(),
+                        new FileSource((string) new Ulid(), (string) new Ulid(), 'file source label'),
+                    ),
+                ],
+                'userId' => $userId,
+                'expectedResponseData' => [],
+            ],
+            'has file and git sources for correct user only' => [
+                'sources' => [
+                    $userFileSources[0],
+                    $userGitSources[0],
+                ],
+                'userId' => $userId,
+                'expectedResponseData' => [
+                    $userFileSources[0]->jsonSerialize(),
+                    $userGitSources[0]->jsonSerialize(),
+                ],
+            ],
+            'has file, git and run sources for correct user only' => [
+                'sources' => [
+                    $userFileSources[0],
+                    $userGitSources[0],
+                    $userRunSources[0],
+                    $userRunSources[1],
+                ],
+                'userId' => $userId,
+                'expectedResponseData' => [
+                    $userFileSources[0]->jsonSerialize(),
+                    $userGitSources[0]->jsonSerialize(),
+                ],
+            ],
+            'has file, git and run sources for mixed users' => [
+                'sources' => [
+                    $userFileSources[0],
+                    new FileSource((string) new Ulid(), (string) new Ulid(), 'file source label'),
+                    $userGitSources[0],
+                    new GitSource((string) new Ulid(), (string) new Ulid(), 'https://example.com/repository.git'),
+                    $userRunSources[0],
+                    $userRunSources[1],
+                    new RunSource(
+                        (string) new Ulid(),
+                        new FileSource((string) new Ulid(), (string) new Ulid(), 'file source label')
+                    ),
+                    new RunSource(
+                        (string) new Ulid(),
+                        new GitSource((string) new Ulid(), (string) new Ulid(), 'https://example.com/repository.git')
+                    )
+                ],
+                'userId' => $userId,
+                'expectedResponseData' => [
+                    $userFileSources[0]->jsonSerialize(),
+                    $userGitSources[0]->jsonSerialize(),
+                ],
+            ],
+        ];
+    }
+
     private function assertAuthorizationRequestIsMade(): void
     {
         $request = $this->httpHistoryContainer->getTransactions()->getRequests()->getLast();
@@ -662,22 +767,30 @@ class SourcesControllerTest extends WebTestCase
         string $sourceId,
         array $parameters = []
     ): SymfonyResponse {
-        return $this->makeSourceRequest($method, $sourceId, $this->createAuthorizationHeader(), $parameters);
+        return $this->makeAuthorizedRequest($method, SourceController::ROUTE_SOURCE . $sourceId, $parameters);
+    }
+
+    /**
+     * @param array<string, string> $parameters
+     */
+    private function makeAuthorizedRequest(string $method, string $uri, array $parameters = []): SymfonyResponse
+    {
+        return $this->makeRequest($method, $uri, $this->createAuthorizationHeader(), $parameters);
     }
 
     /**
      * @param array<string, string> $headers
      * @param array<string, string> $parameters
      */
-    private function makeSourceRequest(
+    private function makeRequest(
         string $method,
-        string $sourceId,
+        string $uri,
         array $headers = [],
         array $parameters = []
     ): SymfonyResponse {
         $this->client->request(
             method: $method,
-            uri: SourceController::ROUTE_SOURCE . $sourceId,
+            uri: $uri,
             parameters: $parameters,
             server: $this->createRequestServerPropertiesFromHeaders($headers)
         );
