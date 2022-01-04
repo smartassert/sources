@@ -13,4 +13,9 @@ interface SourceInterface
     public function getId(): string;
 
     public function getUserId(): string;
+
+    /**
+     * @return self::TYPE_*
+     */
+    public function getType(): string;
 }

@@ -55,6 +55,14 @@ class RunSource extends AbstractSource implements FileLocatorInterface, \JsonSer
     }
 
     /**
+     * @return SourceInterface::TYPE_RUN
+     */
+    public function getType(): string
+    {
+        return SourceInterface::TYPE_RUN;
+    }
+
+    /**
      * @return array{
      *     "id": string,
      *     "user_id": string,
@@ -68,7 +76,7 @@ class RunSource extends AbstractSource implements FileLocatorInterface, \JsonSer
         return [
             'id' => $this->id,
             'user_id' => $this->getUserId(),
-            'type' => SourceInterface::TYPE_RUN,
+            'type' => $this->getType(),
             'parent' => $this->parent?->getId(),
             'parameters' => $this->parameters,
         ];

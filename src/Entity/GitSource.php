@@ -63,6 +63,14 @@ class GitSource extends AbstractSource implements \JsonSerializable
     }
 
     /**
+     * @return SourceInterface::TYPE_GIT
+     */
+    public function getType(): string
+    {
+        return SourceInterface::TYPE_GIT;
+    }
+
+    /**
      * @return array{
      *     "id": string,
      *     "user_id": string,
@@ -77,7 +85,7 @@ class GitSource extends AbstractSource implements \JsonSerializable
         return [
             'id' => $this->id,
             'user_id' => $this->getUserId(),
-            'type' => SourceInterface::TYPE_GIT,
+            'type' => $this->getType(),
             'host_url' => $this->hostUrl,
             'path' => $this->path,
             'access_token' => $this->accessToken
