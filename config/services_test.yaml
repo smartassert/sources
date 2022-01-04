@@ -27,3 +27,6 @@ services:
 
     App\Services\Source\Finder:
         public: true
+
+    App\Services\DirectoryDuplicator:
+        public: true
