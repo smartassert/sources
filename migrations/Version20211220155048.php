@@ -26,7 +26,7 @@ final class Version20211220155048 extends AbstractMigration
             )
         ');
         $this->addSql('COMMENT ON COLUMN run_source.parameters IS \'(DC2Type:simple_array)\'');
-        $this->addSql('CREATE UNIQUE INDEX UNIQ_55B64E4E727ACA70 ON run_source (parent_id)');
+        $this->addSql('CREATE INDEX IDX_55B64E4E727ACA70 ON run_source (parent_id)');
         $this->addSql('
             ALTER TABLE run_source 
                 ADD CONSTRAINT FK_55B64E4E727ACA70 

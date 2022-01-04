@@ -12,7 +12,7 @@ class RunSource extends AbstractSource implements FileLocatorInterface, \JsonSer
 {
     use UserSourceFileLocatorTrait;
 
-    #[ORM\OneToOne(targetEntity: AbstractSource::class, cascade: ['persist', 'remove'])]
+    #[ORM\ManyToOne(targetEntity: AbstractSource::class, cascade: ['persist', 'remove'])]
     #[ORM\JoinColumn(nullable: true)]
     private FileSource|GitSource|null $parent;
 
