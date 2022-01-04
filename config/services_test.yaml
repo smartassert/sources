@@ -19,3 +19,8 @@ services:
 
     App\Tests\Services\Source\SourceRemover:
         public: true
+
+    App\Services\FileStoreFactory:
+        public: true
+        arguments:
+            $basePath: '%file_store_base_path%'

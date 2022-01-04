@@ -4,11 +4,14 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
+use App\Model\FileLocatorInterface;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity]
-class RunSource extends AbstractSource implements \JsonSerializable
+class RunSource extends AbstractSource implements FileLocatorInterface, \JsonSerializable
 {
+    use UserSourceFileLocatorTrait;
+
     #[ORM\OneToOne(targetEntity: AbstractSource::class, cascade: ['persist', 'remove'])]
     #[ORM\JoinColumn(nullable: true)]
     private FileSource|GitSource|null $parent;

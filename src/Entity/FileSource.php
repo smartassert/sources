@@ -4,11 +4,14 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
+use App\Model\FileLocatorInterface;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity]
-class FileSource extends AbstractSource implements \JsonSerializable
+class FileSource extends AbstractSource implements FileLocatorInterface, \JsonSerializable
 {
+    use UserSourceFileLocatorTrait;
+
     #[ORM\Column(type: 'string', length: 255)]
     private string $label;
 

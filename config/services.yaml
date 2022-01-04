@@ -6,6 +6,7 @@
 parameters:
     users_security_bundle_firewall_pattern: '^/'
     users_security_bundle_access_control_pattern: '^/'
+    file_store_base_path: '%env(resolve:FILE_STORE_BASE_PATH)%'
 
 services:
     # default configuration for services in *this* file
@@ -45,3 +46,7 @@ services:
     App\ArgumentResolver\SourceResolver:
         tags:
             - { name: controller.argument_value_resolver, priority: 50 }
+
+    App\Services\FileStoreFactory:
+        arguments:
+            $basePath: '%file_store_base_path%'
