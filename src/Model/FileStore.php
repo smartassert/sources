@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace App\Model;
 
-class FileStore
+class FileStore implements FileLocatorInterface
 {
+    use StringableFileLocatorTrait;
+
     public function __construct(
         private string $basePath,
         private FileLocatorInterface $fileLocator,
