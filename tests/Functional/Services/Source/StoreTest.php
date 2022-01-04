@@ -108,4 +108,16 @@ class StoreTest extends WebTestCase
 
         self::assertSame([$source], $this->repository->findAll());
     }
+
+    public function testAddRunSource(): void
+    {
+        $parent = new FileSource((string) new Ulid(), (string) new Ulid(), 'label');
+        $runSource1 = new RunSource((string) new Ulid(), $parent);
+        $this->store->add($runSource1);
+        self::assertCount(2, $this->repository->findAll());
+
+        $runSource2 = new RunSource((string) new Ulid(), $parent);
+        $this->store->add($runSource2);
+        self::assertCount(3, $this->repository->findAll());
+    }
 }
