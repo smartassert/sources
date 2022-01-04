@@ -24,3 +24,11 @@ services:
         public: true
         arguments:
             $basePath: '%file_store_base_path%'
+
+    App\Services\Source\Finder:
+        public: true
+        arguments:
+            $typeFinders:
+                - '@App\Services\Source\FileSourceFinder'
+                - '@App\Services\Source\GitSourceFinder'
+                - '@App\Services\Source\RunSourceFinder'
