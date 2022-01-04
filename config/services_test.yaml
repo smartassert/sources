@@ -24,3 +24,6 @@ services:
         public: true
         arguments:
             $basePath: '%file_store_base_path%'
+
+    App\Services\DirectoryDuplicator:
+        public: true
