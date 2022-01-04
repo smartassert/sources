@@ -25,41 +25,6 @@ class Factory
     ) {
     }
 
-    public function createGitSource(string $userId, string $hostUrl, string $path, ?string $accessToken): GitSource
-    {
-        $source = $this->gitSourceRepository->findOneBy([
-            'userId' => $userId,
-            'hostUrl' => $hostUrl,
-            'path' => $path,
-        ]);
-
-        if ($source instanceof GitSource) {
-            return $source;
-        }
-
-        $source = new GitSource($this->generateId(), $userId, $hostUrl, $path, $accessToken);
-        $this->store->add($source);
-
-        return $source;
-    }
-
-    public function createFileSource(string $userId, string $label): FileSource
-    {
-        $source = $this->fileSourceRepository->findOneBy([
-            'userId' => $userId,
-            'label' => $label,
-        ]);
-
-        if ($source instanceof FileSource) {
-            return $source;
-        }
-
-        $source = new FileSource($this->generateId(), $userId, $label);
-        $this->store->add($source);
-
-        return $source;
-    }
-
     /**
      * @param array<string, string> $parameters
      */
@@ -76,29 +41,62 @@ class Factory
             return $source;
         }
 
-        $source = new RunSource($this->generateId(), $parent, $parameters);
-        $this->store->add($source);
-
-        return $source;
+        return new RunSource($this->generateId(), $parent, $parameters);
     }
 
     public function createGitSourceFromRequest(UserInterface $user, GitSourceRequest $request): GitSource
     {
-        return $this->createGitSource(
+        $source = $this->createGitSource(
             $user->getUserIdentifier(),
             $request->getHostUrl(),
             $request->getPath(),
             $request->getAccessToken()
         );
+
+        $this->store->add($source);
+
+        return $source;
     }
 
     public function createFileSourceFromRequest(UserInterface $user, FileSourceRequest $request): FileSource
     {
-        return $this->createFileSource($user->getUserIdentifier(), $request->getLabel());
+        $source = $this->createFileSource($user->getUserIdentifier(), $request->getLabel());
+        $this->store->add($source);
+
+        return $source;
     }
 
     private function generateId(): string
     {
         return (string) new Ulid();
+    }
+
+    private function createGitSource(string $userId, string $hostUrl, string $path, ?string $accessToken): GitSource
+    {
+        $source = $this->gitSourceRepository->findOneBy([
+            'userId' => $userId,
+            'hostUrl' => $hostUrl,
+            'path' => $path,
+        ]);
+
+        if ($source instanceof GitSource) {
+            return $source;
+        }
+
+        return new GitSource($this->generateId(), $userId, $hostUrl, $path, $accessToken);
+    }
+
+    private function createFileSource(string $userId, string $label): FileSource
+    {
+        $source = $this->fileSourceRepository->findOneBy([
+            'userId' => $userId,
+            'label' => $label,
+        ]);
+
+        if ($source instanceof FileSource) {
+            return $source;
+        }
+
+        return new FileSource($this->generateId(), $userId, $label);
     }
 }

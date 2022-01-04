@@ -43,109 +43,39 @@ class FactoryTest extends WebTestCase
         }
     }
 
-    /**
-     * @dataProvider createGitSourceDataProvider
-     */
-    public function testCreateGitSource(string $userId, string $hostUrl, string $path, ?string $accessToken): void
+    public function testCreateFileSourceFromRequest(): void
     {
-        $source = $this->factory->createGitSource($userId, $hostUrl, $path, $accessToken);
-
-        $this->assertCreatedGitSource($source, $userId, $hostUrl, $path, $accessToken);
-    }
-
-    /**
-     * @return array<mixed>
-     */
-    public function createGitSourceDataProvider(): array
-    {
-        return [
-            'empty access token' => [
-                'userId' => self::USER_ID,
-                'hostUrl' => 'https://example.com/repository.git',
-                'path' => '/',
-                'accessToken ' => null,
-            ],
-            'non-empty access token' => [
-                'userId' => self::USER_ID,
-                'hostUrl' => 'https://example.com/repository.git',
-                'path' => '/',
-                'accessToken ' => 'access-token',
-            ],
-        ];
-    }
-
-    /**
-     * @dataProvider createFileSourceDataProvider
-     */
-    public function testCreateFileSource(string $userId, string $label): void
-    {
-        $source = $this->factory->createFileSource($userId, $label);
-
-        $this->assertCreatedFileSource($source, $userId, $label);
-    }
-
-    /**
-     * @return array<mixed>
-     */
-    public function createFileSourceDataProvider(): array
-    {
-        return [
-            'default' => [
-                'userId' => self::USER_ID,
-                'label' => 'source label',
-            ],
-        ];
-    }
-
-    /**
-     * @dataProvider createFileSourceFromRequestDataProvider
-     */
-    public function testCreateFileSourceFromRequest(UserInterface $user, FileSourceRequest $request): void
-    {
+        $user = new User(self::USER_ID);
+        $request = new FileSourceRequest('file source label');
         $source = $this->factory->createFileSourceFromRequest($user, $request);
 
         $this->assertCreatedFileSource($source, $user->getUserIdentifier(), $request->getLabel());
     }
 
-    /**
-     * @return array<mixed>
-     */
-    public function createFileSourceFromRequestDataProvider(): array
+    public function testCreateFileSourceFromRequestIsIdempotent(): void
     {
-        $user = new User(self::USER_ID);
-        $label = 'file source label';
+        self::assertCount(0, $this->repository->findAll());
 
-        return [
-            'default' => [
-                'user' => $user,
-                'request' => new FileSourceRequest($label),
-            ],
-        ];
+        $user = new User(self::USER_ID);
+        $request = new FileSourceRequest('file source label');
+
+        $this->factory->createFileSourceFromRequest($user, $request);
+        $this->factory->createFileSourceFromRequest($user, $request);
+        $this->factory->createFileSourceFromRequest($user, $request);
+
+        self::assertCount(1, $this->repository->findAll());
     }
 
-    /**
-     * @dataProvider createFileSourceDataProvider
-     */
-    public function testCreateRunSource(string $userId): void
+    public function testCreateRunSource(): void
     {
-        $parent = $this->factory->createFileSource($userId, 'file source label');
+        $user = new User(self::USER_ID);
+        $parent = new FileSource((string) new Ulid(), $user->getUserIdentifier(), 'file source label');
         $parameters = ['ref' => 'v0.1'];
 
         $source = $this->factory->createRunSource($parent, $parameters);
 
-        $this->assertCreatedRunSource($source, $userId, $parent, $parameters);
-    }
-
-    /**
-     * @return array<mixed>
-     */
-    public function createRunSourceDataProvider(): array
-    {
-        return [
-            'default' => [
-                'userId' => self::USER_ID,
-            ],
-        ];
+        $this->assertCreatedRunSource($source, $user->getUserIdentifier(), $parent, $parameters);
+        self::assertCount(0, $this->repository->findAll());
     }
 
     /**
@@ -185,56 +115,18 @@ class FactoryTest extends WebTestCase
         ];
     }
 
-    public function testCreateGitSourceAlreadyExists(): void
+    public function testCreateGitSourceFromRequestIsIdempotent(): void
     {
         self::assertCount(0, $this->repository->findAll());
 
-        $userId = self::USER_ID;
-        $hostUrl = 'https://example.com/repository.git';
-        $path = '/path';
+        $user = new User(self::USER_ID);
+        $request = new GitSourceRequest('https://example.com/repository.git', '/', null);
 
-        $source = $this->factory->createGitSource($userId, $hostUrl, $path, null);
-        self::assertCount(1, $this->repository->findAll());
-
-        $accessTokenVariants = [null, 'access token one', 'access token two'];
-
-        foreach ($accessTokenVariants as $accessTokenVariant) {
-            self::assertSame(
-                $source,
-                $this->factory->createGitSource($userId, $hostUrl, $path, $accessTokenVariant)
-            );
-        }
+        $this->factory->createGitSourceFromRequest($user, $request);
+        $this->factory->createGitSourceFromRequest($user, $request);
+        $this->factory->createGitSourceFromRequest($user, $request);
 
         self::assertCount(1, $this->repository->findAll());
-    }
-
-    public function testCreateFileSourceAlreadyExists(): void
-    {
-        self::assertCount(0, $this->repository->findAll());
-
-        $userId = self::USER_ID;
-        $label = 'https://example.com/repository.git';
-
-        $this->factory->createFileSource($userId, $label);
-        $this->factory->createFileSource($userId, $label);
-        self::assertCount(1, $this->repository->findAll());
-    }
-
-    public function testCreateRunSourceAlreadyExists(): void
-    {
-        $userId = self::USER_ID;
-
-        self::assertCount(0, $this->repository->findAll());
-
-        $parent = $this->factory->createFileSource($userId, 'file source label');
-
-        self::assertCount(1, $this->repository->findAll());
-
-        $parameters = ['ref' => 'v0.1'];
-
-        $this->factory->createRunSource($parent, $parameters);
-        $this->factory->createRunSource($parent, $parameters);
-        self::assertCount(2, $this->repository->findAll());
     }
 
     private function assertCreatedGitSource(

@@ -9,7 +9,6 @@ use App\Entity\GitSource;
 use App\Entity\RunSource;
 use App\Entity\SourceInterface;
 use App\Repository\SourceRepository;
-use App\Services\Source\Factory;
 use App\Services\Source\Store;
 use App\Tests\Services\Source\SourceRemover;
 use Doctrine\ORM\EntityManagerInterface;
@@ -22,7 +21,6 @@ class SourceRepositoryTest extends WebTestCase
 {
     private const USER_ID = '01FPSVJ7ZT85X73BW05EK9B3XG';
 
-    private Factory $factory;
     private SourceRepository $repository;
     private Store $store;
     private EntityManagerInterface $entityManager;
@@ -30,10 +28,6 @@ class SourceRepositoryTest extends WebTestCase
     protected function setUp(): void
     {
         parent::setUp();
-
-        $factory = self::getContainer()->get(Factory::class);
-        \assert($factory instanceof Factory);
-        $this->factory = $factory;
 
         $repository = self::getContainer()->get(SourceRepository::class);
         \assert($repository instanceof SourceRepository);
@@ -55,12 +49,9 @@ class SourceRepositoryTest extends WebTestCase
 
     /**
      * @dataProvider persistAndRetrieveDataProvider
-     *
-     * @param callable(Factory): SourceInterface $sourceCreator
      */
-    public function testPersistAndRetrieveSource(callable $sourceCreator): void
+    public function testPersistAndRetrieveSource(SourceInterface $source): void
     {
-        $source = $sourceCreator($this->factory);
         $sourceId = $source->getId();
 
         $this->store->add($source);
@@ -81,26 +72,30 @@ class SourceRepositoryTest extends WebTestCase
     {
         return [
             GitSource::class => [
-                'entity' => function (Factory $factory) {
-                    return $factory->createGitSource(
-                        self::USER_ID,
-                        'https://example.com/repository.git',
-                        '/',
-                        null
-                    );
-                },
+                'source' => new GitSource(
+                    (string) new Ulid(),
+                    self::USER_ID,
+                    'https://example.com/repository.git',
+                    '/',
+                    null
+                ),
             ],
             FileSource::class => [
-                'entity' => function (Factory $factory) {
-                    return $factory->createFileSource(self::USER_ID, 'source label');
-                },
+                'source' => new FileSource(
+                    (string) new Ulid(),
+                    self::USER_ID,
+                    'file source label'
+                ),
             ],
             RunSource::class => [
-                'entity' => function (Factory $factory) {
-                    $parent = $factory->createFileSource(self::USER_ID, 'source label');
-
-                    return $factory->createRunSource($parent);
-                },
+                'source' => new RunSource(
+                    (string) new Ulid(),
+                    new FileSource(
+                        (string) new Ulid(),
+                        self::USER_ID,
+                        'file source label'
+                    )
+                ),
             ],
         ];
     }
