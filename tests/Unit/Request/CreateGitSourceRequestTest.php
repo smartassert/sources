@@ -46,7 +46,7 @@ class CreateGitSourceRequestTest extends TestCase
                     request: [
                         GitSourceRequest::KEY_POST_HOST_URL => $hostUrl,
                         GitSourceRequest::KEY_POST_PATH => $path,
-                        GitSourceRequest::KEY_POST_ACCESS_TOKEN => $accessToken,
+                        GitSourceRequest::KEY_POST_CREDENTIALS => $accessToken,
                     ]
                 ),
                 'expected' => new GitSourceRequest($hostUrl, $path, $accessToken)

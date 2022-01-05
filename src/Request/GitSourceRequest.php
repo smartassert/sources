@@ -11,24 +11,24 @@ class GitSourceRequest implements EncapsulatingRequestInterface
 {
     public const KEY_POST_HOST_URL = 'host-url';
     public const KEY_POST_PATH = 'path';
-    public const KEY_POST_ACCESS_TOKEN = 'access-token';
+    public const KEY_POST_CREDENTIALS = 'credentials';
 
     public function __construct(
         private string $hostUrl,
         private string $path,
-        private ?string $accessToken,
+        private ?string $credentials,
     ) {
     }
 
     public static function create(Request $request): GitSourceRequest
     {
-        $accessToken = $request->request->get(self::KEY_POST_ACCESS_TOKEN);
-        $accessToken = is_string($accessToken) || null === $accessToken ? $accessToken : null;
+        $credentials = $request->request->get(self::KEY_POST_CREDENTIALS);
+        $credentials = is_string($credentials) || null === $credentials ? $credentials : null;
 
         return new GitSourceRequest(
             (string) $request->request->get(self::KEY_POST_HOST_URL),
             (string) $request->request->get(self::KEY_POST_PATH),
-            $accessToken
+            $credentials
         );
     }
 
@@ -42,8 +42,8 @@ class GitSourceRequest implements EncapsulatingRequestInterface
         return $this->path;
     }
 
-    public function getAccessToken(): ?string
+    public function getCredentials(): ?string
     {
-        return $this->accessToken;
+        return $this->credentials;
     }
 }
