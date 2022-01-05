@@ -59,11 +59,11 @@ class MutatorTest extends WebTestCase
         $credentials = 'credentials';
 
         return [
-            'null credentials' => [
-                'source' => new GitSource($userId, $hostUrl, $path, null),
-                'request' => new GitSourceRequest($hostUrl, $path, null),
+            'empty credentials' => [
+                'source' => new GitSource($userId, $hostUrl, $path, ''),
+                'request' => new GitSourceRequest($hostUrl, $path, ''),
             ],
-            'non-null credentials' => [
+            'non-empty credentials' => [
                 'source' => new GitSource($userId, $hostUrl, $path, $credentials),
                 'request' => new GitSourceRequest($hostUrl, $path, $credentials),
             ],
@@ -112,12 +112,12 @@ class MutatorTest extends WebTestCase
             ],
             'nullify credentials' => [
                 'source' => new GitSource($userId, $hostUrl, $path, $credentials),
-                'request' => new GitSourceRequest($hostUrl, $path, null),
+                'request' => new GitSourceRequest($hostUrl, $path, ''),
                 'assertions' => function (GitSource $mutatedSource) use ($userId, $hostUrl, $path): void {
                     self::assertSame($userId, $mutatedSource->getUserId());
                     self::assertSame($hostUrl, $mutatedSource->getHostUrl());
                     self::assertSame($path, $mutatedSource->getPath());
-                    self::assertNull($mutatedSource->getCredentials());
+                    self::assertSame('', $mutatedSource->getCredentials());
                 }
             ],
         ];

@@ -74,7 +74,7 @@ class SourceRepositoryTest extends WebTestCase
                     UserId::create(),
                     'https://example.com/repository.git',
                     '/',
-                    null
+                    ''
                 ),
             ],
             FileSource::class => [

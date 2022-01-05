@@ -15,10 +15,10 @@ class GitSource extends AbstractSource implements \JsonSerializable
     #[ORM\Column(type: 'string', length: 255)]
     private string $path;
 
-    #[ORM\Column(type: 'string', length: 255, nullable: true)]
-    private ?string $credentials;
+    #[ORM\Column(type: 'string', length: 255)]
+    private string $credentials;
 
-    public function __construct(string $userId, string $hostUrl, string $path = '/', ?string $credentials = null)
+    public function __construct(string $userId, string $hostUrl, string $path = '/', string $credentials = '')
     {
         parent::__construct($userId);
 
@@ -42,7 +42,7 @@ class GitSource extends AbstractSource implements \JsonSerializable
         $this->path = $path;
     }
 
-    public function setCredentials(?string $credentials): void
+    public function setCredentials(string $credentials): void
     {
         $this->credentials = $credentials;
     }
@@ -52,7 +52,7 @@ class GitSource extends AbstractSource implements \JsonSerializable
         return $this->path;
     }
 
-    public function getCredentials(): ?string
+    public function getCredentials(): string
     {
         return $this->credentials;
     }
@@ -72,7 +72,7 @@ class GitSource extends AbstractSource implements \JsonSerializable
      *     "type": SourceInterface::TYPE_GIT,
      *     "host_url": string,
      *     "path": string,
-     *     "credentials": string|null
+     *     "has_credentials": bool
      * }
      */
     public function jsonSerialize(): array
@@ -83,7 +83,7 @@ class GitSource extends AbstractSource implements \JsonSerializable
             'type' => $this->getType(),
             'host_url' => $this->hostUrl,
             'path' => $this->path,
-            'credentials' => $this->credentials
+            'has_credentials' => '' !== $this->credentials
         ];
     }
 }
