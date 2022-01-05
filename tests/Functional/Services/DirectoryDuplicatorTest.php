@@ -7,6 +7,7 @@ namespace App\Tests\Functional\Services;
 use App\Services\DirectoryDuplicator;
 use App\Services\FileStoreFactory;
 use App\Tests\Mock\Model\MockFileLocator;
+use App\Tests\Services\SourceFixtureCreator;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Filesystem\Filesystem;
 
@@ -14,6 +15,7 @@ class DirectoryDuplicatorTest extends WebTestCase
 {
     private DirectoryDuplicator $directoryDuplicator;
     private FileStoreFactory $fileStoreFactory;
+    private SourceFixtureCreator $sourceFixtureCreator;
 
     protected function setUp(): void
     {
@@ -26,11 +28,17 @@ class DirectoryDuplicatorTest extends WebTestCase
         $fileStoreFactory = self::getContainer()->get(FileStoreFactory::class);
         \assert($fileStoreFactory instanceof FileStoreFactory);
         $this->fileStoreFactory = $fileStoreFactory;
+
+        $sourceFixtureCreator = self::getContainer()->get(SourceFixtureCreator::class);
+        \assert($sourceFixtureCreator instanceof SourceFixtureCreator);
+        $this->sourceFixtureCreator = $sourceFixtureCreator;
     }
 
     public function testDuplicateSuccess(): void
     {
         $sourceRelativePath = 'source';
+        $this->sourceFixtureCreator->create($sourceRelativePath);
+
         $source = (new MockFileLocator())
             ->withToStringCall($sourceRelativePath)
             ->withGetPathCall($sourceRelativePath)
