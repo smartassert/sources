@@ -89,7 +89,7 @@ class FactoryTest extends WebTestCase
             $user->getUserIdentifier(),
             $request->getHostUrl(),
             $request->getPath(),
-            $request->getCredentials()
+            $request->hasCredentials() ? $request->getCredentials() : null
         );
     }
 
@@ -105,7 +105,7 @@ class FactoryTest extends WebTestCase
         return [
             'empty credentials' => [
                 'user' => $user,
-                'request' => new GitSourceRequest($hostUrl, $path, null),
+                'request' => new GitSourceRequest($hostUrl, $path, ''),
             ],
             'non-empty credentials' => [
                 'user' => $user,
@@ -119,7 +119,7 @@ class FactoryTest extends WebTestCase
         self::assertCount(0, $this->repository->findAll());
 
         $user = new User(UserId::create());
-        $request = new GitSourceRequest('https://example.com/repository.git', '/', null);
+        $request = new GitSourceRequest('https://example.com/repository.git', '/', '');
 
         $this->factory->createGitSourceFromRequest($user, $request);
         $this->factory->createGitSourceFromRequest($user, $request);

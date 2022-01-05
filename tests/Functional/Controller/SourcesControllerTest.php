@@ -454,7 +454,7 @@ class SourcesControllerTest extends WebTestCase
                     'label' => $newLabel,
                 ],
             ],
-            SourceInterface::TYPE_GIT => [
+            SourceInterface::TYPE_GIT . ' credentials present and empty' => [
                 'source' => $gitSource,
                 'userId' => $userId,
                 'requestData' => [
@@ -468,7 +468,23 @@ class SourcesControllerTest extends WebTestCase
                     'type' => SourceInterface::TYPE_GIT,
                     'host_url' => $newHostUrl,
                     'path' => $newPath,
-                    'has_credentials' => true,
+                    'has_credentials' => false,
+                ],
+            ],
+            SourceInterface::TYPE_GIT . ' credentials not present' => [
+                'source' => $gitSource,
+                'userId' => $userId,
+                'requestData' => [
+                    GitSourceRequest::KEY_POST_HOST_URL => $newHostUrl,
+                    GitSourceRequest::KEY_POST_PATH => $newPath,
+                ],
+                'expectedResponseData' => [
+                    'id' => $gitSource->getId(),
+                    'user_id' => $gitSource->getUserId(),
+                    'type' => SourceInterface::TYPE_GIT,
+                    'host_url' => $newHostUrl,
+                    'path' => $newPath,
+                    'has_credentials' => false,
                 ],
             ],
         ];

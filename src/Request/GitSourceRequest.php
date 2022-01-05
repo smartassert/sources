@@ -16,14 +16,14 @@ class GitSourceRequest implements EncapsulatingRequestInterface
     public function __construct(
         private string $hostUrl,
         private string $path,
-        private ?string $credentials,
+        private string $credentials,
     ) {
     }
 
     public static function create(Request $request): GitSourceRequest
     {
-        $credentials = $request->request->get(self::KEY_POST_CREDENTIALS);
-        $credentials = is_string($credentials) || null === $credentials ? $credentials : null;
+        $credentials = (string) $request->request->get(self::KEY_POST_CREDENTIALS);
+        $credentials = trim($credentials);
 
         return new GitSourceRequest(
             (string) $request->request->get(self::KEY_POST_HOST_URL),
@@ -42,8 +42,13 @@ class GitSourceRequest implements EncapsulatingRequestInterface
         return $this->path;
     }
 
-    public function getCredentials(): ?string
+    public function getCredentials(): string
     {
         return $this->credentials;
+    }
+
+    public function hasCredentials(): bool
+    {
+        return '' !== $this->credentials;
     }
 }

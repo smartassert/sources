@@ -8,7 +8,7 @@ use App\Request\GitSourceRequest;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 
-class CreateGitSourceRequestTest extends TestCase
+class GitSourceRequestTest extends TestCase
 {
     /**
      * @dataProvider createDataProvider
@@ -30,7 +30,7 @@ class CreateGitSourceRequestTest extends TestCase
         return [
             'empty' => [
                 'request' => new Request(),
-                'expected' => new GitSourceRequest('', '', null)
+                'expected' => new GitSourceRequest('', '', '')
             ],
             'user id, host url, path present, credentials missing' => [
                 'request' => new Request(
@@ -39,9 +39,19 @@ class CreateGitSourceRequestTest extends TestCase
                         GitSourceRequest::KEY_POST_PATH => $path,
                     ]
                 ),
-                'expected' => new GitSourceRequest($hostUrl, $path, null)
+                'expected' => new GitSourceRequest($hostUrl, $path, '')
             ],
-            'user id, host url, path credentials present' => [
+            'user id, host url, path credentials present, set to null' => [
+                'request' => new Request(
+                    request: [
+                        GitSourceRequest::KEY_POST_HOST_URL => $hostUrl,
+                        GitSourceRequest::KEY_POST_PATH => $path,
+                        GitSourceRequest::KEY_POST_CREDENTIALS => null,
+                    ]
+                ),
+                'expected' => new GitSourceRequest($hostUrl, $path, '')
+            ],
+            'user id, host url, path credentials present, set to string' => [
                 'request' => new Request(
                     request: [
                         GitSourceRequest::KEY_POST_HOST_URL => $hostUrl,
@@ -50,6 +60,31 @@ class CreateGitSourceRequestTest extends TestCase
                     ]
                 ),
                 'expected' => new GitSourceRequest($hostUrl, $path, $credentials)
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider hasCredentialsDataProvider
+     */
+    public function testHasCredentials(GitSourceRequest $request, bool $expected): void
+    {
+        self::assertSame($expected, $request->hasCredentials());
+    }
+
+    /**
+     * @return array<mixed>
+     */
+    public function hasCredentialsDataProvider(): array
+    {
+        return [
+            'no credentials' => [
+                'request' => new GitSourceRequest('', '', ''),
+                'expected' => false,
+            ],
+            'has credentials' => [
+                'request' => new GitSourceRequest('', '', 'credentials'),
+                'expected' => true,
             ],
         ];
     }

@@ -35,7 +35,7 @@ class Factory
             $user->getUserIdentifier(),
             $request->getHostUrl(),
             $request->getPath(),
-            $request->getCredentials()
+            $request->hasCredentials() ? $request->getCredentials() : null
         );
 
         if (null === $this->finder->find($source)) {
