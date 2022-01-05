@@ -38,15 +38,47 @@ class MutatorTest extends WebTestCase
     }
 
     /**
-     * @dataProvider updateGitSourceDataProvider
+     * @dataProvider updateGitSourceNoChangesDataProvider
      */
-    public function testUpdateGitSource(GitSource $source, GitSourceRequest $request, GitSource $expected): void
+    public function testUpdateGitSourceNoChanges(GitSource $source, GitSourceRequest $request): void
     {
         $this->store->add($source);
-
         $mutatedSource = $this->mutator->updateGitSource($source, $request);
 
-        self::assertEquals($expected, $mutatedSource);
+        self::assertSame($source, $mutatedSource);
+    }
+
+    /**
+     * @return array<mixed>
+     */
+    public function updateGitSourceNoChangesDataProvider(): array
+    {
+        $userId = (string) new Ulid();
+        $hostUrl = 'https://example.com/repository.git';
+        $path = '/path';
+        $accessToken = 'access token';
+
+        return [
+            'null access token' => [
+                'source' => new GitSource($userId, $hostUrl, $path, null),
+                'request' => new GitSourceRequest($hostUrl, $path, null),
+            ],
+            'non-null access token' => [
+                'source' => new GitSource($userId, $hostUrl, $path, $accessToken),
+                'request' => new GitSourceRequest($hostUrl, $path, $accessToken),
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider updateGitSourceDataProvider
+     */
+    public function testUpdateGitSource(GitSource $source, GitSourceRequest $request, callable $assertions): void
+    {
+        $this->store->add($source);
+        $mutatedSource = $this->mutator->updateGitSource($source, $request);
+
+        $assertions($mutatedSource);
     }
 
     /**
@@ -54,7 +86,6 @@ class MutatorTest extends WebTestCase
      */
     public function updateGitSourceDataProvider(): array
     {
-        $id = (string) new Ulid();
         $userId = (string) new Ulid();
         $hostUrl = 'https://example.com/repository.git';
         $path = '/path';
@@ -64,25 +95,30 @@ class MutatorTest extends WebTestCase
         $newAccessToken = 'new access token';
 
         return [
-            'no changes with null access token' => [
-                'source' => new GitSource($id, $userId, $hostUrl, $path, null),
-                'request' => new GitSourceRequest($hostUrl, $path, null),
-                'expected' => new GitSource($id, $userId, $hostUrl, $path, null),
-            ],
-            'no changes with non-null access token' => [
-                'source' => new GitSource($id, $userId, $hostUrl, $path, $accessToken),
-                'request' => new GitSourceRequest($hostUrl, $path, $accessToken),
-                'expected' => new GitSource($id, $userId, $hostUrl, $path, $accessToken),
-            ],
             'changes' => [
-                'source' => new GitSource($id, $userId, $hostUrl, $path, $accessToken),
+                'source' => new GitSource($userId, $hostUrl, $path, $accessToken),
                 'request' => new GitSourceRequest($newHostUrl, $newPath, $newAccessToken),
-                'expected' => new GitSource($id, $userId, $newHostUrl, $newPath, $newAccessToken),
+                'assertions' => function (GitSource $mutatedSource) use (
+                    $userId,
+                    $newHostUrl,
+                    $newPath,
+                    $newAccessToken
+                ): void {
+                    self::assertSame($userId, $mutatedSource->getUserId());
+                    self::assertSame($newHostUrl, $mutatedSource->getHostUrl());
+                    self::assertSame($newPath, $mutatedSource->getPath());
+                    self::assertSame($newAccessToken, $mutatedSource->getAccessToken());
+                }
             ],
             'nullify access token' => [
-                'source' => new GitSource($id, $userId, $hostUrl, $path, $accessToken),
+                'source' => new GitSource($userId, $hostUrl, $path, $accessToken),
                 'request' => new GitSourceRequest($hostUrl, $path, null),
-                'expected' => new GitSource($id, $userId, $hostUrl, $path, null),
+                'assertions' => function (GitSource $mutatedSource) use ($userId, $hostUrl, $path): void {
+                    self::assertSame($userId, $mutatedSource->getUserId());
+                    self::assertSame($hostUrl, $mutatedSource->getHostUrl());
+                    self::assertSame($path, $mutatedSource->getPath());
+                    self::assertNull($mutatedSource->getAccessToken());
+                }
             ],
         ];
     }
@@ -90,13 +126,12 @@ class MutatorTest extends WebTestCase
     /**
      * @dataProvider updateFileSourceDataProvider
      */
-    public function testUpdateFileSource(FileSource $source, FileSourceRequest $request, FileSource $expected): void
+    public function testUpdateFileSource(FileSource $source, FileSourceRequest $request, callable $assertions): void
     {
         $this->store->add($source);
-
         $mutatedSource = $this->mutator->updateFileSource($source, $request);
 
-        self::assertEquals($expected, $mutatedSource);
+        $assertions($mutatedSource);
     }
 
     /**
@@ -104,21 +139,26 @@ class MutatorTest extends WebTestCase
      */
     public function updateFileSourceDataProvider(): array
     {
-        $id = (string) new Ulid();
         $userId = (string) new Ulid();
         $label = 'file source label';
         $newLabel = 'new file source label';
 
         return [
             'no changes' => [
-                'source' => new FileSource($id, $userId, $label),
+                'source' => new FileSource($userId, $label),
                 'request' => new FileSourceRequest($label),
-                'expected' => new FileSource($id, $userId, $label),
+                'assertions' => function (FileSource $mutatedFileSource) use ($userId, $label): void {
+                    self::assertSame($userId, $mutatedFileSource->getUserId());
+                    self::assertSame($label, $mutatedFileSource->getLabel());
+                }
             ],
             'changes' => [
-                'source' => new FileSource($id, $userId, $label),
+                'source' => new FileSource($userId, $label),
                 'request' => new FileSourceRequest($newLabel),
-                'expected' => new FileSource($id, $userId, $newLabel),
+                'assertions' => function (FileSource $mutatedFileSource) use ($userId, $newLabel): void {
+                    self::assertSame($userId, $mutatedFileSource->getUserId());
+                    self::assertSame($newLabel, $mutatedFileSource->getLabel());
+                }
             ],
         ];
     }

@@ -69,7 +69,7 @@ class FactoryTest extends WebTestCase
     public function testCreateRunSource(): void
     {
         $user = new User(self::USER_ID);
-        $parent = new FileSource((string) new Ulid(), $user->getUserIdentifier(), 'file source label');
+        $parent = new FileSource($user->getUserIdentifier(), 'file source label');
         $parameters = ['ref' => 'v0.1'];
 
         $source = $this->factory->createRunSource($parent, $parameters);

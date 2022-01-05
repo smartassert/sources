@@ -61,12 +61,12 @@ class FinderTest extends WebTestCase
     {
         $userId = (string) new Ulid();
 
-        $fileSource = new FileSource((string) new Ulid(), $userId, 'file source label');
-        $gitSource = new GitSource((string) new Ulid(), $userId, 'https://example.com/repository.git', '/');
-        $fileRunSourceWithoutParameters = new RunSource((string) new Ulid(), $fileSource);
-        $fileRunSourceWithParameters = new RunSource((string) new Ulid(), $fileSource, ['key1' => 'value1']);
-        $gitRunSourceWithoutParameters = new RunSource((string) new Ulid(), $gitSource);
-        $gitRunSourceWithParameters = new RunSource((string) new Ulid(), $gitSource, ['key2' => 'value2']);
+        $fileSource = new FileSource($userId, 'file source label');
+        $gitSource = new GitSource($userId, 'https://example.com/repository.git', '/');
+        $fileRunSourceWithoutParameters = new RunSource($fileSource);
+        $fileRunSourceWithParameters = new RunSource($fileSource, ['key1' => 'value1']);
+        $gitRunSourceWithoutParameters = new RunSource($gitSource);
+        $gitRunSourceWithParameters = new RunSource($gitSource, ['key2' => 'value2']);
 
         $allSources = [
             $fileSource,

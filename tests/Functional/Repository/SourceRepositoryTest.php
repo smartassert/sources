@@ -73,7 +73,6 @@ class SourceRepositoryTest extends WebTestCase
         return [
             GitSource::class => [
                 'source' => new GitSource(
-                    (string) new Ulid(),
                     self::USER_ID,
                     'https://example.com/repository.git',
                     '/',
@@ -81,20 +80,11 @@ class SourceRepositoryTest extends WebTestCase
                 ),
             ],
             FileSource::class => [
-                'source' => new FileSource(
-                    (string) new Ulid(),
-                    self::USER_ID,
-                    'file source label'
-                ),
+                'source' => new FileSource(self::USER_ID, 'file source label'),
             ],
             RunSource::class => [
                 'source' => new RunSource(
-                    (string) new Ulid(),
-                    new FileSource(
-                        (string) new Ulid(),
-                        self::USER_ID,
-                        'file source label'
-                    )
+                    new FileSource(self::USER_ID, 'file source label')
                 ),
             ],
         ];
@@ -125,16 +115,16 @@ class SourceRepositoryTest extends WebTestCase
         $user = new User($userId);
 
         $userFileSources = [
-            new FileSource((string) new Ulid(), $userId, 'file source label'),
+            new FileSource($userId, 'file source label'),
         ];
 
         $userGitSources = [
-            new GitSource((string) new Ulid(), $userId, 'https://example.com/repository.git'),
+            new GitSource($userId, 'https://example.com/repository.git'),
         ];
 
         $userRunSources = [
-            new RunSource((string) new Ulid(), $userFileSources[0]),
-            new RunSource((string) new Ulid(), $userGitSources[0]),
+            new RunSource($userFileSources[0]),
+            new RunSource($userGitSources[0]),
         ];
 
         return [
@@ -150,11 +140,10 @@ class SourceRepositoryTest extends WebTestCase
             ],
             'has file, git and run sources, no user match' => [
                 'sources' => [
-                    new FileSource((string) new Ulid(), (string) new Ulid(), 'file source label'),
-                    new GitSource((string) new Ulid(), (string) new Ulid(), 'https://example.com/repository.git'),
+                    new FileSource((string) new Ulid(), 'file source label'),
+                    new GitSource((string) new Ulid(), 'https://example.com/repository.git'),
                     new RunSource(
-                        (string) new Ulid(),
-                        new FileSource((string) new Ulid(), (string) new Ulid(), 'file source label'),
+                        new FileSource((string) new Ulid(), 'file source label'),
                     ),
                 ],
                 'user' => $user,
@@ -200,18 +189,16 @@ class SourceRepositoryTest extends WebTestCase
             'has file, git and run sources for mixed users' => [
                 'sources' => [
                     $userFileSources[0],
-                    new FileSource((string) new Ulid(), (string) new Ulid(), 'file source label'),
+                    new FileSource((string) new Ulid(), 'file source label'),
                     $userGitSources[0],
-                    new GitSource((string) new Ulid(), (string) new Ulid(), 'https://example.com/repository.git'),
+                    new GitSource((string) new Ulid(), 'https://example.com/repository.git'),
                     $userRunSources[0],
                     $userRunSources[1],
                     new RunSource(
-                        (string) new Ulid(),
-                        new FileSource((string) new Ulid(), (string) new Ulid(), 'file source label')
+                        new FileSource((string) new Ulid(), 'file source label')
                     ),
                     new RunSource(
-                        (string) new Ulid(),
-                        new GitSource((string) new Ulid(), (string) new Ulid(), 'https://example.com/repository.git')
+                        new GitSource((string) new Ulid(), 'https://example.com/repository.git')
                     )
                 ],
                 'user' => $user,

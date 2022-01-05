@@ -11,7 +11,6 @@ use App\Model\FileLocatorInterface;
 use App\Model\FileStore;
 use App\Services\FileStoreFactory;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-use Symfony\Component\Uid\Ulid;
 
 class FileStoreFactoryTest extends WebTestCase
 {
@@ -51,17 +50,10 @@ class FileStoreFactoryTest extends WebTestCase
      */
     public function createDataProvider(): array
     {
-        $fileSourceId = (string) new Ulid();
-        $fileSource = new FileSource($fileSourceId, self::USER_ID, 'file source label');
-
-        $gitSourceId = (string) new Ulid();
-        $gitSource = new GitSource($gitSourceId, self::USER_ID, 'https://example.com/repository.git', '/');
-
-        $fileRunSourceId = (string) new Ulid();
-        $fileRunSource = new RunSource($fileRunSourceId, $fileSource);
-
-        $gitRunSourceId = (string) new Ulid();
-        $gitRunSource = new RunSource($gitRunSourceId, $gitSource);
+        $fileSource = new FileSource(self::USER_ID, 'file source label');
+        $gitSource = new GitSource(self::USER_ID, 'https://example.com/repository.git', '/');
+        $fileRunSource = new RunSource($fileSource);
+        $gitRunSource = new RunSource($gitSource);
 
         return [
             FileSource::class => [
