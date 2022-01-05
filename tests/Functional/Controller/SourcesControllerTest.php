@@ -229,10 +229,10 @@ class SourcesControllerTest extends WebTestCase
         $userId = UserId::create();
         $hostUrl = 'https://example.com/repository.git';
         $path = '/';
-        $accessToken = md5((string) rand());
+        $credentials = md5((string) rand());
 
         return [
-            'access token missing' => [
+            'credentials missing' => [
                 'userId' => $userId,
                 'requestParameters' => [
                     GitSourceRequest::KEY_POST_HOST_URL => $hostUrl,
@@ -246,19 +246,19 @@ class SourcesControllerTest extends WebTestCase
                     'credentials' => null,
                 ],
             ],
-            'access token present' => [
+            'credentials present' => [
                 'userId' => $userId,
                 'requestParameters' => [
                     GitSourceRequest::KEY_POST_HOST_URL => $hostUrl,
                     GitSourceRequest::KEY_POST_PATH => $path,
-                    GitSourceRequest::KEY_POST_CREDENTIALS => $accessToken,
+                    GitSourceRequest::KEY_POST_CREDENTIALS => $credentials,
                 ],
                 'expected' => [
                     'user_id' => $userId,
                     'type' => SourceInterface::TYPE_GIT,
                     'host_url' => $hostUrl,
                     'path' => $path,
-                    'credentials' => $accessToken,
+                    'credentials' => $credentials,
                 ],
             ],
         ];
@@ -430,7 +430,7 @@ class SourcesControllerTest extends WebTestCase
         $userId = UserId::create();
         $hostUrl = 'https://example.com/repository.git';
         $path = '/';
-        $accessToken = md5((string) rand());
+        $credentials = md5((string) rand());
         $newHostUrl = 'https://new.example.com/repository.git';
         $newPath = '/new';
 
@@ -438,7 +438,7 @@ class SourcesControllerTest extends WebTestCase
         $newLabel = 'new file source label';
 
         $fileSource = new FileSource($userId, $label);
-        $gitSource = new GitSource($userId, $hostUrl, $path, $accessToken);
+        $gitSource = new GitSource($userId, $hostUrl, $path, $credentials);
 
         return [
             SourceInterface::TYPE_FILE => [

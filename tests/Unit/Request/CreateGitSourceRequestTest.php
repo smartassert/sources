@@ -25,14 +25,14 @@ class CreateGitSourceRequestTest extends TestCase
     {
         $hostUrl = 'https://example.com/repository.git';
         $path = '/path/to/source';
-        $accessToken = 'e2d940b51d53c18a73dfe939b95002f9';
+        $credentials = 'e2d940b51d53c18a73dfe939b95002f9';
 
         return [
             'empty' => [
                 'request' => new Request(),
                 'expected' => new GitSourceRequest('', '', null)
             ],
-            'user id, host url, path present, access token missing' => [
+            'user id, host url, path present, credentials missing' => [
                 'request' => new Request(
                     request: [
                         GitSourceRequest::KEY_POST_HOST_URL => $hostUrl,
@@ -41,15 +41,15 @@ class CreateGitSourceRequestTest extends TestCase
                 ),
                 'expected' => new GitSourceRequest($hostUrl, $path, null)
             ],
-            'user id, host url, path  access token present' => [
+            'user id, host url, path credentials present' => [
                 'request' => new Request(
                     request: [
                         GitSourceRequest::KEY_POST_HOST_URL => $hostUrl,
                         GitSourceRequest::KEY_POST_PATH => $path,
-                        GitSourceRequest::KEY_POST_CREDENTIALS => $accessToken,
+                        GitSourceRequest::KEY_POST_CREDENTIALS => $credentials,
                     ]
                 ),
-                'expected' => new GitSourceRequest($hostUrl, $path, $accessToken)
+                'expected' => new GitSourceRequest($hostUrl, $path, $credentials)
             ],
         ];
     }

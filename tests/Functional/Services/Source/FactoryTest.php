@@ -103,13 +103,13 @@ class FactoryTest extends WebTestCase
         $path = '/';
 
         return [
-            'empty access token' => [
+            'empty credentials' => [
                 'user' => $user,
                 'request' => new GitSourceRequest($hostUrl, $path, null),
             ],
-            'non-empty access token' => [
+            'non-empty credentials' => [
                 'user' => $user,
-                'request' => new GitSourceRequest($hostUrl, $path, 'access-token'),
+                'request' => new GitSourceRequest($hostUrl, $path, 'credentials'),
             ],
         ];
     }
@@ -133,13 +133,13 @@ class FactoryTest extends WebTestCase
         string $expectedUserId,
         string $expectedHostUrl,
         string $expectedPath,
-        ?string $expectedAccessToken
+        ?string $expectedCredentials
     ): void {
         $this->assertCreatedSource($source, $expectedUserId);
 
         self::assertSame($expectedHostUrl, $source->getHostUrl());
         self::assertSame($expectedPath, $source->getPath());
-        self::assertSame($expectedAccessToken, $source->getCredentials());
+        self::assertSame($expectedCredentials, $source->getCredentials());
     }
 
     private function assertCreatedFileSource(
