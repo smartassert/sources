@@ -31,4 +31,3 @@ services:
             $typeFinders:
                 - '@App\Services\Source\FileSourceFinder'
                 - '@App\Services\Source\GitSourceFinder'
-                - '@App\Services\Source\RunSourceFinder'

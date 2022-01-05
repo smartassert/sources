@@ -174,25 +174,25 @@ class FinderTest extends WebTestCase
                 'source' => $gitSource,
                 'expected' => $gitSource,
             ],
-            'find file run source without parameters, has match' => [
+            'find file run source without parameters' => [
                 'sources' => $allSources,
                 'source' => $fileRunSourceWithoutParameters,
-                'expected' => $fileRunSourceWithoutParameters,
+                'expected' => null,
             ],
-            'find git run source without parameters, has match' => [
+            'find git run source without parameters' => [
                 'sources' => $allSources,
                 'source' => $gitRunSourceWithoutParameters,
-                'expected' => $gitRunSourceWithoutParameters,
+                'expected' => null,
             ],
-            'find file run source with parameters, has match' => [
+            'find file run source with parameters' => [
                 'sources' => $allSources,
                 'source' => $fileRunSourceWithParameters,
-                'expected' => $fileRunSourceWithParameters,
+                'expected' => null,
             ],
-            'find git run source with parameters, has match' => [
+            'find git run source with parameters' => [
                 'sources' => $allSources,
                 'source' => $gitRunSourceWithParameters,
-                'expected' => $gitRunSourceWithParameters,
+                'expected' => null,
             ],
         ];
     }

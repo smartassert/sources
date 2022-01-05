@@ -8,9 +8,6 @@ use App\Entity\SourceInterface;
 
 interface TypeFinderInterface
 {
-    /**
-     * @param SourceInterface::TYPE_* $type
-     */
     public function supports(string $type): bool;
 
     public function find(SourceInterface $source): ?SourceInterface;
