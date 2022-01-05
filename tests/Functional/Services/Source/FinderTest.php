@@ -8,7 +8,6 @@ use App\Entity\FileSource;
 use App\Entity\GitSource;
 use App\Entity\RunSource;
 use App\Entity\SourceInterface;
-use App\Repository\SourceRepository;
 use App\Services\Source\Finder;
 use App\Services\Source\Store;
 use App\Tests\Services\Source\SourceRemover;
@@ -19,7 +18,6 @@ class FinderTest extends WebTestCase
 {
     private Finder $finder;
     private Store $store;
-//    private SourceRepository $repository;
 
     protected function setUp(): void
     {
@@ -32,10 +30,6 @@ class FinderTest extends WebTestCase
         $store = self::getContainer()->get(Store::class);
         \assert($store instanceof Store);
         $this->store = $store;
-
-//        $repository = self::getContainer()->get(SourceRepository::class);
-//        \assert($repository instanceof SourceRepository);
-//        $this->repository = $repository;
 
         $sourceRemover = self::getContainer()->get(SourceRemover::class);
         if ($sourceRemover instanceof SourceRemover) {
