@@ -243,7 +243,7 @@ class SourcesControllerTest extends WebTestCase
                     'type' => SourceInterface::TYPE_GIT,
                     'host_url' => $hostUrl,
                     'path' => $path,
-                    'access_token' => null,
+                    'credentials' => null,
                 ],
             ],
             'access token present' => [
@@ -258,7 +258,7 @@ class SourcesControllerTest extends WebTestCase
                     'type' => SourceInterface::TYPE_GIT,
                     'host_url' => $hostUrl,
                     'path' => $path,
-                    'access_token' => $accessToken,
+                    'credentials' => $accessToken,
                 ],
             ],
         ];
@@ -367,7 +367,7 @@ class SourcesControllerTest extends WebTestCase
                     'type' => SourceInterface::TYPE_GIT,
                     'host_url' => $gitSource->getHostUrl(),
                     'path' => $gitSource->getPath(),
-                    'access_token' => $gitSource->getCredentials(),
+                    'credentials' => $gitSource->getCredentials(),
                 ],
             ],
             SourceInterface::TYPE_FILE => [
@@ -468,7 +468,7 @@ class SourcesControllerTest extends WebTestCase
                     'type' => SourceInterface::TYPE_GIT,
                     'host_url' => $newHostUrl,
                     'path' => $newPath,
-                    'access_token' => null,
+                    'credentials' => null,
                 ],
             ],
         ];

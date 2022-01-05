@@ -72,7 +72,7 @@ class GitSource extends AbstractSource implements \JsonSerializable
      *     "type": SourceInterface::TYPE_GIT,
      *     "host_url": string,
      *     "path": string,
-     *     "access_token": string|null
+     *     "credentials": string|null
      * }
      */
     public function jsonSerialize(): array
@@ -83,7 +83,7 @@ class GitSource extends AbstractSource implements \JsonSerializable
             'type' => $this->getType(),
             'host_url' => $this->hostUrl,
             'path' => $this->path,
-            'access_token' => $this->credentials
+            'credentials' => $this->credentials
         ];
     }
 }
