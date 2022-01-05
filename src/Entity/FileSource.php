@@ -38,6 +38,14 @@ class FileSource extends AbstractSource implements FileLocatorInterface, \JsonSe
     }
 
     /**
+     * @return SourceInterface::TYPE_FILE
+     */
+    public function getType(): string
+    {
+        return SourceInterface::TYPE_FILE;
+    }
+
+    /**
      * @return array{
      *     "id": string,
      *     "user_id": string,
@@ -50,7 +58,7 @@ class FileSource extends AbstractSource implements FileLocatorInterface, \JsonSe
         return [
             'id' => $this->id,
             'user_id' => $this->getUserId(),
-            'type' => SourceInterface::TYPE_FILE,
+            'type' => $this->getType(),
             'label' => $this->label
         ];
     }
