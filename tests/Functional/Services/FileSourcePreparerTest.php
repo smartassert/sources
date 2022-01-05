@@ -12,9 +12,8 @@ use App\Services\FileSourcePreparer;
 use App\Services\FileStoreFactory;
 use App\Tests\Mock\Services\MockDirectoryDuplicator;
 use App\Tests\Model\UserId;
+use App\Tests\Services\FileStoreManager;
 use App\Tests\Services\Source\SourceRemover;
-use App\Tests\Services\SourceFixtureCreator;
-use App\Tests\Services\SourceFixtureRemover;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use webignition\ObjectReflector\ObjectReflector;
 
@@ -23,7 +22,7 @@ class FileSourcePreparerTest extends WebTestCase
     private FileSourcePreparer $fileSourcePreparer;
     private FileStoreFactory $fileStoreFactory;
     private SourceRepository $sourceRepository;
-    private SourceFixtureCreator $sourceFixtureCreator;
+    private FileStoreManager $fileStoreManager;
 
     protected function setUp(): void
     {
@@ -41,23 +40,16 @@ class FileSourcePreparerTest extends WebTestCase
         \assert($sourceRepository instanceof SourceRepository);
         $this->sourceRepository = $sourceRepository;
 
-        $sourceFixtureCreator = self::getContainer()->get(SourceFixtureCreator::class);
-        \assert($sourceFixtureCreator instanceof SourceFixtureCreator);
-        $this->sourceFixtureCreator = $sourceFixtureCreator;
+        $fileStoreManager = self::getContainer()->get(FileStoreManager::class);
+        \assert($fileStoreManager instanceof FileStoreManager);
+        $this->fileStoreManager = $fileStoreManager;
 
         $sourceRemover = self::getContainer()->get(SourceRemover::class);
         if ($sourceRemover instanceof SourceRemover) {
             $sourceRemover->removeAll();
         }
 
-        $this->clearSourceFixtures();
-    }
-
-    protected function tearDown(): void
-    {
-        $this->clearSourceFixtures();
-
-        parent::tearDown();
+        $fileStoreManager->clear();
     }
 
     public function testPrepareDirectoryDuplicatorException(): void
@@ -92,7 +84,7 @@ class FileSourcePreparerTest extends WebTestCase
     public function testPrepareSuccess(): void
     {
         $fileSource = new FileSource(UserId::create(), 'file source label');
-        $this->sourceFixtureCreator->create($fileSource->getPath());
+        $this->fileStoreManager->copyFixturesTo($fileSource->getPath());
 
         $runSource = $this->fileSourcePreparer->prepare($fileSource);
 
@@ -101,13 +93,5 @@ class FileSourcePreparerTest extends WebTestCase
             scandir((string) $this->fileStoreFactory->create($fileSource)),
             scandir((string) $this->fileStoreFactory->create($runSource))
         );
-    }
-
-    private function clearSourceFixtures(): void
-    {
-        $sourceFixtureRemover = self::getContainer()->get(SourceFixtureRemover::class);
-        if ($sourceFixtureRemover instanceof SourceFixtureRemover) {
-            $sourceFixtureRemover->clear();
-        }
     }
 }
