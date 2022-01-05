@@ -46,9 +46,4 @@ class GitSourceRequest implements EncapsulatingRequestInterface
     {
         return $this->credentials;
     }
-
-    public function hasCredentials(): bool
-    {
-        return '' !== $this->credentials;
-    }
 }

@@ -22,7 +22,7 @@ final class Version20211220103733 extends AbstractMigration
                 id VARCHAR(32) NOT NULL, 
                 host_url VARCHAR(255) NOT NULL, 
                 path VARCHAR(255) NOT NULL, 
-                credentials VARCHAR(255) DEFAULT NULL, 
+                credentials VARCHAR(255) NOT NULL, 
                 PRIMARY KEY(id)
             )
         ');

@@ -211,7 +211,7 @@ class SourcesControllerTest extends WebTestCase
             'userId' => $userId,
             'hostUrl' => $requestParameters[GitSourceRequest::KEY_POST_HOST_URL],
             'path' => $requestParameters[GitSourceRequest::KEY_POST_PATH],
-            'credentials' => $requestParameters[GitSourceRequest::KEY_POST_CREDENTIALS] ?? null,
+            'credentials' => $requestParameters[GitSourceRequest::KEY_POST_CREDENTIALS] ?? '',
         ]);
 
         self::assertInstanceOf(SourceInterface::class, $source);

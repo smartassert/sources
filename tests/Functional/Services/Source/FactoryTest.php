@@ -89,7 +89,7 @@ class FactoryTest extends WebTestCase
             $user->getUserIdentifier(),
             $request->getHostUrl(),
             $request->getPath(),
-            $request->hasCredentials() ? $request->getCredentials() : null
+            $request->getCredentials()
         );
     }
 

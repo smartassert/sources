@@ -63,29 +63,4 @@ class GitSourceRequestTest extends TestCase
             ],
         ];
     }
-
-    /**
-     * @dataProvider hasCredentialsDataProvider
-     */
-    public function testHasCredentials(GitSourceRequest $request, bool $expected): void
-    {
-        self::assertSame($expected, $request->hasCredentials());
-    }
-
-    /**
-     * @return array<mixed>
-     */
-    public function hasCredentialsDataProvider(): array
-    {
-        return [
-            'no credentials' => [
-                'request' => new GitSourceRequest('', '', ''),
-                'expected' => false,
-            ],
-            'has credentials' => [
-                'request' => new GitSourceRequest('', '', 'credentials'),
-                'expected' => true,
-            ],
-        ];
-    }
 }
