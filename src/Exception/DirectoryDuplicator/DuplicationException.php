@@ -7,7 +7,7 @@ namespace App\Exception\DirectoryDuplicator;
 use App\Model\FileLocatorInterface;
 use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
 
-class DuplicationException extends \Exception
+class DuplicationException extends \Exception implements DirectoryDuplicatorExceptionInterface
 {
     public function __construct(
         private FileLocatorInterface $source,
