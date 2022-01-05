@@ -15,12 +15,9 @@ class FileSource extends AbstractSource implements FileLocatorInterface, \JsonSe
     #[ORM\Column(type: 'string', length: 255)]
     private string $label;
 
-    public function __construct(
-        string $id,
-        string $userId,
-        string $label,
-    ) {
-        parent::__construct($id, $userId);
+    public function __construct(string $userId, string $label)
+    {
+        parent::__construct($userId);
 
         $this->label = $label;
     }

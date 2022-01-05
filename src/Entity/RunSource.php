@@ -25,12 +25,9 @@ class RunSource extends AbstractSource implements FileLocatorInterface, \JsonSer
     /**
      * @param array<string, string> $parameters
      */
-    public function __construct(
-        string $id,
-        FileSource|GitSource $parent,
-        array $parameters = []
-    ) {
-        parent::__construct($id, $parent->getUserId());
+    public function __construct(FileSource|GitSource $parent, array $parameters = [])
+    {
+        parent::__construct($parent->getUserId());
 
         $this->parent = $parent;
         $this->parameters = $parameters;
