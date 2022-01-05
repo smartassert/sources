@@ -56,16 +56,16 @@ class MutatorTest extends WebTestCase
         $userId = UserId::create();
         $hostUrl = 'https://example.com/repository.git';
         $path = '/path';
-        $accessToken = 'access token';
+        $credentials = 'credentials';
 
         return [
-            'null access token' => [
+            'null credentials' => [
                 'source' => new GitSource($userId, $hostUrl, $path, null),
                 'request' => new GitSourceRequest($hostUrl, $path, null),
             ],
-            'non-null access token' => [
-                'source' => new GitSource($userId, $hostUrl, $path, $accessToken),
-                'request' => new GitSourceRequest($hostUrl, $path, $accessToken),
+            'non-null credentials' => [
+                'source' => new GitSource($userId, $hostUrl, $path, $credentials),
+                'request' => new GitSourceRequest($hostUrl, $path, $credentials),
             ],
         ];
     }
@@ -89,35 +89,35 @@ class MutatorTest extends WebTestCase
         $userId = UserId::create();
         $hostUrl = 'https://example.com/repository.git';
         $path = '/path';
-        $accessToken = 'access token';
+        $credentials = 'credentials';
         $newHostUrl = 'https://new.example.com/repository.git';
         $newPath = '/path/new';
-        $newAccessToken = 'new access token';
+        $newCredentials = 'new credentials';
 
         return [
             'changes' => [
-                'source' => new GitSource($userId, $hostUrl, $path, $accessToken),
-                'request' => new GitSourceRequest($newHostUrl, $newPath, $newAccessToken),
+                'source' => new GitSource($userId, $hostUrl, $path, $credentials),
+                'request' => new GitSourceRequest($newHostUrl, $newPath, $newCredentials),
                 'assertions' => function (GitSource $mutatedSource) use (
                     $userId,
                     $newHostUrl,
                     $newPath,
-                    $newAccessToken
+                    $newCredentials
                 ): void {
                     self::assertSame($userId, $mutatedSource->getUserId());
                     self::assertSame($newHostUrl, $mutatedSource->getHostUrl());
                     self::assertSame($newPath, $mutatedSource->getPath());
-                    self::assertSame($newAccessToken, $mutatedSource->getAccessToken());
+                    self::assertSame($newCredentials, $mutatedSource->getCredentials());
                 }
             ],
-            'nullify access token' => [
-                'source' => new GitSource($userId, $hostUrl, $path, $accessToken),
+            'nullify credentials' => [
+                'source' => new GitSource($userId, $hostUrl, $path, $credentials),
                 'request' => new GitSourceRequest($hostUrl, $path, null),
                 'assertions' => function (GitSource $mutatedSource) use ($userId, $hostUrl, $path): void {
                     self::assertSame($userId, $mutatedSource->getUserId());
                     self::assertSame($hostUrl, $mutatedSource->getHostUrl());
                     self::assertSame($path, $mutatedSource->getPath());
-                    self::assertNull($mutatedSource->getAccessToken());
+                    self::assertNull($mutatedSource->getCredentials());
                 }
             ],
         ];

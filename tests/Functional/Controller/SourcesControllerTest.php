@@ -211,7 +211,7 @@ class SourcesControllerTest extends WebTestCase
             'userId' => $userId,
             'hostUrl' => $requestParameters[GitSourceRequest::KEY_POST_HOST_URL],
             'path' => $requestParameters[GitSourceRequest::KEY_POST_PATH],
-            'accessToken' => $requestParameters[GitSourceRequest::KEY_POST_ACCESS_TOKEN] ?? null,
+            'credentials' => $requestParameters[GitSourceRequest::KEY_POST_CREDENTIALS] ?? null,
         ]);
 
         self::assertInstanceOf(SourceInterface::class, $source);
@@ -229,10 +229,10 @@ class SourcesControllerTest extends WebTestCase
         $userId = UserId::create();
         $hostUrl = 'https://example.com/repository.git';
         $path = '/';
-        $accessToken = md5((string) rand());
+        $credentials = md5((string) rand());
 
         return [
-            'access token missing' => [
+            'credentials missing' => [
                 'userId' => $userId,
                 'requestParameters' => [
                     GitSourceRequest::KEY_POST_HOST_URL => $hostUrl,
@@ -243,22 +243,22 @@ class SourcesControllerTest extends WebTestCase
                     'type' => SourceInterface::TYPE_GIT,
                     'host_url' => $hostUrl,
                     'path' => $path,
-                    'access_token' => null,
+                    'credentials' => null,
                 ],
             ],
-            'access token present' => [
+            'credentials present' => [
                 'userId' => $userId,
                 'requestParameters' => [
                     GitSourceRequest::KEY_POST_HOST_URL => $hostUrl,
                     GitSourceRequest::KEY_POST_PATH => $path,
-                    GitSourceRequest::KEY_POST_ACCESS_TOKEN => $accessToken,
+                    GitSourceRequest::KEY_POST_CREDENTIALS => $credentials,
                 ],
                 'expected' => [
                     'user_id' => $userId,
                     'type' => SourceInterface::TYPE_GIT,
                     'host_url' => $hostUrl,
                     'path' => $path,
-                    'access_token' => $accessToken,
+                    'credentials' => $credentials,
                 ],
             ],
         ];
@@ -367,7 +367,7 @@ class SourcesControllerTest extends WebTestCase
                     'type' => SourceInterface::TYPE_GIT,
                     'host_url' => $gitSource->getHostUrl(),
                     'path' => $gitSource->getPath(),
-                    'access_token' => $gitSource->getAccessToken(),
+                    'credentials' => $gitSource->getCredentials(),
                 ],
             ],
             SourceInterface::TYPE_FILE => [
@@ -430,7 +430,7 @@ class SourcesControllerTest extends WebTestCase
         $userId = UserId::create();
         $hostUrl = 'https://example.com/repository.git';
         $path = '/';
-        $accessToken = md5((string) rand());
+        $credentials = md5((string) rand());
         $newHostUrl = 'https://new.example.com/repository.git';
         $newPath = '/new';
 
@@ -438,7 +438,7 @@ class SourcesControllerTest extends WebTestCase
         $newLabel = 'new file source label';
 
         $fileSource = new FileSource($userId, $label);
-        $gitSource = new GitSource($userId, $hostUrl, $path, $accessToken);
+        $gitSource = new GitSource($userId, $hostUrl, $path, $credentials);
 
         return [
             SourceInterface::TYPE_FILE => [
@@ -460,7 +460,7 @@ class SourcesControllerTest extends WebTestCase
                 'requestData' => [
                     GitSourceRequest::KEY_POST_HOST_URL => $newHostUrl,
                     GitSourceRequest::KEY_POST_PATH => $newPath,
-                    GitSourceRequest::KEY_POST_ACCESS_TOKEN => null,
+                    GitSourceRequest::KEY_POST_CREDENTIALS => null,
                 ],
                 'expectedResponseData' => [
                     'id' => $gitSource->getId(),
@@ -468,7 +468,7 @@ class SourcesControllerTest extends WebTestCase
                     'type' => SourceInterface::TYPE_GIT,
                     'host_url' => $newHostUrl,
                     'path' => $newPath,
-                    'access_token' => null,
+                    'credentials' => null,
                 ],
             ],
         ];

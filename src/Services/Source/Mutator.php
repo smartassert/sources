@@ -20,7 +20,7 @@ class Mutator
     {
         $source->setHostUrl($request->getHostUrl());
         $source->setPath($request->getPath());
-        $source->setAccessToken($request->getAccessToken());
+        $source->setCredentials($request->getCredentials());
 
         $this->store->add($source);
 
