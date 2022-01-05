@@ -9,12 +9,14 @@ use App\Entity\FileSource;
 use App\Entity\GitSource;
 use App\Entity\RunSource;
 use App\Entity\SourceInterface;
+use App\Model\EntityId;
 use App\Repository\FileSourceRepository;
 use App\Repository\GitSourceRepository;
 use App\Repository\SourceRepository;
 use App\Request\FileSourceRequest;
 use App\Request\GitSourceRequest;
 use App\Services\Source\Store;
+use App\Tests\Model\UserId;
 use App\Tests\Services\Source\SourceRemover;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
@@ -27,7 +29,6 @@ use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
-use Symfony\Component\Uid\Ulid;
 use webignition\HttpHistoryContainer\Container as HttpHistoryContainer;
 
 class SourcesControllerTest extends WebTestCase
@@ -111,15 +112,15 @@ class SourcesControllerTest extends WebTestCase
             ],
             'get source' => [
                 'method' => 'GET',
-                'uri' => SourceController::ROUTE_SOURCE . new Ulid(),
+                'uri' => SourceController::ROUTE_SOURCE . EntityId::create(),
             ],
             'update source' => [
                 'method' => 'PUT',
-                'uri' => SourceController::ROUTE_SOURCE . new Ulid(),
+                'uri' => SourceController::ROUTE_SOURCE . EntityId::create(),
             ],
             'delete source' => [
                 'method' => 'DELETE',
-                'uri' => SourceController::ROUTE_SOURCE . new Ulid(),
+                'uri' => SourceController::ROUTE_SOURCE . EntityId::create(),
             ],
             'list sources' => [
                 'method' => 'GET',
@@ -133,10 +134,10 @@ class SourcesControllerTest extends WebTestCase
      */
     public function testRequestSourceNotFound(string $method): void
     {
-        $sourceId = (string) new Ulid();
+        $sourceId = EntityId::create();
 
         $this->mockHandler->append(
-            new Response(200, [], (string) new Ulid())
+            new Response(200, [], $sourceId)
         );
 
         $response = $this->makeAuthorizedSourceRequest($method, $sourceId);
@@ -148,8 +149,8 @@ class SourcesControllerTest extends WebTestCase
      */
     public function testRequestInvalidSourceUser(string $method): void
     {
-        $sourceUserId = (string) new Ulid();
-        $requestUserId = (string) new Ulid();
+        $sourceUserId = UserId::create();
+        $requestUserId = UserId::create();
         $label = 'source label';
 
         $source = new FileSource($sourceUserId, $label);
@@ -225,7 +226,7 @@ class SourcesControllerTest extends WebTestCase
      */
     public function createGitSourceDataProvider(): array
     {
-        $userId = (string) new Ulid();
+        $userId = UserId::create();
         $hostUrl = 'https://example.com/repository.git';
         $path = '/';
         $accessToken = md5((string) rand());
@@ -304,7 +305,7 @@ class SourcesControllerTest extends WebTestCase
      */
     public function createFileSourceDataProvider(): array
     {
-        $userId = (string) new Ulid();
+        $userId = UserId::create();
         $label = 'file source label';
 
         return [
@@ -350,7 +351,7 @@ class SourcesControllerTest extends WebTestCase
      */
     public function getSuccessDataProvider(): array
     {
-        $userId = (string) new Ulid();
+        $userId = UserId::create();
 
         $gitSource = new GitSource($userId, 'https://example.com/repository.git', '/', md5((string) rand()));
         $fileSource = new FileSource($userId, 'file source label');
@@ -426,7 +427,7 @@ class SourcesControllerTest extends WebTestCase
      */
     public function updateSuccessDataProvider(): array
     {
-        $userId = (string) new Ulid();
+        $userId = UserId::create();
         $hostUrl = 'https://example.com/repository.git';
         $path = '/';
         $accessToken = md5((string) rand());
@@ -498,7 +499,7 @@ class SourcesControllerTest extends WebTestCase
      */
     public function deleteSuccessDataProvider(): array
     {
-        $userId = (string) new Ulid();
+        $userId = UserId::create();
 
         return [
             SourceInterface::TYPE_FILE => [
@@ -552,7 +553,7 @@ class SourcesControllerTest extends WebTestCase
      */
     public function listSuccessDataProvider(): array
     {
-        $userId = (string) new Ulid();
+        $userId = UserId::create();
         $userFileSources = [
             new FileSource($userId, 'file source label'),
         ];
@@ -574,10 +575,10 @@ class SourcesControllerTest extends WebTestCase
             ],
             'has file, git and run sources, no user match' => [
                 'sources' => [
-                    new FileSource((string) new Ulid(), 'file source label'),
-                    new GitSource((string) new Ulid(), 'https://example.com/repository.git'),
+                    new FileSource(UserId::create(), 'file source label'),
+                    new GitSource(UserId::create(), 'https://example.com/repository.git'),
                     new RunSource(
-                        new FileSource((string) new Ulid(), 'file source label'),
+                        new FileSource(UserId::create(), 'file source label'),
                     ),
                 ],
                 'userId' => $userId,
@@ -610,16 +611,16 @@ class SourcesControllerTest extends WebTestCase
             'has file, git and run sources for mixed users' => [
                 'sources' => [
                     $userFileSources[0],
-                    new FileSource((string) new Ulid(), 'file source label'),
+                    new FileSource(UserId::create(), 'file source label'),
                     $userGitSources[0],
-                    new GitSource((string) new Ulid(), 'https://example.com/repository.git'),
+                    new GitSource(UserId::create(), 'https://example.com/repository.git'),
                     $userRunSources[0],
                     $userRunSources[1],
                     new RunSource(
-                        new FileSource((string) new Ulid(), 'file source label')
+                        new FileSource(UserId::create(), 'file source label')
                     ),
                     new RunSource(
-                        new GitSource((string) new Ulid(), 'https://example.com/repository.git')
+                        new GitSource(UserId::create(), 'https://example.com/repository.git')
                     )
                 ],
                 'userId' => $userId,

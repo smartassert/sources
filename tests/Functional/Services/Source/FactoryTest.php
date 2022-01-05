@@ -12,6 +12,7 @@ use App\Repository\SourceRepository;
 use App\Request\FileSourceRequest;
 use App\Request\GitSourceRequest;
 use App\Services\Source\Factory;
+use App\Tests\Model\UserId;
 use App\Tests\Services\Source\SourceRemover;
 use SmartAssert\UsersSecurityBundle\Security\User;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -20,8 +21,6 @@ use Symfony\Component\Uid\Ulid;
 
 class FactoryTest extends WebTestCase
 {
-    private const USER_ID = '01FPSVJ7ZT85X73BW05EK9B3XG';
-
     private Factory $factory;
     private SourceRepository $repository;
 
@@ -45,7 +44,7 @@ class FactoryTest extends WebTestCase
 
     public function testCreateFileSourceFromRequest(): void
     {
-        $user = new User(self::USER_ID);
+        $user = new User(UserId::create());
         $request = new FileSourceRequest('file source label');
         $source = $this->factory->createFileSourceFromRequest($user, $request);
 
@@ -56,7 +55,7 @@ class FactoryTest extends WebTestCase
     {
         self::assertCount(0, $this->repository->findAll());
 
-        $user = new User(self::USER_ID);
+        $user = new User(UserId::create());
         $request = new FileSourceRequest('file source label');
 
         $this->factory->createFileSourceFromRequest($user, $request);
@@ -68,7 +67,7 @@ class FactoryTest extends WebTestCase
 
     public function testCreateRunSource(): void
     {
-        $user = new User(self::USER_ID);
+        $user = new User(UserId::create());
         $parent = new FileSource($user->getUserIdentifier(), 'file source label');
         $parameters = ['ref' => 'v0.1'];
 
@@ -99,7 +98,7 @@ class FactoryTest extends WebTestCase
      */
     public function createGitSourceFromRequestDataProvider(): array
     {
-        $user = new User(self::USER_ID);
+        $user = new User(UserId::create());
         $hostUrl = 'https://example.com/repository.git';
         $path = '/';
 
@@ -119,7 +118,7 @@ class FactoryTest extends WebTestCase
     {
         self::assertCount(0, $this->repository->findAll());
 
-        $user = new User(self::USER_ID);
+        $user = new User(UserId::create());
         $request = new GitSourceRequest('https://example.com/repository.git', '/', null);
 
         $this->factory->createGitSourceFromRequest($user, $request);

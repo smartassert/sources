@@ -10,9 +10,9 @@ use App\Entity\RunSource;
 use App\Entity\SourceInterface;
 use App\Services\Source\Finder;
 use App\Services\Source\Store;
+use App\Tests\Model\UserId;
 use App\Tests\Services\Source\SourceRemover;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-use Symfony\Component\Uid\Ulid;
 
 class FinderTest extends WebTestCase
 {
@@ -59,7 +59,7 @@ class FinderTest extends WebTestCase
      */
     public function findDataProvider(): array
     {
-        $userId = (string) new Ulid();
+        $userId = UserId::create();
 
         $fileSource = new FileSource($userId, 'file source label');
         $gitSource = new GitSource($userId, 'https://example.com/repository.git', '/');

@@ -10,9 +10,9 @@ use App\Entity\RunSource;
 use App\Entity\SourceInterface;
 use App\Repository\SourceRepository;
 use App\Services\Source\Store;
+use App\Tests\Model\UserId;
 use App\Tests\Services\Source\SourceRemover;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-use Symfony\Component\Uid\Ulid;
 
 class StoreTest extends WebTestCase
 {
@@ -61,7 +61,7 @@ class StoreTest extends WebTestCase
         return [
             FileSource::class => [
                 'sourceCreator' => function (Store $store): SourceInterface {
-                    $source = new FileSource((string) new Ulid(), 'label');
+                    $source = new FileSource(UserId::create(), 'label');
                     $store->add($source);
 
                     return $source;
@@ -69,12 +69,7 @@ class StoreTest extends WebTestCase
             ],
             GitSource::class => [
                 'sourceCreator' => function (Store $store): SourceInterface {
-                    $source = new GitSource(
-                        (string) new Ulid(),
-                        (string) new Ulid(),
-                        'https://example.com/repository.git'
-                    );
-
+                    $source = new GitSource(UserId::create(), 'https://example.com/repository.git');
                     $store->add($source);
 
                     return $source;
@@ -82,7 +77,7 @@ class StoreTest extends WebTestCase
             ],
             RunSource::class => [
                 'sourceCreator' => function (Store $store): SourceInterface {
-                    $parent = new FileSource((string) new Ulid(), 'label');
+                    $parent = new FileSource(UserId::create(), 'label');
                     $source = new RunSource($parent);
                     $source->unsetParent();
 
@@ -96,7 +91,7 @@ class StoreTest extends WebTestCase
 
     public function testRemoveRunSource(): void
     {
-        $parent = new FileSource((string) new Ulid(), 'label');
+        $parent = new FileSource(UserId::create(), 'label');
         $this->store->add($parent);
 
         $source = new RunSource($parent);
@@ -111,7 +106,7 @@ class StoreTest extends WebTestCase
 
     public function testAddRunSource(): void
     {
-        $parent = new FileSource((string) new Ulid(), 'label');
+        $parent = new FileSource(UserId::create(), 'label');
         $runSource1 = new RunSource($parent);
         $this->store->add($runSource1);
         self::assertCount(2, $this->repository->findAll());

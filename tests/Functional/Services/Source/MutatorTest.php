@@ -10,9 +10,9 @@ use App\Request\FileSourceRequest;
 use App\Request\GitSourceRequest;
 use App\Services\Source\Mutator;
 use App\Services\Source\Store;
+use App\Tests\Model\UserId;
 use App\Tests\Services\Source\SourceRemover;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-use Symfony\Component\Uid\Ulid;
 
 class MutatorTest extends WebTestCase
 {
@@ -53,7 +53,7 @@ class MutatorTest extends WebTestCase
      */
     public function updateGitSourceNoChangesDataProvider(): array
     {
-        $userId = (string) new Ulid();
+        $userId = UserId::create();
         $hostUrl = 'https://example.com/repository.git';
         $path = '/path';
         $accessToken = 'access token';
@@ -86,7 +86,7 @@ class MutatorTest extends WebTestCase
      */
     public function updateGitSourceDataProvider(): array
     {
-        $userId = (string) new Ulid();
+        $userId = UserId::create();
         $hostUrl = 'https://example.com/repository.git';
         $path = '/path';
         $accessToken = 'access token';
@@ -139,7 +139,7 @@ class MutatorTest extends WebTestCase
      */
     public function updateFileSourceDataProvider(): array
     {
-        $userId = (string) new Ulid();
+        $userId = UserId::create();
         $label = 'file source label';
         $newLabel = 'new file source label';
 

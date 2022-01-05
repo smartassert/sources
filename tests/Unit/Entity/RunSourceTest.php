@@ -7,8 +7,8 @@ namespace App\Tests\Unit\Entity;
 use App\Entity\FileSource;
 use App\Entity\RunSource;
 use App\Entity\SourceInterface;
+use App\Tests\Model\UserId;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Uid\Ulid;
 
 class RunSourceTest extends TestCase
 {
@@ -27,7 +27,7 @@ class RunSourceTest extends TestCase
      */
     public function jsonSerializeDataProvider(): array
     {
-        $userId = (string) new Ulid();
+        $userId = UserId::create();
         $parameters = [
             'key1' => 'value1',
             'key2' => 'value2',
