@@ -18,13 +18,13 @@ class GitSource extends AbstractSource implements \JsonSerializable
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private ?string $credentials;
 
-    public function __construct(string $userId, string $hostUrl, string $path = '/', ?string $accessToken = null)
+    public function __construct(string $userId, string $hostUrl, string $path = '/', ?string $credentials = null)
     {
         parent::__construct($userId);
 
         $this->hostUrl = $hostUrl;
         $this->path = $path;
-        $this->credentials = $accessToken;
+        $this->credentials = $credentials;
     }
 
     public function getHostUrl(): string
