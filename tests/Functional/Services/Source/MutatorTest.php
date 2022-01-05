@@ -107,7 +107,7 @@ class MutatorTest extends WebTestCase
                     self::assertSame($userId, $mutatedSource->getUserId());
                     self::assertSame($newHostUrl, $mutatedSource->getHostUrl());
                     self::assertSame($newPath, $mutatedSource->getPath());
-                    self::assertSame($newAccessToken, $mutatedSource->getAccessToken());
+                    self::assertSame($newAccessToken, $mutatedSource->getCredentials());
                 }
             ],
             'nullify access token' => [
@@ -117,7 +117,7 @@ class MutatorTest extends WebTestCase
                     self::assertSame($userId, $mutatedSource->getUserId());
                     self::assertSame($hostUrl, $mutatedSource->getHostUrl());
                     self::assertSame($path, $mutatedSource->getPath());
-                    self::assertNull($mutatedSource->getAccessToken());
+                    self::assertNull($mutatedSource->getCredentials());
                 }
             ],
         ];

@@ -139,7 +139,7 @@ class FactoryTest extends WebTestCase
 
         self::assertSame($expectedHostUrl, $source->getHostUrl());
         self::assertSame($expectedPath, $source->getPath());
-        self::assertSame($expectedAccessToken, $source->getAccessToken());
+        self::assertSame($expectedAccessToken, $source->getCredentials());
     }
 
     private function assertCreatedFileSource(

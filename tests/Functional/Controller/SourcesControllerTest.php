@@ -211,7 +211,7 @@ class SourcesControllerTest extends WebTestCase
             'userId' => $userId,
             'hostUrl' => $requestParameters[GitSourceRequest::KEY_POST_HOST_URL],
             'path' => $requestParameters[GitSourceRequest::KEY_POST_PATH],
-            'accessToken' => $requestParameters[GitSourceRequest::KEY_POST_ACCESS_TOKEN] ?? null,
+            'credentials' => $requestParameters[GitSourceRequest::KEY_POST_ACCESS_TOKEN] ?? null,
         ]);
 
         self::assertInstanceOf(SourceInterface::class, $source);
@@ -367,7 +367,7 @@ class SourcesControllerTest extends WebTestCase
                     'type' => SourceInterface::TYPE_GIT,
                     'host_url' => $gitSource->getHostUrl(),
                     'path' => $gitSource->getPath(),
-                    'access_token' => $gitSource->getAccessToken(),
+                    'access_token' => $gitSource->getCredentials(),
                 ],
             ],
             SourceInterface::TYPE_FILE => [
