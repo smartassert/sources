@@ -10,17 +10,15 @@ use App\Entity\RunSource;
 use App\Entity\SourceInterface;
 use App\Repository\SourceRepository;
 use App\Services\Source\Store;
+use App\Tests\Model\UserId;
 use App\Tests\Services\Source\SourceRemover;
 use Doctrine\ORM\EntityManagerInterface;
 use SmartAssert\UsersSecurityBundle\Security\User;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Security\Core\User\UserInterface;
-use Symfony\Component\Uid\Ulid;
 
 class SourceRepositoryTest extends WebTestCase
 {
-    private const USER_ID = '01FPSVJ7ZT85X73BW05EK9B3XG';
-
     private SourceRepository $repository;
     private Store $store;
     private EntityManagerInterface $entityManager;
@@ -73,28 +71,18 @@ class SourceRepositoryTest extends WebTestCase
         return [
             GitSource::class => [
                 'source' => new GitSource(
-                    (string) new Ulid(),
-                    self::USER_ID,
+                    UserId::create(),
                     'https://example.com/repository.git',
                     '/',
                     null
                 ),
             ],
             FileSource::class => [
-                'source' => new FileSource(
-                    (string) new Ulid(),
-                    self::USER_ID,
-                    'file source label'
-                ),
+                'source' => new FileSource(UserId::create(), 'file source label'),
             ],
             RunSource::class => [
                 'source' => new RunSource(
-                    (string) new Ulid(),
-                    new FileSource(
-                        (string) new Ulid(),
-                        self::USER_ID,
-                        'file source label'
-                    )
+                    new FileSource(UserId::create(), 'file source label')
                 ),
             ],
         ];
@@ -121,20 +109,20 @@ class SourceRepositoryTest extends WebTestCase
      */
     public function findByUserAndTypeDataProvider(): array
     {
-        $userId = (string) new Ulid();
+        $userId = UserId::create();
         $user = new User($userId);
 
         $userFileSources = [
-            new FileSource((string) new Ulid(), $userId, 'file source label'),
+            new FileSource($userId, 'file source label'),
         ];
 
         $userGitSources = [
-            new GitSource((string) new Ulid(), $userId, 'https://example.com/repository.git'),
+            new GitSource($userId, 'https://example.com/repository.git'),
         ];
 
         $userRunSources = [
-            new RunSource((string) new Ulid(), $userFileSources[0]),
-            new RunSource((string) new Ulid(), $userGitSources[0]),
+            new RunSource($userFileSources[0]),
+            new RunSource($userGitSources[0]),
         ];
 
         return [
@@ -150,11 +138,10 @@ class SourceRepositoryTest extends WebTestCase
             ],
             'has file, git and run sources, no user match' => [
                 'sources' => [
-                    new FileSource((string) new Ulid(), (string) new Ulid(), 'file source label'),
-                    new GitSource((string) new Ulid(), (string) new Ulid(), 'https://example.com/repository.git'),
+                    new FileSource(UserId::create(), 'file source label'),
+                    new GitSource(UserId::create(), 'https://example.com/repository.git'),
                     new RunSource(
-                        (string) new Ulid(),
-                        new FileSource((string) new Ulid(), (string) new Ulid(), 'file source label'),
+                        new FileSource(UserId::create(), 'file source label'),
                     ),
                 ],
                 'user' => $user,
@@ -200,18 +187,16 @@ class SourceRepositoryTest extends WebTestCase
             'has file, git and run sources for mixed users' => [
                 'sources' => [
                     $userFileSources[0],
-                    new FileSource((string) new Ulid(), (string) new Ulid(), 'file source label'),
+                    new FileSource(UserId::create(), 'file source label'),
                     $userGitSources[0],
-                    new GitSource((string) new Ulid(), (string) new Ulid(), 'https://example.com/repository.git'),
+                    new GitSource(UserId::create(), 'https://example.com/repository.git'),
                     $userRunSources[0],
                     $userRunSources[1],
                     new RunSource(
-                        (string) new Ulid(),
-                        new FileSource((string) new Ulid(), (string) new Ulid(), 'file source label')
+                        new FileSource(UserId::create(), 'file source label')
                     ),
                     new RunSource(
-                        (string) new Ulid(),
-                        new GitSource((string) new Ulid(), (string) new Ulid(), 'https://example.com/repository.git')
+                        new GitSource(UserId::create(), 'https://example.com/repository.git')
                     )
                 ],
                 'user' => $user,

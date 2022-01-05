@@ -9,12 +9,14 @@ use App\Entity\FileSource;
 use App\Entity\GitSource;
 use App\Entity\RunSource;
 use App\Entity\SourceInterface;
+use App\Model\EntityId;
 use App\Repository\FileSourceRepository;
 use App\Repository\GitSourceRepository;
 use App\Repository\SourceRepository;
 use App\Request\FileSourceRequest;
 use App\Request\GitSourceRequest;
 use App\Services\Source\Store;
+use App\Tests\Model\UserId;
 use App\Tests\Services\Source\SourceRemover;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
@@ -27,7 +29,6 @@ use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
-use Symfony\Component\Uid\Ulid;
 use webignition\HttpHistoryContainer\Container as HttpHistoryContainer;
 
 class SourcesControllerTest extends WebTestCase
@@ -111,15 +112,15 @@ class SourcesControllerTest extends WebTestCase
             ],
             'get source' => [
                 'method' => 'GET',
-                'uri' => SourceController::ROUTE_SOURCE . new Ulid(),
+                'uri' => SourceController::ROUTE_SOURCE . EntityId::create(),
             ],
             'update source' => [
                 'method' => 'PUT',
-                'uri' => SourceController::ROUTE_SOURCE . new Ulid(),
+                'uri' => SourceController::ROUTE_SOURCE . EntityId::create(),
             ],
             'delete source' => [
                 'method' => 'DELETE',
-                'uri' => SourceController::ROUTE_SOURCE . new Ulid(),
+                'uri' => SourceController::ROUTE_SOURCE . EntityId::create(),
             ],
             'list sources' => [
                 'method' => 'GET',
@@ -133,10 +134,10 @@ class SourcesControllerTest extends WebTestCase
      */
     public function testRequestSourceNotFound(string $method): void
     {
-        $sourceId = (string) new Ulid();
+        $sourceId = EntityId::create();
 
         $this->mockHandler->append(
-            new Response(200, [], (string) new Ulid())
+            new Response(200, [], $sourceId)
         );
 
         $response = $this->makeAuthorizedSourceRequest($method, $sourceId);
@@ -148,13 +149,12 @@ class SourcesControllerTest extends WebTestCase
      */
     public function testRequestInvalidSourceUser(string $method): void
     {
-        $sourceId = (string) new Ulid();
-
-        $sourceUserId = (string) new Ulid();
-        $requestUserId = (string) new Ulid();
+        $sourceUserId = UserId::create();
+        $requestUserId = UserId::create();
         $label = 'source label';
 
-        $source = new FileSource($sourceId, $sourceUserId, $label);
+        $source = new FileSource($sourceUserId, $label);
+        $sourceId = $source->getId();
         $this->store->add($source);
 
         $this->mockHandler->append(
@@ -226,7 +226,7 @@ class SourcesControllerTest extends WebTestCase
      */
     public function createGitSourceDataProvider(): array
     {
-        $userId = (string) new Ulid();
+        $userId = UserId::create();
         $hostUrl = 'https://example.com/repository.git';
         $path = '/';
         $accessToken = md5((string) rand());
@@ -305,7 +305,7 @@ class SourcesControllerTest extends WebTestCase
      */
     public function createFileSourceDataProvider(): array
     {
-        $userId = (string) new Ulid();
+        $userId = UserId::create();
         $label = 'file source label';
 
         return [
@@ -326,12 +326,11 @@ class SourcesControllerTest extends WebTestCase
     /**
      * @dataProvider getSuccessDataProvider
      *
-     * @param callable(Store): SourceInterface $sourceCreator
-     * @param array<mixed>                     $expectedResponseData
+     * @param array<mixed> $expectedResponseData
      */
-    public function testGetSuccess(callable $sourceCreator, string $userId, array $expectedResponseData): void
+    public function testGetSuccess(SourceInterface $source, string $userId, array $expectedResponseData): void
     {
-        $source = $sourceCreator($this->store);
+        $this->store->add($source);
 
         $this->mockHandler->append(
             new Response(200, [], $userId)
@@ -352,79 +351,43 @@ class SourcesControllerTest extends WebTestCase
      */
     public function getSuccessDataProvider(): array
     {
-        $gitSourceId = (string) new Ulid();
-        $fileSourceId = (string) new Ulid();
-        $runSourceId = (string) new Ulid();
-        $userId = (string) new Ulid();
-        $hostUrl = 'https://example.com/repository.git';
-        $path = '/';
-        $accessToken = md5((string) rand());
-        $label = 'file source label';
+        $userId = UserId::create();
+
+        $gitSource = new GitSource($userId, 'https://example.com/repository.git', '/', md5((string) rand()));
+        $fileSource = new FileSource($userId, 'file source label');
+        $runSource = new RunSource($fileSource);
 
         return [
             SourceInterface::TYPE_GIT => [
-                'sourceCreator' => function (
-                    Store $store
-                ) use (
-                    $gitSourceId,
-                    $userId,
-                    $hostUrl,
-                    $path,
-                    $accessToken
-                ) {
-                    $source = new GitSource($gitSourceId, $userId, $hostUrl, $path, $accessToken);
-                    $store->add($source);
-
-                    return $source;
-                },
+                'source' => $gitSource,
                 'userId' => $userId,
                 'expectedResponseData' => [
-                    'id' => $gitSourceId,
-                    'user_id' => $userId,
+                    'id' => $gitSource->getId(),
+                    'user_id' => $gitSource->getUserId(),
                     'type' => SourceInterface::TYPE_GIT,
-                    'host_url' => $hostUrl,
-                    'path' => $path,
-                    'access_token' => $accessToken,
+                    'host_url' => $gitSource->getHostUrl(),
+                    'path' => $gitSource->getPath(),
+                    'access_token' => $gitSource->getAccessToken(),
                 ],
             ],
             SourceInterface::TYPE_FILE => [
-                'sourceCreator' => function (Store $store) use ($fileSourceId, $userId, $label) {
-                    $source = new FileSource($fileSourceId, $userId, $label);
-                    $store->add($source);
-
-                    return $source;
-                },
+                'source' => $fileSource,
                 'userId' => $userId,
                 'expectedResponseData' => [
-                    'id' => $fileSourceId,
-                    'user_id' => $userId,
+                    'id' => $fileSource->getId(),
+                    'user_id' => $fileSource->getUserId(),
                     'type' => SourceInterface::TYPE_FILE,
-                    'label' => $label,
+                    'label' => $fileSource->getLabel(),
                 ],
             ],
             SourceInterface::TYPE_RUN => [
-                'sourceCreator' => function (
-                    Store $store
-                ) use (
-                    $fileSourceId,
-                    $runSourceId,
-                    $userId,
-                    $label
-                ) {
-                    $parent = new FileSource($fileSourceId, $userId, $label);
-                    $store->add($parent);
-
-                    $source = new RunSource($runSourceId, $parent);
-                    $store->add($source);
-
-                    return $source;
-                },
+                'source' => $runSource,
                 'userId' => $userId,
                 'expectedResponseData' => [
-                    'id' => $runSourceId,
+                    'id' => $runSource->getId(),
                     'user_id' => $userId,
                     'type' => SourceInterface::TYPE_RUN,
-                    'parent' => $fileSourceId,
+                    'parent' => $runSource->getParent()?->getId(),
                     'parameters' => [],
                 ],
             ],
@@ -434,17 +397,16 @@ class SourcesControllerTest extends WebTestCase
     /**
      * @dataProvider updateSuccessDataProvider
      *
-     * @param callable(Store): SourceInterface $sourceCreator
-     * @param array<string, string>            $requestData
-     * @param array<mixed>                     $expectedResponseData
+     * @param array<string, string> $requestData
+     * @param array<mixed>          $expectedResponseData
      */
     public function testUpdateSuccess(
-        callable $sourceCreator,
+        SourceInterface $source,
         string $userId,
         array $requestData,
         array $expectedResponseData
     ): void {
-        $source = $sourceCreator($this->store);
+        $this->store->add($source);
 
         $this->mockHandler->append(
             new Response(200, [], $userId)
@@ -465,52 +427,35 @@ class SourcesControllerTest extends WebTestCase
      */
     public function updateSuccessDataProvider(): array
     {
-        $gitSourceId = (string) new Ulid();
-        $userId = (string) new Ulid();
+        $userId = UserId::create();
         $hostUrl = 'https://example.com/repository.git';
         $path = '/';
         $accessToken = md5((string) rand());
         $newHostUrl = 'https://new.example.com/repository.git';
         $newPath = '/new';
 
-        $fileSourceId = (string) new Ulid();
         $label = 'file source label';
         $newLabel = 'new file source label';
 
+        $fileSource = new FileSource($userId, $label);
+        $gitSource = new GitSource($userId, $hostUrl, $path, $accessToken);
+
         return [
             SourceInterface::TYPE_FILE => [
-                'sourceCreator' => function (Store $store) use ($fileSourceId, $userId, $label) {
-                    $source = new FileSource($fileSourceId, $userId, $label);
-                    $store->add($source);
-
-                    return $source;
-                },
+                'source' => $fileSource,
                 'userId' => $userId,
                 'requestData' => [
                     FileSourceRequest::KEY_POST_LABEL => $newLabel,
                 ],
                 'expectedResponseData' => [
-                    'id' => $fileSourceId,
-                    'user_id' => $userId,
+                    'id' => $fileSource->getId(),
+                    'user_id' => $fileSource->getUserId(),
                     'type' => SourceInterface::TYPE_FILE,
                     'label' => $newLabel,
                 ],
             ],
             SourceInterface::TYPE_GIT => [
-                'sourceCreator' => function (
-                    Store $store
-                ) use (
-                    $gitSourceId,
-                    $userId,
-                    $hostUrl,
-                    $path,
-                    $accessToken
-                ) {
-                    $source = new GitSource($gitSourceId, $userId, $hostUrl, $path, $accessToken);
-                    $store->add($source);
-
-                    return $source;
-                },
+                'source' => $gitSource,
                 'userId' => $userId,
                 'requestData' => [
                     GitSourceRequest::KEY_POST_HOST_URL => $newHostUrl,
@@ -518,8 +463,8 @@ class SourcesControllerTest extends WebTestCase
                     GitSourceRequest::KEY_POST_ACCESS_TOKEN => null,
                 ],
                 'expectedResponseData' => [
-                    'id' => $gitSourceId,
-                    'user_id' => $userId,
+                    'id' => $gitSource->getId(),
+                    'user_id' => $gitSource->getUserId(),
                     'type' => SourceInterface::TYPE_GIT,
                     'host_url' => $newHostUrl,
                     'path' => $newPath,
@@ -531,12 +476,10 @@ class SourcesControllerTest extends WebTestCase
 
     /**
      * @dataProvider deleteSuccessDataProvider
-     *
-     * @param callable(Store): SourceInterface $sourceCreator
      */
-    public function testDeleteSuccess(callable $sourceCreator, string $userId, int $expectedRepositoryCount): void
+    public function testDeleteSuccess(SourceInterface $source, string $userId, int $expectedRepositoryCount): void
     {
-        $source = $sourceCreator($this->store);
+        $this->store->add($source);
         self::assertGreaterThan(0, $this->repository->count([]));
 
         $this->mockHandler->append(
@@ -556,43 +499,23 @@ class SourcesControllerTest extends WebTestCase
      */
     public function deleteSuccessDataProvider(): array
     {
-        $userId = (string) new Ulid();
+        $userId = UserId::create();
 
         return [
             SourceInterface::TYPE_FILE => [
-                'sourceCreator' => function (Store $store) use ($userId) {
-                    $source = new FileSource((string) new Ulid(), $userId, 'label');
-                    $store->add($source);
-
-                    return $source;
-                },
+                'source' => new FileSource($userId, 'label'),
                 'userId' => $userId,
                 'expectedRepositoryCount' => 0,
             ],
             SourceInterface::TYPE_GIT => [
-                'sourceCreator' => function (Store $store) use ($userId) {
-                    $source = new GitSource(
-                        (string) new Ulid(),
-                        $userId,
-                        'https://example.com/repository.git'
-                    );
-                    $store->add($source);
-
-                    return $source;
-                },
+                'source' => new GitSource($userId, 'https://example.com/repository.git'),
                 'userId' => $userId,
                 'expectedRepositoryCount' => 0,
             ],
             SourceInterface::TYPE_RUN => [
-                'sourceCreator' => function (Store $store) use ($userId) {
-                    $parent = new FileSource((string) new Ulid(), $userId, 'label');
-                    $store->add($parent);
-
-                    $source = new RunSource((string) new Ulid(), $parent);
-                    $store->add($source);
-
-                    return $source;
-                },
+                'source' => new RunSource(
+                    new FileSource($userId, 'label')
+                ),
                 'userId' => $userId,
                 'expectedRepositoryCount' => 1,
             ],
@@ -630,18 +553,18 @@ class SourcesControllerTest extends WebTestCase
      */
     public function listSuccessDataProvider(): array
     {
-        $userId = (string) new Ulid();
+        $userId = UserId::create();
         $userFileSources = [
-            new FileSource((string) new Ulid(), $userId, 'file source label'),
+            new FileSource($userId, 'file source label'),
         ];
 
         $userGitSources = [
-            new GitSource((string) new Ulid(), $userId, 'https://example.com/repository.git'),
+            new GitSource($userId, 'https://example.com/repository.git'),
         ];
 
         $userRunSources = [
-            new RunSource((string) new Ulid(), $userFileSources[0]),
-            new RunSource((string) new Ulid(), $userGitSources[0]),
+            new RunSource($userFileSources[0]),
+            new RunSource($userGitSources[0]),
         ];
 
         return [
@@ -652,11 +575,10 @@ class SourcesControllerTest extends WebTestCase
             ],
             'has file, git and run sources, no user match' => [
                 'sources' => [
-                    new FileSource((string) new Ulid(), (string) new Ulid(), 'file source label'),
-                    new GitSource((string) new Ulid(), (string) new Ulid(), 'https://example.com/repository.git'),
+                    new FileSource(UserId::create(), 'file source label'),
+                    new GitSource(UserId::create(), 'https://example.com/repository.git'),
                     new RunSource(
-                        (string) new Ulid(),
-                        new FileSource((string) new Ulid(), (string) new Ulid(), 'file source label'),
+                        new FileSource(UserId::create(), 'file source label'),
                     ),
                 ],
                 'userId' => $userId,
@@ -689,18 +611,16 @@ class SourcesControllerTest extends WebTestCase
             'has file, git and run sources for mixed users' => [
                 'sources' => [
                     $userFileSources[0],
-                    new FileSource((string) new Ulid(), (string) new Ulid(), 'file source label'),
+                    new FileSource(UserId::create(), 'file source label'),
                     $userGitSources[0],
-                    new GitSource((string) new Ulid(), (string) new Ulid(), 'https://example.com/repository.git'),
+                    new GitSource(UserId::create(), 'https://example.com/repository.git'),
                     $userRunSources[0],
                     $userRunSources[1],
                     new RunSource(
-                        (string) new Ulid(),
-                        new FileSource((string) new Ulid(), (string) new Ulid(), 'file source label')
+                        new FileSource(UserId::create(), 'file source label')
                     ),
                     new RunSource(
-                        (string) new Ulid(),
-                        new GitSource((string) new Ulid(), (string) new Ulid(), 'https://example.com/repository.git')
+                        new GitSource(UserId::create(), 'https://example.com/repository.git')
                     )
                 ],
                 'userId' => $userId,

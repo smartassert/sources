@@ -10,10 +10,10 @@ use App\Entity\RunSource;
 use App\Entity\SourceInterface;
 use App\Repository\SourceRepository;
 use App\Services\Source\Store;
+use App\Tests\Model\UserId;
 use App\Tests\Services\Source\SourceRemover;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-use Symfony\Component\Uid\Ulid;
 
 class RunSourceTest extends WebTestCase
 {
@@ -50,8 +50,8 @@ class RunSourceTest extends WebTestCase
     {
         $this->store->add($parent);
 
-        $runSourceId = (string) new Ulid();
-        $runSource = new RunSource($runSourceId, $parent);
+        $runSource = new RunSource($parent);
+        $runSourceId = $runSource->getId();
 
         $this->store->add($runSource);
         self::assertSame($parent, $runSource->getParent());
@@ -76,14 +76,10 @@ class RunSourceTest extends WebTestCase
     {
         return [
             SourceInterface::TYPE_FILE => [
-                'parent' => new FileSource((string) new Ulid(), (string) new Ulid(), 'label'),
+                'parent' => new FileSource(UserId::create(), 'label'),
             ],
             SourceInterface::TYPE_GIT => [
-                'parent' => new GitSource(
-                    (string) new Ulid(),
-                    (string) new Ulid(),
-                    'https://example.com/repository.git'
-                ),
+                'parent' => new GitSource(UserId::create(), 'https://example.com/repository.git'),
             ],
         ];
     }

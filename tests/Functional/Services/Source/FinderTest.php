@@ -10,9 +10,9 @@ use App\Entity\RunSource;
 use App\Entity\SourceInterface;
 use App\Services\Source\Finder;
 use App\Services\Source\Store;
+use App\Tests\Model\UserId;
 use App\Tests\Services\Source\SourceRemover;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-use Symfony\Component\Uid\Ulid;
 
 class FinderTest extends WebTestCase
 {
@@ -59,14 +59,14 @@ class FinderTest extends WebTestCase
      */
     public function findDataProvider(): array
     {
-        $userId = (string) new Ulid();
+        $userId = UserId::create();
 
-        $fileSource = new FileSource((string) new Ulid(), $userId, 'file source label');
-        $gitSource = new GitSource((string) new Ulid(), $userId, 'https://example.com/repository.git', '/');
-        $fileRunSourceWithoutParameters = new RunSource((string) new Ulid(), $fileSource);
-        $fileRunSourceWithParameters = new RunSource((string) new Ulid(), $fileSource, ['key1' => 'value1']);
-        $gitRunSourceWithoutParameters = new RunSource((string) new Ulid(), $gitSource);
-        $gitRunSourceWithParameters = new RunSource((string) new Ulid(), $gitSource, ['key2' => 'value2']);
+        $fileSource = new FileSource($userId, 'file source label');
+        $gitSource = new GitSource($userId, 'https://example.com/repository.git', '/');
+        $fileRunSourceWithoutParameters = new RunSource($fileSource);
+        $fileRunSourceWithParameters = new RunSource($fileSource, ['key1' => 'value1']);
+        $gitRunSourceWithoutParameters = new RunSource($gitSource);
+        $gitRunSourceWithParameters = new RunSource($gitSource, ['key2' => 'value2']);
 
         $allSources = [
             $fileSource,

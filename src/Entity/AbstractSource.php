@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
+use App\Model\EntityId;
 use App\Repository\SourceRepository;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -29,9 +30,9 @@ abstract class AbstractSource implements SourceInterface
     #[ORM\Column(type: 'string', length: 32)]
     private string $userId;
 
-    public function __construct(string $id, string $userId)
+    public function __construct(string $userId)
     {
-        $this->id = $id;
+        $this->id = EntityId::create();
         $this->userId = $userId;
     }
 

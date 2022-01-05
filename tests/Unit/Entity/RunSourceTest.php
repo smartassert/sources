@@ -7,8 +7,8 @@ namespace App\Tests\Unit\Entity;
 use App\Entity\FileSource;
 use App\Entity\RunSource;
 use App\Entity\SourceInterface;
+use App\Tests\Model\UserId;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Uid\Ulid;
 
 class RunSourceTest extends TestCase
 {
@@ -27,64 +27,61 @@ class RunSourceTest extends TestCase
      */
     public function jsonSerializeDataProvider(): array
     {
-        $parentSourceId = (string) new Ulid();
-        $runSourceId = (string) new Ulid();
-        $userId = (string) new Ulid();
+        $userId = UserId::create();
         $parameters = [
             'key1' => 'value1',
             'key2' => 'value2',
         ];
 
-        $parent = new FileSource($parentSourceId, $userId, 'file source label');
+        $parent = new FileSource($userId, 'file source label');
+
+        $withoutParent = new RunSource($parent);
+        $withoutParent->unsetParent();
+
+        $withoutParentWithParameters = new RunSource($parent, $parameters);
+        $withoutParentWithParameters->unsetParent();
+
+        $withoutParameters = new RunSource($parent);
+        $withParameters = new RunSource($parent, $parameters);
 
         return [
             'no parent, no parameters' => [
-                'source' => (function () use ($runSourceId, $parent) {
-                    $source = new RunSource($runSourceId, $parent);
-                    $source->unsetParent();
-
-                    return $source;
-                })(),
+                'source' => $withoutParent,
                 'expected' => [
-                    'id' => $runSourceId,
-                    'user_id' => $userId,
+                    'id' => $withoutParent->getId(),
+                    'user_id' => $withoutParent->getUserId(),
                     'type' => SourceInterface::TYPE_RUN,
                     'parent' => null,
                     'parameters' => [],
                 ],
             ],
             'no parent, has parameters' => [
-                'source' => (function () use ($runSourceId, $parent, $parameters) {
-                    $source = new RunSource($runSourceId, $parent, $parameters);
-                    $source->unsetParent();
-
-                    return $source;
-                })(),
+                'source' => $withoutParentWithParameters,
                 'expected' => [
-                    'id' => $runSourceId,
-                    'user_id' => $userId,
+                    'id' => $withoutParentWithParameters->getId(),
+                    'user_id' => $withoutParentWithParameters->getUserId(),
                     'type' => SourceInterface::TYPE_RUN,
                     'parent' => null,
-                    'parameters' => $parameters,
+                    'parameters' => $withoutParentWithParameters->getParameters(),
                 ],
             ],
             'has parent, no parameters' => [
-                'source' => new RunSource($runSourceId, $parent),
+                'source' => $withoutParameters,
                 'expected' => [
-                    'id' => $runSourceId,
-                    'user_id' => $userId,
+                    'id' => $withoutParameters->getId(),
+                    'user_id' => $withoutParameters->getUserId(),
                     'type' => SourceInterface::TYPE_RUN,
-                    'parent' => $parentSourceId,
+                    'parent' => $withoutParameters->getParent()?->getId(),
                     'parameters' => [],
                 ],
             ],
             'has parent, has parameters' => [
-                'source' => new RunSource($runSourceId, $parent, $parameters),
+                'source' => $withParameters,
                 'expected' => [
-                    'id' => $runSourceId,
-                    'user_id' => $userId,
+                    'id' => $withParameters->getId(),
+                    'user_id' => $withParameters->getUserId(),
                     'type' => SourceInterface::TYPE_RUN,
-                    'parent' => $parentSourceId,
+                    'parent' => $withParameters->getParent()?->getId(),
                     'parameters' => $parameters,
                 ],
             ],

@@ -10,7 +10,6 @@ use App\Entity\RunSource;
 use App\Request\FileSourceRequest;
 use App\Request\GitSourceRequest;
 use Symfony\Component\Security\Core\User\UserInterface;
-use Symfony\Component\Uid\Ulid;
 
 class Factory
 {
@@ -27,13 +26,12 @@ class Factory
     {
         ksort($parameters);
 
-        return new RunSource($this->generateId(), $parent, $parameters);
+        return new RunSource($parent, $parameters);
     }
 
     public function createGitSourceFromRequest(UserInterface $user, GitSourceRequest $request): GitSource
     {
         $source = new GitSource(
-            $this->generateId(),
             $user->getUserIdentifier(),
             $request->getHostUrl(),
             $request->getPath(),
@@ -49,17 +47,12 @@ class Factory
 
     public function createFileSourceFromRequest(UserInterface $user, FileSourceRequest $request): FileSource
     {
-        $source = new FileSource($this->generateId(), $user->getUserIdentifier(), $request->getLabel());
+        $source = new FileSource($user->getUserIdentifier(), $request->getLabel());
 
         if (null === $this->finder->find($source)) {
             $this->store->add($source);
         }
 
         return $source;
-    }
-
-    private function generateId(): string
-    {
-        return (string) new Ulid();
     }
 }
