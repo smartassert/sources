@@ -106,7 +106,7 @@ class StoreTest extends WebTestCase
 
         $this->store->remove($source);
 
-        self::assertSame([$source], $this->repository->findAll());
+        self::assertSame([$parent], $this->repository->findAll());
     }
 
     public function testAddRunSource(): void

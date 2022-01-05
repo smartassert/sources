@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Services\Source;
 
-use App\Entity\RunSource;
 use App\Entity\SourceInterface;
 use Doctrine\ORM\EntityManagerInterface;
 
@@ -23,14 +22,6 @@ class Store
 
     public function remove(SourceInterface $source): void
     {
-        if ($source instanceof RunSource && null !== $source->getParent()) {
-            $parent = $source->getParent();
-            $source->unsetParent();
-            $this->add($source);
-
-            $source = $parent;
-        }
-
         $this->entityManager->remove($source);
         $this->entityManager->flush();
     }
