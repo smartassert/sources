@@ -39,3 +39,11 @@ services:
         arguments:
             $sourceFixturesPath: '%source_fixtures_path%'
             $fileStoreBasePath: '%file_store_base_path%'
+
+    App\Tests\Services\SourceFixtureRemover:
+        public: true
+        arguments:
+            $fileStoreBasePath: '%file_store_base_path%'
+
+    App\Services\FileSourcePreparer:
+        public: true
