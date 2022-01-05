@@ -6,7 +6,7 @@ namespace App\Exception\DirectoryDuplicator;
 
 use App\Model\FileLocatorInterface;
 
-abstract class AbstractFileLocatorException extends \Exception
+abstract class AbstractFileLocatorException extends \Exception implements DirectoryDuplicatorExceptionInterface
 {
     public function __construct(
         private FileLocatorInterface $fileLocator,
