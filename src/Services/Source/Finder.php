@@ -8,27 +8,22 @@ use App\Entity\SourceInterface;
 
 class Finder
 {
-    /**
-     * @var TypeFinderInterface[]
-     */
-    private array $typeFinders;
-
-    /**
-     * @param TypeFinderInterface[] $typeFinders
-     */
-    public function __construct(array $typeFinders)
-    {
-        $this->typeFinders = array_filter($typeFinders, function ($item) {
-            return $item instanceof TypeFinderInterface;
-        });
+    public function __construct(
+        private FileSourceFinder $fileSourceFinder,
+        private GitSourceFinder $gitSourceFinder,
+    ) {
     }
 
     public function find(SourceInterface $source): ?SourceInterface
     {
-        foreach ($this->typeFinders as $typeFinder) {
-            if ($typeFinder->supports($source->getType())) {
-                return $typeFinder->find($source);
-            }
+        $type = $source->getType();
+
+        if ($this->fileSourceFinder->supports($type)) {
+            return $this->fileSourceFinder->find($source);
+        }
+
+        if ($this->gitSourceFinder->supports($type)) {
+            return $this->gitSourceFinder->find($source);
         }
 
         return null;

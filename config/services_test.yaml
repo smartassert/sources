@@ -27,7 +27,3 @@ services:
 
     App\Services\Source\Finder:
         public: true
-        arguments:
-            $typeFinders:
-                - '@App\Services\Source\FileSourceFinder'
-                - '@App\Services\Source\GitSourceFinder'
