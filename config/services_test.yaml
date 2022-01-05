@@ -1,3 +1,6 @@
+parameters:
+    source_fixtures_path: '%env(resolve:SOURCE_FIXTURES_PATH)%'
+
 services:
     _defaults:
         autowire: true
@@ -30,3 +33,9 @@ services:
 
     App\Services\DirectoryDuplicator:
         public: true
+
+    App\Tests\Services\SourceFixtureCreator:
+        public: true
+        arguments:
+            $sourceFixturesPath: '%source_fixtures_path%'
+            $fileStoreBasePath: '%file_store_base_path%'
