@@ -14,6 +14,11 @@ class FileStore implements FileLocatorInterface
     ) {
     }
 
+    public function getBasePath(): string
+    {
+        return $this->basePath;
+    }
+
     public function getPath(): string
     {
         return sprintf(
