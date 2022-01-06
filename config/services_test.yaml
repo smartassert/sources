@@ -23,15 +23,7 @@ services:
     App\Tests\Services\Source\SourceRemover:
         public: true
 
-    App\Services\FileStoreFactory:
-        public: true
-        arguments:
-            $basePath: '%file_store_base_path%'
-
     App\Services\Source\Finder:
-        public: true
-
-    App\Services\DirectoryDuplicator:
         public: true
 
     App\Tests\Services\FileStoreManager:
@@ -44,4 +36,7 @@ services:
         public: true
 
     App\Services\GitRepositoryCloner:
+        public: true
+
+    App\Services\FileStoreAssetRemover:
         public: true
