@@ -7,14 +7,14 @@ namespace App\Tests\Functional\Services;
 use App\Entity\FileSource;
 use App\Services\FileStoreAssetRemover;
 use App\Tests\Model\UserId;
-use App\Tests\Services\FileStoreManager;
+use App\Tests\Services\FileStoreFixtureCreator;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 class FileStoreAssetRemoverTest extends WebTestCase
 {
     private FileStoreAssetRemover $fileStoreAssetRemover;
+    private FileStoreFixtureCreator $fixtureCreator;
     private string $basePath;
-    private FileStoreManager $fileStoreManager;
 
     protected function setUp(): void
     {
@@ -28,9 +28,9 @@ class FileStoreAssetRemoverTest extends WebTestCase
         \assert(is_string($basePath));
         $this->basePath = $basePath;
 
-        $fileStoreManager = self::getContainer()->get(FileStoreManager::class);
-        \assert($fileStoreManager instanceof FileStoreManager);
-        $this->fileStoreManager = $fileStoreManager;
+        $fixtureCreator = self::getContainer()->get(FileStoreFixtureCreator::class);
+        \assert($fixtureCreator instanceof FileStoreFixtureCreator);
+        $this->fixtureCreator = $fixtureCreator;
     }
 
     public function testRemoveSuccess(): void
@@ -38,7 +38,7 @@ class FileStoreAssetRemoverTest extends WebTestCase
         $fileSource = new FileSource(UserId::create(), 'file source label');
         $fileSourceAbsolutePath = $this->basePath . '/' . $fileSource;
 
-        $this->fileStoreManager->copyFixturesTo($fileSource->getPath());
+        $this->fixtureCreator->copyFixturesTo($fileSource->getPath());
         self::assertDirectoryExists($fileSourceAbsolutePath);
 
         $result = $this->fileStoreAssetRemover->remove($fileSource);

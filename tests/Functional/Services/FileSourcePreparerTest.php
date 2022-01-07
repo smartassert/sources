@@ -12,6 +12,7 @@ use App\Services\FileSourcePreparer;
 use App\Services\FileStoreFactory;
 use App\Tests\Mock\Services\MockDirectoryDuplicator;
 use App\Tests\Model\UserId;
+use App\Tests\Services\FileStoreFixtureCreator;
 use App\Tests\Services\FileStoreManager;
 use App\Tests\Services\Source\SourceRemover;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -22,7 +23,7 @@ class FileSourcePreparerTest extends WebTestCase
     private FileSourcePreparer $fileSourcePreparer;
     private FileStoreFactory $fileStoreFactory;
     private SourceRepository $sourceRepository;
-    private FileStoreManager $fileStoreManager;
+    private FileStoreFixtureCreator $fixtureCreator;
 
     protected function setUp(): void
     {
@@ -40,16 +41,19 @@ class FileSourcePreparerTest extends WebTestCase
         \assert($sourceRepository instanceof SourceRepository);
         $this->sourceRepository = $sourceRepository;
 
-        $fileStoreManager = self::getContainer()->get(FileStoreManager::class);
-        \assert($fileStoreManager instanceof FileStoreManager);
-        $this->fileStoreManager = $fileStoreManager;
+        $fixtureCreator = self::getContainer()->get(FileStoreFixtureCreator::class);
+        \assert($fixtureCreator instanceof FileStoreFixtureCreator);
+        $this->fixtureCreator = $fixtureCreator;
 
         $sourceRemover = self::getContainer()->get(SourceRemover::class);
         if ($sourceRemover instanceof SourceRemover) {
             $sourceRemover->removeAll();
         }
 
-        $fileStoreManager->clear();
+        $fileStoreManager = self::getContainer()->get(FileStoreManager::class);
+        if ($fileStoreManager instanceof FileStoreManager) {
+            $fileStoreManager->clear();
+        }
     }
 
     public function testPrepareDirectoryDuplicatorException(): void
@@ -84,7 +88,7 @@ class FileSourcePreparerTest extends WebTestCase
     public function testPrepareSuccess(): void
     {
         $fileSource = new FileSource(UserId::create(), 'file source label');
-        $this->fileStoreManager->copyFixturesTo($fileSource->getPath());
+        $this->fixtureCreator->copyFixturesTo($fileSource->getPath());
 
         $runSource = $this->fileSourcePreparer->prepare($fileSource);
 
