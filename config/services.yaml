@@ -50,3 +50,7 @@ services:
     App\Services\FileStoreFactory:
         arguments:
             $basePath: '%file_store_base_path%'
+
+    App\Services\FileStoreManager:
+        arguments:
+            $basePath: '%file_store_base_path%'

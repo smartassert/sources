@@ -32,6 +32,12 @@ services:
             $sourceFixturesPath: '%source_fixtures_path%'
             $fileStoreBasePath: '%file_store_base_path%'
 
+    App\Tests\Services\FileStoreFixtureCreator:
+        public: true
+        arguments:
+            $sourceFixturesPath: '%source_fixtures_path%'
+            $fileStoreBasePath: '%file_store_base_path%'
+
     App\Services\FileSourcePreparer:
         public: true
 
@@ -40,3 +46,8 @@ services:
 
     App\Services\FileStoreAssetRemover:
         public: true
+
+    App\Services\FileStoreManager:
+        public: true
+        arguments:
+            $basePath: '%file_store_base_path%'
