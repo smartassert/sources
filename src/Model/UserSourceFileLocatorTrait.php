@@ -6,7 +6,10 @@ namespace App\Model;
 
 trait UserSourceFileLocatorTrait
 {
-    use StringableFileLocatorTrait;
+    public function __toString(): string
+    {
+        return $this->getPath();
+    }
 
     public function getPath(): string
     {
