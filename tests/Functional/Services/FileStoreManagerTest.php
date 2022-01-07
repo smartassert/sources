@@ -6,7 +6,6 @@ namespace App\Tests\Functional\Services;
 
 use App\Entity\GitSource;
 use App\Entity\RunSource;
-use App\Model\FileLocatorInterface;
 use App\Model\UserGitRepository;
 use App\Services\FileStoreManager;
 use App\Tests\Mock\Model\MockFileLocator;
@@ -62,23 +61,8 @@ class FileStoreManagerTest extends WebTestCase
         $this->fileStoreManager->mirror($sourceFileLocator, $targetFileLocator);
 
         self::assertSame(
-            scandir($this->callFileStoreManagerCreatePath($sourceFileLocator)),
-            scandir($this->callFileStoreManagerCreatePath($targetFileLocator))
+            scandir($this->fileStoreManager->createPath($sourceFileLocator)),
+            scandir($this->fileStoreManager->createPath($targetFileLocator))
         );
-    }
-
-    private function callFileStoreManagerCreatePath(FileLocatorInterface $fileLocator): string
-    {
-        $classReflector = new \ReflectionClass(FileStoreManager::class);
-
-        $createPathMethod = $classReflector->getMethod('createPath');
-        $createPathMethod->setAccessible(true);
-
-        $path = $createPathMethod->invokeArgs($this->fileStoreManager, [$fileLocator]);
-        if (false === is_string($path)) {
-            throw new \RuntimeException('FileStoreManager::createPath() returned a non-string value');
-        }
-
-        return $path;
     }
 }
