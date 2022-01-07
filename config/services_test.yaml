@@ -26,7 +26,7 @@ services:
     App\Services\Source\Finder:
         public: true
 
-    App\Tests\Services\FileStoreManager:
+    App\Tests\Services\FileStoreFixtureCreator:
         public: true
         arguments:
             $sourceFixturesPath: '%source_fixtures_path%'
@@ -38,5 +38,7 @@ services:
     App\Services\GitRepositoryCloner:
         public: true
 
-    App\Services\FileStoreAssetRemover:
+    App\Services\FileStoreManager:
         public: true
+        arguments:
+            $basePath: '%file_store_base_path%'
