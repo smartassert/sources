@@ -54,6 +54,10 @@ class FileStoreManagerTest extends TestCase
         $outOfScopeFileLocator = (new MockFileLocator())->withToStringCall('..')->getMock();
         $validFileLocator = (new MockFileLocator())->withToStringCall(self::FILE_LOCATOR_PATH)->getMock();
 
+        $createPathAction = function (FileStoreManager $fileStoreManager, FileLocatorInterface $fileLocator) {
+            $fileStoreManager->createPath($fileLocator);
+        };
+
         $initializeAction = function (FileStoreManager $fileStoreManager, FileLocatorInterface $fileLocator) {
             $fileStoreManager->initialize($fileLocator);
         };
@@ -70,6 +74,18 @@ class FileStoreManagerTest extends TestCase
         $expectedOutOfScopeException = new OutOfScopeException('/absolute/base', self::BASE_PATH);
 
         return [
+            'createPath ' . NonAbsolutePathException::class => [
+                'fileStoreManager' => $relativeBasePathFileStoreManager,
+                'fileLocator' => $validFileLocator,
+                'action' => $createPathAction,
+                'expected' => $expectedNonAbsolutePathException,
+            ],
+            'createPath ' . OutOfScopeException::class => [
+                'fileStoreManager' => $validFileStoreManager,
+                'fileLocator' => $outOfScopeFileLocator,
+                'action' => $createPathAction,
+                'expected' => $expectedOutOfScopeException,
+            ],
             'initialize ' . NonAbsolutePathException::class => [
                 'fileStoreManager' => $relativeBasePathFileStoreManager,
                 'fileLocator' => $validFileLocator,
@@ -107,6 +123,17 @@ class FileStoreManagerTest extends TestCase
                 'expected' => $expectedOutOfScopeException,
             ],
         ];
+    }
+
+    public function testCreatePathSuccess(): void
+    {
+        $fileStoreManager = new FileStoreManager(self::BASE_PATH, (new MockFileSystem())->getMock());
+        $fileLocator = (new MockFileLocator())->withToStringCall(self::FILE_LOCATOR_PATH)->getMock();
+
+        self::assertEquals(
+            self::PATH,
+            $fileStoreManager->createPath($fileLocator)
+        );
     }
 
     /**
