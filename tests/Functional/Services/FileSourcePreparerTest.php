@@ -5,14 +5,15 @@ declare(strict_types=1);
 namespace App\Tests\Functional\Services;
 
 use App\Entity\FileSource;
-use App\Exception\DirectoryDuplicator\MissingSourceException;
 use App\Exception\FileSourcePreparationException;
+use App\Exception\FileStore\NotExistsException;
+use App\Model\FileLocatorInterface;
 use App\Repository\SourceRepository;
 use App\Services\FileSourcePreparer;
-use App\Services\FileStoreFactory;
-use App\Tests\Mock\Services\MockDirectoryDuplicator;
+use App\Services\FileStoreManager;
+use App\Tests\Mock\Services\MockFileStoreManager;
 use App\Tests\Model\UserId;
-use App\Tests\Services\FileStoreManager;
+use App\Tests\Services\FileStoreFixtureCreator;
 use App\Tests\Services\Source\SourceRemover;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use webignition\ObjectReflector\ObjectReflector;
@@ -20,9 +21,8 @@ use webignition\ObjectReflector\ObjectReflector;
 class FileSourcePreparerTest extends WebTestCase
 {
     private FileSourcePreparer $fileSourcePreparer;
-    private FileStoreFactory $fileStoreFactory;
     private SourceRepository $sourceRepository;
-    private FileStoreManager $fileStoreManager;
+    private FileStoreFixtureCreator $fixtureCreator;
 
     protected function setUp(): void
     {
@@ -32,43 +32,35 @@ class FileSourcePreparerTest extends WebTestCase
         \assert($fileSourcePreparer instanceof FileSourcePreparer);
         $this->fileSourcePreparer = $fileSourcePreparer;
 
-        $fileStoreFactory = self::getContainer()->get(FileStoreFactory::class);
-        \assert($fileStoreFactory instanceof FileStoreFactory);
-        $this->fileStoreFactory = $fileStoreFactory;
-
         $sourceRepository = self::getContainer()->get(SourceRepository::class);
         \assert($sourceRepository instanceof SourceRepository);
         $this->sourceRepository = $sourceRepository;
 
-        $fileStoreManager = self::getContainer()->get(FileStoreManager::class);
-        \assert($fileStoreManager instanceof FileStoreManager);
-        $this->fileStoreManager = $fileStoreManager;
+        $fixtureCreator = self::getContainer()->get(FileStoreFixtureCreator::class);
+        \assert($fixtureCreator instanceof FileStoreFixtureCreator);
+        $this->fixtureCreator = $fixtureCreator;
 
         $sourceRemover = self::getContainer()->get(SourceRemover::class);
         if ($sourceRemover instanceof SourceRemover) {
             $sourceRemover->removeAll();
         }
-
-        $fileStoreManager->clear();
     }
 
-    public function testPrepareDirectoryDuplicatorException(): void
+    public function testPrepareFileSourceMirrorException(): void
     {
         $source = new FileSource(UserId::create(), 'file source label');
-        $exception = new MissingSourceException(
-            $this->fileStoreFactory->create($source)
-        );
+        $exception = new NotExistsException('path-does-not-exist');
 
-        $directoryDuplicator = (new MockDirectoryDuplicator())
-            ->withDuplicateCallThrowingException($exception)
+        $fileStoreManager = (new MockFileStoreManager())
+            ->withMirrorCallThrowingException($exception)
             ->getMock()
         ;
 
         ObjectReflector::setProperty(
             $this->fileSourcePreparer,
             FileSourcePreparer::class,
-            'directoryDuplicator',
-            $directoryDuplicator
+            'fileStoreManager',
+            $fileStoreManager
         );
 
         try {
@@ -84,14 +76,32 @@ class FileSourcePreparerTest extends WebTestCase
     public function testPrepareSuccess(): void
     {
         $fileSource = new FileSource(UserId::create(), 'file source label');
-        $this->fileStoreManager->copyFixturesTo($fileSource->getPath());
+        $this->fixtureCreator->copyFixturesTo($fileSource->getPath());
 
         $runSource = $this->fileSourcePreparer->prepare($fileSource);
 
         self::assertCount(2, $this->sourceRepository->findAll());
         self::assertSame(
-            scandir((string) $this->fileStoreFactory->create($fileSource)),
-            scandir((string) $this->fileStoreFactory->create($runSource))
+            scandir($this->callFileStoreManagerCreatePath($fileSource)),
+            scandir($this->callFileStoreManagerCreatePath($runSource))
         );
+    }
+
+    private function callFileStoreManagerCreatePath(FileLocatorInterface $fileLocator): string
+    {
+        $fileStoreManager = self::getContainer()->get(FileStoreManager::class);
+        \assert($fileStoreManager instanceof FileStoreManager);
+
+        $classReflector = new \ReflectionClass(FileStoreManager::class);
+
+        $createPathMethod = $classReflector->getMethod('createPath');
+        $createPathMethod->setAccessible(true);
+
+        $path = $createPathMethod->invokeArgs($fileStoreManager, [$fileLocator]);
+        if (false === is_string($path)) {
+            throw new \RuntimeException('FileStoreManager::createPath() returned a non-string value');
+        }
+
+        return $path;
     }
 }

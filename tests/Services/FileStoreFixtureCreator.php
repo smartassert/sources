@@ -6,7 +6,7 @@ namespace App\Tests\Services;
 
 use Symfony\Component\Filesystem\Filesystem;
 
-class FileStoreManager
+class FileStoreFixtureCreator
 {
     public function __construct(
         private Filesystem $filesystem,
@@ -21,19 +21,5 @@ class FileStoreManager
             $this->sourceFixturesPath,
             sprintf('%s/%s', $this->fileStoreBasePath, $relativePath)
         );
-    }
-
-    public function clear(): void
-    {
-        $directoryIterator = new \DirectoryIterator($this->fileStoreBasePath);
-
-        /**
-         * @var \DirectoryIterator $item
-         */
-        foreach ($directoryIterator as $item) {
-            if (true === $item->isDir() && false === $item->isDot()) {
-                $this->filesystem->remove($item->getPathname());
-            }
-        }
     }
 }

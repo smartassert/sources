@@ -71,6 +71,32 @@ class MockFileSystem
         return $this;
     }
 
+    public function withoutRemoveCall(): self
+    {
+        return $this->withoutCall('remove');
+    }
+
+    public function withoutMkdirCall(): self
+    {
+        return $this->withoutCall('mkdir');
+    }
+
+    public function withoutMirrorCall(): self
+    {
+        return $this->withoutCall('mirror');
+    }
+
+    private function withoutCall(string $method): self
+    {
+        if (false === $this->mock instanceof MockInterface) {
+            return $this;
+        }
+
+        $this->mock->shouldNotReceive($method);
+
+        return $this;
+    }
+
     private function withDirectoryCall(string $method, string $path): self
     {
         if (false === $this->mock instanceof MockInterface) {
