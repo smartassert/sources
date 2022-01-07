@@ -7,9 +7,10 @@ namespace App\Tests\Functional\Services;
 use App\Entity\FileSource;
 use App\Exception\FileSourcePreparationException;
 use App\Exception\FileStore\NotExistsException;
+use App\Model\FileLocatorInterface;
 use App\Repository\SourceRepository;
 use App\Services\FileSourcePreparer;
-use App\Services\FileStoreFactory;
+use App\Services\FileStoreManager;
 use App\Tests\Mock\Services\MockFileStoreManager;
 use App\Tests\Model\UserId;
 use App\Tests\Services\FileStoreFixtureCreator;
@@ -20,7 +21,6 @@ use webignition\ObjectReflector\ObjectReflector;
 class FileSourcePreparerTest extends WebTestCase
 {
     private FileSourcePreparer $fileSourcePreparer;
-    private FileStoreFactory $fileStoreFactory;
     private SourceRepository $sourceRepository;
     private FileStoreFixtureCreator $fixtureCreator;
 
@@ -31,10 +31,6 @@ class FileSourcePreparerTest extends WebTestCase
         $fileSourcePreparer = self::getContainer()->get(FileSourcePreparer::class);
         \assert($fileSourcePreparer instanceof FileSourcePreparer);
         $this->fileSourcePreparer = $fileSourcePreparer;
-
-        $fileStoreFactory = self::getContainer()->get(FileStoreFactory::class);
-        \assert($fileStoreFactory instanceof FileStoreFactory);
-        $this->fileStoreFactory = $fileStoreFactory;
 
         $sourceRepository = self::getContainer()->get(SourceRepository::class);
         \assert($sourceRepository instanceof SourceRepository);
@@ -86,8 +82,26 @@ class FileSourcePreparerTest extends WebTestCase
 
         self::assertCount(2, $this->sourceRepository->findAll());
         self::assertSame(
-            scandir((string) $this->fileStoreFactory->create($fileSource)),
-            scandir((string) $this->fileStoreFactory->create($runSource))
+            scandir($this->callFileStoreManagerCreatePath($fileSource)),
+            scandir($this->callFileStoreManagerCreatePath($runSource))
         );
+    }
+
+    private function callFileStoreManagerCreatePath(FileLocatorInterface $fileLocator): string
+    {
+        $fileStoreManager = self::getContainer()->get(FileStoreManager::class);
+        \assert($fileStoreManager instanceof FileStoreManager);
+
+        $classReflector = new \ReflectionClass(FileStoreManager::class);
+
+        $createPathMethod = $classReflector->getMethod('createPath');
+        $createPathMethod->setAccessible(true);
+
+        $path = $createPathMethod->invokeArgs($fileStoreManager, [$fileLocator]);
+        if (false === is_string($path)) {
+            throw new \RuntimeException('FileStoreManager::createPath() returned a non-string value');
+        }
+
+        return $path;
     }
 }
