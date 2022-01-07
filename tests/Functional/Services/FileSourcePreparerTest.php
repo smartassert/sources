@@ -13,7 +13,6 @@ use App\Services\FileStoreFactory;
 use App\Tests\Mock\Services\MockDirectoryDuplicator;
 use App\Tests\Model\UserId;
 use App\Tests\Services\FileStoreFixtureCreator;
-use App\Tests\Services\FileStoreManager;
 use App\Tests\Services\Source\SourceRemover;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use webignition\ObjectReflector\ObjectReflector;
@@ -48,11 +47,6 @@ class FileSourcePreparerTest extends WebTestCase
         $sourceRemover = self::getContainer()->get(SourceRemover::class);
         if ($sourceRemover instanceof SourceRemover) {
             $sourceRemover->removeAll();
-        }
-
-        $fileStoreManager = self::getContainer()->get(FileStoreManager::class);
-        if ($fileStoreManager instanceof FileStoreManager) {
-            $fileStoreManager->clear();
         }
     }
 

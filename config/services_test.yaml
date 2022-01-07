@@ -26,11 +26,6 @@ services:
     App\Services\Source\Finder:
         public: true
 
-    App\Tests\Services\FileStoreManager:
-        public: true
-        arguments:
-            $fileStoreBasePath: '%file_store_base_path%'
-
     App\Tests\Services\FileStoreFixtureCreator:
         public: true
         arguments:
