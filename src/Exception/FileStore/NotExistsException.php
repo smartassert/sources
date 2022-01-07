@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Exception\FileStore;
 
-class NotExistsException extends \Exception
+class NotExistsException extends \Exception implements FileStoreExceptionInterface
 {
     use GetPathTrait;
 

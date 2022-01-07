@@ -6,7 +6,7 @@ namespace App\Exception\FileStore;
 
 use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
 
-class CreateException extends \Exception
+class CreateException extends \Exception implements FileStoreExceptionInterface
 {
     use GetIOExceptionTrait;
     use GetPathTrait;

@@ -6,7 +6,7 @@ namespace App\Exception\FileStore;
 
 use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
 
-class MirrorException extends \Exception
+class MirrorException extends \Exception implements FileStoreExceptionInterface
 {
     use GetIOExceptionTrait;
 

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Exception\FileStore;
 
-class OutOfScopeException extends \Exception
+class OutOfScopeException extends \Exception implements FileStoreExceptionInterface
 {
     use GetPathTrait;
 

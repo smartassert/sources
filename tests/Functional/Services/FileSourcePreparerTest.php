@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace App\Tests\Functional\Services;
 
 use App\Entity\FileSource;
-use App\Exception\DirectoryDuplicator\MissingSourceException;
 use App\Exception\FileSourcePreparationException;
+use App\Exception\FileStore\NotExistsException;
 use App\Repository\SourceRepository;
 use App\Services\FileSourcePreparer;
 use App\Services\FileStoreFactory;
-use App\Tests\Mock\Services\MockDirectoryDuplicator;
+use App\Tests\Mock\Services\MockFileStoreManager;
 use App\Tests\Model\UserId;
 use App\Tests\Services\FileStoreFixtureCreator;
 use App\Tests\Services\Source\SourceRemover;
@@ -50,23 +50,21 @@ class FileSourcePreparerTest extends WebTestCase
         }
     }
 
-    public function testPrepareDirectoryDuplicatorException(): void
+    public function testPrepareFileSourceMirrorException(): void
     {
         $source = new FileSource(UserId::create(), 'file source label');
-        $exception = new MissingSourceException(
-            $this->fileStoreFactory->create($source)
-        );
+        $exception = new NotExistsException('path-does-not-exist');
 
-        $directoryDuplicator = (new MockDirectoryDuplicator())
-            ->withDuplicateCallThrowingException($exception)
+        $fileStoreManager = (new MockFileStoreManager())
+            ->withMirrorCallThrowingException($exception)
             ->getMock()
         ;
 
         ObjectReflector::setProperty(
             $this->fileSourcePreparer,
             FileSourcePreparer::class,
-            'directoryDuplicator',
-            $directoryDuplicator
+            'fileStoreManager',
+            $fileStoreManager
         );
 
         try {

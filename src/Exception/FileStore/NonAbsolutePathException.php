@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Exception\FileStore;
 
-class NonAbsolutePathException extends \Exception
+class NonAbsolutePathException extends \Exception implements FileStoreExceptionInterface
 {
     use GetPathTrait;
 
