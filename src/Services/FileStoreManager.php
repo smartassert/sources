@@ -25,6 +25,25 @@ class FileStoreManager
     }
 
     /**
+     * @throws NonAbsolutePathException
+     * @throws OutOfScopeException
+     */
+    public function createPath(FileLocatorInterface $fileLocator): string
+    {
+        try {
+            $path = Path::makeAbsolute((string) $fileLocator, $this->basePath);
+        } catch (InvalidArgumentException $exception) {
+            throw new NonAbsolutePathException($this->basePath, $exception);
+        }
+
+        if (false === Path::isBasePath($this->basePath, $path)) {
+            throw new OutOfScopeException($path, $this->basePath);
+        }
+
+        return $path;
+    }
+
+    /**
      * @throws CreateException
      * @throws NonAbsolutePathException
      * @throws OutOfScopeException
@@ -120,24 +139,5 @@ class FileStoreManager
     private function doExists(string $path): bool
     {
         return $this->filesystem->exists($path);
-    }
-
-    /**
-     * @throws NonAbsolutePathException
-     * @throws OutOfScopeException
-     */
-    private function createPath(FileLocatorInterface $fileLocator): string
-    {
-        try {
-            $path = Path::makeAbsolute((string) $fileLocator, $this->basePath);
-        } catch (InvalidArgumentException $exception) {
-            throw new NonAbsolutePathException($this->basePath, $exception);
-        }
-
-        if (false === Path::isBasePath($this->basePath, $path)) {
-            throw new OutOfScopeException($path, $this->basePath);
-        }
-
-        return $path;
     }
 }
