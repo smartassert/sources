@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Tests\Unit\Services\Process;
 
 use App\Exception\ProcessExecutorException;
+use App\Model\CommandDefinition;
 use App\Model\ProcessOutput;
-use App\Services\Process\CommandBuilder;
 use App\Services\Process\Executor;
 use App\Services\Process\Factory;
 use App\Tests\Mock\Services\Process\MockFactory;
@@ -23,7 +23,7 @@ class ExecutorTest extends TestCase
     {
         parent::setUp();
 
-        $this->executor = new Executor(new CommandBuilder(), new Factory());
+        $this->executor = new Executor(new Factory());
     }
 
     public function testExecuteThrowsException(): void
@@ -49,24 +49,21 @@ class ExecutorTest extends TestCase
             )
         );
 
-        $this->executor->execute($command, []);
+        $this->executor->execute(new CommandDefinition($command, []));
     }
 
     /**
      * @dataProvider executeSuccessDataProvider
-     *
-     * @param array<string, string> $parameters
      */
     public function testExecuteSuccess(
-        string $command,
-        array $parameters,
+        CommandDefinition $commandDefinition,
         ?string $cwd,
         Factory $factory,
         ProcessOutput $expectedOutput
     ): void {
         $this->setProcessFactoryOnExecutor($factory);
 
-        self::assertEquals($expectedOutput, $this->executor->execute($command, $parameters, $cwd));
+        self::assertEquals($expectedOutput, $this->executor->execute($commandDefinition, $cwd));
     }
 
     /**
@@ -76,11 +73,10 @@ class ExecutorTest extends TestCase
     {
         return [
             'command exits with no errors' => [
-                'command' => './command %param1% %param2%',
-                'parameters' => [
+                'commandDefinition' => new CommandDefinition('./command %param1% %param2%', [
                     '%param1%' => 'first parameter',
                     '%param2%' => 'second parameter',
-                ],
+                ]),
                 'cwd' => null,
                 'factory' => (new MockFactory())
                     ->withCreateCall(
@@ -96,11 +92,10 @@ class ExecutorTest extends TestCase
                 'expectedOutput' => new ProcessOutput(0, 'process output', '')
             ],
             'command with cwd exits with no errors' => [
-                'command' => './command %param1% %param2%',
-                'parameters' => [
+                'commandDefinition' => new CommandDefinition('./command %param1% %param2%', [
                     '%param1%' => 'first parameter',
                     '%param2%' => 'second parameter',
-                ],
+                ]),
                 'cwd' => '/path/to/directory',
                 'factory' => (new MockFactory())
                     ->withCreateCall(
@@ -116,11 +111,10 @@ class ExecutorTest extends TestCase
                 'expectedOutput' => new ProcessOutput(0, 'process output', '')
             ],
             'command exits with error' => [
-                'command' => './command %param1% %param2%',
-                'parameters' => [
+                'commandDefinition' => new CommandDefinition('./command %param1% %param2%', [
                     '%param1%' => 'first parameter',
                     '%param2%' => 'second parameter',
-                ],
+                ]),
                 'cwd' => null,
                 'factory' => (new MockFactory())
                     ->withCreateCall(

@@ -2,26 +2,19 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Unit\Services\Process;
+namespace App\Tests\Unit\Model;
 
-use App\Services\Process\CommandBuilder;
+use App\Model\CommandDefinition;
 use PHPUnit\Framework\TestCase;
 
-class CommandBuilderTest extends TestCase
+class CommandDefinitionTest extends TestCase
 {
     /**
      * @dataProvider buildDataProvider
-     *
-     * @param array<string, string> $parameters
      */
-    public function testBuild(string $command, array $parameters, string $expected): void
+    public function testBuild(CommandDefinition $commandDefinition, string $expected): void
     {
-        $builder = new CommandBuilder();
-
-        self::assertSame(
-            $expected,
-            $builder->build($command, $parameters)
-        );
+        self::assertSame($expected, $commandDefinition->build());
     }
 
     /**
@@ -31,24 +24,21 @@ class CommandBuilderTest extends TestCase
     {
         return [
             'no parameters' => [
-                'command' => './command',
-                'parameters' => [],
+                'commandDefinition' => new CommandDefinition('./command'),
                 'expected' => './command',
             ],
             'has parameters' => [
-                'command' => './command %param1% %param2%',
-                'parameters' => [
+                'commandDefinition' => new CommandDefinition('./command %param1% %param2%', [
                     '%param1%' => 'first parameter value',
                     '%param2%' => 'second parameter value',
-                ],
+                ]),
                 'expected' => "./command 'first parameter value' 'second parameter value'",
             ],
             'has parameters with required escaping' => [
-                'command' => './command %param1% %param2%',
-                'parameters' => [
+                'commandDefinition' => new CommandDefinition('./command %param1% %param2%', [
                     '%param1%' => "'first' parameter value",
                     '%param2%' => "'second' parameter value",
-                ],
+                ]),
                 'expected' => "./command '\\'first\\' parameter value' '\\'second\\' parameter value'",
             ],
         ];
