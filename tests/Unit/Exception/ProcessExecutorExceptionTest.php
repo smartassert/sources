@@ -38,7 +38,8 @@ class ProcessExecutorExceptionTest extends TestCase
      */
     public function getPropertiesDataProvider(): array
     {
-        $runtimeException = new RuntimeException();
+        $unableToLaunchRuntimeException = new RuntimeException('Unable to launch a new process');
+        $cwdDoesNotExistRuntimeException = new RuntimeException('The provided cwd "/foo" does not exist');
 
         $timedOutProcess = \Mockery::mock(Process::class);
         $timedOutProcess
@@ -69,11 +70,17 @@ class ProcessExecutorExceptionTest extends TestCase
         $unknownException = new UnknownSymfonyProcessException();
 
         return [
-            RuntimeException::class => [
-                'exception' => new ProcessExecutorException($runtimeException),
-                'expectedMessage' => 'Process cannot be started or is already running',
+            'Unable to launch ' . RuntimeException::class => [
+                'exception' => new ProcessExecutorException($unableToLaunchRuntimeException),
+                'expectedMessage' => $unableToLaunchRuntimeException->getMessage(),
                 'expectedCode' => 100,
-                'expectedException' => $runtimeException,
+                'expectedException' => $unableToLaunchRuntimeException,
+            ],
+            'Cwd does not exist ' . RuntimeException::class => [
+                'exception' => new ProcessExecutorException($cwdDoesNotExistRuntimeException),
+                'expectedMessage' => $cwdDoesNotExistRuntimeException->getMessage(),
+                'expectedCode' => 101,
+                'expectedException' => $cwdDoesNotExistRuntimeException,
             ],
             ProcessTimedOutException::class => [
                 'exception' => new ProcessExecutorException($processTimedOutException),
