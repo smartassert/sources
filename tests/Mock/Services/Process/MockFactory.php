@@ -22,7 +22,7 @@ class MockFactory
         return $this->mock;
     }
 
-    public function withCreateCall(string $command, Process $process): self
+    public function withCreateCall(string $command, ?string $cwd, Process $process): self
     {
         if (false === $this->mock instanceof MockInterface) {
             return $this;
@@ -30,7 +30,7 @@ class MockFactory
 
         $this->mock
             ->shouldReceive('create')
-            ->with($command)
+            ->with($command, $cwd)
             ->andReturn($process)
         ;
 
