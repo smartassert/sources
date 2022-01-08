@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\Services;
 
+use App\Model\CommandDefinition;
 use App\Model\EntityId;
 use App\Model\ProcessOutput;
 use App\Services\GitRepositoryCloner;
@@ -30,15 +31,15 @@ class GitRepositoryClonerTest extends WebTestCase
         $url = 'https://user:password@example.com/repository.git';
         $path = UserId::create() . '/' . EntityId::create();
 
-        $expectedExecutorCommand = 'git clone --no-checkout %url% %path%';
-        $expectedExecutorArguments = [
+        $expectedCommandDefinition = new CommandDefinition('git clone --no-checkout %url% %path%', [
             '%url%' => $url,
             '%path%' => $path,
-        ];
+        ]);
+
         $executorProcessOutput = new ProcessOutput(0, '', '');
 
         $executor = (new MockExecutor())
-            ->withExecuteCall($expectedExecutorCommand, $expectedExecutorArguments, $executorProcessOutput)
+            ->withExecuteCall($expectedCommandDefinition, $executorProcessOutput)
             ->getMock()
         ;
 
