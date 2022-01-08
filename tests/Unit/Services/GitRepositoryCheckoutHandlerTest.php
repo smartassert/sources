@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\Services;
 
-use App\Model\CommandDefinition;
+use App\Model\CommandDefinition\Definition;
 use App\Model\ProcessOutput;
 use App\Services\GitRepositoryCheckoutHandler;
 use App\Tests\Mock\Services\Process\MockExecutor;
@@ -18,7 +18,7 @@ class GitRepositoryCheckoutHandlerTest extends WebTestCase
     public function testCheckout(
         string $repositoryPath,
         ?string $ref,
-        CommandDefinition $expectedCommandDefinition
+        Definition $expectedCommandDefinition
     ): void {
         $executorProcessOutput = new ProcessOutput(0, '', '');
 
@@ -44,12 +44,12 @@ class GitRepositoryCheckoutHandlerTest extends WebTestCase
             'without ref' => [
                 'repositoryPath' => '/path/to/repository',
                 'ref' => null,
-                'expectedCommandDefinition' => new CommandDefinition('git checkout')
+                'expectedCommandDefinition' => new Definition('git checkout')
             ],
             'with ref' => [
                 'repositoryPath' => '/path/to/repository',
                 'ref' => 'ref',
-                'expectedCommandDefinition' => new CommandDefinition('git checkout ref')
+                'expectedCommandDefinition' => new Definition('git checkout ref')
             ],
         ];
     }
