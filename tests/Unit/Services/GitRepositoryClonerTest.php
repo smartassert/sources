@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Functional\Services;
+namespace App\Tests\Unit\Services;
 
 use App\Model\CommandDefinition;
 use App\Model\EntityId;
@@ -11,21 +11,9 @@ use App\Services\GitRepositoryCloner;
 use App\Tests\Mock\Services\Process\MockExecutor;
 use App\Tests\Model\UserId;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-use webignition\ObjectReflector\ObjectReflector;
 
 class GitRepositoryClonerTest extends WebTestCase
 {
-    private GitRepositoryCloner $gitRepositoryCloner;
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        $gitRepositoryCloner = self::getContainer()->get(GitRepositoryCloner::class);
-        \assert($gitRepositoryCloner instanceof GitRepositoryCloner);
-        $this->gitRepositoryCloner = $gitRepositoryCloner;
-    }
-
     public function testClone(): void
     {
         $url = 'https://user:password@example.com/repository.git';
@@ -43,16 +31,11 @@ class GitRepositoryClonerTest extends WebTestCase
             ->getMock()
         ;
 
-        ObjectReflector::setProperty(
-            $this->gitRepositoryCloner,
-            $this->gitRepositoryCloner::class,
-            'processExecutor',
-            $executor
-        );
+        $gitRepositoryCloner = new GitRepositoryCloner($executor);
 
         self::assertEquals(
             $executorProcessOutput,
-            $this->gitRepositoryCloner->clone($url, $path)
+            $gitRepositoryCloner->clone($url, $path)
         );
     }
 }
