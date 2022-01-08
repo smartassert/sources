@@ -37,7 +37,7 @@ class ExecutorTest extends TestCase
         ;
 
         $factory = (new MockFactory())
-            ->withCreateCall($command, $process)
+            ->withCreateCall($command, null, $process)
             ->getMock()
         ;
 
@@ -60,12 +60,13 @@ class ExecutorTest extends TestCase
     public function testExecuteSuccess(
         string $command,
         array $parameters,
+        ?string $cwd,
         Factory $factory,
         ProcessOutput $expectedOutput
     ): void {
         $this->setProcessFactoryOnExecutor($factory);
 
-        self::assertEquals($expectedOutput, $this->executor->execute($command, $parameters));
+        self::assertEquals($expectedOutput, $this->executor->execute($command, $parameters, $cwd));
     }
 
     /**
@@ -80,9 +81,31 @@ class ExecutorTest extends TestCase
                     '%param1%' => 'first parameter',
                     '%param2%' => 'second parameter',
                 ],
+                'cwd' => null,
                 'factory' => (new MockFactory())
                     ->withCreateCall(
                         "./command 'first parameter' 'second parameter'",
+                        null,
+                        (new MockProcess())
+                            ->withRunCall(0)
+                            ->withGetOutputCall('process output')
+                            ->withGetErrorOutputCall('')
+                            ->getMock()
+                    )
+                    ->getMock(),
+                'expectedOutput' => new ProcessOutput(0, 'process output', '')
+            ],
+            'command with cwd exits with no errors' => [
+                'command' => './command %param1% %param2%',
+                'parameters' => [
+                    '%param1%' => 'first parameter',
+                    '%param2%' => 'second parameter',
+                ],
+                'cwd' => '/path/to/directory',
+                'factory' => (new MockFactory())
+                    ->withCreateCall(
+                        "./command 'first parameter' 'second parameter'",
+                        '/path/to/directory',
                         (new MockProcess())
                             ->withRunCall(0)
                             ->withGetOutputCall('process output')
@@ -98,9 +121,11 @@ class ExecutorTest extends TestCase
                     '%param1%' => 'first parameter',
                     '%param2%' => 'second parameter',
                 ],
+                'cwd' => null,
                 'factory' => (new MockFactory())
                     ->withCreateCall(
                         "./command 'first parameter' 'second parameter'",
+                        null,
                         (new MockProcess())
                             ->withRunCall(1)
                             ->withGetOutputCall('process output')
