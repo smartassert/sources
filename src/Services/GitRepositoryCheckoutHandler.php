@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Exception\ProcessExecutorException;
-use App\Model\CommandDefinition;
+use App\Model\CommandDefinition\Definition;
 use App\Model\ProcessOutput;
 use App\Services\Process\Executor;
 
@@ -21,13 +21,9 @@ class GitRepositoryCheckoutHandler
      */
     public function checkout(string $repositoryPath, ?string $ref = null): ProcessOutput
     {
-        $command = 'git checkout';
-        if (null !== $ref) {
-            $command .= ' %ref%';
-        }
-
         return $this->processExecutor->execute(
-            new CommandDefinition($command, ['%ref%' => (string) $ref]),
+            (new Definition('git checkout'))
+                ->withArguments([$ref]),
             $repositoryPath
         );
     }

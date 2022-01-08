@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Services\Process;
 
 use App\Exception\ProcessExecutorException;
-use App\Model\CommandDefinition;
+use App\Model\CommandDefinition\Definition;
 use App\Model\ProcessOutput;
 use Symfony\Component\Process\Exception\ExceptionInterface;
 
@@ -19,7 +19,7 @@ class Executor
     /**
      * @throws ProcessExecutorException
      */
-    public function execute(CommandDefinition $commandDefinition, ?string $cwd = null): ProcessOutput
+    public function execute(Definition $commandDefinition, ?string $cwd = null): ProcessOutput
     {
         $process = $this->factory->create((string) $commandDefinition, $cwd);
 
