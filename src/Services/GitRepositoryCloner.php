@@ -24,7 +24,7 @@ class GitRepositoryCloner
             'git clone --no-checkout %url% %path%',
             [
                 '%url%' => $url,
-                '%path' => $path,
+                '%path%' => $path,
             ]
         );
     }
