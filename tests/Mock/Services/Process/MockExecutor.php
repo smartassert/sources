@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Mock\Services\Process;
 
+use App\Model\CommandDefinition;
 use App\Model\ProcessOutput;
 use App\Services\Process\Executor;
 use Mockery\MockInterface;
@@ -22,10 +23,7 @@ class MockExecutor
         return $this->mock;
     }
 
-    /**
-     * @param array<string, string> $arguments
-     */
-    public function withExecuteCall(string $command, array $arguments, ProcessOutput $output): self
+    public function withExecuteCall(CommandDefinition $commandDefinition, ProcessOutput $output): self
     {
         if (false === $this->mock instanceof MockInterface) {
             return $this;
@@ -33,7 +31,11 @@ class MockExecutor
 
         $this->mock
             ->shouldReceive('execute')
-            ->with($command, $arguments)
+            ->withArgs(function (CommandDefinition $passedCommandDefinition) use ($commandDefinition) {
+                \assert((string) $commandDefinition === (string) $passedCommandDefinition);
+
+                return true;
+            })
             ->andReturn($output)
         ;
 
