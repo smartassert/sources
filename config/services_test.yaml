@@ -35,9 +35,6 @@ services:
     App\Services\FileSourcePreparer:
         public: true
 
-    App\Services\GitRepositoryCloner:
-        public: true
-
     App\Services\FileStoreManager:
         public: true
         arguments:
