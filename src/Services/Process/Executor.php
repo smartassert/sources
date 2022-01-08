@@ -21,10 +21,10 @@ class Executor
      *
      * @throws ProcessExecutorException
      */
-    public function execute(string $command, array $parameters = []): ProcessOutput
+    public function execute(string $command, array $parameters = [], ?string $cwd = null): ProcessOutput
     {
         $builtCommand = $this->commandBuilder->build($command, $parameters);
-        $process = $this->factory->create($builtCommand);
+        $process = $this->factory->create($builtCommand, $cwd);
 
         try {
             $exitCode = $process->run();
