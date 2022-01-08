@@ -33,7 +33,7 @@ class GitRepositoryClonerTest extends WebTestCase
         $expectedExecutorCommand = 'git clone --no-checkout %url% %path%';
         $expectedExecutorArguments = [
             '%url%' => $url,
-            '%path' => $path,
+            '%path%' => $path,
         ];
         $executorProcessOutput = new ProcessOutput(0, '', '');
 
