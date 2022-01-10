@@ -2,14 +2,12 @@
 
 declare(strict_types=1);
 
-namespace App\Exception\FileStore;
+namespace App\Exception\File;
 
 use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
 
-class MirrorException extends \Exception implements FileStoreExceptionInterface
+class MirrorException extends \Exception implements MutationExceptionInterface
 {
-    use GetIOExceptionTrait;
-
     public function __construct(
         private string $source,
         private string $target,
@@ -20,6 +18,11 @@ class MirrorException extends \Exception implements FileStoreExceptionInterface
             0,
             $this->IOException
         );
+    }
+
+    public function getIOException(): IOExceptionInterface
+    {
+        return $this->IOException;
     }
 
     public function getSource(): string

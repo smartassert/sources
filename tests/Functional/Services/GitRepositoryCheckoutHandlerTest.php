@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Functional\Services;
 
 use App\Exception\ProcessExecutorException;
+use App\Model\AbsoluteFileLocator;
 use App\Services\GitRepositoryCheckoutHandler;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Process\Exception\RuntimeException;
@@ -30,6 +31,6 @@ class GitRepositoryCheckoutHandlerTest extends WebTestCase
             )
         );
 
-        $this->checkoutHandler->checkout(__DIR__ . '/does-not-exist');
+        $this->checkoutHandler->checkout(new AbsoluteFileLocator(__DIR__ . '/does-not-exist'));
     }
 }
