@@ -37,6 +37,9 @@ services:
 
     App\Services\FileStoreManager:
         public: true
+
+    App\Services\FileStorePathFactory:
+        public: true
         arguments:
             $basePath: '@app.configuration.file_store_base_path'
 
