@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Model;
 
-use App\Exception\NonAbsolutePathException;
+use App\Exception\FilePath\NonAbsolutePathException;
 use Symfony\Component\Filesystem\Path;
 
 class AbsoluteFileLocator implements FileLocatorInterface

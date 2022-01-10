@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\Model;
 
-use App\Exception\NonAbsolutePathException;
+use App\Exception\FilePath\NonAbsolutePathException;
 use App\Model\AbsoluteFileLocator;
 use PHPUnit\Framework\TestCase;
 
