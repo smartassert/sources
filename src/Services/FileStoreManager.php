@@ -6,10 +6,10 @@ namespace App\Services;
 
 use App\Exception\FilePath\CreateException;
 use App\Exception\FilePath\NotExistsException;
+use App\Exception\FilePath\RemoveException;
 use App\Exception\FileStore\MirrorException;
 use App\Exception\FileStore\NonAbsolutePathException;
 use App\Exception\FileStore\OutOfScopeException;
-use App\Exception\FileStore\RemoveException;
 use App\Model\FileLocatorInterface;
 use Symfony\Component\Filesystem\Exception\InvalidArgumentException;
 use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
