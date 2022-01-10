@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use App\Exception\FileStore\CreateException;
+use App\Exception\FilePath\CreateException;
 use App\Exception\FileStore\MirrorException;
 use App\Exception\FileStore\NonAbsolutePathException;
 use App\Exception\FileStore\NotExistsException;

@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Exception;
 
+use App\Exception\FilePath\CreateException;
 use App\Exception\FilePath\FilePathExceptionInterface;
-use App\Exception\FileStore\CreateException;
 use App\Exception\FileStore\FileStoreExceptionInterface;
 use App\Exception\FileStore\MirrorException;
 use App\Exception\FileStore\NonAbsolutePathException;
