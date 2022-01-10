@@ -16,6 +16,7 @@ class FileSourcePreparer
     public function __construct(
         private Factory $sourceFactory,
         private Store $sourceStore,
+        private FileStorePathFactory $fileStorePathFactory,
         private FileStoreManager $fileStoreManager,
     ) {
     }
@@ -28,7 +29,10 @@ class FileSourcePreparer
         $runSource = $this->sourceFactory->createRunSource($source);
 
         try {
-            $this->fileStoreManager->mirror($source, $runSource);
+            $this->fileStoreManager->mirror(
+                $this->fileStorePathFactory->create($source),
+                $this->fileStorePathFactory->create($runSource)
+            );
         } catch (FileExceptionInterface $exception) {
             $this->sourceStore->remove($runSource);
 
