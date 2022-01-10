@@ -209,7 +209,6 @@ class FileStoreManagerTest extends TestCase
      */
     public function mirrorThrowsExceptionDataProvider(): array
     {
-        $relativeBasePath = 'relative-base-path';
         $sourceLocatorPath = 'source-path';
         $targetLocatorPath = 'target-path';
         $sourcePath = self::BASE_PATH . '/' . $sourceLocatorPath;
@@ -301,7 +300,7 @@ class FileStoreManagerTest extends TestCase
 
     public function testMirrorSourcePathAndTargetPathAreEqual(): void
     {
-        $locator = (new MockFileLocator())->withToStringCall(self::PATH)->getMock();
+        $locator = (new MockFileLocator())->withToStringCall(self::FILE_LOCATOR_PATH)->getMock();
 
         $fileStoreManager = new FileStoreManager(
             new AbsoluteFileLocator(self::BASE_PATH),
