@@ -47,6 +47,11 @@ services:
         tags:
             - { name: controller.argument_value_resolver, priority: 50 }
 
+    app.configuration.file_store_base_path:
+        class: App\Model\AbsoluteFileLocator
+        arguments:
+            $path: '%file_store_base_path%'
+
     App\Services\FileStoreManager:
         arguments:
-            $basePath: '%file_store_base_path%'
+            $basePath: '@app.configuration.file_store_base_path'

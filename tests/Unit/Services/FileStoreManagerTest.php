@@ -6,10 +6,10 @@ namespace App\Tests\Unit\Services;
 
 use App\Exception\File\CreateException;
 use App\Exception\File\MirrorException;
-use App\Exception\File\NonAbsolutePathException;
 use App\Exception\File\NotExistsException;
 use App\Exception\File\OutOfScopeException;
 use App\Exception\File\RemoveException;
+use App\Model\AbsoluteFileLocator;
 use App\Model\FileLocatorInterface;
 use App\Services\FileStoreManager;
 use App\Tests\Mock\Model\MockFileLocator;
@@ -47,12 +47,12 @@ class FileStoreManagerTest extends TestCase
      */
     public function singleLocatorMethodThrowsExceptionDataProvider(): array
     {
-        $relativeBasePath = 'relative-base-path';
-        $relativeBasePathFileStoreManager = new FileStoreManager($relativeBasePath, (new MockFileSystem())->getMock());
-        $validFileStoreManager = new FileStoreManager(self::BASE_PATH, (new MockFileSystem())->getMock());
+        $validFileStoreManager = new FileStoreManager(
+            new AbsoluteFileLocator(self::BASE_PATH),
+            (new MockFileSystem())->getMock()
+        );
 
         $outOfScopeFileLocator = (new MockFileLocator())->withToStringCall('..')->getMock();
-        $validFileLocator = (new MockFileLocator())->withToStringCall(self::FILE_LOCATOR_PATH)->getMock();
 
         $createPathAction = function (FileStoreManager $fileStoreManager, FileLocatorInterface $fileLocator) {
             $fileStoreManager->createPath($fileLocator);
@@ -70,27 +70,14 @@ class FileStoreManagerTest extends TestCase
             $fileStoreManager->exists($fileLocator);
         };
 
-        $expectedNonAbsolutePathException = new NonAbsolutePathException($relativeBasePath);
         $expectedOutOfScopeException = new OutOfScopeException('/absolute/base', self::BASE_PATH);
 
         return [
-            'createPath ' . NonAbsolutePathException::class => [
-                'fileStoreManager' => $relativeBasePathFileStoreManager,
-                'fileLocator' => $validFileLocator,
-                'action' => $createPathAction,
-                'expected' => $expectedNonAbsolutePathException,
-            ],
             'createPath ' . OutOfScopeException::class => [
                 'fileStoreManager' => $validFileStoreManager,
                 'fileLocator' => $outOfScopeFileLocator,
                 'action' => $createPathAction,
                 'expected' => $expectedOutOfScopeException,
-            ],
-            'initialize ' . NonAbsolutePathException::class => [
-                'fileStoreManager' => $relativeBasePathFileStoreManager,
-                'fileLocator' => $validFileLocator,
-                'action' => $initializeAction,
-                'expected' => $expectedNonAbsolutePathException,
             ],
             'initialize ' . OutOfScopeException::class => [
                 'fileStoreManager' => $validFileStoreManager,
@@ -98,23 +85,11 @@ class FileStoreManagerTest extends TestCase
                 'action' => $initializeAction,
                 'expected' => $expectedOutOfScopeException,
             ],
-            'remove ' . NonAbsolutePathException::class => [
-                'fileStoreManager' => $relativeBasePathFileStoreManager,
-                'fileLocator' => $validFileLocator,
-                'action' => $removeAction,
-                'expected' => $expectedNonAbsolutePathException,
-            ],
             'remove ' . OutOfScopeException::class => [
                 'fileStoreManager' => $validFileStoreManager,
                 'fileLocator' => $outOfScopeFileLocator,
                 'action' => $removeAction,
                 'expected' => $expectedOutOfScopeException,
-            ],
-            'exists ' . NonAbsolutePathException::class => [
-                'fileStoreManager' => $relativeBasePathFileStoreManager,
-                'fileLocator' => $validFileLocator,
-                'action' => $existsAction,
-                'expected' => $expectedNonAbsolutePathException,
             ],
             'exists ' . OutOfScopeException::class => [
                 'fileStoreManager' => $validFileStoreManager,
@@ -127,7 +102,10 @@ class FileStoreManagerTest extends TestCase
 
     public function testCreatePathSuccess(): void
     {
-        $fileStoreManager = new FileStoreManager(self::BASE_PATH, (new MockFileSystem())->getMock());
+        $fileStoreManager = new FileStoreManager(
+            new AbsoluteFileLocator(self::BASE_PATH),
+            (new MockFileSystem())->getMock()
+        );
         $fileLocator = (new MockFileLocator())->withToStringCall(self::FILE_LOCATOR_PATH)->getMock();
 
         self::assertEquals(
@@ -173,7 +151,7 @@ class FileStoreManagerTest extends TestCase
         return [
             CreateException::class => [
                 'fileStoreManager' => new FileStoreManager(
-                    self::BASE_PATH,
+                    new AbsoluteFileLocator(self::BASE_PATH),
                     (new MockFileSystem())
                         ->withExistsCall(self::PATH, true)
                         ->withRemoveCall(self::PATH)
@@ -198,7 +176,7 @@ class FileStoreManagerTest extends TestCase
         return [
             RemoveException::class => [
                 'fileStoreManager' => new FileStoreManager(
-                    self::BASE_PATH,
+                    new AbsoluteFileLocator(self::BASE_PATH),
                     (new MockFileSystem())
                         ->withExistsCall(self::PATH, true)
                         ->withRemoveCallThrowingException(self::PATH, $cannotRemoveIOException)
@@ -246,14 +224,11 @@ class FileStoreManagerTest extends TestCase
         $cannotMirrorIOException = new IOException('Unable to guess "/var/foo" file type.');
 
         return [
-            'source ' . NonAbsolutePathException::class => [
-                'fileStoreManager' => new FileStoreManager($relativeBasePath, (new MockFileSystem())->getMock()),
-                'source' => $sourceLocator,
-                'target' => $unusedLocator,
-                'expected' => new NonAbsolutePathException($relativeBasePath),
-            ],
             'source ' . OutOfScopeException::class => [
-                'fileStoreManager' => new FileStoreManager(self::BASE_PATH, (new MockFileSystem())->getMock()),
+                'fileStoreManager' => new FileStoreManager(
+                    new AbsoluteFileLocator(self::BASE_PATH),
+                    (new MockFileSystem())->getMock()
+                ),
                 'source' => (new MockFileLocator())
                     ->withToStringCall('..')
                     ->getMock(),
@@ -261,7 +236,10 @@ class FileStoreManagerTest extends TestCase
                 'expected' => new OutOfScopeException('/absolute/base', self::BASE_PATH),
             ],
             'target ' . OutOfScopeException::class => [
-                'fileStoreManager' => new FileStoreManager(self::BASE_PATH, (new MockFileSystem())->getMock()),
+                'fileStoreManager' => new FileStoreManager(
+                    new AbsoluteFileLocator(self::BASE_PATH),
+                    (new MockFileSystem())->getMock()
+                ),
                 'source' => (new MockFileLocator())
                     ->withToStringCall('../..')
                     ->getMock(),
@@ -270,7 +248,7 @@ class FileStoreManagerTest extends TestCase
             ],
             'source ' . NotExistsException::class => [
                 'fileStoreManager' => new FileStoreManager(
-                    self::BASE_PATH,
+                    new AbsoluteFileLocator(self::BASE_PATH),
                     (new MockFileSystem())
                         ->withExistsCall($sourcePath, false)
                         ->getMock()
@@ -281,7 +259,7 @@ class FileStoreManagerTest extends TestCase
             ],
             'target ' . RemoveException::class => [
                 'fileStoreManager' => new FileStoreManager(
-                    self::BASE_PATH,
+                    new AbsoluteFileLocator(self::BASE_PATH),
                     (new MockFileSystem())
                         ->withExistsCall($sourcePath, true)
                         ->withRemoveCallThrowingException($targetPath, $cannotRemoveIOException)
@@ -293,7 +271,7 @@ class FileStoreManagerTest extends TestCase
             ],
             'target ' . CreateException::class => [
                 'fileStoreManager' => new FileStoreManager(
-                    self::BASE_PATH,
+                    new AbsoluteFileLocator(self::BASE_PATH),
                     (new MockFileSystem())
                         ->withExistsCall($sourcePath, true)
                         ->withRemoveCall($targetPath)
@@ -306,7 +284,7 @@ class FileStoreManagerTest extends TestCase
             ],
             MirrorException::class => [
                 'fileStoreManager' => new FileStoreManager(
-                    self::BASE_PATH,
+                    new AbsoluteFileLocator(self::BASE_PATH),
                     (new MockFileSystem())
                         ->withExistsCall($sourcePath, true)
                         ->withRemoveCall($targetPath)
@@ -326,7 +304,7 @@ class FileStoreManagerTest extends TestCase
         $locator = (new MockFileLocator())->withToStringCall(self::PATH)->getMock();
 
         $fileStoreManager = new FileStoreManager(
-            self::BASE_PATH,
+            new AbsoluteFileLocator(self::BASE_PATH),
             (new MockFileSystem())
                 ->withExistsCall(self::PATH, true)
                 ->withoutRemoveCall()
