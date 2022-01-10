@@ -5,9 +5,10 @@ declare(strict_types=1);
 namespace App\Model;
 
 use App\Exception\File\NonAbsolutePathException;
+use App\Exception\File\OutOfScopeException;
 use Symfony\Component\Filesystem\Path;
 
-class AbsoluteFileLocator implements FileLocatorInterface
+class AbsoluteFileLocator implements AppendableFileLocatorInterface
 {
     /**
      * @throws NonAbsolutePathException
@@ -28,5 +29,18 @@ class AbsoluteFileLocator implements FileLocatorInterface
     public function getPath(): string
     {
         return $this->path;
+    }
+
+    /**
+     * @throws OutOfScopeException
+     */
+    public function append(string $path): void
+    {
+        $newPath = Path::canonicalize($this->path . '/' . $path);
+        if (false === Path::isBasePath($this->path, $newPath)) {
+            throw new OutOfScopeException($newPath, $this->path);
+        }
+
+        $this->path = Path::canonicalize($this->path . '/' . $path);
     }
 }
