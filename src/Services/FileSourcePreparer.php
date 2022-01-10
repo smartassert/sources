@@ -6,8 +6,7 @@ namespace App\Services;
 
 use App\Entity\FileSource;
 use App\Entity\RunSource;
-use App\Exception\File\MutationExceptionInterface;
-use App\Exception\File\PathExceptionInterface;
+use App\Exception\File\FileExceptionInterface;
 use App\Exception\FileSourcePreparationException;
 use App\Services\Source\Factory;
 use App\Services\Source\Store;
@@ -28,15 +27,9 @@ class FileSourcePreparer
     {
         $runSource = $this->sourceFactory->createRunSource($source);
 
-        $exception = null;
-
         try {
             $this->fileStoreManager->mirror($source, $runSource);
-        } catch (MutationExceptionInterface $exception) {
-        } catch (PathExceptionInterface $exception) {
-        }
-
-        if ($exception instanceof \Throwable) {
+        } catch (FileExceptionInterface $exception) {
             $this->sourceStore->remove($runSource);
 
             throw new FileSourcePreparationException($exception);

@@ -5,12 +5,11 @@ declare(strict_types=1);
 namespace App\Exception;
 
 use App\Exception\File\CreateException;
+use App\Exception\File\FileExceptionInterface;
 use App\Exception\File\MirrorException;
-use App\Exception\File\MutationExceptionInterface;
 use App\Exception\File\NonAbsolutePathException;
 use App\Exception\File\NotExistsException;
 use App\Exception\File\OutOfScopeException;
-use App\Exception\File\PathExceptionInterface;
 use App\Exception\File\RemoveException;
 
 class FileSourcePreparationException extends \Exception
@@ -24,7 +23,7 @@ class FileSourcePreparationException extends \Exception
         RemoveException::class => 300,
     ];
 
-    public function __construct(MutationExceptionInterface|PathExceptionInterface|MirrorException $previous)
+    public function __construct(FileExceptionInterface $previous)
     {
         $code = self::EXCEPTION_CLASS_CODE_MAP[$previous::class] ?? 0;
 

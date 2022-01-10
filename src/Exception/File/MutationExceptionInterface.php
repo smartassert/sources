@@ -6,7 +6,7 @@ namespace App\Exception\File;
 
 use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
 
-interface MutationExceptionInterface extends \Throwable
+interface MutationExceptionInterface extends FileExceptionInterface
 {
     public function getIOException(): IOExceptionInterface;
 }
