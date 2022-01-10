@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace App\Exception\FileStore;
 
+use App\Exception\File\MutationExceptionInterface;
 use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
 
-class MirrorException extends \Exception implements FileStoreExceptionInterface
+class MirrorException extends \Exception implements MutationExceptionInterface
 {
     public function __construct(
         private string $source,

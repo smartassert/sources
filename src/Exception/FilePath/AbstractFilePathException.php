@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Exception\FilePath;
 
-abstract class AbstractFilePathException extends \Exception implements FilePathExceptionInterface
+use App\Exception\File\PathExceptionInterface;
+
+abstract class AbstractFilePathException extends \Exception implements PathExceptionInterface
 {
     public function __construct(
         private string $path,
