@@ -2,19 +2,17 @@
 
 declare(strict_types=1);
 
-namespace App\Exception\FilePath;
+namespace App\Exception\File;
 
-use App\Exception\File\MutationExceptionInterface;
-use App\Exception\File\PathExceptionInterface;
 use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
 
-class CreateException extends \Exception implements MutationExceptionInterface, PathExceptionInterface
+class RemoveException extends \Exception implements MutationExceptionInterface, PathExceptionInterface
 {
     public function __construct(
         private string $path,
         private IOExceptionInterface $IOException
     ) {
-        parent::__construct(sprintf('Unable to create "%s"', $path), 0, $this->IOException);
+        parent::__construct(sprintf('Unable to remove "%s"', $path), 0, $IOException);
     }
 
     public function getPath(): string

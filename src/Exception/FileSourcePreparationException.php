@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace App\Exception;
 
+use App\Exception\File\CreateException;
+use App\Exception\File\MirrorException;
 use App\Exception\File\MutationExceptionInterface;
+use App\Exception\File\NonAbsolutePathException;
+use App\Exception\File\NotExistsException;
+use App\Exception\File\OutOfScopeException;
 use App\Exception\File\PathExceptionInterface;
-use App\Exception\FilePath\CreateException;
-use App\Exception\FilePath\NonAbsolutePathException;
-use App\Exception\FilePath\NotExistsException;
-use App\Exception\FilePath\OutOfScopeException;
-use App\Exception\FilePath\RemoveException;
-use App\Exception\FileStore\MirrorException;
+use App\Exception\File\RemoveException;
 
 class FileSourcePreparationException extends \Exception
 {

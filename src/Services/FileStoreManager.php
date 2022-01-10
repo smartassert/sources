@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use App\Exception\FilePath\CreateException;
-use App\Exception\FilePath\NonAbsolutePathException;
-use App\Exception\FilePath\NotExistsException;
-use App\Exception\FilePath\OutOfScopeException;
-use App\Exception\FilePath\RemoveException;
-use App\Exception\FileStore\MirrorException;
+use App\Exception\File\CreateException;
+use App\Exception\File\MirrorException;
+use App\Exception\File\NonAbsolutePathException;
+use App\Exception\File\NotExistsException;
+use App\Exception\File\OutOfScopeException;
+use App\Exception\File\RemoveException;
 use App\Model\FileLocatorInterface;
 use Symfony\Component\Filesystem\Exception\InvalidArgumentException;
 use Symfony\Component\Filesystem\Exception\IOExceptionInterface;

@@ -2,9 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Exception\FilePath;
-
-use App\Exception\File\PathExceptionInterface;
+namespace App\Exception\File;
 
 class NonAbsolutePathException extends \Exception implements PathExceptionInterface
 {

@@ -2,9 +2,8 @@
 
 declare(strict_types=1);
 
-namespace App\Exception\FileStore;
+namespace App\Exception\File;
 
-use App\Exception\File\MutationExceptionInterface;
 use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
 
 class MirrorException extends \Exception implements MutationExceptionInterface
