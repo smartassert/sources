@@ -86,8 +86,8 @@ class FileSourcePreparerTest extends WebTestCase
 
         self::assertCount(2, $this->sourceRepository->findAll());
         self::assertSame(
-            scandir($this->fileStoreManager->createPath($fileSource)),
-            scandir($this->fileStoreManager->createPath($runSource))
+            scandir((string) $this->fileStoreManager->createPath($fileSource)),
+            scandir((string) $this->fileStoreManager->createPath($runSource))
         );
     }
 }

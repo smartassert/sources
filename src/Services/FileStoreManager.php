@@ -11,10 +11,8 @@ use App\Exception\File\OutOfScopeException;
 use App\Exception\File\RemoveException;
 use App\Model\AbsoluteFileLocator;
 use App\Model\FileLocatorInterface;
-use Symfony\Component\Filesystem\Exception\InvalidArgumentException;
 use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
 use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\Filesystem\Path;
 
 class FileStoreManager
 {
@@ -27,21 +25,10 @@ class FileStoreManager
     /**
      * @throws OutOfScopeException
      */
-    public function createPath(FileLocatorInterface $fileLocator): string
+    public function createPath(FileLocatorInterface $fileLocator): AbsoluteFileLocator
     {
-        $basePath = (string) $this->basePath;
-        $path = '';
-
-        try {
-            $path = Path::makeAbsolute((string) $fileLocator, (string) $this->basePath);
-        } catch (InvalidArgumentException) {
-            // Will be thrown if the base path is empty of non-absolute
-            // Both conditions are prevented by AbsoluteFileLocator
-        }
-
-        if (false === Path::isBasePath($basePath, $path)) {
-            throw new OutOfScopeException($path, $basePath);
-        }
+        $path = clone $this->basePath;
+        $path->append((string) $fileLocator);
 
         return $path;
     }
@@ -88,10 +75,13 @@ class FileStoreManager
      */
     public function mirror(FileLocatorInterface $source, FileLocatorInterface $target): void
     {
-        $sourcePath = $this->createPath($source);
-        $targetPath = $this->createPath($target);
+        $sourceAbsoluteLocator = $this->createPath($source);
+        $targetAbsoluteLocator = $this->createPath($target);
 
-        if (false === $this->doExists($sourcePath)) {
+        $sourcePath = (string) $sourceAbsoluteLocator;
+        $targetPath = (string) $targetAbsoluteLocator;
+
+        if (false === $this->doExists($sourceAbsoluteLocator)) {
             throw new NotExistsException($sourcePath);
         }
 
@@ -99,7 +89,7 @@ class FileStoreManager
             return;
         }
 
-        $this->doInitialize($targetPath);
+        $this->doInitialize($targetAbsoluteLocator);
 
         try {
             $this->filesystem->mirror($sourcePath, $targetPath);
@@ -111,12 +101,12 @@ class FileStoreManager
     /**
      * @throws RemoveException
      */
-    private function doRemove(string $path): void
+    private function doRemove(AbsoluteFileLocator $fileLocator): void
     {
         try {
-            $this->filesystem->remove($path);
+            $this->filesystem->remove((string) $fileLocator);
         } catch (IOExceptionInterface $IOException) {
-            throw new RemoveException($path, $IOException);
+            throw new RemoveException((string) $fileLocator, $IOException);
         }
     }
 
@@ -124,19 +114,19 @@ class FileStoreManager
      * @throws CreateException
      * @throws RemoveException
      */
-    private function doInitialize(string $path): void
+    private function doInitialize(AbsoluteFileLocator $fileLocator): void
     {
-        $this->doRemove($path);
+        $this->doRemove($fileLocator);
 
         try {
-            $this->filesystem->mkdir($path);
+            $this->filesystem->mkdir((string) $fileLocator);
         } catch (IOExceptionInterface $IOException) {
-            throw new CreateException($path, $IOException);
+            throw new CreateException((string) $fileLocator, $IOException);
         }
     }
 
-    private function doExists(string $path): bool
+    private function doExists(AbsoluteFileLocator $fileLocator): bool
     {
-        return $this->filesystem->exists($path);
+        return $this->filesystem->exists((string) $fileLocator);
     }
 }
