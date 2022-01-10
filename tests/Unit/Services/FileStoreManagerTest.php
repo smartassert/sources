@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace App\Tests\Unit\Services;
 
 use App\Exception\FilePath\CreateException;
+use App\Exception\FilePath\NotExistsException;
 use App\Exception\FileStore\MirrorException;
 use App\Exception\FileStore\NonAbsolutePathException;
-use App\Exception\FileStore\NotExistsException;
 use App\Exception\FileStore\OutOfScopeException;
 use App\Exception\FileStore\RemoveException;
 use App\Model\FileLocatorInterface;
