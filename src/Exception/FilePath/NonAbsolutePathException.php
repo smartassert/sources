@@ -4,10 +4,19 @@ declare(strict_types=1);
 
 namespace App\Exception\FilePath;
 
-class NonAbsolutePathException extends AbstractFilePathException
+use App\Exception\File\PathExceptionInterface;
+
+class NonAbsolutePathException extends \Exception implements PathExceptionInterface
 {
-    public function __construct(string $path, ?\Throwable $previous = null)
+    public function __construct(
+        private string $path,
+        ?\Throwable $previous = null
+    ) {
+        parent::__construct(sprintf('Path "%s" is not absolute"', $path), 0, $previous);
+    }
+
+    public function getPath(): string
     {
-        parent::__construct($path, sprintf('Path "%s" is not absolute"', $path), $previous);
+        return $this->path;
     }
 }
