@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Tests\Functional\Services;
 
 use App\Entity\FileSource;
+use App\Exception\File\NotExistsException;
 use App\Exception\FileSourcePreparationException;
-use App\Exception\FileStore\NotExistsException;
 use App\Repository\SourceRepository;
 use App\Services\FileSourcePreparer;
 use App\Services\FileStoreManager;
