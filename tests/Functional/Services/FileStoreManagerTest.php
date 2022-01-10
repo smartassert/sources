@@ -61,8 +61,8 @@ class FileStoreManagerTest extends WebTestCase
         $this->fileStoreManager->mirror($sourceFileLocator, $targetFileLocator);
 
         self::assertSame(
-            scandir($this->fileStoreManager->createPath($sourceFileLocator)),
-            scandir($this->fileStoreManager->createPath($targetFileLocator))
+            scandir((string) $this->fileStoreManager->createPath($sourceFileLocator)),
+            scandir((string) $this->fileStoreManager->createPath($targetFileLocator))
         );
     }
 }
