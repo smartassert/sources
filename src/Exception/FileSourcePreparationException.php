@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Exception;
 
+use App\Exception\FilePath\FilePathExceptionInterface;
 use App\Exception\FileStore\CreateException;
 use App\Exception\FileStore\FileStoreExceptionInterface;
 use App\Exception\FileStore\MirrorException;
@@ -14,14 +15,6 @@ use App\Exception\FileStore\RemoveException;
 
 class FileSourcePreparationException extends \Exception
 {
-    /**
-     * @throws CreateException
-     * @throws MirrorException
-     * @throws NonAbsolutePathException
-     * @throws NotExistsException
-     * @throws OutOfScopeException
-     * @throws RemoveException
-     */
     private const EXCEPTION_CLASS_CODE_MAP = [
         CreateException::class => 100,
         MirrorException::class => 200,
@@ -31,7 +24,7 @@ class FileSourcePreparationException extends \Exception
         RemoveException::class => 300,
     ];
 
-    public function __construct(FileStoreExceptionInterface $previous)
+    public function __construct(FileStoreExceptionInterface|FilePathExceptionInterface|MirrorException $previous)
     {
         $code = self::EXCEPTION_CLASS_CODE_MAP[$previous::class] ?? 0;
 
