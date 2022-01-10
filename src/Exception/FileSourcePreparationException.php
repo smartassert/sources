@@ -8,10 +8,10 @@ use App\Exception\FilePath\CreateException;
 use App\Exception\FilePath\FilePathExceptionInterface;
 use App\Exception\FilePath\NonAbsolutePathException;
 use App\Exception\FilePath\NotExistsException;
+use App\Exception\FilePath\OutOfScopeException;
 use App\Exception\FilePath\RemoveException;
 use App\Exception\FileStore\FileStoreExceptionInterface;
 use App\Exception\FileStore\MirrorException;
-use App\Exception\FileStore\OutOfScopeException;
 
 class FileSourcePreparationException extends \Exception
 {

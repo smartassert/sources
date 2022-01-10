@@ -2,17 +2,16 @@
 
 declare(strict_types=1);
 
-namespace App\Exception\FileStore;
+namespace App\Exception\FilePath;
 
-class OutOfScopeException extends \Exception implements FileStoreExceptionInterface
+class OutOfScopeException extends AbstractFilePathException
 {
-    use GetPathTrait;
-
     public function __construct(
-        private string $path,
+        string $path,
         private string $basePath
     ) {
         parent::__construct(
+            $path,
             sprintf('Path "%s" outside the scope of base path "%s"', $path, $basePath)
         );
     }
