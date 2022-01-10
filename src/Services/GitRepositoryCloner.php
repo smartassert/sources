@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Exception\ProcessExecutorException;
+use App\Model\AbsoluteFileLocator;
 use App\Model\CommandDefinition\Definition;
 use App\Model\CommandDefinition\Option;
 use App\Model\ProcessOutput;
@@ -20,7 +21,7 @@ class GitRepositoryCloner
     /**
      * @throws ProcessExecutorException
      */
-    public function clone(string $url, string $path): ProcessOutput
+    public function clone(string $url, AbsoluteFileLocator $path): ProcessOutput
     {
         return $this->processExecutor->execute(
             (new Definition('git clone'))

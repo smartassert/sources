@@ -38,7 +38,7 @@ services:
     App\Services\FileStoreManager:
         public: true
         arguments:
-            $basePath: '%file_store_base_path%'
+            $basePath: '@app.configuration.file_store_base_path'
 
     App\Services\GitRepositoryCheckoutHandler:
         public: true

@@ -6,8 +6,8 @@ namespace App\Services;
 
 use App\Entity\FileSource;
 use App\Entity\RunSource;
+use App\Exception\File\FileExceptionInterface;
 use App\Exception\FileSourcePreparationException;
-use App\Exception\FileStore\FileStoreExceptionInterface;
 use App\Services\Source\Factory;
 use App\Services\Source\Store;
 
@@ -29,10 +29,10 @@ class FileSourcePreparer
 
         try {
             $this->fileStoreManager->mirror($source, $runSource);
-        } catch (FileStoreExceptionInterface $e) {
+        } catch (FileExceptionInterface $exception) {
             $this->sourceStore->remove($runSource);
 
-            throw new FileSourcePreparationException($e);
+            throw new FileSourcePreparationException($exception);
         }
 
         $this->sourceStore->add($runSource);
