@@ -55,3 +55,7 @@ services:
     App\Services\FileStoreManager:
         arguments:
             $basePath: '@app.configuration.file_store_base_path'
+
+    App\Services\FileStorePathFactory:
+        arguments:
+            $basePath: '@app.configuration.file_store_base_path'

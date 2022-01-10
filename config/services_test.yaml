@@ -40,5 +40,10 @@ services:
         arguments:
             $basePath: '@app.configuration.file_store_base_path'
 
+    App\Services\FileStorePathFactory:
+        public: true
+        arguments:
+            $basePath: '@app.configuration.file_store_base_path'
+
     App\Services\GitRepositoryCheckoutHandler:
         public: true
