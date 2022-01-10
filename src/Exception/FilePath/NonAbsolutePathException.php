@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Exception\FilePath;
 
-class NonAbsolutePathException extends \Exception
+class NonAbsolutePathException extends \Exception implements FilePathExceptionInterface
 {
     public function __construct(
         private string $path,
