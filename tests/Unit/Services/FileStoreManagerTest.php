@@ -168,7 +168,7 @@ class FileStoreManagerTest extends TestCase
                 'expected' => (new OutOfScopeException(
                     '/absolute/base/source-out-of-scope',
                     self::BASE_PATH
-                ))->setContext('source'),
+                ))->withContext('source'),
             ],
             'target ' . OutOfScopeException::class => [
                 'fileStoreManager' => new FileStoreManager(
@@ -182,7 +182,7 @@ class FileStoreManagerTest extends TestCase
                 'expected' => (new OutOfScopeException(
                     '/absolute/base/target-out-of-scope',
                     self::BASE_PATH
-                ))->setContext('target'),
+                ))->withContext('target'),
             ],
             'source ' . NotExistsException::class => [
                 'fileStoreManager' => new FileStoreManager(
