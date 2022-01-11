@@ -7,52 +7,81 @@ namespace App\Services;
 use App\Exception\File\CreateException;
 use App\Exception\File\MirrorException;
 use App\Exception\File\NotExistsException;
+use App\Exception\File\OutOfScopeException;
 use App\Exception\File\RemoveException;
 use App\Model\AbsoluteFileLocator;
+use App\Model\FileLocatorInterface;
 use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
 use Symfony\Component\Filesystem\Filesystem;
 
 class FileStoreManager
 {
     public function __construct(
+        private AbsoluteFileLocator $basePath,
         private Filesystem $filesystem
     ) {
     }
 
     /**
-     * @throws CreateException
-     * @throws RemoveException
+     * @throws OutOfScopeException
      */
-    public function initialize(AbsoluteFileLocator $fileLocator): void
+    public function createPath(FileLocatorInterface $fileLocator): AbsoluteFileLocator
     {
-        $this->doInitialize($fileLocator);
+        $path = clone $this->basePath;
+        $path->append((string) $fileLocator);
+
+        return $path;
     }
 
     /**
+     * @throws CreateException
+     * @throws OutOfScopeException
      * @throws RemoveException
      */
-    public function remove(AbsoluteFileLocator $fileLocator): void
+    public function initialize(FileLocatorInterface $fileLocator): void
     {
-        $this->doRemove($fileLocator);
+        $this->doInitialize(
+            $this->createPath($fileLocator)
+        );
     }
 
-    public function exists(AbsoluteFileLocator $fileLocator): bool
+    /**
+     * @throws OutOfScopeException
+     * @throws RemoveException
+     */
+    public function remove(FileLocatorInterface $fileLocator): void
     {
-        return $this->doExists($fileLocator);
+        $this->doRemove(
+            $this->createPath($fileLocator)
+        );
+    }
+
+    /**
+     * @throws OutOfScopeException
+     */
+    public function exists(FileLocatorInterface $fileLocator): bool
+    {
+        return $this->doExists(
+            $this->createPath($fileLocator)
+        );
     }
 
     /**
      * @throws CreateException
      * @throws MirrorException
      * @throws NotExistsException
+     * @throws OutOfScopeException
      * @throws RemoveException
      */
-    public function mirror(AbsoluteFileLocator $source, AbsoluteFileLocator $target): void
+    public function mirror(FileLocatorInterface $source, FileLocatorInterface $target): void
     {
-        $sourcePath = (string) $source;
-        $targetPath = (string) $target;
+        $sourceAbsoluteLocator = $this->createPath($source);
+        $targetAbsoluteLocator = $this->createPath($target);
 
-        if (false === $this->doExists($source)) {
+        $sourcePath = (string) $sourceAbsoluteLocator;
+        $targetPath = (string) $targetAbsoluteLocator;
+
+        if (false === $this->doExists($sourceAbsoluteLocator)) {
             throw new NotExistsException($sourcePath);
         }
 
@@ -60,7 +89,7 @@ class FileStoreManager
             return;
         }
 
-        $this->doInitialize($target);
+        $this->doInitialize($targetAbsoluteLocator);
 
         try {
             $this->filesystem->mirror($sourcePath, $targetPath);
