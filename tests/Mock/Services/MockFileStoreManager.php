@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Tests\Mock\Services;
 
-use App\Model\FileLocatorInterface;
 use App\Services\FileStoreManager;
 use Mockery\MockInterface;
 
@@ -30,7 +29,7 @@ class MockFileStoreManager
 
         $this->mock
             ->shouldReceive('mirror')
-            ->withArgs(function (FileLocatorInterface $source, FileLocatorInterface $target): bool {
+            ->withArgs(function (string $sourceRelativePath, string $targetRelativePath): bool {
                 return true;
             })
             ->andThrow($exception)
