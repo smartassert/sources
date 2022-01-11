@@ -25,11 +25,10 @@ class FileStoreManager
     /**
      * @throws CreateException
      * @throws OutOfScopeException
-     * @throws RemoveException
      */
-    public function initialize(FileLocatorInterface $fileLocator): AbsoluteFileLocator
+    public function create(FileLocatorInterface $fileLocator): AbsoluteFileLocator
     {
-        return $this->doInitialize($this->createPath($fileLocator));
+        return $this->doCreate($this->createPath($fileLocator));
     }
 
     /**
@@ -83,7 +82,8 @@ class FileStoreManager
             return $targetAbsoluteLocator;
         }
 
-        $this->doInitialize($targetAbsoluteLocator);
+        $this->doRemove($targetAbsoluteLocator);
+        $this->doCreate($targetAbsoluteLocator);
 
         try {
             $this->filesystem->mirror($sourcePath, $targetPath);
@@ -103,6 +103,20 @@ class FileStoreManager
     }
 
     /**
+     * @throws CreateException
+     */
+    private function doCreate(AbsoluteFileLocator $fileLocator): AbsoluteFileLocator
+    {
+        try {
+            $this->filesystem->mkdir((string) $fileLocator);
+        } catch (IOExceptionInterface $IOException) {
+            throw new CreateException((string) $fileLocator, $IOException);
+        }
+
+        return $fileLocator;
+    }
+
+    /**
      * @throws RemoveException
      */
     private function doRemove(AbsoluteFileLocator $fileLocator): AbsoluteFileLocator
@@ -111,23 +125,6 @@ class FileStoreManager
             $this->filesystem->remove((string) $fileLocator);
         } catch (IOExceptionInterface $IOException) {
             throw new RemoveException((string) $fileLocator, $IOException);
-        }
-
-        return $fileLocator;
-    }
-
-    /**
-     * @throws CreateException
-     * @throws RemoveException
-     */
-    private function doInitialize(AbsoluteFileLocator $fileLocator): AbsoluteFileLocator
-    {
-        $this->doRemove($fileLocator);
-
-        try {
-            $this->filesystem->mkdir((string) $fileLocator);
-        } catch (IOExceptionInterface $IOException) {
-            throw new CreateException((string) $fileLocator, $IOException);
         }
 
         return $fileLocator;
