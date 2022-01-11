@@ -27,94 +27,7 @@ class FileStoreManagerTest extends TestCase
     private const PATH = self::BASE_PATH . '/' . self::FILE_LOCATOR_PATH;
 
     /**
-     * @dataProvider singleLocatorMethodThrowsExceptionDataProvider
-     *
-     * @param callable(FileStoreManager, FileLocatorInterface): void $action
-     */
-    public function testSingleLocatorMethodThrowsException(
-        FileStoreManager $fileStoreManager,
-        FileLocatorInterface $fileLocator,
-        callable $action,
-        \Exception $expected
-    ): void {
-        $this->expectExceptionObject($expected);
-
-        $action($fileStoreManager, $fileLocator);
-    }
-
-    /**
-     * @return array<mixed>
-     */
-    public function singleLocatorMethodThrowsExceptionDataProvider(): array
-    {
-        $validFileStoreManager = new FileStoreManager(
-            new AbsoluteFileLocator(self::BASE_PATH),
-            (new MockFileSystem())->getMock()
-        );
-
-        $outOfScopeFileLocator = (new MockFileLocator())->withToStringCall('..')->getMock();
-
-        $createPathAction = function (FileStoreManager $fileStoreManager, FileLocatorInterface $fileLocator) {
-            $fileStoreManager->createPath($fileLocator);
-        };
-
-        $initializeAction = function (FileStoreManager $fileStoreManager, FileLocatorInterface $fileLocator) {
-            $fileStoreManager->initialize($fileLocator);
-        };
-
-        $removeAction = function (FileStoreManager $fileStoreManager, FileLocatorInterface $fileLocator) {
-            $fileStoreManager->remove($fileLocator);
-        };
-
-        $existsAction = function (FileStoreManager $fileStoreManager, FileLocatorInterface $fileLocator) {
-            $fileStoreManager->exists($fileLocator);
-        };
-
-        $expectedOutOfScopeException = new OutOfScopeException('/absolute/base', self::BASE_PATH);
-
-        return [
-            'createPath ' . OutOfScopeException::class => [
-                'fileStoreManager' => $validFileStoreManager,
-                'fileLocator' => $outOfScopeFileLocator,
-                'action' => $createPathAction,
-                'expected' => $expectedOutOfScopeException,
-            ],
-            'initialize ' . OutOfScopeException::class => [
-                'fileStoreManager' => $validFileStoreManager,
-                'fileLocator' => $outOfScopeFileLocator,
-                'action' => $initializeAction,
-                'expected' => $expectedOutOfScopeException,
-            ],
-            'remove ' . OutOfScopeException::class => [
-                'fileStoreManager' => $validFileStoreManager,
-                'fileLocator' => $outOfScopeFileLocator,
-                'action' => $removeAction,
-                'expected' => $expectedOutOfScopeException,
-            ],
-            'exists ' . OutOfScopeException::class => [
-                'fileStoreManager' => $validFileStoreManager,
-                'fileLocator' => $outOfScopeFileLocator,
-                'action' => $existsAction,
-                'expected' => $expectedOutOfScopeException,
-            ],
-        ];
-    }
-
-    public function testCreatePathSuccess(): void
-    {
-        $fileStoreManager = new FileStoreManager(
-            new AbsoluteFileLocator(self::BASE_PATH),
-            (new MockFileSystem())->getMock()
-        );
-        $fileLocator = (new MockFileLocator())->withToStringCall(self::FILE_LOCATOR_PATH)->getMock();
-
-        self::assertEquals(
-            self::PATH,
-            $fileStoreManager->createPath($fileLocator)
-        );
-    }
-
-    /**
+     * @dataProvider throwsOutOfScopeExceptionDataProvider
      * @dataProvider throwsRemoveExceptionDataProvider
      * @dataProvider throwsCreateExceptionDataProvider
      */
@@ -129,6 +42,7 @@ class FileStoreManagerTest extends TestCase
     }
 
     /**
+     * @dataProvider throwsOutOfScopeExceptionDataProvider
      * @dataProvider throwsRemoveExceptionDataProvider
      */
     public function testRemoveThrowsException(
@@ -139,6 +53,26 @@ class FileStoreManagerTest extends TestCase
         $this->expectExceptionObject($expected);
 
         $fileStoreManager->remove($fileLocator);
+    }
+
+    /**
+     * @return array<mixed>
+     */
+    public function throwsOutOfScopeExceptionDataProvider(): array
+    {
+        return [
+            OutOfScopeException::class => [
+                'fileStoreManager' => new FileStoreManager(
+                    new AbsoluteFileLocator(self::BASE_PATH),
+                    (new MockFileSystem())
+                        ->getMock()
+                ),
+                'fileLocator' => (new MockFileLocator())
+                    ->withToStringCall('..')
+                    ->getMock(),
+                'expected' => new OutOfScopeException('/absolute/base', self::BASE_PATH),
+            ],
+        ];
     }
 
     /**
