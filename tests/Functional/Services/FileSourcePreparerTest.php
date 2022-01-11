@@ -9,12 +9,12 @@ use App\Exception\File\NotExistsException;
 use App\Exception\FileSourcePreparationException;
 use App\Repository\SourceRepository;
 use App\Services\FileSourcePreparer;
-use App\Services\FileStoreManager;
 use App\Tests\Mock\Services\MockFileStoreManager;
 use App\Tests\Model\UserId;
 use App\Tests\Services\FileStoreFixtureCreator;
 use App\Tests\Services\Source\SourceRemover;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Symfony\Component\Filesystem\Path;
 use webignition\ObjectReflector\ObjectReflector;
 
 class FileSourcePreparerTest extends WebTestCase
@@ -22,7 +22,6 @@ class FileSourcePreparerTest extends WebTestCase
     private FileSourcePreparer $fileSourcePreparer;
     private SourceRepository $sourceRepository;
     private FileStoreFixtureCreator $fixtureCreator;
-    private FileStoreManager $fileStoreManager;
 
     protected function setUp(): void
     {
@@ -39,10 +38,6 @@ class FileSourcePreparerTest extends WebTestCase
         $fixtureCreator = self::getContainer()->get(FileStoreFixtureCreator::class);
         \assert($fixtureCreator instanceof FileStoreFixtureCreator);
         $this->fixtureCreator = $fixtureCreator;
-
-        $fileStoreManager = self::getContainer()->get(FileStoreManager::class);
-        \assert($fileStoreManager instanceof FileStoreManager);
-        $this->fileStoreManager = $fileStoreManager;
 
         $sourceRemover = self::getContainer()->get(SourceRemover::class);
         if ($sourceRemover instanceof SourceRemover) {
@@ -85,9 +80,13 @@ class FileSourcePreparerTest extends WebTestCase
         $runSource = $this->fileSourcePreparer->prepare($fileSource);
 
         self::assertCount(2, $this->sourceRepository->findAll());
-        self::assertSame(
-            scandir((string) $this->fileStoreManager->createPath($fileSource)),
-            scandir((string) $this->fileStoreManager->createPath($runSource))
-        );
+
+        $fileStoreBasePath = self::getContainer()->getParameter('file_store_base_path');
+        \assert(is_string($fileStoreBasePath));
+
+        $sourceAbsolutePath = Path::canonicalize($fileStoreBasePath . '/' . $fileSource);
+        $targetAbsolutePath = Path::canonicalize($fileStoreBasePath . '/' . $runSource);
+
+        self::assertSame(scandir($sourceAbsolutePath), scandir($targetAbsolutePath));
     }
 }
