@@ -43,10 +43,6 @@ class OutOfScopeException extends \Exception implements PathExceptionInterface
 
     public function withContext(string $context): self
     {
-        return new OutOfScopeException(
-            $this->path,
-            $this->basePath,
-            $context
-        );
+        return new OutOfScopeException($this->path, $this->basePath, $context);
     }
 }

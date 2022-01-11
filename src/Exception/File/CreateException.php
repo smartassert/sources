@@ -10,9 +10,14 @@ class CreateException extends \Exception implements MutationExceptionInterface, 
 {
     public function __construct(
         private string $path,
-        private IOExceptionInterface $IOException
+        private IOExceptionInterface $IOException,
+        private ?string $context = null
     ) {
-        parent::__construct(sprintf('Unable to create "%s"', $path), 0, $this->IOException);
+        parent::__construct(
+            sprintf('Unable to create "%s" (%s)', $path, $context),
+            0,
+            $this->IOException
+        );
     }
 
     public function getPath(): string
@@ -23,5 +28,15 @@ class CreateException extends \Exception implements MutationExceptionInterface, 
     public function getIOException(): IOExceptionInterface
     {
         return $this->IOException;
+    }
+
+    public function getContext(): ?string
+    {
+        return $this->context;
+    }
+
+    public function withContext(string $context): self
+    {
+        return new CreateException($this->path, $this->IOException, $context);
     }
 }
