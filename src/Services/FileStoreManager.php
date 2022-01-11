@@ -90,10 +90,7 @@ class FileStoreManager
      */
     private function createPath(FileLocatorInterface $fileLocator): AbsoluteFileLocator
     {
-        $path = clone $this->basePath;
-        $path->append((string) $fileLocator);
-
-        return $path;
+        return $this->basePath->append((string) $fileLocator);
     }
 
     /**
