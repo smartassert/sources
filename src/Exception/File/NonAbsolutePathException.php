@@ -8,13 +8,23 @@ class NonAbsolutePathException extends \Exception implements PathExceptionInterf
 {
     public function __construct(
         private string $path,
-        ?\Throwable $previous = null
+        private ?string $context = null,
     ) {
-        parent::__construct(sprintf('Path "%s" is not absolute"', $path), 0, $previous);
+        parent::__construct(sprintf('Path "%s" is not absolute" (%s)', $path, $context));
     }
 
     public function getPath(): string
     {
         return $this->path;
+    }
+
+    public function getContext(): ?string
+    {
+        return $this->context;
+    }
+
+    public function withContext(string $context): self
+    {
+        return new NonAbsolutePathException($this->path, $context);
     }
 }
