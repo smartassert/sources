@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\Services;
 
-use App\Model\AbsoluteFileLocator;
 use App\Model\CommandDefinition\Definition;
 use App\Model\ProcessOutput;
 use App\Services\GitRepositoryCheckoutHandler;
@@ -16,11 +15,8 @@ class GitRepositoryCheckoutHandlerTest extends WebTestCase
     /**
      * @dataProvider checkoutDataProvider
      */
-    public function testCheckout(
-        string $repositoryPath,
-        ?string $ref,
-        Definition $expectedCommandDefinition
-    ): void {
+    public function testCheckout(string $path, ?string $ref, Definition $expectedCommandDefinition): void
+    {
         $executorProcessOutput = new ProcessOutput(0, '', '');
 
         $executor = (new MockExecutor())
@@ -32,7 +28,7 @@ class GitRepositoryCheckoutHandlerTest extends WebTestCase
 
         self::assertEquals(
             $executorProcessOutput,
-            $gitRepositoryCheckoutHandler->checkout(new AbsoluteFileLocator($repositoryPath), $ref)
+            $gitRepositoryCheckoutHandler->checkout($path, $ref)
         );
     }
 
