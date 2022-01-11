@@ -23,37 +23,22 @@ class FileStoreManager
     }
 
     /**
-     * @throws OutOfScopeException
-     */
-    public function createPath(FileLocatorInterface $fileLocator): AbsoluteFileLocator
-    {
-        $path = clone $this->basePath;
-        $path->append((string) $fileLocator);
-
-        return $path;
-    }
-
-    /**
      * @throws CreateException
      * @throws OutOfScopeException
      * @throws RemoveException
      */
-    public function initialize(FileLocatorInterface $fileLocator): void
+    public function initialize(FileLocatorInterface $fileLocator): AbsoluteFileLocator
     {
-        $this->doInitialize(
-            $this->createPath($fileLocator)
-        );
+        return $this->doInitialize($this->createPath($fileLocator));
     }
 
     /**
      * @throws OutOfScopeException
      * @throws RemoveException
      */
-    public function remove(FileLocatorInterface $fileLocator): void
+    public function remove(FileLocatorInterface $fileLocator): AbsoluteFileLocator
     {
-        $this->doRemove(
-            $this->createPath($fileLocator)
-        );
+        return $this->doRemove($this->createPath($fileLocator));
     }
 
     /**
@@ -61,9 +46,7 @@ class FileStoreManager
      */
     public function exists(FileLocatorInterface $fileLocator): bool
     {
-        return $this->doExists(
-            $this->createPath($fileLocator)
-        );
+        return $this->doExists($this->createPath($fileLocator));
     }
 
     /**
@@ -72,8 +55,10 @@ class FileStoreManager
      * @throws NotExistsException
      * @throws OutOfScopeException
      * @throws RemoveException
+     *
+     * @return AbsoluteFileLocator The absolute target path
      */
-    public function mirror(FileLocatorInterface $source, FileLocatorInterface $target): void
+    public function mirror(FileLocatorInterface $source, FileLocatorInterface $target): AbsoluteFileLocator
     {
         $sourceAbsoluteLocator = $this->createPath($source);
         $targetAbsoluteLocator = $this->createPath($target);
@@ -86,7 +71,7 @@ class FileStoreManager
         }
 
         if ($sourcePath === $targetPath) {
-            return;
+            return $targetAbsoluteLocator;
         }
 
         $this->doInitialize($targetAbsoluteLocator);
@@ -96,25 +81,40 @@ class FileStoreManager
         } catch (IOExceptionInterface $IOException) {
             throw new MirrorException($sourcePath, $targetPath, $IOException);
         }
+
+        return $targetAbsoluteLocator;
+    }
+
+    /**
+     * @throws OutOfScopeException
+     */
+    private function createPath(FileLocatorInterface $fileLocator): AbsoluteFileLocator
+    {
+        $path = clone $this->basePath;
+        $path->append((string) $fileLocator);
+
+        return $path;
     }
 
     /**
      * @throws RemoveException
      */
-    private function doRemove(AbsoluteFileLocator $fileLocator): void
+    private function doRemove(AbsoluteFileLocator $fileLocator): AbsoluteFileLocator
     {
         try {
             $this->filesystem->remove((string) $fileLocator);
         } catch (IOExceptionInterface $IOException) {
             throw new RemoveException((string) $fileLocator, $IOException);
         }
+
+        return $fileLocator;
     }
 
     /**
      * @throws CreateException
      * @throws RemoveException
      */
-    private function doInitialize(AbsoluteFileLocator $fileLocator): void
+    private function doInitialize(AbsoluteFileLocator $fileLocator): AbsoluteFileLocator
     {
         $this->doRemove($fileLocator);
 
@@ -123,6 +123,8 @@ class FileStoreManager
         } catch (IOExceptionInterface $IOException) {
             throw new CreateException((string) $fileLocator, $IOException);
         }
+
+        return $fileLocator;
     }
 
     private function doExists(AbsoluteFileLocator $fileLocator): bool
