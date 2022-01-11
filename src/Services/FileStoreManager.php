@@ -10,7 +10,6 @@ use App\Exception\File\NotExistsException;
 use App\Exception\File\OutOfScopeException;
 use App\Exception\File\RemoveException;
 use App\Model\AbsoluteFileLocator;
-use App\Model\FileLocatorInterface;
 use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
 use Symfony\Component\Filesystem\Filesystem;
 
@@ -26,26 +25,26 @@ class FileStoreManager
      * @throws CreateException
      * @throws OutOfScopeException
      */
-    public function create(FileLocatorInterface $fileLocator): AbsoluteFileLocator
+    public function create(string $relativePath): AbsoluteFileLocator
     {
-        return $this->doCreate($this->createPath($fileLocator));
+        return $this->doCreate($this->createAbsolutePath($relativePath));
     }
 
     /**
      * @throws OutOfScopeException
      * @throws RemoveException
      */
-    public function remove(FileLocatorInterface $fileLocator): AbsoluteFileLocator
+    public function remove(string $relativePath): AbsoluteFileLocator
     {
-        return $this->doRemove($this->createPath($fileLocator));
+        return $this->doRemove($this->createAbsolutePath($relativePath));
     }
 
     /**
      * @throws OutOfScopeException
      */
-    public function exists(FileLocatorInterface $fileLocator): bool
+    public function exists(string $relativePath): bool
     {
-        return $this->doExists($this->createPath($fileLocator));
+        return $this->doExists($this->createAbsolutePath($relativePath));
     }
 
     /**
@@ -57,16 +56,16 @@ class FileStoreManager
      *
      * @return AbsoluteFileLocator The absolute target path
      */
-    public function mirror(FileLocatorInterface $source, FileLocatorInterface $target): AbsoluteFileLocator
+    public function mirror(string $sourceRelativePath, string $targetRelativePath): AbsoluteFileLocator
     {
         try {
-            $sourceAbsoluteLocator = $this->createPath($source);
+            $sourceAbsoluteLocator = $this->createAbsolutePath($sourceRelativePath);
         } catch (OutOfScopeException $sourceOutOfScopeException) {
             throw $sourceOutOfScopeException->withContext('source');
         }
 
         try {
-            $targetAbsoluteLocator = $this->createPath($target);
+            $targetAbsoluteLocator = $this->createAbsolutePath($targetRelativePath);
         } catch (OutOfScopeException $targetOutOfScopeException) {
             throw $targetOutOfScopeException->withContext('target');
         }
@@ -97,9 +96,9 @@ class FileStoreManager
     /**
      * @throws OutOfScopeException
      */
-    private function createPath(FileLocatorInterface $fileLocator): AbsoluteFileLocator
+    private function createAbsolutePath(string $relativePath): AbsoluteFileLocator
     {
-        return $this->basePath->append((string) $fileLocator);
+        return $this->basePath->append($relativePath);
     }
 
     /**
