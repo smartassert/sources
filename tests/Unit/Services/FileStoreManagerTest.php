@@ -10,9 +10,7 @@ use App\Exception\File\NotExistsException;
 use App\Exception\File\OutOfScopeException;
 use App\Exception\File\RemoveException;
 use App\Model\AbsoluteFileLocator;
-use App\Model\FileLocatorInterface;
 use App\Services\FileStoreManager;
-use App\Tests\Mock\Model\MockFileLocator;
 use App\Tests\Mock\Symfony\Component\Filesystem\MockFileSystem;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use PHPUnit\Framework\TestCase;
@@ -32,12 +30,12 @@ class FileStoreManagerTest extends TestCase
      */
     public function testCreateThrowsException(
         FileStoreManager $fileStoreManager,
-        FileLocatorInterface $fileLocator,
+        string $relativePath,
         \Exception $expected
     ): void {
         $this->expectExceptionObject($expected);
 
-        $fileStoreManager->create($fileLocator);
+        $fileStoreManager->create($relativePath);
     }
 
     /**
@@ -46,12 +44,12 @@ class FileStoreManagerTest extends TestCase
      */
     public function testRemoveThrowsException(
         FileStoreManager $fileStoreManager,
-        FileLocatorInterface $fileLocator,
+        string $relativePath,
         \Exception $expected
     ): void {
         $this->expectExceptionObject($expected);
 
-        $fileStoreManager->remove($fileLocator);
+        $fileStoreManager->remove($relativePath);
     }
 
     /**
@@ -66,9 +64,7 @@ class FileStoreManagerTest extends TestCase
                     (new MockFileSystem())
                         ->getMock()
                 ),
-                'fileLocator' => (new MockFileLocator())
-                    ->withToStringCall('..')
-                    ->getMock(),
+                'relativePath' => '..',
                 'expected' => new OutOfScopeException('/absolute/base', self::BASE_PATH),
             ],
         ];
@@ -91,9 +87,7 @@ class FileStoreManagerTest extends TestCase
                         ->withMkdirCallThrowingException(self::PATH, $cannotCreateIOException)
                         ->getMock()
                 ),
-                'fileLocator' => (new MockFileLocator())
-                    ->withToStringCall(self::FILE_LOCATOR_PATH)
-                    ->getMock(),
+                'relativePath' => self::FILE_LOCATOR_PATH,
                 'expected' => new CreateException(self::PATH, $cannotCreateIOException),
             ],
         ];
@@ -115,9 +109,7 @@ class FileStoreManagerTest extends TestCase
                         ->withRemoveCallThrowingException(self::PATH, $cannotRemoveIOException)
                         ->getMock()
                 ),
-                'fileLocator' => (new MockFileLocator())
-                    ->withToStringCall(self::FILE_LOCATOR_PATH)
-                    ->getMock(),
+                'relativePath' => self::FILE_LOCATOR_PATH,
                 'expected' => new RemoveException(self::PATH, $cannotRemoveIOException),
             ],
         ];
@@ -128,13 +120,13 @@ class FileStoreManagerTest extends TestCase
      */
     public function testMirrorThrowsExceptionDataProvider(
         FileStoreManager $fileStoreManager,
-        FileLocatorInterface $source,
-        FileLocatorInterface $target,
+        string $sourceRelativePath,
+        string $targetRelativePath,
         \Exception $expected
     ): void {
         $this->expectExceptionObject($expected);
 
-        $fileStoreManager->mirror($source, $target);
+        $fileStoreManager->mirror($sourceRelativePath, $targetRelativePath);
     }
 
     /**
@@ -142,14 +134,11 @@ class FileStoreManagerTest extends TestCase
      */
     public function mirrorThrowsExceptionDataProvider(): array
     {
-        $sourceLocatorPath = 'source-path';
-        $targetLocatorPath = 'target-path';
-        $sourcePath = self::BASE_PATH . '/' . $sourceLocatorPath;
-        $targetPath = self::BASE_PATH . '/' . $targetLocatorPath;
+        $sourceRelativePath = 'source-path';
+        $targetRelativePath = 'target-path';
 
-        $sourceLocator = (new MockFileLocator())->withToStringCall($sourceLocatorPath)->getMock();
-        $targetLocator = (new MockFileLocator())->withToStringCall($targetLocatorPath)->getMock();
-        $unusedLocator = (new MockFileLocator())->getMock();
+        $sourcePath = self::BASE_PATH . '/' . $sourceRelativePath;
+        $targetPath = self::BASE_PATH . '/' . $targetRelativePath;
 
         $cannotCreateIOException = new IOException('Failed to create "' . $targetPath . '"');
         $cannotRemoveIOException = new IOException('Failed to remove file "' . $targetPath . '"');
@@ -161,10 +150,8 @@ class FileStoreManagerTest extends TestCase
                     new AbsoluteFileLocator(self::BASE_PATH),
                     (new MockFileSystem())->getMock()
                 ),
-                'source' => (new MockFileLocator())
-                    ->withToStringCall('../source-out-of-scope')
-                    ->getMock(),
-                'target' => $unusedLocator,
+                'sourceRelativePath' => '../source-out-of-scope',
+                'targetRelativePath' => $targetRelativePath,
                 'expected' => (new OutOfScopeException(
                     '/absolute/base/source-out-of-scope',
                     self::BASE_PATH
@@ -175,10 +162,8 @@ class FileStoreManagerTest extends TestCase
                     new AbsoluteFileLocator(self::BASE_PATH),
                     (new MockFileSystem())->getMock()
                 ),
-                'source' => $sourceLocator,
-                'target' => (new MockFileLocator())
-                    ->withToStringCall('../target-out-of-scope')
-                    ->getMock(),
+                'sourceRelativePath' => $sourceRelativePath,
+                'targetRelativePath' => '../target-out-of-scope',
                 'expected' => (new OutOfScopeException(
                     '/absolute/base/target-out-of-scope',
                     self::BASE_PATH
@@ -191,8 +176,8 @@ class FileStoreManagerTest extends TestCase
                         ->withExistsCall($sourcePath, false)
                         ->getMock()
                 ),
-                'source' => $sourceLocator,
-                'target' => $targetLocator,
+                'sourceRelativePath' => $sourceRelativePath,
+                'targetRelativePath' => $targetRelativePath,
                 'expected' => new NotExistsException($sourcePath),
             ],
             'target ' . RemoveException::class => [
@@ -203,8 +188,8 @@ class FileStoreManagerTest extends TestCase
                         ->withRemoveCallThrowingException($targetPath, $cannotRemoveIOException)
                         ->getMock()
                 ),
-                'source' => $sourceLocator,
-                'target' => $targetLocator,
+                'sourceRelativePath' => $sourceRelativePath,
+                'targetRelativePath' => $targetRelativePath,
                 'expected' => new RemoveException($targetPath, $cannotRemoveIOException),
             ],
             'target ' . CreateException::class => [
@@ -216,8 +201,8 @@ class FileStoreManagerTest extends TestCase
                         ->withMkdirCallThrowingException($targetPath, $cannotCreateIOException)
                         ->getMock()
                 ),
-                'source' => $sourceLocator,
-                'target' => $targetLocator,
+                'sourceRelativePath' => $sourceRelativePath,
+                'targetRelativePath' => $targetRelativePath,
                 'expected' => new CreateException($targetPath, $cannotCreateIOException),
             ],
             MirrorException::class => [
@@ -230,8 +215,8 @@ class FileStoreManagerTest extends TestCase
                         ->withMirrorCallThrowingException($sourcePath, $targetPath, $cannotMirrorIOException)
                         ->getMock()
                 ),
-                'source' => $sourceLocator,
-                'target' => $targetLocator,
+                'sourceRelativePath' => $sourceRelativePath,
+                'targetRelativePath' => $targetRelativePath,
                 'expected' => new MirrorException($sourcePath, $targetPath, $cannotMirrorIOException),
             ],
         ];
@@ -239,8 +224,6 @@ class FileStoreManagerTest extends TestCase
 
     public function testMirrorSourcePathAndTargetPathAreEqual(): void
     {
-        $locator = (new MockFileLocator())->withToStringCall(self::FILE_LOCATOR_PATH)->getMock();
-
         $fileStoreManager = new FileStoreManager(
             new AbsoluteFileLocator(self::BASE_PATH),
             (new MockFileSystem())
@@ -251,6 +234,6 @@ class FileStoreManagerTest extends TestCase
                 ->getMock()
         );
 
-        $fileStoreManager->mirror($locator, $locator);
+        $fileStoreManager->mirror(self::FILE_LOCATOR_PATH, self::FILE_LOCATOR_PATH);
     }
 }

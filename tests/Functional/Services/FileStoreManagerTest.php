@@ -9,7 +9,6 @@ use App\Entity\RunSource;
 use App\Model\AbsoluteFileLocator;
 use App\Model\UserGitRepository;
 use App\Services\FileStoreManager;
-use App\Tests\Mock\Model\MockFileLocator;
 use App\Tests\Model\UserId;
 use App\Tests\Services\FileStoreFixtureCreator;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -40,39 +39,38 @@ class FileStoreManagerTest extends WebTestCase
 
     public function testExistsCreateRemoveSuccess(): void
     {
-        $fileLocator = (new MockFileLocator())->withToStringCall(UserId::create())->getMock();
-        self::assertFalse($this->fileStoreManager->exists($fileLocator));
+        $relativePath = UserId::create();
+        $expectedFileStoreAbsolutePath = $this->createFileStoreAbsolutePath($relativePath);
+        self::assertFalse($this->fileStoreManager->exists($relativePath));
 
-        $expectedFileStoreAbsolutePath = $this->createFileStoreAbsolutePath((string) $fileLocator);
-
-        $createdPath = $this->fileStoreManager->create($fileLocator);
+        $createdPath = $this->fileStoreManager->create($relativePath);
         self::assertInstanceOf(AbsoluteFileLocator::class, $createdPath);
         self::assertSame($expectedFileStoreAbsolutePath, (string) $createdPath);
-        self::assertTrue($this->fileStoreManager->exists($fileLocator));
+        self::assertTrue($this->fileStoreManager->exists($relativePath));
 
-        $removedPath = $this->fileStoreManager->remove($fileLocator);
+        $removedPath = $this->fileStoreManager->remove($relativePath);
         self::assertInstanceOf(AbsoluteFileLocator::class, $removedPath);
         self::assertSame($expectedFileStoreAbsolutePath, (string) $removedPath);
-        self::assertFalse($this->fileStoreManager->exists($fileLocator));
+        self::assertFalse($this->fileStoreManager->exists($relativePath));
     }
 
     public function testMirrorSuccess(): void
     {
         $userId = UserId::create();
         $gitSource = new GitSource($userId, 'https://example.com/repository.git');
-        $sourceRelativeLocator = new UserGitRepository($gitSource);
-        self::assertFalse($this->fileStoreManager->exists($sourceRelativeLocator));
+        $sourceRelativePath = (string) (new UserGitRepository($gitSource));
+        self::assertFalse($this->fileStoreManager->exists($sourceRelativePath));
 
-        $sourceAbsoluteLocator = $this->fileStoreManager->create($sourceRelativeLocator);
-        self::assertTrue($this->fileStoreManager->exists($sourceRelativeLocator));
+        $sourceAbsoluteLocator = $this->fileStoreManager->create($sourceRelativePath);
+        self::assertTrue($this->fileStoreManager->exists($sourceRelativePath));
 
-        $this->fixtureCreator->copyFixturesTo((string) $sourceRelativeLocator);
+        $this->fixtureCreator->copyFixturesTo($sourceRelativePath);
 
-        $targetFileLocator = new RunSource($gitSource);
-        self::assertFalse($this->fileStoreManager->exists($targetFileLocator));
+        $targetRelativePath = (string) (new RunSource($gitSource));
+        self::assertFalse($this->fileStoreManager->exists($targetRelativePath));
 
-        $expectedTargetPath = $this->createFileStoreAbsolutePath((string) $targetFileLocator);
-        $targetAbsoluteLocator = $this->fileStoreManager->mirror($sourceRelativeLocator, $targetFileLocator);
+        $expectedTargetPath = $this->createFileStoreAbsolutePath($targetRelativePath);
+        $targetAbsoluteLocator = $this->fileStoreManager->mirror($sourceRelativePath, $targetRelativePath);
         self::assertInstanceOf(AbsoluteFileLocator::class, $targetAbsoluteLocator);
         self::assertSame($expectedTargetPath, (string) $targetAbsoluteLocator);
         self::assertSame(scandir((string) $sourceAbsoluteLocator), scandir($expectedTargetPath));
