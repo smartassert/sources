@@ -28,7 +28,7 @@ class FileSourcePreparer
         $runSource = $this->sourceFactory->createRunSource($source);
 
         try {
-            $this->fileStoreManager->mirror($source, $runSource);
+            $this->fileStoreManager->mirror((string) $source, (string) $runSource);
         } catch (FileExceptionInterface $exception) {
             $this->sourceStore->remove($runSource);
 
