@@ -16,5 +16,5 @@ interface AppendableFileLocatorInterface extends FileLocatorInterface
      *
      * @throws OutOfScopeException
      */
-    public function append(string $path): void;
+    public function append(string $path): self;
 }

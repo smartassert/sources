@@ -34,13 +34,16 @@ class AbsoluteFileLocator implements AppendableFileLocatorInterface
     /**
      * @throws OutOfScopeException
      */
-    public function append(string $path): void
+    public function append(string $path): AbsoluteFileLocator
     {
         $newPath = Path::canonicalize($this->path . '/' . $path);
         if (false === Path::isBasePath($this->path, $newPath)) {
             throw new OutOfScopeException($newPath, $this->path);
         }
 
-        $this->path = Path::canonicalize($this->path . '/' . $path);
+        $new = clone $this;
+        $new->path = Path::canonicalize($this->path . '/' . $path);
+
+        return $new;
     }
 }
