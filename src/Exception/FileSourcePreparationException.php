@@ -7,7 +7,6 @@ namespace App\Exception;
 use App\Exception\File\CreateException;
 use App\Exception\File\FileExceptionInterface;
 use App\Exception\File\MirrorException;
-use App\Exception\File\NonAbsolutePathException;
 use App\Exception\File\NotExistsException;
 use App\Exception\File\OutOfScopeException;
 use App\Exception\File\RemoveException;
@@ -17,10 +16,9 @@ class FileSourcePreparationException extends \Exception
     private const EXCEPTION_CLASS_CODE_MAP = [
         CreateException::class => 100,
         MirrorException::class => 200,
-        NonAbsolutePathException::class => 300,
-        NotExistsException::class => 400,
-        OutOfScopeException::class => 500,
-        RemoveException::class => 300,
+        NotExistsException::class => 300,
+        OutOfScopeException::class => 400,
+        RemoveException::class => 500,
     ];
 
     public function __construct(FileExceptionInterface $previous)
