@@ -35,9 +35,7 @@ class AbsoluteFileLocatorTest extends TestCase
      */
     public function testAppend(AbsoluteFileLocator $locator, string $path, string $expected): void
     {
-        $locator->append($path);
-
-        self::assertSame($expected, (string) $locator);
+        self::assertSame($expected, (string) $locator->append($path));
     }
 
     /**
