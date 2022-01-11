@@ -25,18 +25,24 @@ class FileStoreManager
      * @throws CreateException
      * @throws OutOfScopeException
      */
-    public function create(string $relativePath): AbsoluteFileLocator
+    public function create(string $relativePath): string
     {
-        return $this->doCreate($this->createAbsolutePath($relativePath));
+        $absolutePath = $this->createAbsolutePath($relativePath);
+        $this->doCreate($absolutePath);
+
+        return (string) $absolutePath;
     }
 
     /**
      * @throws OutOfScopeException
      * @throws RemoveException
      */
-    public function remove(string $relativePath): AbsoluteFileLocator
+    public function remove(string $relativePath): string
     {
-        return $this->doRemove($this->createAbsolutePath($relativePath));
+        $absolutePath = $this->createAbsolutePath($relativePath);
+        $this->doRemove($absolutePath);
+
+        return (string) $absolutePath;
     }
 
     /**
@@ -54,35 +60,35 @@ class FileStoreManager
      * @throws OutOfScopeException
      * @throws RemoveException
      *
-     * @return AbsoluteFileLocator The absolute target path
+     * @return string The absolute target path
      */
-    public function mirror(string $sourceRelativePath, string $targetRelativePath): AbsoluteFileLocator
+    public function mirror(string $sourceRelativePath, string $targetRelativePath): string
     {
         try {
-            $sourceAbsoluteLocator = $this->createAbsolutePath($sourceRelativePath);
+            $sourceAbsolutePath = $this->createAbsolutePath($sourceRelativePath);
         } catch (OutOfScopeException $sourceOutOfScopeException) {
             throw $sourceOutOfScopeException->withContext('source');
         }
 
         try {
-            $targetAbsoluteLocator = $this->createAbsolutePath($targetRelativePath);
+            $targetAbsolutePath = $this->createAbsolutePath($targetRelativePath);
         } catch (OutOfScopeException $targetOutOfScopeException) {
             throw $targetOutOfScopeException->withContext('target');
         }
 
-        $sourcePath = (string) $sourceAbsoluteLocator;
-        $targetPath = (string) $targetAbsoluteLocator;
+        $sourcePath = (string) $sourceAbsolutePath;
+        $targetPath = (string) $targetAbsolutePath;
 
-        if (false === $this->doExists($sourceAbsoluteLocator)) {
+        if (false === $this->doExists($sourceAbsolutePath)) {
             throw new NotExistsException($sourcePath);
         }
 
         if ($sourcePath === $targetPath) {
-            return $targetAbsoluteLocator;
+            return $targetPath;
         }
 
-        $this->doRemove($targetAbsoluteLocator);
-        $this->doCreate($targetAbsoluteLocator);
+        $this->doRemove($targetAbsolutePath);
+        $this->doCreate($targetAbsolutePath);
 
         try {
             $this->filesystem->mirror($sourcePath, $targetPath);
@@ -90,7 +96,7 @@ class FileStoreManager
             throw new MirrorException($sourcePath, $targetPath, $IOException);
         }
 
-        return $targetAbsoluteLocator;
+        return $targetPath;
     }
 
     /**
@@ -104,29 +110,25 @@ class FileStoreManager
     /**
      * @throws CreateException
      */
-    private function doCreate(AbsoluteFileLocator $fileLocator): AbsoluteFileLocator
+    private function doCreate(AbsoluteFileLocator $fileLocator): void
     {
         try {
             $this->filesystem->mkdir((string) $fileLocator);
         } catch (IOExceptionInterface $IOException) {
             throw new CreateException((string) $fileLocator, $IOException);
         }
-
-        return $fileLocator;
     }
 
     /**
      * @throws RemoveException
      */
-    private function doRemove(AbsoluteFileLocator $fileLocator): AbsoluteFileLocator
+    private function doRemove(AbsoluteFileLocator $fileLocator): void
     {
         try {
             $this->filesystem->remove((string) $fileLocator);
         } catch (IOExceptionInterface $IOException) {
             throw new RemoveException((string) $fileLocator, $IOException);
         }
-
-        return $fileLocator;
     }
 
     private function doExists(AbsoluteFileLocator $fileLocator): bool
