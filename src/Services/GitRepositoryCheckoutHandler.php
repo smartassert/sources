@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Exception\ProcessExecutorException;
-use App\Model\AbsoluteFileLocator;
 use App\Model\CommandDefinition\Definition;
 use App\Model\ProcessOutput;
 use App\Services\Process\Executor;
@@ -20,12 +19,12 @@ class GitRepositoryCheckoutHandler
     /**
      * @throws ProcessExecutorException
      */
-    public function checkout(AbsoluteFileLocator $repositoryPath, ?string $ref = null): ProcessOutput
+    public function checkout(string $path, ?string $ref = null): ProcessOutput
     {
         return $this->processExecutor->execute(
             (new Definition('git checkout'))
                 ->withArguments([$ref]),
-            (string) $repositoryPath
+            $path
         );
     }
 }
