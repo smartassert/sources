@@ -8,13 +8,23 @@ class NotExistsException extends \Exception implements PathExceptionInterface
 {
     public function __construct(
         private string $path,
-        ?\Throwable $previous = null
+        private ?string $context = null,
     ) {
-        parent::__construct(sprintf('Path "%s" does not exist"', $path), 0, $previous);
+        parent::__construct(sprintf('Path "%s" does not exist" (%s)', $path, $context));
     }
 
     public function getPath(): string
     {
         return $this->path;
+    }
+
+    public function getContext(): ?string
+    {
+        return $this->context;
+    }
+
+    public function withContext(string $context): self
+    {
+        return new NotExistsException($this->path, $context);
     }
 }
