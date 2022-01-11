@@ -25,6 +25,23 @@ class FileStoreManager
     /**
      * @throws CreateException
      * @throws OutOfScopeException
+     */
+    public function create(FileLocatorInterface $fileLocator): AbsoluteFileLocator
+    {
+        $absoluteLocator = $this->createPath($fileLocator);
+
+        try {
+            $this->filesystem->mkdir((string) $absoluteLocator);
+        } catch (IOExceptionInterface $IOException) {
+            throw new CreateException((string) $absoluteLocator, $IOException);
+        }
+
+        return $absoluteLocator;
+    }
+
+    /**
+     * @throws CreateException
+     * @throws OutOfScopeException
      * @throws RemoveException
      */
     public function initialize(FileLocatorInterface $fileLocator): AbsoluteFileLocator

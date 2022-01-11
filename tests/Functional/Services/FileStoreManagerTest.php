@@ -38,6 +38,19 @@ class FileStoreManagerTest extends WebTestCase
         $this->fileStoreBasePath = $fileStoreBasePath;
     }
 
+    public function testCreateSuccess(): void
+    {
+        $fileLocator = (new MockFileLocator())->withToStringCall(UserId::create())->getMock();
+        self::assertFalse($this->fileStoreManager->exists($fileLocator));
+
+        $expectedFileStoreAbsolutePath = $this->createFileStoreAbsolutePath((string) $fileLocator);
+
+        $createdPath = $this->fileStoreManager->create($fileLocator);
+        self::assertInstanceOf(AbsoluteFileLocator::class, $createdPath);
+        self::assertSame($expectedFileStoreAbsolutePath, (string) $createdPath);
+        self::assertTrue($this->fileStoreManager->exists($fileLocator));
+    }
+
     public function testExistsInitializeRemoveSuccess(): void
     {
         $fileLocator = (new MockFileLocator())->withToStringCall(UserId::create())->getMock();

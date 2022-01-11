@@ -28,6 +28,20 @@ class FileStoreManagerTest extends TestCase
 
     /**
      * @dataProvider throwsOutOfScopeExceptionDataProvider
+     * @dataProvider throwsCreateExceptionDataProvider
+     */
+    public function testCreateThrowsException(
+        FileStoreManager $fileStoreManager,
+        FileLocatorInterface $fileLocator,
+        \Exception $expected
+    ): void {
+        $this->expectExceptionObject($expected);
+
+        $fileStoreManager->create($fileLocator);
+    }
+
+    /**
+     * @dataProvider throwsOutOfScopeExceptionDataProvider
      * @dataProvider throwsRemoveExceptionDataProvider
      * @dataProvider throwsCreateExceptionDataProvider
      */
