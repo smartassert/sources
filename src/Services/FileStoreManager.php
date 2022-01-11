@@ -60,8 +60,17 @@ class FileStoreManager
      */
     public function mirror(FileLocatorInterface $source, FileLocatorInterface $target): AbsoluteFileLocator
     {
-        $sourceAbsoluteLocator = $this->createPath($source);
-        $targetAbsoluteLocator = $this->createPath($target);
+        try {
+            $sourceAbsoluteLocator = $this->createPath($source);
+        } catch (OutOfScopeException $sourceOutOfScopeException) {
+            throw $sourceOutOfScopeException->setContext('source');
+        }
+
+        try {
+            $targetAbsoluteLocator = $this->createPath($target);
+        } catch (OutOfScopeException $targetOutOfScopeException) {
+            throw $targetOutOfScopeException->setContext('target');
+        }
 
         $sourcePath = (string) $sourceAbsoluteLocator;
         $targetPath = (string) $targetAbsoluteLocator;
