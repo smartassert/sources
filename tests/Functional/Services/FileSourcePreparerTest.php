@@ -9,7 +9,7 @@ use App\Exception\File\NotExistsException;
 use App\Exception\FileSourcePreparationException;
 use App\Repository\SourceRepository;
 use App\Services\FileSourcePreparer;
-use App\Services\FileStorePathFactory;
+use App\Services\FileStoreManager;
 use App\Tests\Mock\Services\MockFileStoreManager;
 use App\Tests\Model\UserId;
 use App\Tests\Services\FileStoreFixtureCreator;
@@ -22,7 +22,7 @@ class FileSourcePreparerTest extends WebTestCase
     private FileSourcePreparer $fileSourcePreparer;
     private SourceRepository $sourceRepository;
     private FileStoreFixtureCreator $fixtureCreator;
-    private FileStorePathFactory $fileStorePathFactory;
+    private FileStoreManager $fileStoreManager;
 
     protected function setUp(): void
     {
@@ -40,9 +40,9 @@ class FileSourcePreparerTest extends WebTestCase
         \assert($fixtureCreator instanceof FileStoreFixtureCreator);
         $this->fixtureCreator = $fixtureCreator;
 
-        $fileStorePathFactory = self::getContainer()->get(FileStorePathFactory::class);
-        \assert($fileStorePathFactory instanceof FileStorePathFactory);
-        $this->fileStorePathFactory = $fileStorePathFactory;
+        $fileStoreManager = self::getContainer()->get(FileStoreManager::class);
+        \assert($fileStoreManager instanceof FileStoreManager);
+        $this->fileStoreManager = $fileStoreManager;
 
         $sourceRemover = self::getContainer()->get(SourceRemover::class);
         if ($sourceRemover instanceof SourceRemover) {
@@ -86,8 +86,8 @@ class FileSourcePreparerTest extends WebTestCase
 
         self::assertCount(2, $this->sourceRepository->findAll());
         self::assertSame(
-            scandir((string) $this->fileStorePathFactory->create($fileSource)),
-            scandir((string) $this->fileStorePathFactory->create($runSource))
+            scandir((string) $this->fileStoreManager->createPath($fileSource)),
+            scandir((string) $this->fileStoreManager->createPath($runSource))
         );
     }
 }
