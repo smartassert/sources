@@ -6,13 +6,17 @@ namespace App\Exception\File;
 
 class OutOfScopeException extends \Exception implements PathExceptionInterface
 {
-    private ?string $context;
-
     public function __construct(
         private string $path,
-        private string $basePath
+        private string $basePath,
+        private ?string $context = null
     ) {
-        parent::__construct(sprintf('Path "%s" outside the scope of base path "%s"', $path, $basePath));
+        parent::__construct(sprintf(
+            'Path "%s" outside the scope of base path "%s" (%s)',
+            $path,
+            $basePath,
+            $context
+        ));
     }
 
     public function getPath(): string
@@ -35,5 +39,14 @@ class OutOfScopeException extends \Exception implements PathExceptionInterface
         $this->context = $context;
 
         return $this;
+    }
+
+    public function withContext(string $context): self
+    {
+        return new OutOfScopeException(
+            $this->path,
+            $this->basePath,
+            $context
+        );
     }
 }

@@ -62,13 +62,13 @@ class FileStoreManager
         try {
             $sourceAbsoluteLocator = $this->createPath($source);
         } catch (OutOfScopeException $sourceOutOfScopeException) {
-            throw $sourceOutOfScopeException->setContext('source');
+            throw $sourceOutOfScopeException->withContext('source');
         }
 
         try {
             $targetAbsoluteLocator = $this->createPath($target);
         } catch (OutOfScopeException $targetOutOfScopeException) {
-            throw $targetOutOfScopeException->setContext('target');
+            throw $targetOutOfScopeException->withContext('target');
         }
 
         $sourcePath = (string) $sourceAbsoluteLocator;
