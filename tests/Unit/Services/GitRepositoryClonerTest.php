@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\Services;
 
-use App\Model\AbsoluteFileLocator;
 use App\Model\CommandDefinition\Definition;
 use App\Model\CommandDefinition\Option;
 use App\Model\EntityId;
@@ -37,7 +36,7 @@ class GitRepositoryClonerTest extends WebTestCase
 
         self::assertEquals(
             $executorProcessOutput,
-            $gitRepositoryCloner->clone($url, new AbsoluteFileLocator($path))
+            $gitRepositoryCloner->clone($url, $path)
         );
     }
 }
