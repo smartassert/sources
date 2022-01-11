@@ -163,21 +163,21 @@ class FileStoreManagerTest extends TestCase
                     (new MockFileSystem())->getMock()
                 ),
                 'source' => (new MockFileLocator())
-                    ->withToStringCall('..')
+                    ->withToStringCall('../source-out-of-scope')
                     ->getMock(),
                 'target' => $unusedLocator,
-                'expected' => new OutOfScopeException('/absolute/base', self::BASE_PATH),
+                'expected' => new OutOfScopeException('/absolute/base/source-out-of-scope', self::BASE_PATH),
             ],
             'target ' . OutOfScopeException::class => [
                 'fileStoreManager' => new FileStoreManager(
                     new AbsoluteFileLocator(self::BASE_PATH),
                     (new MockFileSystem())->getMock()
                 ),
-                'source' => (new MockFileLocator())
-                    ->withToStringCall('../..')
+                'source' => $sourceLocator,
+                'target' => (new MockFileLocator())
+                    ->withToStringCall('../target-out-of-scope')
                     ->getMock(),
-                'target' => $unusedLocator,
-                'expected' => new OutOfScopeException('/absolute', self::BASE_PATH),
+                'expected' => new OutOfScopeException('/absolute/base/target-out-of-scope', self::BASE_PATH),
             ],
             'source ' . NotExistsException::class => [
                 'fileStoreManager' => new FileStoreManager(
