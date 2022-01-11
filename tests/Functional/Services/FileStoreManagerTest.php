@@ -6,17 +6,20 @@ namespace App\Tests\Functional\Services;
 
 use App\Entity\GitSource;
 use App\Entity\RunSource;
+use App\Model\AbsoluteFileLocator;
 use App\Model\UserGitRepository;
 use App\Services\FileStoreManager;
 use App\Tests\Mock\Model\MockFileLocator;
 use App\Tests\Model\UserId;
 use App\Tests\Services\FileStoreFixtureCreator;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Symfony\Component\Filesystem\Path;
 
 class FileStoreManagerTest extends WebTestCase
 {
     private FileStoreManager $fileStoreManager;
     private FileStoreFixtureCreator $fixtureCreator;
+    private string $fileStoreBasePath;
 
     protected function setUp(): void
     {
@@ -29,6 +32,10 @@ class FileStoreManagerTest extends WebTestCase
         $fixtureCreator = self::getContainer()->get(FileStoreFixtureCreator::class);
         \assert($fixtureCreator instanceof FileStoreFixtureCreator);
         $this->fixtureCreator = $fixtureCreator;
+
+        $fileStoreBasePath = self::getContainer()->getParameter('file_store_base_path');
+        \assert(is_string($fileStoreBasePath));
+        $this->fileStoreBasePath = $fileStoreBasePath;
     }
 
     public function testExistsInitializeRemoveSuccess(): void
@@ -36,10 +43,16 @@ class FileStoreManagerTest extends WebTestCase
         $fileLocator = (new MockFileLocator())->withToStringCall(UserId::create())->getMock();
         self::assertFalse($this->fileStoreManager->exists($fileLocator));
 
-        $this->fileStoreManager->initialize($fileLocator);
+        $expectedFileStoreAbsolutePath = $this->createFileStoreAbsolutePath((string) $fileLocator);
+
+        $initializedPath = $this->fileStoreManager->initialize($fileLocator);
+        self::assertInstanceOf(AbsoluteFileLocator::class, $initializedPath);
+        self::assertSame($expectedFileStoreAbsolutePath, (string) $initializedPath);
         self::assertTrue($this->fileStoreManager->exists($fileLocator));
 
-        $this->fileStoreManager->remove($fileLocator);
+        $removedPath = $this->fileStoreManager->remove($fileLocator);
+        self::assertInstanceOf(AbsoluteFileLocator::class, $removedPath);
+        self::assertSame($expectedFileStoreAbsolutePath, (string) $removedPath);
         self::assertFalse($this->fileStoreManager->exists($fileLocator));
     }
 
@@ -47,22 +60,26 @@ class FileStoreManagerTest extends WebTestCase
     {
         $userId = UserId::create();
         $gitSource = new GitSource($userId, 'https://example.com/repository.git');
-        $sourceFileLocator = new UserGitRepository($gitSource);
-        self::assertFalse($this->fileStoreManager->exists($sourceFileLocator));
+        $sourceRelativeLocator = new UserGitRepository($gitSource);
+        self::assertFalse($this->fileStoreManager->exists($sourceRelativeLocator));
 
-        $this->fileStoreManager->initialize($sourceFileLocator);
-        self::assertTrue($this->fileStoreManager->exists($sourceFileLocator));
+        $sourceAbsoluteLocator = $this->fileStoreManager->initialize($sourceRelativeLocator);
+        self::assertTrue($this->fileStoreManager->exists($sourceRelativeLocator));
 
-        $this->fixtureCreator->copyFixturesTo((string) $sourceFileLocator);
+        $this->fixtureCreator->copyFixturesTo((string) $sourceRelativeLocator);
 
         $targetFileLocator = new RunSource($gitSource);
         self::assertFalse($this->fileStoreManager->exists($targetFileLocator));
 
-        $this->fileStoreManager->mirror($sourceFileLocator, $targetFileLocator);
+        $expectedTargetPath = $this->createFileStoreAbsolutePath((string) $targetFileLocator);
+        $targetAbsoluteLocator = $this->fileStoreManager->mirror($sourceRelativeLocator, $targetFileLocator);
+        self::assertInstanceOf(AbsoluteFileLocator::class, $targetAbsoluteLocator);
+        self::assertSame($expectedTargetPath, (string) $targetAbsoluteLocator);
+        self::assertSame(scandir((string) $sourceAbsoluteLocator), scandir($expectedTargetPath));
+    }
 
-        self::assertSame(
-            scandir((string) $this->fileStoreManager->createPath($sourceFileLocator)),
-            scandir((string) $this->fileStoreManager->createPath($targetFileLocator))
-        );
+    private function createFileStoreAbsolutePath(string $relativePath): string
+    {
+        return Path::canonicalize($this->fileStoreBasePath . '/' . $relativePath);
     }
 }
