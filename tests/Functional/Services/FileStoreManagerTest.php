@@ -38,16 +38,16 @@ class FileStoreManagerTest extends WebTestCase
         $this->fileStoreBasePath = $fileStoreBasePath;
     }
 
-    public function testExistsInitializeRemoveSuccess(): void
+    public function testExistsCreateRemoveSuccess(): void
     {
         $fileLocator = (new MockFileLocator())->withToStringCall(UserId::create())->getMock();
         self::assertFalse($this->fileStoreManager->exists($fileLocator));
 
         $expectedFileStoreAbsolutePath = $this->createFileStoreAbsolutePath((string) $fileLocator);
 
-        $initializedPath = $this->fileStoreManager->initialize($fileLocator);
-        self::assertInstanceOf(AbsoluteFileLocator::class, $initializedPath);
-        self::assertSame($expectedFileStoreAbsolutePath, (string) $initializedPath);
+        $createdPath = $this->fileStoreManager->create($fileLocator);
+        self::assertInstanceOf(AbsoluteFileLocator::class, $createdPath);
+        self::assertSame($expectedFileStoreAbsolutePath, (string) $createdPath);
         self::assertTrue($this->fileStoreManager->exists($fileLocator));
 
         $removedPath = $this->fileStoreManager->remove($fileLocator);
@@ -63,7 +63,7 @@ class FileStoreManagerTest extends WebTestCase
         $sourceRelativeLocator = new UserGitRepository($gitSource);
         self::assertFalse($this->fileStoreManager->exists($sourceRelativeLocator));
 
-        $sourceAbsoluteLocator = $this->fileStoreManager->initialize($sourceRelativeLocator);
+        $sourceAbsoluteLocator = $this->fileStoreManager->create($sourceRelativeLocator);
         self::assertTrue($this->fileStoreManager->exists($sourceRelativeLocator));
 
         $this->fixtureCreator->copyFixturesTo((string) $sourceRelativeLocator);
