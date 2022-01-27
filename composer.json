@@ -39,7 +39,7 @@
         "symfony/browser-kit": "6.0.*",
         "symfony/maker-bundle": "^1.36",
         "symfony/phpunit-bridge": "^6.0",
-        "webignition/http-history-container": "^2.4",
+        "webignition/http-history-container": "^2.5",
         "webignition/object-reflector": "^1.0"
     },
     "config": {
