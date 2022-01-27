@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "cc1403d44f449392875f4283227159db",
+    "content-hash": "5310239e4712d76783f4e5d0204e9ec1",
     "packages": [
         {
             "name": "doctrine/annotations",
@@ -1878,20 +1878,20 @@
         },
         {
             "name": "smartassert/users-client",
-            "version": "0.1",
+            "version": "0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/smartassert/users-client.git",
-                "reference": "75a830a9d3acbfce07adf0dd11dc1cfb31d3e7f4"
+                "reference": "a31acd9a834eec8ed7b6beff6f872f254bd04ab9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/smartassert/users-client/zipball/75a830a9d3acbfce07adf0dd11dc1cfb31d3e7f4",
-                "reference": "75a830a9d3acbfce07adf0dd11dc1cfb31d3e7f4",
+                "url": "https://api.github.com/repos/smartassert/users-client/zipball/a31acd9a834eec8ed7b6beff6f872f254bd04ab9",
+                "reference": "a31acd9a834eec8ed7b6beff6f872f254bd04ab9",
                 "shasum": ""
             },
             "require": {
-                "php": ">=8",
+                "php": "^8.0|^8.1",
                 "psr/http-client": "^1.0",
                 "psr/http-factory": "^1.0",
                 "psr/http-message": "^1.0"
@@ -1900,7 +1900,7 @@
                 "guzzlehttp/guzzle": "^7.4",
                 "mockery/mockery": "^1.4",
                 "phpstan/extension-installer": "^1.1",
-                "phpstan/phpstan": "^1.2",
+                "phpstan/phpstan": "^1.4",
                 "phpstan/phpstan-mockery": "^1.0",
                 "phpunit/phpunit": "^9.5",
                 "squizlabs/php_codesniffer": "^3.6",
@@ -1926,28 +1926,28 @@
             "homepage": "https://github.com/smartassert/users-client",
             "support": {
                 "issues": "https://github.com/smartassert/users-client/issues",
-                "source": "https://github.com/smartassert/users-client/tree/0.1"
+                "source": "https://github.com/smartassert/users-client/tree/0.2"
             },
-            "time": "2021-12-16T15:30:49+00:00"
+            "time": "2022-01-27T15:46:22+00:00"
         },
         {
             "name": "smartassert/users-security-bundle",
-            "version": "0.2",
+            "version": "0.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/smartassert/UsersSecurityBundle.git",
-                "reference": "2e659c116f660e985cba2b5f15696b150222990b"
+                "reference": "a7f48f2f6cdaa37a1dc62f6d5d2e62fbbae4b4d1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/smartassert/UsersSecurityBundle/zipball/2e659c116f660e985cba2b5f15696b150222990b",
-                "reference": "2e659c116f660e985cba2b5f15696b150222990b",
+                "url": "https://api.github.com/repos/smartassert/UsersSecurityBundle/zipball/a7f48f2f6cdaa37a1dc62f6d5d2e62fbbae4b4d1",
+                "reference": "a7f48f2f6cdaa37a1dc62f6d5d2e62fbbae4b4d1",
                 "shasum": ""
             },
             "require": {
                 "ext-json": "*",
-                "php": ">=8.0.2",
-                "smartassert/users-client": "^0.1.0",
+                "php": "^8.0|^8.1",
+                "smartassert/users-client": "^0.2.0",
                 "symfony/config": "^6.0",
                 "symfony/dependency-injection": "^6.0",
                 "symfony/http-foundation": "^6.0",
@@ -1959,9 +1959,9 @@
             },
             "require-dev": {
                 "guzzlehttp/guzzle": "^7.4",
-                "mockery/mockery": "^1.4",
+                "mockery/mockery": "^1.5",
                 "phpstan/extension-installer": "^1.1",
-                "phpstan/phpstan": "^1.2",
+                "phpstan/phpstan": "^1.4",
                 "phpstan/phpstan-mockery": "^1.0",
                 "phpstan/phpstan-phpunit": "^1.0",
                 "phpunit/phpunit": "^9.5",
@@ -1990,9 +1990,9 @@
             "homepage": "https://github.com/smartassert/UsersSecurityBundle",
             "support": {
                 "issues": "https://github.com/smartassert/UsersSecurityBundle/issues",
-                "source": "https://github.com/smartassert/UsersSecurityBundle/tree/0.2"
+                "source": "https://github.com/smartassert/UsersSecurityBundle/tree/0.3"
             },
-            "time": "2021-12-16T17:38:47+00:00"
+            "time": "2022-01-27T15:54:44+00:00"
         },
         {
             "name": "symfony/cache",
