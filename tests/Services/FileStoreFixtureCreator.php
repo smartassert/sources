@@ -22,4 +22,9 @@ class FileStoreFixtureCreator
             sprintf('%s/%s', $this->fileStoreBasePath, $relativePath)
         );
     }
+
+    public function getFixturesPath(): string
+    {
+        return $this->sourceFixturesPath;
+    }
 }
