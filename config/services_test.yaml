@@ -42,3 +42,6 @@ services:
 
     App\Services\GitRepositoryCheckoutHandler:
         public: true
+
+    App\Services\GitSourcePreparer:
+        public: true
