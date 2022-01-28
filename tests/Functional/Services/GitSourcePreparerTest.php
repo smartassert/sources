@@ -84,12 +84,7 @@ class GitSourcePreparerTest extends WebTestCase
 
     public function testPrepareSuccess(): void
     {
-        $this->setGitSourcePreparerProperty(
-            'gitRepositoryCloner',
-            $this->createGitRepositoryCloner(
-                new ProcessOutput(0, 'clone success output', '')
-            )
-        );
+        $this->setGitRepositoryClonerOutcome(new ProcessOutput(0, 'clone success output', ''));
 
         $this->setGitSourcePreparerProperty(
             'gitRepositoryCheckoutHandler',
@@ -129,6 +124,11 @@ class GitSourcePreparerTest extends WebTestCase
             });
 
         return $checkoutHandler;
+    }
+
+    private function setGitRepositoryClonerOutcome(ProcessOutput|\Exception $outcome): void
+    {
+        $this->setGitSourcePreparerProperty('gitRepositoryCloner', $this->createGitRepositoryCloner($outcome));
     }
 
     private function setGitSourcePreparerProperty(string $name, object $value): void
