@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Functional\Services;
 
 use App\Entity\GitSource;
-use App\Exception\GitCloneException;
+use App\Exception\GitActionException;
 use App\Exception\ProcessExecutorException;
 use App\Model\ProcessOutput;
 use App\Services\GitRepositoryCheckoutHandler;
@@ -64,7 +64,7 @@ class GitSourcePreparerTest extends WebTestCase
             new ProcessExecutorException(
                 new SymfonyProcessRuntimeException('Unable to launch a new process.')
             ),
-            function (ProcessExecutorException $cloneProcessException, GitCloneException $gitCloneException) {
+            function (ProcessExecutorException $cloneProcessException, GitActionException $gitCloneException) {
                 self::assertSame('Git clone process failed', $gitCloneException->getMessage());
                 self::assertSame($cloneProcessException, $gitCloneException->getProcessExecutorException());
             }
@@ -77,11 +77,33 @@ class GitSourcePreparerTest extends WebTestCase
             $this->createCloneProcessErrorOutput(
                 $this->createCloneMessageForRepositoryNotFound()
             ),
-            function (ProcessOutput $cloneProcessOutput, GitCloneException $gitCloneException) {
+            function (ProcessOutput $cloneProcessOutput, GitActionException $gitCloneException) {
                 self::assertStringEndsWith($gitCloneException->getMessage(), $cloneProcessOutput->getErrorOutput());
             }
         );
     }
+
+//    public function testPrepareCheckoutProcessThrowsException(): void
+//    {
+//        $this->setGitRepositoryClonerOutcome(new ProcessOutput(0, 'clone success output', ''));
+//
+//        $this->setGitRepositoryCheckoutHandlerOutcome(new ProcessOutput(0, 'checkout output', ''));
+//
+//        new ProcessExecutorException(
+//            new RuntimeException(sprintf('The provided cwd "%s" does not exist', __DIR__ . '/does-not-exist'))
+//        );
+//
+//        $runSource = $this->gitSourcePreparer->prepare($this->gitSource, self::REF);
+//
+//        self::assertDirectoryDoesNotExist($this->repositoryPath);
+//
+//        $sourceAbsolutePath = Path::canonicalize(
+//            $this->fixtureCreator->getFixturesPath() . $this->gitSource->getPath()
+//        );
+//        $targetAbsolutePath = Path::canonicalize($this->fileStoreBasePath . '/' . $runSource);
+//
+//        self::assertSame(scandir($sourceAbsolutePath), scandir($targetAbsolutePath));
+//    }
 
     public function testPrepareSuccess(): void
     {
@@ -142,8 +164,8 @@ class GitSourcePreparerTest extends WebTestCase
 
         try {
             $this->gitSourcePreparer->prepare($this->gitSource, 'ref not relevant');
-            self::fail(GitCloneException::class . ' not thrown');
-        } catch (GitCloneException $gitCloneException) {
+            self::fail(GitActionException::class . ' not thrown');
+        } catch (GitActionException $gitCloneException) {
             $assertions($gitCloneProcessOutcome, $gitCloneException);
         }
 

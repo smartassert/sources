@@ -11,7 +11,7 @@ use App\Exception\File\MirrorException;
 use App\Exception\File\NotExistsException;
 use App\Exception\File\OutOfScopeException;
 use App\Exception\File\RemoveException;
-use App\Exception\GitCloneException;
+use App\Exception\GitActionException;
 use App\Exception\ProcessExecutorException;
 use App\Model\UserGitRepository;
 use App\Services\Source\Factory;
@@ -35,7 +35,7 @@ class GitSourcePreparer
      * @throws MirrorException
      * @throws NotExistsException
      * @throws ProcessExecutorException
-     * @throws GitCloneException
+     * @throws GitActionException
      */
     public function prepare(GitSource $source, ?string $ref = null): RunSource
     {
@@ -49,29 +49,48 @@ class GitSourcePreparer
             throw $exception->withContext('source');
         }
 
-        $gitCloneException = null;
+        $gitActionException = null;
         try {
-            $cloneProcessOutput = $this->gitRepositoryCloner->clone(
+            $cloneOutput = $this->gitRepositoryCloner->clone(
                 $this->createRepositoryUrl($source),
                 $gitRepositoryAbsolutePath
             );
 
-            if (false === $cloneProcessOutput->isSuccessful()) {
-                $gitCloneException = GitCloneException::createFromErrorOutput($cloneProcessOutput->getErrorOutput());
+            if (false === $cloneOutput->isSuccessful()) {
+                $gitActionException = GitActionException::createFromCloneErrorOutput($cloneOutput->getErrorOutput());
             }
         } catch (ProcessExecutorException $gitCloneProcessExecutorException) {
-            $gitCloneException = new GitCloneException('Git clone process failed', $gitCloneProcessExecutorException);
+            $gitActionException = GitActionException::createForProcessException(
+                GitActionException::ACTION_CLONE,
+                $gitCloneProcessExecutorException
+            );
         } finally {
-            if ($gitCloneException instanceof GitCloneException) {
+            if ($gitActionException instanceof GitActionException) {
                 $this->fileStoreManager->remove($gitRepositoryRelativePath);
-                throw $gitCloneException;
+                throw $gitActionException;
             }
         }
 
-        $checkoutProcessOutput = $this->gitRepositoryCheckoutHandler->checkout($gitRepositoryAbsolutePath, $ref);
-        if (false === $checkoutProcessOutput->isSuccessful()) {
-            // throw GitCheckoutException
-            throw new \RuntimeException('foo!');
+        $gitCheckoutException = null;
+        try {
+            $checkoutOutput = $this->gitRepositoryCheckoutHandler->checkout($gitRepositoryAbsolutePath, $ref);
+
+            if (false === $checkoutOutput->isSuccessful()) {
+                $gitCheckoutException = GitActionException::createFromCheckoutErrorOutput(
+                    $checkoutOutput->getErrorOutput()
+                );
+            }
+        } catch (ProcessExecutorException $gitCheckoutProcessExecutorException) {
+            $gitCheckoutException = GitActionException::createForProcessException(
+                GitActionException::ACTION_CHECKOUT,
+                $gitCheckoutProcessExecutorException
+            );
+
+        } finally {
+            if ($gitCheckoutException instanceof GitActionException) {
+                $this->fileStoreManager->remove($gitRepositoryRelativePath);
+                throw $gitCheckoutException;
+            }
         }
 
         $runSource = $this->sourceFactory->createRunSource($source);
