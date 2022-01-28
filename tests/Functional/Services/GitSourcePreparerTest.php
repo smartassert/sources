@@ -11,6 +11,7 @@ use App\Model\ProcessOutput;
 use App\Services\GitRepositoryCheckoutHandler;
 use App\Services\GitRepositoryCloner;
 use App\Services\GitSourcePreparer;
+use App\Tests\Mock\Services\MockGitRepositoryCheckoutHandler;
 use App\Tests\Mock\Services\MockGitRepositoryCloner;
 use App\Tests\Model\UserId;
 use App\Tests\Services\FileStoreFixtureCreator;
@@ -85,11 +86,7 @@ class GitSourcePreparerTest extends WebTestCase
     public function testPrepareSuccess(): void
     {
         $this->setGitRepositoryClonerOutcome(new ProcessOutput(0, 'clone success output', ''));
-
-        $this->setGitSourcePreparerProperty(
-            'gitRepositoryCheckoutHandler',
-            $this->createMockGitRepositoryCheckoutHandler($this->repositoryPath)
-        );
+        $this->setGitRepositoryCheckoutHandlerOutcome(new ProcessOutput(0, 'checkout output', ''));
 
         $runSource = $this->gitSourcePreparer->prepare($this->gitSource, self::REF);
 
@@ -103,41 +100,23 @@ class GitSourcePreparerTest extends WebTestCase
         self::assertSame(scandir($sourceAbsolutePath), scandir($targetAbsolutePath));
     }
 
-    private function createMockGitRepositoryCheckoutHandler(
-        string &$repositoryPath
-    ): GitRepositoryCheckoutHandler {
-        $checkoutHandler = \Mockery::mock(GitRepositoryCheckoutHandler::class);
-        $checkoutHandler
-            ->shouldReceive('checkout')
-            ->withArgs(function (string $passedPath, string $passedRef) use (&$repositoryPath) {
-                self::assertSame($repositoryPath, $passedPath);
-                self::assertSame(self::REF, $passedRef);
-
-                return true;
-            })
-            ->andReturnUsing(function () use (&$repositoryPath) {
-                $repositoryRelativePath = (string) (new UnicodeString($repositoryPath))
-                    ->trimPrefix($this->fileStoreBasePath . '/');
-                $this->fixtureCreator->copyFixturesTo($repositoryRelativePath);
-
-                return new ProcessOutput(0, 'checkout output', '');
-            });
-
-        return $checkoutHandler;
-    }
-
     private function setGitRepositoryClonerOutcome(ProcessOutput|\Exception $outcome): void
-    {
-        $this->setGitSourcePreparerProperty('gitRepositoryCloner', $this->createGitRepositoryCloner($outcome));
-    }
-
-    private function setGitSourcePreparerProperty(string $name, object $value): void
     {
         ObjectReflector::setProperty(
             $this->gitSourcePreparer,
             GitSourcePreparer::class,
-            $name,
-            $value
+            'gitRepositoryCloner',
+            $this->createGitRepositoryCloner($outcome)
+        );
+    }
+
+    private function setGitRepositoryCheckoutHandlerOutcome(ProcessOutput|\Exception $outcome): void
+    {
+        ObjectReflector::setProperty(
+            $this->gitSourcePreparer,
+            GitSourcePreparer::class,
+            'gitRepositoryCheckoutHandler',
+            $this->createGitRepositoryCheckoutHandler($this->repositoryPath, $outcome)
         );
     }
 
@@ -159,10 +138,7 @@ class GitSourcePreparerTest extends WebTestCase
         ProcessOutput|\Exception $gitCloneProcessOutcome,
         callable $assertions
     ): void {
-        $this->setGitSourcePreparerProperty(
-            'gitRepositoryCloner',
-            $this->createGitRepositoryCloner($gitCloneProcessOutcome)
-        );
+        $this->setGitRepositoryClonerOutcome($gitCloneProcessOutcome);
 
         try {
             $this->gitSourcePreparer->prepare($this->gitSource, 'ref not relevant');
@@ -183,5 +159,29 @@ class GitSourcePreparerTest extends WebTestCase
         return (new MockGitRepositoryCloner())
             ->withCloneCall(self::REPOSITORY_URL, $outcome, $this->repositoryPath)
             ->getMock();
+    }
+
+    private function createGitRepositoryCheckoutHandler(
+        string &$repositoryPath,
+        \Exception|ProcessOutput $outcome
+    ): GitRepositoryCheckoutHandler {
+        if ($outcome instanceof ProcessOutput) {
+            $checkoutOutcome = function (string $repositoryPath) use ($outcome): ProcessOutput {
+                $repositoryRelativePath = (string) (new UnicodeString($repositoryPath))
+                    ->trimPrefix($this->fileStoreBasePath . '/');
+                $this->fixtureCreator->copyFixturesTo($repositoryRelativePath);
+
+                return $outcome;
+            };
+        } else {
+            $checkoutOutcome = $outcome;
+        }
+
+        return (new MockGitRepositoryCheckoutHandler())
+            ->withCheckoutCall(
+                $repositoryPath,
+                self::REF,
+                $checkoutOutcome
+            )->getMock();
     }
 }
