@@ -11,11 +11,10 @@ use App\Model\ProcessOutput;
 use App\Services\GitRepositoryCheckoutHandler;
 use App\Services\GitRepositoryCloner;
 use App\Services\GitSourcePreparer;
-use App\Tests\Mock\Services\MockGitRepositoryCheckoutHandler;
-use App\Tests\Mock\Services\MockGitRepositoryCloner;
 use App\Tests\Model\UserId;
 use App\Tests\Services\FileStoreFixtureCreator;
 use App\Tests\Services\Source\SourceRemover;
+use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Filesystem\Path;
 use Symfony\Component\Process\Exception\RuntimeException as SymfonyProcessRuntimeException;
@@ -203,38 +202,56 @@ class GitSourcePreparerTest extends WebTestCase
             $this->gitSourcePreparer,
             GitSourcePreparer::class,
             'gitRepositoryCheckoutHandler',
-            $this->createGitRepositoryCheckoutHandler($this->repositoryPath, $outcome)
+            $this->createGitRepositoryCheckoutHandler($outcome)
         );
     }
 
     private function createGitRepositoryCloner(ProcessOutput|\Exception $outcome): GitRepositoryCloner
     {
-        return (new MockGitRepositoryCloner())
-            ->withCloneCall(self::REPOSITORY_URL, $outcome, $this->repositoryPath)
-            ->getMock();
+        $mock = \Mockery::mock(GitRepositoryCloner::class);
+        $expectation = $mock
+            ->shouldReceive('clone')
+            ->withArgs(function (string $repositoryUrl, string $localPath): bool {
+                TestCase::assertSame(self::REPOSITORY_URL, $repositoryUrl);
+                $this->repositoryPath = $localPath;
+
+                return true;
+            });
+
+        if ($outcome instanceof ProcessOutput) {
+            $expectation->andReturn($outcome);
+        } else {
+            $expectation->andThrow($outcome);
+        }
+
+        return $mock;
     }
 
-    private function createGitRepositoryCheckoutHandler(
-        string &$repositoryPath,
-        \Exception|ProcessOutput $outcome
-    ): GitRepositoryCheckoutHandler {
+    private function createGitRepositoryCheckoutHandler(\Exception|ProcessOutput $outcome): GitRepositoryCheckoutHandler
+    {
+        $mock = \Mockery::mock(GitRepositoryCheckoutHandler::class);
+
+        $expectation = $mock
+            ->shouldReceive('checkout')
+            ->withArgs(function (string $passedPath, string $passedRef) {
+                TestCase::assertSame($this->repositoryPath, $passedPath);
+                TestCase::assertSame(self::REF, $passedRef);
+
+                return true;
+            });
+
         if ($outcome instanceof ProcessOutput) {
-            $checkoutOutcome = function (string $repositoryPath) use ($outcome): ProcessOutput {
+            $expectation->andReturnUsing(function (string $repositoryPath) use ($outcome): ProcessOutput {
                 $repositoryRelativePath = (string) (new UnicodeString($repositoryPath))
                     ->trimPrefix($this->fileStoreBasePath . '/');
                 $this->fixtureCreator->copyFixturesTo($repositoryRelativePath);
 
                 return $outcome;
-            };
+            });
         } else {
-            $checkoutOutcome = $outcome;
+            $expectation->andThrow($outcome);
         }
 
-        return (new MockGitRepositoryCheckoutHandler())
-            ->withCheckoutCall(
-                $repositoryPath,
-                self::REF,
-                $checkoutOutcome
-            )->getMock();
+        return $mock;
     }
 }
