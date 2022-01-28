@@ -96,27 +96,23 @@ class GitSourcePreparerTest extends WebTestCase
      */
     public function prepareThrowsExceptionDataProvider(): array
     {
-        $checkoutProcessException = new ProcessExecutorException(
-            new SymfonyProcessRuntimeException(sprintf(
-                'The provided cwd "%s" does not exist',
-                __DIR__ . '/does-not-exist'
-            ))
-        );
-
         return [
             'clone process throws exception' => [
-                'cloneProcessOutcome' => new ProcessExecutorException(
-                    new SymfonyProcessRuntimeException('Unable to launch a new process.')
+                'cloneProcessOutcome' => GitActionException::createForProcessException(
+                    GitActionException::ACTION_CLONE,
+                    new ProcessExecutorException(
+                        new SymfonyProcessRuntimeException('Unable to launch a new process.')
+                    )
                 ),
                 'checkoutProcessOutcome' => null,
                 'assertions' => function (
-                    ProcessExecutorException $cloneProcessException,
+                    GitActionException $cloneProcessException,
                     ?object $checkoutProcessOutcome,
                     GitActionException $gitActionException
                 ) {
                     self::assertSame(GitActionException::ACTION_CLONE, $gitActionException->getAction());
                     self::assertSame('Git clone process failed', $gitActionException->getMessage());
-                    self::assertSame($cloneProcessException, $gitActionException->getProcessExecutorException());
+                    self::assertSame($cloneProcessException, $gitActionException);
                 },
             ],
             'clone process fails to clone' => [
@@ -144,15 +140,23 @@ class GitSourcePreparerTest extends WebTestCase
             ],
             'checkout process throws exception' => [
                 'cloneProcessOutcome' => new ProcessOutput(0, 'clone success output', ''),
-                'checkoutProcessOutcome' => $checkoutProcessException,
+                'checkoutProcessOutcome' => GitActionException::createForProcessException(
+                    GitActionException::ACTION_CHECKOUT,
+                    new ProcessExecutorException(
+                        new SymfonyProcessRuntimeException(sprintf(
+                            'The provided cwd "%s" does not exist',
+                            __DIR__ . '/does-not-exist'
+                        ))
+                    )
+                ),
                 'assertions' => function (
                     ProcessOutput $cloneProcessOutput,
-                    ProcessExecutorException $passedCheckoutProcessException,
+                    GitActionException $passedCheckoutProcessException,
                     GitActionException $gitActionException
-                ) use ($checkoutProcessException) {
+                ) {
                     self::assertSame(GitActionException::ACTION_CHECKOUT, $gitActionException->getAction());
                     self::assertSame('Git checkout process failed', $gitActionException->getMessage());
-                    self::assertSame($checkoutProcessException, $gitActionException->getProcessExecutorException());
+                    self::assertSame($passedCheckoutProcessException, $gitActionException);
                 },
             ],
             'checkout process fails to checkout' => [
