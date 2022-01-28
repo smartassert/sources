@@ -27,6 +27,7 @@ class GitSourcePreparerTest extends WebTestCase
     private const REPOSITORY_URL = 'https://example.com/repository.git';
     private const REF = 'v1.1';
     private const PATH = '/directory';
+    private const CHECKOUT_ERROR = 'error: pathspec \'' . self::REF . '\' did not match any file(s) known to git';
 
     private GitSourcePreparer $gitSourcePreparer;
     private FileStoreFixtureCreator $fixtureCreator;
@@ -58,44 +59,42 @@ class GitSourcePreparerTest extends WebTestCase
         $this->gitSource = new GitSource(UserId::create(), self::REPOSITORY_URL, self::PATH);
     }
 
-    public function testPrepareCloneProcessThrowsException(): void
-    {
-        $this->doPrepareWithExpectedGitCloneExceptionTest(
-            new ProcessExecutorException(
-                new SymfonyProcessRuntimeException('Unable to launch a new process.')
-            ),
-            null,
-            function (
-                ProcessExecutorException $cloneProcessException,
-                ?object $checkoutProcessOutcome,
-                GitActionException $gitActionException
-            ) {
-                self::assertSame(GitActionException::ACTION_CLONE, $gitActionException->getAction());
-                self::assertSame('Git clone process failed', $gitActionException->getMessage());
-                self::assertSame($cloneProcessException, $gitActionException->getProcessExecutorException());
-            }
-        );
+    /**
+     * @dataProvider prepareThrowsExceptionDataProvider
+     *
+     * @param callable(ProcessOutput|\Exception, null|ProcessOutput|\Exception, GitActionException): void $assertions
+     */
+    public function testPrepareThrowsException(
+        ProcessOutput|\Exception $cloneProcessOutcome,
+        null|ProcessOutput|\Exception $checkoutProcessOutcome,
+        callable $assertions
+    ): void {
+        $this->setGitRepositoryClonerOutcome($cloneProcessOutcome);
+
+        if (null != $checkoutProcessOutcome) {
+            $this->setGitRepositoryCheckoutHandlerOutcome($checkoutProcessOutcome);
+        }
+
+        $assertionCount = self::getCount();
+        try {
+            $this->gitSourcePreparer->prepare($this->gitSource, self::REF);
+            self::fail(GitActionException::class . ' not thrown');
+        } catch (GitActionException $gitActionException) {
+            $assertions($cloneProcessOutcome, $checkoutProcessOutcome, $gitActionException);
+        }
+        self::assertGreaterThan($assertionCount, self::getCount());
+
+        self::assertNotSame('', $this->repositoryPath);
+
+        $fileStoreUserPath = substr($this->repositoryPath, 0, (int) strrpos($this->repositoryPath, '/'));
+        self::assertDirectoryDoesNotExist($this->repositoryPath);
+        self::assertDirectoryExists($fileStoreUserPath);
     }
 
-    public function testPrepareCloneProcessCannotClone(): void
-    {
-        $this->doPrepareWithExpectedGitCloneExceptionTest(
-            $this->createCloneProcessErrorOutput(
-                $this->createCloneMessageForRepositoryNotFound()
-            ),
-            null,
-            function (
-                ProcessOutput $cloneProcessOutput,
-                ?object $checkoutProcessOutcome,
-                GitActionException $gitActionException
-            ) {
-                self::assertSame(GitActionException::ACTION_CLONE, $gitActionException->getAction());
-                self::assertStringEndsWith($gitActionException->getMessage(), $cloneProcessOutput->getErrorOutput());
-            }
-        );
-    }
-
-    public function testPrepareCheckoutProcessThrowsException(): void
+    /**
+     * @return array<mixed>
+     */
+    public function prepareThrowsExceptionDataProvider(): array
     {
         $checkoutProcessException = new ProcessExecutorException(
             new SymfonyProcessRuntimeException(sprintf(
@@ -104,37 +103,71 @@ class GitSourcePreparerTest extends WebTestCase
             ))
         );
 
-        $this->doPrepareWithExpectedGitCloneExceptionTest(
-            new ProcessOutput(0, 'clone success output', ''),
-            $checkoutProcessException,
-            function (
-                ProcessOutput $cloneProcessOutput,
-                ProcessExecutorException $passedCheckoutProcessException,
-                GitActionException $gitActionException
-            ) use ($checkoutProcessException) {
-                self::assertSame(GitActionException::ACTION_CHECKOUT, $gitActionException->getAction());
-                self::assertSame('Git checkout process failed', $gitActionException->getMessage());
-                self::assertSame($checkoutProcessException, $gitActionException->getProcessExecutorException());
-            }
-        );
-    }
-
-    public function testPrepareCheckoutProcessCannotCheckout(): void
-    {
-        $checkoutProcessOutput = $this->createCheckoutProcessErrorOutput();
-
-        $this->doPrepareWithExpectedGitCloneExceptionTest(
-            new ProcessOutput(0, 'clone success output', ''),
-            $checkoutProcessOutput,
-            function (
-                ProcessOutput $cloneProcessOutput,
-                ProcessOutput $passedCheckoutProcessOutput,
-                GitActionException $gitActionException
-            ) use ($checkoutProcessOutput) {
-                self::assertSame(GitActionException::ACTION_CHECKOUT, $gitActionException->getAction());
-                self::assertSame($checkoutProcessOutput->getErrorOutput(), $gitActionException->getMessage());
-            }
-        );
+        return [
+            'clone process throws exception' => [
+                'cloneProcessOutcome' => new ProcessExecutorException(
+                    new SymfonyProcessRuntimeException('Unable to launch a new process.')
+                ),
+                'checkoutProcessOutcome' => null,
+                'assertions' => function (
+                    ProcessExecutorException $cloneProcessException,
+                    ?object $checkoutProcessOutcome,
+                    GitActionException $gitActionException
+                ) {
+                    self::assertSame(GitActionException::ACTION_CLONE, $gitActionException->getAction());
+                    self::assertSame('Git clone process failed', $gitActionException->getMessage());
+                    self::assertSame($cloneProcessException, $gitActionException->getProcessExecutorException());
+                },
+            ],
+            'clone process fails to clone' => [
+                'cloneProcessOutcome' => new ProcessOutput(
+                    128,
+                    '',
+                    sprintf(
+                        'Cloning into \'%s\'' . "\n" . 'fatal: repository \'%s\' not found',
+                        self::REPOSITORY_URL,
+                        self::REPOSITORY_URL
+                    )
+                ),
+                'checkoutProcessOutcome' => null,
+                'assertions' => function (
+                    ProcessOutput $cloneProcessOutput,
+                    ?object $checkoutProcessOutcome,
+                    GitActionException $gitActionException
+                ) {
+                    self::assertSame(GitActionException::ACTION_CLONE, $gitActionException->getAction());
+                    self::assertStringEndsWith(
+                        $gitActionException->getMessage(),
+                        $cloneProcessOutput->getErrorOutput()
+                    );
+                },
+            ],
+            'checkout process throws exception' => [
+                'cloneProcessOutcome' => new ProcessOutput(0, 'clone success output', ''),
+                'checkoutProcessOutcome' => $checkoutProcessException,
+                'assertions' => function (
+                    ProcessOutput $cloneProcessOutput,
+                    ProcessExecutorException $passedCheckoutProcessException,
+                    GitActionException $gitActionException
+                ) use ($checkoutProcessException) {
+                    self::assertSame(GitActionException::ACTION_CHECKOUT, $gitActionException->getAction());
+                    self::assertSame('Git checkout process failed', $gitActionException->getMessage());
+                    self::assertSame($checkoutProcessException, $gitActionException->getProcessExecutorException());
+                },
+            ],
+            'checkout process fails to checkout' => [
+                'cloneProcessOutcome' => new ProcessOutput(0, 'clone success output', ''),
+                'checkoutProcessOutcome' => new ProcessOutput(128, '', self::CHECKOUT_ERROR),
+                'assertions' => function (
+                    ProcessOutput $cloneProcessOutput,
+                    ProcessOutput $passedCheckoutProcessOutput,
+                    GitActionException $gitActionException
+                ) {
+                    self::assertSame(GitActionException::ACTION_CHECKOUT, $gitActionException->getAction());
+                    self::assertSame(self::CHECKOUT_ERROR, $gitActionException->getMessage());
+                },
+            ],
+        ];
     }
 
     public function testPrepareSuccess(): void
@@ -172,55 +205,6 @@ class GitSourcePreparerTest extends WebTestCase
             'gitRepositoryCheckoutHandler',
             $this->createGitRepositoryCheckoutHandler($this->repositoryPath, $outcome)
         );
-    }
-
-    private function createCloneProcessErrorOutput(string $message): ProcessOutput
-    {
-        return new ProcessOutput(
-            128,
-            '',
-            sprintf('Cloning into \'%s\'' . "\n" . '%s', self::REPOSITORY_URL, $message)
-        );
-    }
-
-    private function createCheckoutProcessErrorOutput(): ProcessOutput
-    {
-        return new ProcessOutput(
-            128,
-            '',
-            'error: pathspec \'' . self::REF . '\' did not match any file(s) known to git'
-        );
-    }
-
-
-    private function createCloneMessageForRepositoryNotFound(): string
-    {
-        return sprintf('fatal: repository \'%s\' not found', self::REPOSITORY_URL);
-    }
-
-    private function doPrepareWithExpectedGitCloneExceptionTest(
-        ProcessOutput|\Exception $cloneProcessOutcome,
-        null|ProcessOutput|\Exception $checkoutProcessOutcome,
-        callable $assertions
-    ): void {
-        $this->setGitRepositoryClonerOutcome($cloneProcessOutcome);
-
-        if (null != $checkoutProcessOutcome) {
-            $this->setGitRepositoryCheckoutHandlerOutcome($checkoutProcessOutcome);
-        }
-
-        try {
-            $this->gitSourcePreparer->prepare($this->gitSource, self::REF);
-            self::fail(GitActionException::class . ' not thrown');
-        } catch (GitActionException $gitActionException) {
-            $assertions($cloneProcessOutcome, $checkoutProcessOutcome, $gitActionException);
-        }
-
-        self::assertNotSame('', $this->repositoryPath);
-
-        $fileStoreUserPath = substr($this->repositoryPath, 0, (int) strrpos($this->repositoryPath, '/'));
-        self::assertDirectoryDoesNotExist($this->repositoryPath);
-        self::assertDirectoryExists($fileStoreUserPath);
     }
 
     private function createGitRepositoryCloner(ProcessOutput|\Exception $outcome): GitRepositoryCloner
