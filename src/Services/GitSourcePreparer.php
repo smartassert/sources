@@ -12,7 +12,6 @@ use App\Exception\File\NotExistsException;
 use App\Exception\File\OutOfScopeException;
 use App\Exception\File\RemoveException;
 use App\Exception\GitActionException;
-use App\Exception\ProcessExecutorException;
 use App\Model\ProcessOutput;
 use App\Model\UserGitRepository;
 use App\Services\Source\Factory;
@@ -50,7 +49,6 @@ class GitSourcePreparer
         }
 
         $gitActionException = null;
-        $gitAction = GitActionException::ACTION_CLONE;
         $cloneOutput = null;
         $checkoutOutput = null;
 
@@ -61,11 +59,9 @@ class GitSourcePreparer
             );
 
             if ($cloneOutput->isSuccessful()) {
-                $gitAction = GitActionException::ACTION_CHECKOUT;
                 $checkoutOutput = $this->gitRepositoryCheckoutHandler->checkout($gitRepositoryAbsolutePath, $ref);
             }
-        } catch (ProcessExecutorException $processExecutorException) {
-            $gitActionException = GitActionException::createForProcessException($gitAction, $processExecutorException);
+        } catch (GitActionException $gitActionException) {
         } finally {
             if ($cloneOutput instanceof ProcessOutput && false === $cloneOutput->isSuccessful()) {
                 $gitActionException = GitActionException::createFromCloneOutput($cloneOutput->getErrorOutput());
