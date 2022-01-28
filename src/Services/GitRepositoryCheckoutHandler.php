@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Exception\GitActionException;
 use App\Exception\ProcessExecutorException;
 use App\Model\CommandDefinition\Definition;
 use App\Model\ProcessOutput;
@@ -17,14 +18,18 @@ class GitRepositoryCheckoutHandler
     }
 
     /**
-     * @throws ProcessExecutorException
+     * @throws GitActionException
      */
     public function checkout(string $path, ?string $ref = null): ProcessOutput
     {
-        return $this->processExecutor->execute(
-            (new Definition('git checkout'))
-                ->withArguments([$ref]),
-            $path
-        );
+        try {
+            return $this->processExecutor->execute(
+                (new Definition('git checkout'))
+                    ->withArguments([$ref]),
+                $path
+            );
+        } catch (ProcessExecutorException $e) {
+            throw GitActionException::createForProcessException(GitActionException::ACTION_CHECKOUT, $e);
+        }
     }
 }

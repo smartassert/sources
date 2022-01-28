@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\Services;
 
+use App\Exception\GitActionException;
 use App\Exception\ProcessExecutorException;
 use App\Services\GitRepositoryCheckoutHandler;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -25,8 +26,11 @@ class GitRepositoryCheckoutHandlerTest extends WebTestCase
     public function testCheckoutRepositoryDirectoryDoesNotExist(): void
     {
         $this->expectExceptionObject(
-            new ProcessExecutorException(
-                new RuntimeException(sprintf('The provided cwd "%s" does not exist', __DIR__ . '/does-not-exist'))
+            GitActionException::createForProcessException(
+                GitActionException::ACTION_CHECKOUT,
+                new ProcessExecutorException(
+                    new RuntimeException(sprintf('The provided cwd "%s" does not exist', __DIR__ . '/does-not-exist'))
+                )
             )
         );
 
