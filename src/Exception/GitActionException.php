@@ -20,7 +20,7 @@ class GitActionException extends \Exception
         parent::__construct($message, 0, $processExecutorException);
     }
 
-    public static function createFromCloneErrorOutput(string $errorOutput): self
+    public static function createFromCloneOutput(string $errorOutput): self
     {
         $lines = explode("\n", trim($errorOutput));
         array_shift($lines);
@@ -28,7 +28,7 @@ class GitActionException extends \Exception
         return new GitActionException(self::ACTION_CLONE, implode("\n", $lines));
     }
 
-    public static function createFromCheckoutErrorOutput(string $errorOutput): self
+    public static function createFromCheckoutOutput(string $errorOutput): self
     {
         return new GitActionException(self::ACTION_CHECKOUT, $errorOutput);
     }
