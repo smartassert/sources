@@ -75,6 +75,7 @@ class GitSourcePreparerTest extends WebTestCase
         }
 
         $assertionCount = self::getCount();
+
         try {
             $this->gitSourcePreparer->prepare($this->gitSource, self::REF);
             self::fail(GitActionException::class . ' not thrown');
@@ -216,7 +217,8 @@ class GitSourcePreparerTest extends WebTestCase
                 $this->repositoryPath = $localPath;
 
                 return true;
-            });
+            })
+        ;
 
         if ($outcome instanceof ProcessOutput) {
             $expectation->andReturn($outcome);
@@ -238,12 +240,13 @@ class GitSourcePreparerTest extends WebTestCase
                 TestCase::assertSame(self::REF, $passedRef);
 
                 return true;
-            });
+            })
+        ;
 
         if ($outcome instanceof ProcessOutput) {
             $expectation->andReturnUsing(function (string $repositoryPath) use ($outcome): ProcessOutput {
-                $repositoryRelativePath = (string) (new UnicodeString($repositoryPath))
-                    ->trimPrefix($this->fileStoreBasePath . '/');
+                $repositoryRelativePath =
+                    (string) (new UnicodeString($repositoryPath))->trimPrefix($this->fileStoreBasePath . '/');
                 $this->fixtureCreator->copyFixturesTo($repositoryRelativePath);
 
                 return $outcome;

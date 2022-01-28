@@ -53,6 +53,7 @@ class GitSourcePreparer
         $gitAction = GitActionException::ACTION_CLONE;
         $cloneOutput = null;
         $checkoutOutput = null;
+
         try {
             $cloneOutput = $this->gitRepositoryCloner->clone(
                 $this->createRepositoryUrl($source),
@@ -76,6 +77,7 @@ class GitSourcePreparer
 
             if ($gitActionException instanceof GitActionException) {
                 $this->fileStoreManager->remove($gitRepositoryRelativePath);
+
                 throw $gitActionException;
             }
         }
