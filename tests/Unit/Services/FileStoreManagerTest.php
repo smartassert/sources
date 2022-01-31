@@ -178,7 +178,7 @@ class FileStoreManagerTest extends TestCase
                 ),
                 'sourceRelativePath' => $sourceRelativePath,
                 'targetRelativePath' => $targetRelativePath,
-                'expected' => new NotExistsException($sourcePath),
+                'expected' => (new NotExistsException($sourcePath))->withContext('source'),
             ],
             'target ' . RemoveException::class => [
                 'fileStoreManager' => new FileStoreManager(
