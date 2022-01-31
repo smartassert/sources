@@ -32,7 +32,7 @@ class FileSourcePreparer
         $exception = null;
 
         try {
-            $this->fileStoreManager->mirror((string)$source, (string)$target);
+            $this->fileStoreManager->mirror((string) $source, (string) $target);
         } catch (MirrorException $mirrorException) {
             $exception = $mirrorException;
 

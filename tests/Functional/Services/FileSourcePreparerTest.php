@@ -9,7 +9,6 @@ use App\Entity\RunSource;
 use App\Exception\File\MirrorException;
 use App\Exception\File\NotExistsException;
 use App\Exception\SourceMirrorException;
-use App\Repository\SourceRepository;
 use App\Services\FileSourcePreparer;
 use App\Tests\Mock\Services\MockFileStoreManager;
 use App\Tests\Model\UserId;
@@ -23,7 +22,6 @@ use webignition\ObjectReflector\ObjectReflector;
 class FileSourcePreparerTest extends WebTestCase
 {
     private FileSourcePreparer $fileSourcePreparer;
-    private SourceRepository $sourceRepository;
     private FileStoreFixtureCreator $fixtureCreator;
 
     protected function setUp(): void
@@ -33,10 +31,6 @@ class FileSourcePreparerTest extends WebTestCase
         $fileSourcePreparer = self::getContainer()->get(FileSourcePreparer::class);
         \assert($fileSourcePreparer instanceof FileSourcePreparer);
         $this->fileSourcePreparer = $fileSourcePreparer;
-
-        $sourceRepository = self::getContainer()->get(SourceRepository::class);
-        \assert($sourceRepository instanceof SourceRepository);
-        $this->sourceRepository = $sourceRepository;
 
         $fixtureCreator = self::getContainer()->get(FileStoreFixtureCreator::class);
         \assert($fixtureCreator instanceof FileStoreFixtureCreator);
