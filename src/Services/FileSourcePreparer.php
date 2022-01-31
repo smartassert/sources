@@ -7,7 +7,7 @@ namespace App\Services;
 use App\Entity\FileSource;
 use App\Entity\RunSource;
 use App\Exception\File\FileExceptionInterface;
-use App\Exception\FileSourcePreparationException;
+use App\Exception\SourceMirrorException;
 use App\Services\Source\Factory;
 use App\Services\Source\Store;
 
@@ -21,7 +21,7 @@ class FileSourcePreparer
     }
 
     /**
-     * @throws FileSourcePreparationException
+     * @throws SourceMirrorException
      */
     public function prepare(FileSource $source): RunSource
     {
@@ -32,7 +32,7 @@ class FileSourcePreparer
         } catch (FileExceptionInterface $exception) {
             $this->sourceStore->remove($runSource);
 
-            throw new FileSourcePreparationException($exception);
+            throw new SourceMirrorException($exception);
         }
 
         $this->sourceStore->add($runSource);
