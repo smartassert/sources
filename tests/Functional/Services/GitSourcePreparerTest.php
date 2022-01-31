@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Functional\Services;
 
 use App\Entity\GitSource;
+use App\Entity\RunSource;
 use App\Exception\GitActionException;
 use App\Exception\UserGitRepositoryException;
 use App\Model\UserGitRepository;
@@ -69,7 +70,7 @@ class GitSourcePreparerTest extends WebTestCase
         $this->setUserGitRepositoryPreparerOutcome($this->gitSource, self::REF, $userGitRepositoryException);
 
         try {
-            $this->gitSourcePreparer->prepare($this->gitSource, self::REF);
+            $this->gitSourcePreparer->prepare(new RunSource($this->gitSource), self::REF);
             self::fail(UserGitRepositoryException::class . ' not thrown');
         } catch (UserGitRepositoryException $exception) {
             self::assertSame($userGitRepositoryException, $exception);
@@ -82,7 +83,8 @@ class GitSourcePreparerTest extends WebTestCase
     {
         $this->setUserGitRepositoryPreparerOutcome($this->gitSource, self::REF, $this->userGitRepository);
 
-        $runSource = $this->gitSourcePreparer->prepare($this->gitSource, self::REF);
+        $runSource = new RunSource($this->gitSource);
+        $this->gitSourcePreparer->prepare($runSource, self::REF);
 
         $sourceAbsolutePath = Path::canonicalize(
             $this->fixtureCreator->getFixturesPath() . $this->gitSource->getPath()
@@ -90,6 +92,7 @@ class GitSourcePreparerTest extends WebTestCase
         $targetAbsolutePath = Path::canonicalize($this->fileStoreBasePath . '/' . $runSource);
 
         self::assertSame(scandir($sourceAbsolutePath), scandir($targetAbsolutePath));
+        self::assertDirectoryDoesNotExist($this->repositoryPath);
     }
 
     private function setUserGitRepositoryPreparerOutcome(

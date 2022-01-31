@@ -10,7 +10,6 @@ use App\Exception\File\CreateException;
 use App\Exception\SourceMirrorException;
 use App\Model\UserGitRepository;
 use App\Services\GitSourcePreparer;
-use App\Services\Source\Factory;
 use App\Services\UserGitRepositoryPreparer;
 use App\Tests\Mock\Services\MockFileStoreManager;
 use App\Tests\Model\UserId;
@@ -30,16 +29,6 @@ class GitSourcePreparerTest extends WebTestCase
         ))->withContext('target');
 
         $userGitRepository = new UserGitRepository($gitSource);
-
-        $runSource = new RunSource($gitSource, ['ref' => $ref]);
-
-        $sourceFactory = \Mockery::mock(Factory::class);
-        $sourceFactory
-            ->shouldReceive('createRunSource')
-            ->with($gitSource, ['ref' => $ref])
-            ->andReturn($runSource)
-        ;
-
         $userGitRepositoryPreparer = $this->createUserGitRepositoryPreparer($gitSource, $ref, $userGitRepository);
 
         $fileStoreManager = (new MockFileStoreManager())
@@ -48,10 +37,10 @@ class GitSourcePreparerTest extends WebTestCase
             ->getMock()
         ;
 
-        $gitSourcePreparer = new GitSourcePreparer($sourceFactory, $userGitRepositoryPreparer, $fileStoreManager);
+        $gitSourcePreparer = new GitSourcePreparer($userGitRepositoryPreparer, $fileStoreManager);
 
         try {
-            $gitSourcePreparer->prepare($gitSource, $ref);
+            $gitSourcePreparer->prepare(new RunSource($gitSource), $ref);
             self::fail('Exception not thrown');
         } catch (\Exception $exception) {
             self::assertEquals(new SourceMirrorException($fileStoreManagerException), $exception);

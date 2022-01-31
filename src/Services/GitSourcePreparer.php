@@ -11,13 +11,11 @@ use App\Exception\File\OutOfScopeException;
 use App\Exception\File\RemoveException;
 use App\Exception\SourceMirrorException;
 use App\Exception\UserGitRepositoryException;
-use App\Services\Source\Factory;
 use Symfony\Component\Filesystem\Path;
 
 class GitSourcePreparer
 {
     public function __construct(
-        private Factory $sourceFactory,
         private UserGitRepositoryPreparer $userGitRepositoryPreparer,
         private FileStoreManager $fileStoreManager,
     ) {
@@ -27,21 +25,25 @@ class GitSourcePreparer
      * @throws UserGitRepositoryException
      * @throws SourceMirrorException
      */
-    public function prepare(GitSource $source, ?string $ref = null): RunSource
+    public function prepare(RunSource $target, ?string $ref = null): void
     {
-        $gitRepository = $this->userGitRepositoryPreparer->prepare($source, $ref);
+        $source = $target->getParent();
 
-        $runSourceParameters = [];
-        if (is_string($ref)) {
-            $runSourceParameters['ref'] = $ref;
+        if (!$source instanceof GitSource) {
+            return;
         }
 
-        $runSource = $this->sourceFactory->createRunSource($source, $runSourceParameters);
+        $gitRepository = $this->userGitRepositoryPreparer->prepare($source, $ref);
         $copyableSourcePath = Path::canonicalize($gitRepository->getPath() . '/' . $source->getPath());
 
         try {
-            $this->fileStoreManager->mirror($copyableSourcePath, (string) $runSource);
+            $this->fileStoreManager->mirror($copyableSourcePath, (string) $target);
         } catch (FileExceptionInterface $mirrorException) {
+            try {
+                $this->fileStoreManager->remove((string) $target);
+            } catch (OutOfScopeException | RemoveException) {
+            }
+
             throw new SourceMirrorException($mirrorException);
         } finally {
             try {
@@ -49,7 +51,5 @@ class GitSourcePreparer
             } catch (OutOfScopeException | RemoveException) {
             }
         }
-
-        return $runSource;
     }
 }
