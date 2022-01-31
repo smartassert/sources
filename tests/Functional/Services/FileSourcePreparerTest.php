@@ -5,22 +5,23 @@ declare(strict_types=1);
 namespace App\Tests\Functional\Services;
 
 use App\Entity\FileSource;
+use App\Entity\RunSource;
+use App\Exception\File\MirrorException;
 use App\Exception\File\NotExistsException;
 use App\Exception\SourceMirrorException;
-use App\Repository\SourceRepository;
 use App\Services\FileSourcePreparer;
 use App\Tests\Mock\Services\MockFileStoreManager;
 use App\Tests\Model\UserId;
 use App\Tests\Services\FileStoreFixtureCreator;
 use App\Tests\Services\Source\SourceRemover;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Path;
 use webignition\ObjectReflector\ObjectReflector;
 
 class FileSourcePreparerTest extends WebTestCase
 {
     private FileSourcePreparer $fileSourcePreparer;
-    private SourceRepository $sourceRepository;
     private FileStoreFixtureCreator $fixtureCreator;
 
     protected function setUp(): void
@@ -30,10 +31,6 @@ class FileSourcePreparerTest extends WebTestCase
         $fileSourcePreparer = self::getContainer()->get(FileSourcePreparer::class);
         \assert($fileSourcePreparer instanceof FileSourcePreparer);
         $this->fileSourcePreparer = $fileSourcePreparer;
-
-        $sourceRepository = self::getContainer()->get(SourceRepository::class);
-        \assert($sourceRepository instanceof SourceRepository);
-        $this->sourceRepository = $sourceRepository;
 
         $fixtureCreator = self::getContainer()->get(FileStoreFixtureCreator::class);
         \assert($fixtureCreator instanceof FileStoreFixtureCreator);
@@ -45,13 +42,15 @@ class FileSourcePreparerTest extends WebTestCase
         }
     }
 
-    public function testPrepareFileSourceMirrorException(): void
+    public function testPrepareFileSourceMirrorCallFileException(): void
     {
         $source = new FileSource(UserId::create(), 'file source label');
-        $exception = new NotExistsException('path-does-not-exist');
+        $fileException = new NotExistsException('path-does-not-exist');
+
+        $runSource = new RunSource($source);
 
         $fileStoreManager = (new MockFileStoreManager())
-            ->withMirrorCallThrowingException($exception)
+            ->withMirrorCallThrowingException($fileException)
             ->getMock()
         ;
 
@@ -63,29 +62,58 @@ class FileSourcePreparerTest extends WebTestCase
         );
 
         try {
-            $this->fileSourcePreparer->prepare($source);
+            $this->fileSourcePreparer->prepare($runSource);
             self::fail(SourceMirrorException::class . ' not thrown');
         } catch (SourceMirrorException $fileSourcePreparationException) {
-            self::assertEquals(new SourceMirrorException($exception), $fileSourcePreparationException);
+            self::assertEquals(new SourceMirrorException($fileException), $fileSourcePreparationException);
         }
+    }
 
-        self::assertCount(0, $this->sourceRepository->findAll());
+    public function testPrepareFileSourceMirrorCallMirrorException(): void
+    {
+        $source = new FileSource(UserId::create(), 'file source label');
+        $fileException = new MirrorException(
+            '/path/to/source',
+            '/path/to/target',
+            \Mockery::mock(IOException::class)
+        );
+
+        $runSource = new RunSource($source);
+
+        $fileStoreManager = (new MockFileStoreManager())
+            ->withMirrorCallThrowingException($fileException)
+            ->withRemoveCall((string) $runSource)
+            ->getMock()
+        ;
+
+        ObjectReflector::setProperty(
+            $this->fileSourcePreparer,
+            FileSourcePreparer::class,
+            'fileStoreManager',
+            $fileStoreManager
+        );
+
+        try {
+            $this->fileSourcePreparer->prepare($runSource);
+            self::fail(SourceMirrorException::class . ' not thrown');
+        } catch (SourceMirrorException $fileSourcePreparationException) {
+            self::assertEquals(new SourceMirrorException($fileException), $fileSourcePreparationException);
+        }
     }
 
     public function testPrepareSuccess(): void
     {
-        $fileSource = new FileSource(UserId::create(), 'file source label');
-        $this->fixtureCreator->copyFixturesTo($fileSource->getPath());
+        $source = new FileSource(UserId::create(), 'file source label');
+        $this->fixtureCreator->copyFixturesTo($source->getPath());
 
-        $runSource = $this->fileSourcePreparer->prepare($fileSource);
-
-        self::assertCount(2, $this->sourceRepository->findAll());
+        $target = new RunSource($source);
+        $this->fileSourcePreparer->prepare($target);
 
         $fileStoreBasePath = self::getContainer()->getParameter('file_store_base_path');
         \assert(is_string($fileStoreBasePath));
 
-        $sourceAbsolutePath = Path::canonicalize($fileStoreBasePath . '/' . $fileSource);
-        $targetAbsolutePath = Path::canonicalize($fileStoreBasePath . '/' . $runSource);
+        $sourceAbsolutePath = Path::canonicalize($fileStoreBasePath . '/' . $source);
+        $targetAbsolutePath = Path::canonicalize($fileStoreBasePath . '/' . $target);
 
         self::assertSame(scandir($sourceAbsolutePath), scandir($targetAbsolutePath));
     }
