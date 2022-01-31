@@ -46,13 +46,9 @@ class GitSourcePreparer
 
         try {
             $this->fileStoreManager->mirror($copyableSourcePath, (string) $runSource);
-        } catch (CreateException | NotExistsException | RemoveException | MirrorException $exception) {
+        } finally {
             $this->fileStoreManager->remove((string) $gitRepository);
-
-            throw $exception;
         }
-
-        $this->fileStoreManager->remove((string) $gitRepository);
 
         return $runSource;
     }
