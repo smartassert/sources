@@ -80,7 +80,7 @@ class FileStoreManager
         $targetPath = (string) $targetAbsolutePath;
 
         if (false === $this->doExists($sourceAbsolutePath)) {
-            throw new NotExistsException($sourcePath);
+            throw (new NotExistsException($sourcePath))->withContext('source');
         }
 
         if ($sourcePath === $targetPath) {
