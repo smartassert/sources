@@ -6,11 +6,10 @@ namespace App\Services;
 
 use App\Entity\GitSource;
 use App\Entity\RunSource;
-use App\Exception\File\CreateException;
-use App\Exception\File\MirrorException;
-use App\Exception\File\NotExistsException;
+use App\Exception\File\FileExceptionInterface;
 use App\Exception\File\OutOfScopeException;
 use App\Exception\File\RemoveException;
+use App\Exception\SourceMirrorException;
 use App\Exception\UserGitRepositoryException;
 use App\Services\Source\Factory;
 use Symfony\Component\Filesystem\Path;
@@ -25,12 +24,8 @@ class GitSourcePreparer
     }
 
     /**
-     * @throws CreateException
-     * @throws OutOfScopeException
-     * @throws RemoveException
-     * @throws MirrorException
-     * @throws NotExistsException
      * @throws UserGitRepositoryException
+     * @throws SourceMirrorException
      */
     public function prepare(GitSource $source, ?string $ref = null): RunSource
     {
@@ -46,8 +41,13 @@ class GitSourcePreparer
 
         try {
             $this->fileStoreManager->mirror($copyableSourcePath, (string) $runSource);
+        } catch (FileExceptionInterface $mirrorException) {
+            throw new SourceMirrorException($mirrorException);
         } finally {
-            $this->fileStoreManager->remove((string) $gitRepository);
+            try {
+                $this->fileStoreManager->remove((string) $gitRepository);
+            } catch (OutOfScopeException | RemoveException) {
+            }
         }
 
         return $runSource;
