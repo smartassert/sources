@@ -38,14 +38,16 @@ class GitSourcePreparerTest extends WebTestCase
         $sourceFactory
             ->shouldReceive('createRunSource')
             ->with($gitSource, ['ref' => $ref])
-            ->andReturn($runSource);
+            ->andReturn($runSource)
+        ;
 
         $userGitRepositoryPreparer = $this->createUserGitRepositoryPreparer($gitSource, $ref, $userGitRepository);
 
         $fileStoreManager = (new MockFileStoreManager())
             ->withMirrorCallThrowingException($fileStoreManagerException)
             ->withRemoveCall((string) $userGitRepository)
-            ->getMock();
+            ->getMock()
+        ;
 
         $gitSourcePreparer = new GitSourcePreparer($sourceFactory, $userGitRepositoryPreparer, $fileStoreManager);
 
@@ -126,7 +128,8 @@ class GitSourcePreparerTest extends WebTestCase
 
                 return true;
             })
-            ->andReturn($outcome);
+            ->andReturn($outcome)
+        ;
 
         return $mock;
     }

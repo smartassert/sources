@@ -48,7 +48,8 @@ class MockFileStoreManager
             ->shouldReceive('remove')
             ->withArgs(function (string $gitRepositoryRelativePath): bool {
                 return true;
-            });
+            })
+        ;
 
         if (is_string($outcome)) {
             $expectation->andReturn($outcome);

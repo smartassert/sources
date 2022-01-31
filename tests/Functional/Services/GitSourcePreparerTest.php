@@ -123,7 +123,8 @@ class GitSourcePreparerTest extends WebTestCase
                 }
 
                 return true;
-            });
+            })
+        ;
 
         if ($outcome instanceof UserGitRepositoryException) {
             $expectation->andThrow($outcome);
