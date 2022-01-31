@@ -87,8 +87,12 @@ class FileStoreManager
             return $targetPath;
         }
 
-        $this->doRemove($targetAbsolutePath);
-        $this->doCreate($targetAbsolutePath);
+        try {
+            $this->doRemove($targetAbsolutePath);
+            $this->doCreate($targetAbsolutePath);
+        } catch (RemoveException | CreateException $exception) {
+            throw $exception->withContext('target');
+        }
 
         try {
             $this->filesystem->mirror($sourcePath, $targetPath);
