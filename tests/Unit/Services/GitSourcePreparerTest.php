@@ -7,6 +7,7 @@ namespace App\Tests\Unit\Services;
 use App\Entity\GitSource;
 use App\Entity\RunSource;
 use App\Exception\File\CreateException;
+use App\Exception\SourceMirrorException;
 use App\Model\UserGitRepository;
 use App\Services\GitSourcePreparer;
 use App\Services\Source\Factory;
@@ -53,7 +54,7 @@ class GitSourcePreparerTest extends WebTestCase
             $gitSourcePreparer->prepare($gitSource, $ref);
             self::fail('Exception not thrown');
         } catch (\Exception $exception) {
-            self::assertSame($fileStoreManagerException, $exception);
+            self::assertEquals(new SourceMirrorException($fileStoreManagerException), $exception);
         }
     }
 
