@@ -27,4 +27,9 @@ class UserGitRepository implements UserFileLocatorInterface
     {
         return $this->source->getUserId();
     }
+
+    public function getSource(): GitSource
+    {
+        return $this->source;
+    }
 }
