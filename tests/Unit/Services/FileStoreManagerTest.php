@@ -190,7 +190,7 @@ class FileStoreManagerTest extends TestCase
                 ),
                 'sourceRelativePath' => $sourceRelativePath,
                 'targetRelativePath' => $targetRelativePath,
-                'expected' => new RemoveException($targetPath, $cannotRemoveIOException),
+                'expected' => (new RemoveException($targetPath, $cannotRemoveIOException))->withContext('target'),
             ],
             'target ' . CreateException::class => [
                 'fileStoreManager' => new FileStoreManager(
@@ -203,7 +203,7 @@ class FileStoreManagerTest extends TestCase
                 ),
                 'sourceRelativePath' => $sourceRelativePath,
                 'targetRelativePath' => $targetRelativePath,
-                'expected' => new CreateException($targetPath, $cannotCreateIOException),
+                'expected' => (new CreateException($targetPath, $cannotCreateIOException))->withContext('target'),
             ],
             MirrorException::class => [
                 'fileStoreManager' => new FileStoreManager(
