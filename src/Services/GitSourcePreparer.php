@@ -11,20 +11,16 @@ use App\Exception\File\MirrorException;
 use App\Exception\File\NotExistsException;
 use App\Exception\File\OutOfScopeException;
 use App\Exception\File\RemoveException;
-use App\Exception\GitActionException;
-use App\Model\ProcessOutput;
-use App\Model\UserGitRepository;
+use App\Exception\UserGitRepositoryException;
 use App\Services\Source\Factory;
 use Symfony\Component\Filesystem\Path;
-use Symfony\Component\String\UnicodeString;
 
 class GitSourcePreparer
 {
     public function __construct(
         private Factory $sourceFactory,
+        private UserGitRepositoryPreparer $userGitRepositoryPreparer,
         private FileStoreManager $fileStoreManager,
-        private GitRepositoryCloner $gitRepositoryCloner,
-        private GitRepositoryCheckoutHandler $gitRepositoryCheckoutHandler,
     ) {
     }
 
@@ -34,82 +30,38 @@ class GitSourcePreparer
      * @throws RemoveException
      * @throws MirrorException
      * @throws NotExistsException
-     * @throws GitActionException
+     * @throws UserGitRepositoryException
      */
     public function prepare(GitSource $source, ?string $ref = null): RunSource
     {
-        $gitRepository = new UserGitRepository($source);
-        $gitRepositoryRelativePath = (string) $gitRepository;
+        $gitRepository = $this->userGitRepositoryPreparer->prepare($source, $ref);
 
-        try {
-            $gitRepositoryAbsolutePath = $this->fileStoreManager->remove($gitRepositoryRelativePath);
-            $this->fileStoreManager->create($gitRepositoryRelativePath);
-        } catch (CreateException | OutOfScopeException $exception) {
-            throw $exception->withContext('source');
+        $runSourceParameters = [];
+        if (is_string($ref)) {
+            $runSourceParameters['ref'] = $ref;
         }
 
-        $gitActionException = null;
-        $cloneOutput = null;
-        $checkoutOutput = null;
-
-        try {
-            $cloneOutput = $this->gitRepositoryCloner->clone(
-                $this->createRepositoryUrl($source),
-                $gitRepositoryAbsolutePath
-            );
-
-            if ($cloneOutput->isSuccessful()) {
-                $checkoutOutput = $this->gitRepositoryCheckoutHandler->checkout($gitRepositoryAbsolutePath, $ref);
-            }
-        } catch (GitActionException $gitActionException) {
-        } finally {
-            if ($cloneOutput instanceof ProcessOutput && false === $cloneOutput->isSuccessful()) {
-                $gitActionException = GitActionException::createFromCloneOutput($cloneOutput->getErrorOutput());
-            }
-
-            if ($checkoutOutput instanceof ProcessOutput && false === $checkoutOutput->isSuccessful()) {
-                $gitActionException = GitActionException::createFromCheckoutOutput($checkoutOutput->getErrorOutput());
-            }
-
-            if ($gitActionException instanceof GitActionException) {
-                $this->fileStoreManager->remove($gitRepositoryRelativePath);
-
-                throw $gitActionException;
-            }
-        }
-
-        $runSource = $this->sourceFactory->createRunSource($source);
+        $runSource = $this->sourceFactory->createRunSource($source, $runSourceParameters);
         $copyableSourcePath = Path::canonicalize($gitRepository->getPath() . '/' . $source->getPath());
 
         try {
             $this->fileStoreManager->mirror($copyableSourcePath, (string) $runSource);
         } catch (CreateException | NotExistsException | RemoveException $exception) {
-            $this->fileStoreManager->remove($gitRepositoryRelativePath);
+            $this->fileStoreManager->remove((string) $gitRepository);
 
-            throw $exception->withContext('target');
+            if (null == $exception->getContext()) {
+                $exception = $exception->withContext('target');
+            }
+
+            throw $exception;
         } catch (MirrorException $mirrorException) {
-            $this->fileStoreManager->remove($gitRepositoryRelativePath);
+            $this->fileStoreManager->remove((string) $gitRepository);
 
             throw $mirrorException;
         }
 
-        $this->fileStoreManager->remove($gitRepositoryRelativePath);
+        $this->fileStoreManager->remove((string) $gitRepository);
 
         return $runSource;
-    }
-
-    private function createRepositoryUrl(GitSource $source): string
-    {
-        $url = $source->getHostUrl();
-
-        $credentials = $source->getCredentials();
-        if ('' === $credentials) {
-            return $url;
-        }
-
-        $urlString = new UnicodeString($url);
-        $urlString = $urlString->trimPrefix(['https://', 'http://']);
-
-        return sprintf('%s%s@%s', 'https://', $credentials, $urlString);
     }
 }
