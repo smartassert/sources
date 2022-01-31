@@ -6,7 +6,7 @@ namespace App\Tests\Functional\Services;
 
 use App\Entity\FileSource;
 use App\Exception\File\NotExistsException;
-use App\Exception\FileSourcePreparationException;
+use App\Exception\SourceMirrorException;
 use App\Repository\SourceRepository;
 use App\Services\FileSourcePreparer;
 use App\Tests\Mock\Services\MockFileStoreManager;
@@ -64,9 +64,9 @@ class FileSourcePreparerTest extends WebTestCase
 
         try {
             $this->fileSourcePreparer->prepare($source);
-            self::fail(FileSourcePreparationException::class . ' not thrown');
-        } catch (FileSourcePreparationException $fileSourcePreparationException) {
-            self::assertEquals(new FileSourcePreparationException($exception), $fileSourcePreparationException);
+            self::fail(SourceMirrorException::class . ' not thrown');
+        } catch (SourceMirrorException $fileSourcePreparationException) {
+            self::assertEquals(new SourceMirrorException($exception), $fileSourcePreparationException);
         }
 
         self::assertCount(0, $this->sourceRepository->findAll());
