@@ -6,7 +6,7 @@ namespace App\Model;
 
 use App\Entity\GitSource;
 
-class UserGitRepository implements UserFileLocatorInterface
+class UserGitRepository implements UserFileLocatorInterface, SourceOriginInterface
 {
     use UserSourceFileLocatorTrait;
 
