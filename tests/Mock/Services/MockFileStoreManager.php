@@ -37,4 +37,43 @@ class MockFileStoreManager
 
         return $this;
     }
+
+    public function withRemoveCall(string|\Exception $outcome): self
+    {
+        if (false === $this->mock instanceof MockInterface) {
+            return $this;
+        }
+
+        $expectation = $this->mock
+            ->shouldReceive('remove')
+            ->withArgs(function (string $gitRepositoryRelativePath): bool {
+                return true;
+            })
+        ;
+
+        if (is_string($outcome)) {
+            $expectation->andReturn($outcome);
+        } else {
+            $expectation->andThrow($outcome);
+        }
+
+        return $this;
+    }
+
+    public function withCreateCallThrowingException(\Exception $exception): self
+    {
+        if (false === $this->mock instanceof MockInterface) {
+            return $this;
+        }
+
+        $this->mock
+            ->shouldReceive('create')
+            ->withArgs(function (string $gitRepositoryRelativePath): bool {
+                return true;
+            })
+            ->andThrow($exception)
+        ;
+
+        return $this;
+    }
 }
