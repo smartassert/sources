@@ -32,9 +32,6 @@ services:
             $sourceFixturesPath: '%source_fixtures_path%'
             $fileStoreBasePath: '%file_store_base_path%'
 
-    App\Services\FileSourcePreparer:
-        public: true
-
     App\Services\FileStoreManager:
         public: true
         arguments:
@@ -43,8 +40,8 @@ services:
     App\Services\GitRepositoryCheckoutHandler:
         public: true
 
-    App\Services\GitSourcePreparer:
+    App\Services\UserGitRepositoryPreparer:
         public: true
 
-    App\Services\UserGitRepositoryPreparer:
+    App\Services\RunSourcePreparer:
         public: true
