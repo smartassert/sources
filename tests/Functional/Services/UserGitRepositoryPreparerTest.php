@@ -13,8 +13,8 @@ use App\Services\GitRepositoryCheckoutHandler;
 use App\Services\GitRepositoryCloner;
 use App\Services\UserGitRepositoryPreparer;
 use App\Tests\Model\UserId;
+use App\Tests\Services\EntityRemover;
 use App\Tests\Services\FileStoreFixtureCreator;
-use App\Tests\Services\Source\SourceRemover;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Filesystem\Path;
@@ -51,9 +51,9 @@ class UserGitRepositoryPreparerTest extends WebTestCase
         \assert(is_string($fileStoreBasePath));
         $this->fileStoreBasePath = $fileStoreBasePath;
 
-        $sourceRemover = self::getContainer()->get(SourceRemover::class);
-        if ($sourceRemover instanceof SourceRemover) {
-            $sourceRemover->removeAll();
+        $entityRemover = self::getContainer()->get(EntityRemover::class);
+        if ($entityRemover instanceof EntityRemover) {
+            $entityRemover->removeAll();
         }
 
         $this->gitSource = new GitSource(UserId::create(), self::REPOSITORY_URL, self::PATH);
