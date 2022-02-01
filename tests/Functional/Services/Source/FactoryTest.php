@@ -6,7 +6,6 @@ namespace App\Tests\Functional\Services\Source;
 
 use App\Entity\FileSource;
 use App\Entity\GitSource;
-use App\Entity\RunSource;
 use App\Entity\SourceInterface;
 use App\Repository\SourceRepository;
 use App\Request\FileSourceRequest;
@@ -63,18 +62,6 @@ class FactoryTest extends WebTestCase
         $this->factory->createFileSourceFromRequest($user, $request);
 
         self::assertCount(1, $this->repository->findAll());
-    }
-
-    public function testCreateRunSource(): void
-    {
-        $user = new User(UserId::create());
-        $parent = new FileSource($user->getUserIdentifier(), 'file source label');
-        $parameters = ['ref' => 'v0.1'];
-
-        $source = $this->factory->createRunSource($parent, $parameters);
-
-        $this->assertCreatedRunSource($source, $user->getUserIdentifier(), $parent, $parameters);
-        self::assertCount(0, $this->repository->findAll());
     }
 
     /**
@@ -150,21 +137,6 @@ class FactoryTest extends WebTestCase
         $this->assertCreatedSource($source, $expectedUserId);
 
         self::assertSame($expectedLabel, $source->getLabel());
-    }
-
-    /**
-     * @param array<string, string> $expectedParameters
-     */
-    private function assertCreatedRunSource(
-        RunSource $source,
-        string $expectedUserId,
-        FileSource|GitSource $expectedParent,
-        array $expectedParameters
-    ): void {
-        $this->assertCreatedSource($source, $expectedUserId);
-
-        self::assertEquals($expectedParent, $source->getParent());
-        self::assertEquals($expectedParameters, $source->getParameters());
     }
 
     private function assertCreatedSource(SourceInterface $source, string $expectedUserId): void
