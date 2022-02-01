@@ -9,9 +9,9 @@ use App\Entity\RunSource;
 use App\Exception\DirectoryDuplicationException;
 use App\Services\DirectoryDuplicator;
 use App\Services\FileSourcePreparer;
-use App\Services\Source\Factory;
 use App\Tests\Model\UserId;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Symfony\Component\Uid\Ulid;
 
 class FileSourcePreparerTest extends WebTestCase
 {
@@ -20,23 +20,26 @@ class FileSourcePreparerTest extends WebTestCase
         $source = new FileSource(UserId::create(), 'file source label');
         $target = new RunSource($source);
 
-        $sourceFactory = \Mockery::mock(Factory::class);
-        $sourceFactory
-            ->shouldReceive('createRunSource')
-            ->with($source)
-            ->andReturn($target)
-        ;
-
         $directoryDuplicatorException = \Mockery::mock(DirectoryDuplicationException::class);
 
         $directoryDuplicator = \Mockery::mock(DirectoryDuplicator::class);
         $directoryDuplicator
             ->shouldReceive('duplicate')
-            ->with((string) $source, (string) $target)
+            ->withArgs(function (string $sourcePath, string $targetPath) use ($source) {
+                self::assertSame((string) $source, $sourcePath);
+
+                $sourcePathParts = explode('/', $sourcePath);
+                $targetPathParts = explode('/', $targetPath);
+
+                self::assertSame($sourcePathParts[0], $targetPathParts[0]);
+                self::assertTrue(Ulid::isValid($targetPathParts[1]));
+
+                return true;
+            })
             ->andThrow($directoryDuplicatorException)
         ;
 
         self::expectExceptionObject($directoryDuplicatorException);
-        (new FileSourcePreparer($sourceFactory, $directoryDuplicator))->prepare($source);
+        (new FileSourcePreparer($directoryDuplicator))->prepare($source);
     }
 }
