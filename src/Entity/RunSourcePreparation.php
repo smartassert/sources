@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
-use App\Enum\RunSourcePreparationFailureReason;
-use App\Enum\RunSourcePreparationState;
+use App\Enum\RunSource\FailureReason;
+use App\Enum\RunSource\State;
 use App\Repository\RunSourcePreparationRepository;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -17,16 +17,16 @@ class RunSourcePreparation
     #[ORM\JoinColumn(nullable: false)]
     private RunSource $runSource;
 
-    #[ORM\Column(type: 'string', enumType: RunSourcePreparationState::class)]
-    private RunSourcePreparationState $state;
+    #[ORM\Column(type: 'string', enumType: State::class)]
+    private State $state;
 
-    #[ORM\Column(type: 'string', nullable: true, enumType: RunSourcePreparationFailureReason::class)]
-    private ?RunSourcePreparationFailureReason $failureReason = null;
+    #[ORM\Column(type: 'string', nullable: true, enumType: FailureReason::class)]
+    private ?FailureReason $failureReason = null;
 
     #[ORM\Column(type: 'text')]
     private ?string $failureMessage = null;
 
-    public function __construct(RunSource $runSource, RunSourcePreparationState $state)
+    public function __construct(RunSource $runSource, State $state)
     {
         $this->runSource = $runSource;
         $this->state = $state;
@@ -37,17 +37,17 @@ class RunSourcePreparation
         return $this->runSource;
     }
 
-    public function getState(): RunSourcePreparationState
+    public function getState(): State
     {
         return $this->state;
     }
 
-    public function setState(RunSourcePreparationState $state): void
+    public function setState(State $state): void
     {
         $this->state = $state;
     }
 
-    public function getFailureReason(): ?RunSourcePreparationFailureReason
+    public function getFailureReason(): ?FailureReason
     {
         return $this->failureReason;
     }
@@ -58,7 +58,7 @@ class RunSourcePreparation
     }
 
     public function setFailed(
-        RunSourcePreparationFailureReason $failureReason,
+        FailureReason $failureReason,
         string $failureMessage
     ): void {
         $this->failureReason = $failureReason;

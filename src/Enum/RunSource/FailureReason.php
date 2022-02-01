@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\Enum;
+namespace App\Enum\RunSource;
 
-enum RunSourcePreparationFailureReason: string
+enum FailureReason: string
 {
     case UNKNOWN = 'unknown';
     case TARGET_CREATE = 'target/create';
