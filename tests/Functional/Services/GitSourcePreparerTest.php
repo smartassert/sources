@@ -5,17 +5,12 @@ declare(strict_types=1);
 namespace App\Tests\Functional\Services;
 
 use App\Entity\GitSource;
-use App\Entity\RunSource;
-use App\Exception\GitActionException;
-use App\Exception\UserGitRepositoryException;
 use App\Model\UserGitRepository;
 use App\Services\GitSourcePreparer;
 use App\Services\UserGitRepositoryPreparer;
 use App\Tests\Model\UserId;
 use App\Tests\Services\FileStoreFixtureCreator;
-use App\Tests\Services\Source\SourceRemover;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-use Symfony\Component\Filesystem\Path;
 use webignition\ObjectReflector\ObjectReflector;
 
 class GitSourcePreparerTest extends WebTestCase
@@ -27,9 +22,6 @@ class GitSourcePreparerTest extends WebTestCase
     private GitSourcePreparer $gitSourcePreparer;
     private FileStoreFixtureCreator $fixtureCreator;
     private string $fileStoreBasePath;
-    private GitSource $gitSource;
-    private UserGitRepository $userGitRepository;
-    private string $repositoryPath;
 
     protected function setUp(): void
     {
@@ -46,95 +38,40 @@ class GitSourcePreparerTest extends WebTestCase
         $fileStoreBasePath = self::getContainer()->getParameter('file_store_base_path');
         \assert(is_string($fileStoreBasePath));
         $this->fileStoreBasePath = $fileStoreBasePath;
-
-        $sourceRemover = self::getContainer()->get(SourceRemover::class);
-        if ($sourceRemover instanceof SourceRemover) {
-            $sourceRemover->removeAll();
-        }
-
-        $this->gitSource = new GitSource(UserId::create(), self::REPOSITORY_URL, self::PATH);
-        $this->userGitRepository = new UserGitRepository($this->gitSource);
-        $this->repositoryPath = $this->fileStoreBasePath . '/' . $this->userGitRepository;
-    }
-
-    public function testPrepareUserGitRepositoryPreparerThrowsException(): void
-    {
-        $userGitRepositoryException = new UserGitRepositoryException(
-            $this->userGitRepository,
-            GitActionException::createFromCloneOutput(sprintf(
-                'Cloning into %s' . "\n" . 'Clone error content',
-                $this->repositoryPath,
-            ))
-        );
-
-        $this->setUserGitRepositoryPreparerOutcome($this->gitSource, self::REF, $userGitRepositoryException);
-
-        try {
-            $this->gitSourcePreparer->prepare(new RunSource($this->gitSource), self::REF);
-            self::fail(UserGitRepositoryException::class . ' not thrown');
-        } catch (UserGitRepositoryException $exception) {
-            self::assertSame($userGitRepositoryException, $exception);
-        }
-
-        self::assertDirectoryDoesNotExist($this->repositoryPath);
     }
 
     public function testPrepareSuccess(): void
     {
-        $this->setUserGitRepositoryPreparerOutcome($this->gitSource, self::REF, $this->userGitRepository);
+        $gitSource = new GitSource(UserId::create(), self::REPOSITORY_URL, self::PATH);
+        $userGitRepository = new UserGitRepository($gitSource);
+        $repositoryPath = $this->fileStoreBasePath . '/' . $userGitRepository;
 
-        $runSource = new RunSource($this->gitSource);
-        $this->gitSourcePreparer->prepare($runSource, self::REF);
+        $userGitRepositoryPreparer = \Mockery::mock(UserGitRepositoryPreparer::class);
+        $userGitRepositoryPreparer
+            ->shouldReceive('prepare')
+            ->withArgs(function (GitSource $passedGitSource, string $passedRef) use ($gitSource, $userGitRepository) {
+                self::assertSame($gitSource, $passedGitSource);
+                self::assertSame(self::REF, $passedRef);
+                $this->fixtureCreator->copyFixturesTo((string) $userGitRepository);
 
-        $sourceAbsolutePath = Path::canonicalize(
-            $this->fixtureCreator->getFixturesPath() . $this->gitSource->getPath()
-        );
-        $targetAbsolutePath = Path::canonicalize($this->fileStoreBasePath . '/' . $runSource);
+                return true;
+            })
+            ->andReturn($userGitRepository)
+        ;
 
-        self::assertSame(scandir($sourceAbsolutePath), scandir($targetAbsolutePath));
-        self::assertDirectoryDoesNotExist($this->repositoryPath);
-    }
-
-    private function setUserGitRepositoryPreparerOutcome(
-        GitSource $expectedGitSource,
-        ?string $expectedRef,
-        UserGitRepositoryException|UserGitRepository $outcome
-    ): void {
         ObjectReflector::setProperty(
             $this->gitSourcePreparer,
             GitSourcePreparer::class,
             'userGitRepositoryPreparer',
-            $this->createUserGitRepositoryPreparer($expectedGitSource, $expectedRef, $outcome)
+            $userGitRepositoryPreparer
         );
-    }
 
-    private function createUserGitRepositoryPreparer(
-        GitSource $expectedGitSource,
-        ?string $expectedRef,
-        UserGitRepositoryException|UserGitRepository $outcome
-    ): UserGitRepositoryPreparer {
-        $mock = \Mockery::mock(UserGitRepositoryPreparer::class);
+        $runSource = $this->gitSourcePreparer->prepare($gitSource, self::REF);
 
-        $expectation = $mock
-            ->shouldReceive('prepare')
-            ->withArgs(function (GitSource $gitSource, ?string $ref) use ($expectedGitSource, $expectedRef, $outcome) {
-                self::assertSame($expectedGitSource, $gitSource);
-                self::assertSame($expectedRef, $ref);
+        $sourceAbsolutePath = $this->fixtureCreator->getFixturesPath() . $gitSource->getPath();
+        $targetAbsolutePath = $this->fileStoreBasePath . '/' . $runSource;
 
-                if ($outcome instanceof UserGitRepository) {
-                    $this->fixtureCreator->copyFixturesTo((string) $this->userGitRepository);
-                }
-
-                return true;
-            })
-        ;
-
-        if ($outcome instanceof UserGitRepositoryException) {
-            $expectation->andThrow($outcome);
-        } else {
-            $expectation->andReturn($outcome);
-        }
-
-        return $mock;
+        self::assertSame(scandir($sourceAbsolutePath), scandir($targetAbsolutePath));
+        self::assertDirectoryDoesNotExist($repositoryPath);
     }
 }
