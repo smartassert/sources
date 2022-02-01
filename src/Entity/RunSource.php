@@ -20,7 +20,7 @@ class RunSource extends AbstractSource implements FileLocatorInterface, \JsonSer
      * @var array<string, string>
      */
     #[ORM\Column(type: 'simple_array', nullable: true)]
-    private array $parameters = [];
+    private array $parameters;
 
     /**
      * @param array<string, string> $parameters
@@ -31,6 +31,7 @@ class RunSource extends AbstractSource implements FileLocatorInterface, \JsonSer
 
         $this->parent = $parent;
         $this->parameters = $parameters;
+        ksort($this->parameters);
     }
 
     public function getParent(): FileSource|GitSource|null

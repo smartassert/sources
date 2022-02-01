@@ -6,7 +6,6 @@ namespace App\Services\Source;
 
 use App\Entity\FileSource;
 use App\Entity\GitSource;
-use App\Entity\RunSource;
 use App\Request\FileSourceRequest;
 use App\Request\GitSourceRequest;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -17,16 +16,6 @@ class Factory
         private Store $store,
         private Finder $finder,
     ) {
-    }
-
-    /**
-     * @param array<string, string> $parameters
-     */
-    public function createRunSource(FileSource|GitSource $parent, array $parameters = []): RunSource
-    {
-        ksort($parameters);
-
-        return new RunSource($parent, $parameters);
     }
 
     public function createGitSourceFromRequest(UserInterface $user, GitSourceRequest $request): GitSource
