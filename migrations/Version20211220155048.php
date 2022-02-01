@@ -22,6 +22,7 @@ final class Version20211220155048 extends AbstractMigration
                 id VARCHAR(32) NOT NULL, 
                 parent_id VARCHAR(32), 
                 parameters TEXT DEFAULT NULL,
+                preparation_state VARCHAR(255) NOT NULL,
                 PRIMARY KEY(id)
             )
         ');
