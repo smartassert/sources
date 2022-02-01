@@ -8,7 +8,6 @@ use App\Entity\FileSource;
 use App\Entity\GitSource;
 use App\Entity\RunSource;
 use App\Entity\SourceInterface;
-use App\Enum\RunSourcePreparationState;
 use App\Repository\SourceRepository;
 use App\Services\Source\Store;
 use App\Tests\Model\UserId;
@@ -21,7 +20,6 @@ class RunSourceTest extends WebTestCase
     private SourceRepository $repository;
     private Store $store;
     private EntityManagerInterface $entityManager;
-    private SourceRepository $sourceRepository;
 
     protected function setUp(): void
     {
@@ -38,10 +36,6 @@ class RunSourceTest extends WebTestCase
         $entityManager = self::getContainer()->get(EntityManagerInterface::class);
         \assert($entityManager instanceof EntityManagerInterface);
         $this->entityManager = $entityManager;
-
-        $sourceRepository = self::getContainer()->get(SourceRepository::class);
-        \assert($sourceRepository instanceof SourceRepository);
-        $this->sourceRepository = $sourceRepository;
 
         $sourceRemover = self::getContainer()->get(SourceRemover::class);
         if ($sourceRemover instanceof SourceRemover) {
@@ -86,54 +80,6 @@ class RunSourceTest extends WebTestCase
             ],
             SourceInterface::TYPE_GIT => [
                 'parent' => new GitSource(UserId::create(), 'https://example.com/repository.git'),
-            ],
-        ];
-    }
-
-    /**
-     * @dataProvider persistPreparationStateDataProvider
-     */
-    public function testPersistPreparationState(RunSourcePreparationState $state): void
-    {
-        self::assertCount(0, $this->sourceRepository->findAll());
-
-        $source = new FileSource(UserId::create(), 'label');
-        $runSource = new RunSource($source, [], $state);
-        $runSourceId = $runSource->getId();
-
-        $this->entityManager->persist($runSource);
-        $this->entityManager->flush();
-
-        self::assertCount(2, $this->sourceRepository->findAll());
-
-        $this->entityManager->clear();
-
-        $retrievedRunSource = $this->sourceRepository->find($runSourceId);
-        self::assertInstanceOf(RunSource::class, $retrievedRunSource);
-        self::assertEquals($runSource, $retrievedRunSource);
-        self::assertEquals($state, $retrievedRunSource->getPreparationState());
-    }
-
-    /**
-     * @return array<mixed>
-     */
-    public function persistPreparationStateDataProvider(): array
-    {
-        return [
-            RunSourcePreparationState::UNKNOWN->value => [
-                'state' => RunSourcePreparationState::UNKNOWN,
-            ],
-            RunSourcePreparationState::FAILED->value => [
-                'state' => RunSourcePreparationState::FAILED,
-            ],
-            RunSourcePreparationState::REQUESTED->value => [
-                'state' => RunSourcePreparationState::REQUESTED,
-            ],
-            RunSourcePreparationState::PREPARING->value => [
-                'state' => RunSourcePreparationState::PREPARING,
-            ],
-            RunSourcePreparationState::PREPARED->value => [
-                'state' => RunSourcePreparationState::PREPARED,
             ],
         ];
     }
