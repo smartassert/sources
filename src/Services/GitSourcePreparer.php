@@ -10,13 +10,11 @@ use App\Exception\DirectoryDuplicationException;
 use App\Exception\File\OutOfScopeException;
 use App\Exception\File\RemoveException;
 use App\Exception\UserGitRepositoryException;
-use App\Services\Source\Factory;
 use Symfony\Component\Filesystem\Path;
 
 class GitSourcePreparer
 {
     public function __construct(
-        private Factory $sourceFactory,
         private UserGitRepositoryPreparer $userGitRepositoryPreparer,
         private DirectoryDuplicator $directoryDuplicator,
         private FileStoreManager $fileStoreManager,
@@ -29,7 +27,7 @@ class GitSourcePreparer
      */
     public function prepare(GitSource $source, ?string $ref = null): RunSource
     {
-        $target = $this->sourceFactory->createRunSource($source);
+        $target = new RunSource($source);
 
         $gitRepository = $this->userGitRepositoryPreparer->prepare($source, $ref);
         $copyableSourcePath = Path::canonicalize($gitRepository->getPath() . '/' . $source->getPath());
