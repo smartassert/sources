@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
-use App\Enum\RunSourcePreparationState;
 use App\Model\UserFileLocatorInterface;
 use App\Model\UserSourceFileLocatorTrait;
 use Doctrine\ORM\Mapping as ORM;
@@ -24,25 +23,16 @@ class RunSource extends AbstractSource implements UserFileLocatorInterface, \Jso
     #[ORM\Column(type: 'simple_array', nullable: true)]
     private array $parameters;
 
-    #[ORM\Column(type: 'string', enumType: RunSourcePreparationState::class)]
-    private RunSourcePreparationState $preparationState;
-
     /**
      * @param array<string, string> $parameters
      */
-    public function __construct(
-        FileSource|GitSource $parent,
-        array $parameters = [],
-        ?RunSourcePreparationState $preparationState = null
-    ) {
+    public function __construct(FileSource|GitSource $parent, array $parameters = [])
+    {
         parent::__construct($parent->getUserId());
 
         $this->parent = $parent;
         $this->parameters = $parameters;
         ksort($this->parameters);
-        $this->preparationState = $preparationState instanceof RunSourcePreparationState
-            ? $preparationState
-            : RunSourcePreparationState::UNKNOWN;
     }
 
     public function getParent(): FileSource|GitSource|null
@@ -69,16 +59,6 @@ class RunSource extends AbstractSource implements UserFileLocatorInterface, \Jso
     public function getType(): string
     {
         return SourceInterface::TYPE_RUN;
-    }
-
-    public function getPreparationState(): RunSourcePreparationState
-    {
-        return $this->preparationState;
-    }
-
-    public function setPreparationState(RunSourcePreparationState $preparationState): void
-    {
-        $this->preparationState = $preparationState;
     }
 
     /**
