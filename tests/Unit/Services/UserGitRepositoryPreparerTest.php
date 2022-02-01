@@ -12,7 +12,6 @@ use App\Services\FileStoreManager;
 use App\Services\GitRepositoryCheckoutHandler;
 use App\Services\GitRepositoryCloner;
 use App\Services\UserGitRepositoryPreparer;
-use App\Tests\Mock\Services\MockFileStoreManager;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Filesystem\Exception\IOException;
 
@@ -49,18 +48,29 @@ class UserGitRepositoryPreparerTest extends WebTestCase
         $removeException = new RemoveException('/path/to/remove', \Mockery::mock(IOException::class));
         $outOfScopeException = new OutOfScopeException('/path', '/base-path');
 
+        $fileStoreManagerThrowingRemoveException = \Mockery::mock(FileStoreManager::class);
+        $fileStoreManagerThrowingRemoveException
+            ->shouldReceive('remove')
+            ->andThrow($removeException)
+        ;
+
+        $fileStoreManagerThrowingCreateException = \Mockery::mock(FileStoreManager::class);
+        $fileStoreManagerThrowingCreateException
+            ->shouldReceive('remove')
+            ->andReturn('/absolute/removed/path')
+        ;
+        $fileStoreManagerThrowingCreateException
+            ->shouldReceive('create')
+            ->andThrow($outOfScopeException)
+        ;
+
         return [
             'remove throws exception' => [
-                'fileStoreManager' => (new MockFileStoreManager())
-                    ->withRemoveCall($removeException)
-                    ->getMock(),
+                'fileStoreManager' => $fileStoreManagerThrowingRemoveException,
                 'expectedPrevious' => $removeException,
             ],
             'create throws exception' => [
-                'fileStoreManager' => (new MockFileStoreManager())
-                    ->withRemoveCall('/path')
-                    ->withCreateCallThrowingException($outOfScopeException)
-                    ->getMock(),
+                'fileStoreManager' => $fileStoreManagerThrowingCreateException,
                 'expectedPrevious' => $outOfScopeException,
             ],
         ];
