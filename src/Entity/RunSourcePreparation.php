@@ -13,7 +13,7 @@ use Doctrine\ORM\Mapping as ORM;
 class RunSourcePreparation
 {
     #[ORM\Id]
-    #[ORM\OneToOne(targetEntity: RunSource::class)]
+    #[ORM\OneToOne(targetEntity: RunSource::class, cascade: ['persist'])]
     #[ORM\JoinColumn(nullable: false)]
     private RunSource $runSource;
 
@@ -23,13 +23,13 @@ class RunSourcePreparation
     #[ORM\Column(type: 'string', nullable: true, enumType: FailureReason::class)]
     private ?FailureReason $failureReason = null;
 
-    #[ORM\Column(type: 'text')]
+    #[ORM\Column(type: 'text', nullable: true)]
     private ?string $failureMessage = null;
 
-    public function __construct(RunSource $runSource, State $state)
+    public function __construct(RunSource $runSource)
     {
         $this->runSource = $runSource;
-        $this->state = $state;
+        $this->state = State::UNKNOWN;
     }
 
     public function getRunSource(): RunSource

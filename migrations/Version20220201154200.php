@@ -22,7 +22,7 @@ final class Version20220201154200 extends AbstractMigration
                 run_source_id VARCHAR(32) NOT NULL, 
                 state VARCHAR(255) NOT NULL, 
                 failure_reason VARCHAR(255) DEFAULT NULL, 
-                failure_message TEXT NOT NULL, 
+                failure_message TEXT DEFAULT NULL, 
                 PRIMARY KEY(run_source_id)
             )
         ');

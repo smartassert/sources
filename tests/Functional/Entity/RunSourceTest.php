@@ -11,7 +11,7 @@ use App\Entity\SourceInterface;
 use App\Repository\SourceRepository;
 use App\Services\Source\Store;
 use App\Tests\Model\UserId;
-use App\Tests\Services\Source\SourceRemover;
+use App\Tests\Services\EntityRemover;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
@@ -37,9 +37,9 @@ class RunSourceTest extends WebTestCase
         \assert($entityManager instanceof EntityManagerInterface);
         $this->entityManager = $entityManager;
 
-        $sourceRemover = self::getContainer()->get(SourceRemover::class);
-        if ($sourceRemover instanceof SourceRemover) {
-            $sourceRemover->removeAll();
+        $entityRemover = self::getContainer()->get(EntityRemover::class);
+        if ($entityRemover instanceof EntityRemover) {
+            $entityRemover->removeAll();
         }
     }
 

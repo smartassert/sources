@@ -11,7 +11,7 @@ use App\Entity\SourceInterface;
 use App\Services\Source\Finder;
 use App\Services\Source\Store;
 use App\Tests\Model\UserId;
-use App\Tests\Services\Source\SourceRemover;
+use App\Tests\Services\EntityRemover;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 class FinderTest extends WebTestCase
@@ -31,9 +31,9 @@ class FinderTest extends WebTestCase
         \assert($store instanceof Store);
         $this->store = $store;
 
-        $sourceRemover = self::getContainer()->get(SourceRemover::class);
-        if ($sourceRemover instanceof SourceRemover) {
-            $sourceRemover->removeAll();
+        $entityRemover = self::getContainer()->get(EntityRemover::class);
+        if ($entityRemover instanceof EntityRemover) {
+            $entityRemover->removeAll();
         }
     }
 

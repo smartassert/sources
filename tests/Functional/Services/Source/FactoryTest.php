@@ -13,7 +13,7 @@ use App\Request\FileSourceRequest;
 use App\Request\GitSourceRequest;
 use App\Services\Source\Factory;
 use App\Tests\Model\UserId;
-use App\Tests\Services\Source\SourceRemover;
+use App\Tests\Services\EntityRemover;
 use SmartAssert\UsersSecurityBundle\Security\User;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -36,9 +36,9 @@ class FactoryTest extends WebTestCase
         \assert($repository instanceof SourceRepository);
         $this->repository = $repository;
 
-        $sourceRemover = self::getContainer()->get(SourceRemover::class);
-        if ($sourceRemover instanceof SourceRemover) {
-            $sourceRemover->removeAll();
+        $entityRemover = self::getContainer()->get(EntityRemover::class);
+        if ($entityRemover instanceof EntityRemover) {
+            $entityRemover->removeAll();
         }
     }
 

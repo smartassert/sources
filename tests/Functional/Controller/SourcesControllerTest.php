@@ -17,7 +17,7 @@ use App\Request\FileSourceRequest;
 use App\Request\GitSourceRequest;
 use App\Services\Source\Store;
 use App\Tests\Model\UserId;
-use App\Tests\Services\Source\SourceRemover;
+use App\Tests\Services\EntityRemover;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Middleware;
@@ -67,9 +67,9 @@ class SourcesControllerTest extends WebTestCase
         \assert($repository instanceof SourceRepository);
         $this->repository = $repository;
 
-        $sourceRemover = self::getContainer()->get(SourceRemover::class);
-        if ($sourceRemover instanceof SourceRemover) {
-            $sourceRemover->removeAll();
+        $entityRemover = self::getContainer()->get(EntityRemover::class);
+        if ($entityRemover instanceof EntityRemover) {
+            $entityRemover->removeAll();
         }
     }
 
