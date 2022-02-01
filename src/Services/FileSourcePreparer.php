@@ -7,14 +7,11 @@ namespace App\Services;
 use App\Entity\FileSource;
 use App\Entity\RunSource;
 use App\Exception\DirectoryDuplicationException;
-use App\Services\Source\Factory;
 
 class FileSourcePreparer
 {
-    public function __construct(
-        private Factory $sourceFactory,
-        private DirectoryDuplicator $directoryDuplicator,
-    ) {
+    public function __construct(private DirectoryDuplicator $directoryDuplicator)
+    {
     }
 
     /**
@@ -22,7 +19,7 @@ class FileSourcePreparer
      */
     public function prepare(FileSource $source): RunSource
     {
-        $target = $this->sourceFactory->createRunSource($source);
+        $target = new RunSource($source);
 
         $this->directoryDuplicator->duplicate((string) $source, (string) $target);
 
