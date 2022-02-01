@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\Enum;
+namespace App\Enum\RunSource;
 
-enum RunSourcePreparationState: string
+enum State: string
 {
     case UNKNOWN = 'unknown';
     case REQUESTED = 'requested';
