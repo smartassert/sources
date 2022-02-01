@@ -6,46 +6,26 @@ namespace App\Services;
 
 use App\Entity\FileSource;
 use App\Entity\RunSource;
-use App\Exception\File\FileExceptionInterface;
-use App\Exception\File\MirrorException;
-use App\Exception\File\OutOfScopeException;
-use App\Exception\File\RemoveException;
-use App\Exception\SourceMirrorException;
+use App\Exception\DirectoryDuplicationException;
+use App\Services\Source\Factory;
 
 class FileSourcePreparer
 {
     public function __construct(
-        private FileStoreManager $fileStoreManager,
+        private Factory $sourceFactory,
+        private DirectoryDuplicator $directoryDuplicator,
     ) {
     }
 
     /**
-     * @throws SourceMirrorException
+     * @throws DirectoryDuplicationException
      */
-    public function prepare(RunSource $target): void
+    public function prepare(FileSource $source): RunSource
     {
-        $source = $target->getParent();
-        if (!$source instanceof FileSource) {
-            return;
-        }
+        $target = $this->sourceFactory->createRunSource($source);
 
-        $exception = null;
+        $this->directoryDuplicator->duplicate((string) $source, (string) $target);
 
-        try {
-            $this->fileStoreManager->mirror((string) $source, (string) $target);
-        } catch (MirrorException $mirrorException) {
-            $exception = $mirrorException;
-
-            try {
-                $this->fileStoreManager->remove((string) $target);
-            } catch (OutOfScopeException | RemoveException) {
-            }
-        } catch (FileExceptionInterface $fileException) {
-            $exception = $fileException;
-        }
-
-        if ($exception instanceof \Throwable) {
-            throw new SourceMirrorException($exception);
-        }
+        return $target;
     }
 }

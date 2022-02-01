@@ -6,50 +6,41 @@ namespace App\Services;
 
 use App\Entity\GitSource;
 use App\Entity\RunSource;
-use App\Exception\File\FileExceptionInterface;
+use App\Exception\DirectoryDuplicationException;
 use App\Exception\File\OutOfScopeException;
 use App\Exception\File\RemoveException;
-use App\Exception\SourceMirrorException;
 use App\Exception\UserGitRepositoryException;
+use App\Services\Source\Factory;
 use Symfony\Component\Filesystem\Path;
 
 class GitSourcePreparer
 {
     public function __construct(
+        private Factory $sourceFactory,
         private UserGitRepositoryPreparer $userGitRepositoryPreparer,
+        private DirectoryDuplicator $directoryDuplicator,
         private FileStoreManager $fileStoreManager,
     ) {
     }
 
     /**
      * @throws UserGitRepositoryException
-     * @throws SourceMirrorException
+     * @throws DirectoryDuplicationException
      */
-    public function prepare(RunSource $target, ?string $ref = null): void
+    public function prepare(GitSource $source, ?string $ref = null): RunSource
     {
-        $source = $target->getParent();
-
-        if (!$source instanceof GitSource) {
-            return;
-        }
+        $target = $this->sourceFactory->createRunSource($source);
 
         $gitRepository = $this->userGitRepositoryPreparer->prepare($source, $ref);
         $copyableSourcePath = Path::canonicalize($gitRepository->getPath() . '/' . $source->getPath());
 
-        try {
-            $this->fileStoreManager->mirror($copyableSourcePath, (string) $target);
-        } catch (FileExceptionInterface $mirrorException) {
-            try {
-                $this->fileStoreManager->remove((string) $target);
-            } catch (OutOfScopeException | RemoveException) {
-            }
+        $this->directoryDuplicator->duplicate($copyableSourcePath, (string) $target);
 
-            throw new SourceMirrorException($mirrorException);
-        } finally {
-            try {
-                $this->fileStoreManager->remove((string) $gitRepository);
-            } catch (OutOfScopeException | RemoveException) {
-            }
+        try {
+            $this->fileStoreManager->remove((string) $gitRepository);
+        } catch (OutOfScopeException | RemoveException) {
         }
+
+        return $target;
     }
 }

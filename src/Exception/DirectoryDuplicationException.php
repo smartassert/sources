@@ -11,7 +11,7 @@ use App\Exception\File\NotExistsException;
 use App\Exception\File\OutOfScopeException;
 use App\Exception\File\RemoveException;
 
-class SourceMirrorException extends \Exception
+class DirectoryDuplicationException extends \Exception
 {
     private const EXCEPTION_CLASS_CODE_MAP = [
         CreateException::class => 100,
