@@ -11,7 +11,6 @@ use App\Enum\RunSource\State;
 use App\Message\Prepare;
 use App\MessageHandler\PrepareHandler;
 use App\Model\EntityId;
-use App\Repository\RunSourceRepository;
 use App\Repository\SourceRepository;
 use App\Services\RunSourcePreparer;
 use App\Services\Source\Store;
@@ -29,7 +28,6 @@ class PrepareHandlerTest extends WebTestCase
     private PrepareHandler $handler;
     private EntityManagerInterface $entityManager;
     private SourceRepository $sourceRepository;
-    private RunSourceRepository $runSourceRepository;
 
     protected function setUp(): void
     {
@@ -46,10 +44,6 @@ class PrepareHandlerTest extends WebTestCase
         $sourceRepository = self::getContainer()->get(SourceRepository::class);
         \assert($sourceRepository instanceof SourceRepository);
         $this->sourceRepository = $sourceRepository;
-
-        $runSourceRepository = self::getContainer()->get(RunSourceRepository::class);
-        \assert($runSourceRepository instanceof RunSourceRepository);
-        $this->runSourceRepository = $runSourceRepository;
 
         $entityRemover = self::getContainer()->get(EntityRemover::class);
         if ($entityRemover instanceof EntityRemover) {
@@ -101,56 +95,52 @@ class PrepareHandlerTest extends WebTestCase
         $gitSource = new GitSource(UserId::create(), 'http://example.com/repository.git');
         $gitRunSource = new RunSource($gitSource, []);
 
+        $runSourceWithoutParent = $fileRunSource->unsetParent();
+
         return [
             'no entities' => [
                 'entities' => [],
                 'message' => new Prepare(EntityId::create(), []),
             ],
-            'run source matches message source id' => [
+            'source is not RunSource' => [
                 'entities' => [
-                    $fileRunSource,
-                ],
-                'message' => new Prepare($fileRunSource->getId(), []),
-            ],
-            'file source has no run source' => [
-                'entities' => [
-                    $fileSource,
+                    $fileSource
                 ],
                 'message' => new Prepare($fileSource->getId(), []),
             ],
-            'git source has no run source' => [
+            'source has no parent' => [
                 'entities' => [
-                    $gitSource,
+                    $runSourceWithoutParent
                 ],
-                'message' => new Prepare($gitSource->getId(), []),
+                'message' => new Prepare($runSourceWithoutParent->getId(), []),
             ],
             'file run source preparation state is "preparing/running"' => [
                 'entities' => [
                     $fileSource,
                     $fileRunSource->setState(State::PREPARING_RUNNING),
                 ],
-                'message' => new Prepare($fileSource->getId(), []),
+                'message' => new Prepare($fileRunSource->getId(), []),
             ],
             'file run source preparation state is "failed"' => [
                 'entities' => [
                     $fileSource,
                     $fileRunSource->setState(State::FAILED),
                 ],
-                'message' => new Prepare($fileSource->getId(), []),
+                'message' => new Prepare($fileRunSource->getId(), []),
             ],
             'file run source preparation state is "prepared"' => [
                 'entities' => [
                     $fileSource,
                     $fileRunSource->setState(State::PREPARED),
                 ],
-                'message' => new Prepare($fileSource->getId(), []),
+                'message' => new Prepare($fileRunSource->getId(), []),
             ],
             'git run source preparation state is "preparing/running"' => [
                 'entities' => [
                     $gitSource,
                     $gitRunSource->setState(State::PREPARING_RUNNING),
                 ],
-                'message' => new Prepare($gitSource->getId(), []),
+                'message' => new Prepare($gitRunSource->getId(), []),
             ],
         ];
     }
@@ -165,8 +155,8 @@ class PrepareHandlerTest extends WebTestCase
         RunSourcePreparer $runSourcePreparer,
         Prepare $message,
     ): void {
-        foreach ($entities as $source) {
-            $this->entityManager->persist($source);
+        foreach ($entities as $entity) {
+            $this->entityManager->persist($entity);
         }
         $this->entityManager->flush();
 
@@ -177,16 +167,13 @@ class PrepareHandlerTest extends WebTestCase
             $runSourcePreparer
         );
 
+        $source = $this->sourceRepository->find($message->getSourceId());
+        self::assertInstanceOf(RunSource::class, $source);
+        self::assertNotSame(State::PREPARED, $source->getState());
+
         $this->handler->__invoke($message);
 
-        $expectedSource = $this->sourceRepository->find($message->getSourceId());
-        if (!($expectedSource instanceof FileSource || $expectedSource instanceof GitSource)) {
-            self::fail('Expected source is not ' . FileSource::class . ' or ' . GitSource::class);
-        }
-
-        $runSource = $this->runSourceRepository->findByParent($expectedSource);
-        self::assertInstanceOf(RunSource::class, $runSource);
-        self::assertSame($expectedSource, $runSource->getParent());
+        self::assertSame(State::PREPARED, $source->getState());
     }
 
     /**
@@ -197,41 +184,45 @@ class PrepareHandlerTest extends WebTestCase
         $fileSource = new FileSource(UserId::create(), 'file source label');
         $gitSource = new GitSource(UserId::create(), 'http://example.com/repository.git');
 
+        $fileRunSource = new RunSource($fileSource);
+        $gitRunSource = new RunSource($gitSource);
+        $fileRunSourceStatePreparingHalted = (new RunSource($fileSource))->setState(State::PREPARING_HALTED);
+
         return [
-            'file source has run source, state is "requested"' => [
+            'run source is parent of file source, state is "requested"' => [
                 'entities' => [
                     $fileSource,
-                    new RunSource($fileSource),
+                    $fileRunSource,
                 ],
-                'runSourcePreparer' => $this->createRunSourcePreparer($fileSource),
-                'message' => new Prepare($fileSource->getId(), []),
+                'runSourcePreparer' => $this->createRunSourcePreparer($fileRunSource),
+                'message' => Prepare::createFromRunSource($fileRunSource),
             ],
-            'git source has run source, state is "requested"' => [
+            'run source is parent of git source, state is "requested"' => [
                 'entities' => [
                     $gitSource,
-                    new RunSource($gitSource),
+                    $gitRunSource,
                 ],
-                'runSourcePreparer' => $this->createRunSourcePreparer($gitSource),
-                'message' => new Prepare($gitSource->getId(), []),
+                'runSourcePreparer' => $this->createRunSourcePreparer($gitRunSource),
+                'message' => Prepare::createFromRunSource($gitRunSource),
             ],
-            'file source has run source, state is "preparing/halted"' => [
+            'run source is parent of file source, state is "preparing/halted"' => [
                 'entities' => [
                     $fileSource,
-                    (new RunSource($fileSource))->setState(State::PREPARING_HALTED),
+                    $fileRunSourceStatePreparingHalted,
                 ],
-                'runSourcePreparer' => $this->createRunSourcePreparer($fileSource),
-                'message' => new Prepare($fileSource->getId(), []),
+                'runSourcePreparer' => $this->createRunSourcePreparer($fileRunSourceStatePreparingHalted),
+                'message' => Prepare::createFromRunSource($fileRunSourceStatePreparingHalted),
             ],
         ];
     }
 
-    private function createRunSourcePreparer(FileSource|GitSource $source): RunSourcePreparer
+    private function createRunSourcePreparer(RunSource $runSource): RunSourcePreparer
     {
         $runSourcePreparer = \Mockery::mock(RunSourcePreparer::class);
         $runSourcePreparer
             ->shouldReceive('prepare')
-            ->withArgs(function (RunSource $runSource) use ($source) {
-                self::assertSame($source, $runSource->getParent());
+            ->withArgs(function (RunSource $passedRunSource) use ($runSource) {
+                self::assertSame($runSource->getId(), $passedRunSource->getId());
 
                 return true;
             })
