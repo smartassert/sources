@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
+use App\Enum\RunSource\FailureReason;
+use App\Enum\RunSource\State;
 use App\Model\UserFileLocatorInterface;
 use App\Model\UserSourceFileLocatorTrait;
 use Doctrine\ORM\Mapping as ORM;
@@ -23,6 +25,15 @@ class RunSource extends AbstractSource implements UserFileLocatorInterface, \Jso
     #[ORM\Column(type: 'simple_array', nullable: true)]
     private array $parameters;
 
+    #[ORM\Column(type: 'string', enumType: State::class)]
+    private State $state;
+
+    #[ORM\Column(type: 'string', nullable: true, enumType: FailureReason::class)]
+    private ?FailureReason $failureReason = null;
+
+    #[ORM\Column(type: 'text', nullable: true)]
+    private ?string $failureMessage = null;
+
     /**
      * @param array<string, string> $parameters
      */
@@ -33,6 +44,7 @@ class RunSource extends AbstractSource implements UserFileLocatorInterface, \Jso
         $this->parent = $parent;
         $this->parameters = $parameters;
         ksort($this->parameters);
+        $this->state = State::UNKNOWN;
     }
 
     public function getParent(): FileSource|GitSource|null
@@ -40,9 +52,11 @@ class RunSource extends AbstractSource implements UserFileLocatorInterface, \Jso
         return $this->parent;
     }
 
-    public function unsetParent(): void
+    public function unsetParent(): self
     {
         $this->parent = null;
+
+        return $this;
     }
 
     /**
@@ -61,23 +75,66 @@ class RunSource extends AbstractSource implements UserFileLocatorInterface, \Jso
         return SourceInterface::TYPE_RUN;
     }
 
+    public function setState(State $state): self
+    {
+        $this->state = $state;
+
+        return $this;
+    }
+
+    public function getFailureReason(): ?FailureReason
+    {
+        return $this->failureReason;
+    }
+
+    public function getFailureMessage(): ?string
+    {
+        return $this->failureMessage;
+    }
+
+    public function setPreparationFailed(
+        FailureReason $failureReason,
+        string $failureMessage
+    ): self {
+        $this->state = State::FAILED;
+        $this->failureReason = $failureReason;
+        $this->failureMessage = $failureMessage;
+
+        return $this;
+    }
+
     /**
      * @return array{
      *     "id": string,
      *     "user_id": string,
      *     "type": SourceInterface::TYPE_RUN,
      *     "parent": string|null,
-     *     "parameters": array<string, string>
+     *     "parameters": array<string, string>,
+     *     "state": string,
+     *     "failure_reason"?: string,
+     *     "failure_message"?: string
      * }
      */
     public function jsonSerialize(): array
     {
-        return [
+        $data = [
             'id' => $this->id,
             'user_id' => $this->getUserId(),
             'type' => $this->getType(),
             'parent' => $this->parent?->getId(),
             'parameters' => $this->parameters,
+            'state' => $this->state->value,
         ];
+
+        if (State::FAILED === $this->state) {
+            $failureReason = $this->failureReason instanceof FailureReason
+                ? $this->failureReason
+                : FailureReason::UNKNOWN;
+
+            $data['failure_reason'] = $failureReason->value;
+            $data['failure_message'] = (string) $this->failureMessage;
+        }
+
+        return $data;
     }
 }

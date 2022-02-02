@@ -8,6 +8,8 @@ use App\Entity\FileSource;
 use App\Entity\GitSource;
 use App\Entity\RunSource;
 use App\Entity\SourceInterface;
+use App\Enum\RunSource\FailureReason;
+use App\Enum\RunSource\State;
 use App\Model\EntityId;
 use App\Repository\FileSourceRepository;
 use App\Repository\GitSourceRepository;
@@ -356,6 +358,12 @@ class SourcesControllerTest extends WebTestCase
         $fileSource = new FileSource($userId, 'file source label');
         $runSource = new RunSource($fileSource);
 
+        $failureMessage = 'fatal: repository \'http://example.com/repository.git\' not found';
+        $failedRunSource = (new RunSource($gitSource))->setPreparationFailed(
+            FailureReason::GIT_CLONE,
+            $failureMessage
+        );
+
         return [
             SourceInterface::TYPE_GIT => [
                 'source' => $gitSource,
@@ -388,6 +396,21 @@ class SourcesControllerTest extends WebTestCase
                     'type' => SourceInterface::TYPE_RUN,
                     'parent' => $runSource->getParent()?->getId(),
                     'parameters' => [],
+                    'state' => State::UNKNOWN->value,
+                ],
+            ],
+            SourceInterface::TYPE_RUN . ': preparation failed' => [
+                'source' => $failedRunSource,
+                'userId' => $userId,
+                'expectedResponseData' => [
+                    'id' => $failedRunSource->getId(),
+                    'user_id' => $userId,
+                    'type' => SourceInterface::TYPE_RUN,
+                    'parent' => $failedRunSource->getParent()?->getId(),
+                    'parameters' => [],
+                    'state' => State::FAILED->value,
+                    'failure_reason' => FailureReason::GIT_CLONE->value,
+                    'failure_message' => $failureMessage,
                 ],
             ],
         ];
