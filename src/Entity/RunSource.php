@@ -82,6 +82,11 @@ class RunSource extends AbstractSource implements UserFileLocatorInterface, \Jso
         return $this;
     }
 
+    public function getState(): State
+    {
+        return $this->state;
+    }
+
     public function getFailureReason(): ?FailureReason
     {
         return $this->failureReason;

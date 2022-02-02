@@ -7,7 +7,8 @@ namespace App\Enum\RunSource;
 enum State: string
 {
     case REQUESTED = 'requested';
-    case PREPARING = 'preparing';
+    case PREPARING_RUNNING = 'preparing/running';
+    case PREPARING_HALTED = 'preparing/halted';
     case FAILED = 'failed';
     case PREPARED = 'prepared';
 }
