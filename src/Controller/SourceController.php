@@ -48,35 +48,27 @@ class SourceController
     #[Route(self::ROUTE_SOURCE . '{sourceId<[A-Z90-9]{26}>}', name: 'get', methods: ['GET'])]
     public function get(?SourceInterface $source, UserInterface $user): JsonResponse
     {
-        return $this->doAction($source, $user, function (SourceInterface $source): JsonResponse {
+        return $this->doUserSourceAction($source, $user, function (SourceInterface $source) {
             return new JsonResponse($source);
         });
     }
 
     #[Route(self::ROUTE_SOURCE . '{sourceId<[A-Z90-9]{26}>}', name: 'update', methods: ['PUT'])]
-    public function update(?SourceInterface $source, Request $request, UserInterface $user): JsonResponse
+    public function update(null|FileSource|GitSource $source, Request $request, UserInterface $user): JsonResponse
     {
-        return $this->doAction($source, $user, function (SourceInterface $source) use ($request): JsonResponse {
-            if ($source instanceof FileSource) {
-                $source = $this->mutator->updateFileSource($source, FileSourceRequest::create($request));
+        return $this->doUserSourceAction($source, $user, function (FileSource|GitSource $source) use ($request) {
+            $source = $source instanceof FileSource
+                ? $this->mutator->updateFileSource($source, FileSourceRequest::create($request))
+                : $this->mutator->updateGitSource($source, GitSourceRequest::create($request));
 
-                return new JsonResponse($source);
-            }
-
-            if ($source instanceof GitSource) {
-                $source = $this->mutator->updateGitSource($source, GitSourceRequest::create($request));
-
-                return new JsonResponse($source);
-            }
-
-            return new JsonResponse(null, 404);
+            return new JsonResponse($source);
         });
     }
 
     #[Route(self::ROUTE_SOURCE . '{sourceId<[A-Z90-9]{26}>}', name: 'delete', methods: ['DELETE'])]
     public function delete(?SourceInterface $source, UserInterface $user): JsonResponse
     {
-        return $this->doAction($source, $user, function (SourceInterface $source): JsonResponse {
+        return $this->doUserSourceAction($source, $user, function (SourceInterface $source) {
             $this->store->remove($source);
 
             return new JsonResponse();
@@ -92,10 +84,7 @@ class SourceController
         ]));
     }
 
-    /**
-     * @param callable(SourceInterface): JsonResponse $action
-     */
-    private function doAction(?SourceInterface $source, UserInterface $user, callable $action): JsonResponse
+    private function doUserSourceAction(?SourceInterface $source, UserInterface $user, callable $action): JsonResponse
     {
         if (null === $source) {
             return new JsonResponse(null, 404);
