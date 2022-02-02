@@ -44,7 +44,7 @@ class RunSourceTest extends TestCase
         $withoutParameters = new RunSource($parent);
         $withParameters = new RunSource($parent, $parameters);
 
-        $withNonDefaultState = (new RunSource($parent))->setState(State::REQUESTED);
+        $withNonDefaultState = (new RunSource($parent))->setState(State::PREPARED);
 
         $failureMessage = 'fatal: repository \'http://example.com/repository.git\' not found';
         $hasPreparationFailed = (new RunSource($parent))->setPreparationFailed(
@@ -61,7 +61,7 @@ class RunSourceTest extends TestCase
                     'type' => SourceInterface::TYPE_RUN,
                     'parent' => null,
                     'parameters' => [],
-                    'state' => State::UNKNOWN->value,
+                    'state' => State::REQUESTED->value,
                 ],
             ],
             'no parent, has parameters' => [
@@ -72,7 +72,7 @@ class RunSourceTest extends TestCase
                     'type' => SourceInterface::TYPE_RUN,
                     'parent' => null,
                     'parameters' => $withoutParentWithParameters->getParameters(),
-                    'state' => State::UNKNOWN->value,
+                    'state' => State::REQUESTED->value,
                 ],
             ],
             'has parent, no parameters' => [
@@ -83,7 +83,7 @@ class RunSourceTest extends TestCase
                     'type' => SourceInterface::TYPE_RUN,
                     'parent' => $withoutParameters->getParent()?->getId(),
                     'parameters' => [],
-                    'state' => State::UNKNOWN->value,
+                    'state' => State::REQUESTED->value,
                 ],
             ],
             'has parent, has parameters' => [
@@ -94,7 +94,7 @@ class RunSourceTest extends TestCase
                     'type' => SourceInterface::TYPE_RUN,
                     'parent' => $withParameters->getParent()?->getId(),
                     'parameters' => $parameters,
-                    'state' => State::UNKNOWN->value,
+                    'state' => State::REQUESTED->value,
                 ],
             ],
             'non-default state' => [
@@ -105,7 +105,7 @@ class RunSourceTest extends TestCase
                     'type' => SourceInterface::TYPE_RUN,
                     'parent' => $withParameters->getParent()?->getId(),
                     'parameters' => [],
-                    'state' => State::REQUESTED->value,
+                    'state' => State::PREPARED->value,
                 ],
             ],
             'preparation failed' => [
