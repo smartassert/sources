@@ -6,7 +6,6 @@ namespace App\Enum\RunSource;
 
 enum State: string
 {
-    case UNKNOWN = 'unknown';
     case REQUESTED = 'requested';
     case PREPARING = 'preparing';
     case FAILED = 'failed';
