@@ -44,7 +44,7 @@ class RunSource extends AbstractSource implements UserFileLocatorInterface, \Jso
         $this->parent = $parent;
         $this->parameters = $parameters;
         ksort($this->parameters);
-        $this->state = State::UNKNOWN;
+        $this->state = State::REQUESTED;
     }
 
     public function getParent(): FileSource|GitSource|null

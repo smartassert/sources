@@ -397,7 +397,7 @@ class SourcesControllerTest extends WebTestCase
                     'type' => SourceInterface::TYPE_RUN,
                     'parent' => $runSource->getParent()?->getId(),
                     'parameters' => [],
-                    'state' => State::UNKNOWN->value,
+                    'state' => State::REQUESTED->value,
                 ],
             ],
             SourceInterface::TYPE_RUN . ': preparation failed' => [
