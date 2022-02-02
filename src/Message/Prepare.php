@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Message;
 
+use App\Entity\RunSource;
+
 class Prepare
 {
     /**
@@ -13,6 +15,11 @@ class Prepare
         private string $sourceId,
         private array $parameters,
     ) {
+    }
+
+    public static function createFromRunSource(RunSource $runSource): self
+    {
+        return new Prepare($runSource->getId(), $runSource->getParameters());
     }
 
     public function getSourceId(): string
