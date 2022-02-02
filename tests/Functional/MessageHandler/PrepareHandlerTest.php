@@ -101,21 +101,6 @@ class PrepareHandlerTest extends WebTestCase
         $gitSource = new GitSource(UserId::create(), 'http://example.com/repository.git');
         $gitRunSource = new RunSource($gitSource, []);
 
-//        $fileRunSourcePreparationStateUnknown = new RunSourcePreparation($fileRunSource);
-//        $fileRunSourcePreparationStateUnknown->setState(State::UNKNOWN);
-//
-//        $gitRunSourcePreparationStateUnknown = new RunSourcePreparation($gitRunSource);
-//        $gitRunSourcePreparationStateUnknown->setState(State::UNKNOWN);
-//
-//        $runSourcePreparationStatePreparingRunning = new RunSourcePreparation($fileRunSource);
-//        $runSourcePreparationStatePreparingRunning->setState(State::PREPARING_RUNNING);
-//
-//        $runSourcePreparationStateFailed = new RunSourcePreparation($fileRunSource);
-//        $runSourcePreparationStateFailed->setState(State::FAILED);
-//
-//        $runSourcePreparationStatePrepared = new RunSourcePreparation($fileRunSource);
-//        $runSourcePreparationStatePrepared->setState(State::PREPARED);
-
         return [
             'no entities' => [
                 'entities' => [],
@@ -126,6 +111,18 @@ class PrepareHandlerTest extends WebTestCase
                     $fileRunSource,
                 ],
                 'message' => new Prepare($fileRunSource->getId(), []),
+            ],
+            'file source has no run source' => [
+                'entities' => [
+                    $fileSource,
+                ],
+                'message' => new Prepare($fileSource->getId(), []),
+            ],
+            'git source has no run source' => [
+                'entities' => [
+                    $gitSource,
+                ],
+                'message' => new Prepare($gitSource->getId(), []),
             ],
             'file run source preparation state is "preparing/running"' => [
                 'entities' => [
@@ -200,36 +197,27 @@ class PrepareHandlerTest extends WebTestCase
         $fileSource = new FileSource(UserId::create(), 'file source label');
         $gitSource = new GitSource(UserId::create(), 'http://example.com/repository.git');
 
-        $fileRunSourceStateRequested = new RunSource($fileSource);
-        $fileRunSourceStatePreparingHalted = (new RunSource($fileSource))->setState(State::PREPARING_HALTED);
-
         return [
-            'file source has no run source' => [
+            'file source has run source, state is "requested"' => [
                 'entities' => [
                     $fileSource,
+                    new RunSource($fileSource),
                 ],
                 'runSourcePreparer' => $this->createRunSourcePreparer($fileSource),
                 'message' => new Prepare($fileSource->getId(), []),
             ],
-            'git source has no run source' => [
+            'git source has run source, state is "requested"' => [
                 'entities' => [
                     $gitSource,
+                    new RunSource($gitSource),
                 ],
                 'runSourcePreparer' => $this->createRunSourcePreparer($gitSource),
                 'message' => new Prepare($gitSource->getId(), []),
             ],
-            'file source has run source, state is "requested"' => [
-                'entities' => [
-                    $fileSource,
-                    $fileRunSourceStateRequested,
-                ],
-                'runSourcePreparer' => $this->createRunSourcePreparer($fileSource),
-                'message' => new Prepare($fileSource->getId(), []),
-            ],
             'file source has run source, state is "preparing/halted"' => [
                 'entities' => [
                     $fileSource,
-                    $fileRunSourceStatePreparingHalted,
+                    (new RunSource($fileSource))->setState(State::PREPARING_HALTED),
                 ],
                 'runSourcePreparer' => $this->createRunSourcePreparer($fileSource),
                 'message' => new Prepare($fileSource->getId(), []),

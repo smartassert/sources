@@ -41,8 +41,7 @@ class PrepareHandler
 
         $runSource = $this->runSourceRepository->findByParent($source);
         if (!$runSource instanceof RunSource) {
-            $runSource = new RunSource($source, $message->getParameters());
-            $this->sourceStore->add($runSource);
+            return;
         }
 
         if (!in_array($runSource->getState(), [State::REQUESTED, State::PREPARING_HALTED])) {
