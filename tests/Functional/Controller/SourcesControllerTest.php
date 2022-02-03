@@ -15,6 +15,7 @@ use App\Repository\SourceRepository;
 use App\Request\FileSourceRequest;
 use App\Request\GitSourceRequest;
 use App\Services\Source\Store;
+use App\Tests\Model\Route;
 use App\Tests\Model\UserId;
 use App\Tests\Services\Source\SourceRemover;
 use GuzzleHttp\Handler\MockHandler;
@@ -80,16 +81,14 @@ class SourcesControllerTest extends WebTestCase
 
     /**
      * @dataProvider requestForUnauthorizedUserDataProvider
-     *
-     * @param array<string, string> $routeParameters
      */
-    public function testRequestForUnauthorizedUser(string $method, string $routeName, array $routeParameters): void
+    public function testRequestForUnauthorizedUser(string $method, Route $route): void
     {
         $this->mockHandler->append(
             new Response(401)
         );
 
-        $response = $this->makeAuthorizedRequest($method, $routeName, $routeParameters);
+        $response = $this->makeAuthorizedRequest($method, $route);
 
         self::assertSame(401, $response->getStatusCode());
         $this->assertAuthorizationRequestIsMade();
@@ -100,71 +99,57 @@ class SourcesControllerTest extends WebTestCase
      */
     public function requestForUnauthorizedUserDataProvider(): array
     {
+        $sourceRouteParameters = ['sourceId' => EntityId::create()];
+
         return [
             'create git source' => [
                 'method' => 'POST',
-                'routeName' => 'create_git',
-                'routeParameters' => [],
+                'route' => new Route('create_git'),
             ],
             'create file source' => [
                 'method' => 'POST',
-                'routeName' => 'create_file',
-                'routeParameters' => [],
+                'route' => new Route('create_file'),
             ],
             'get source' => [
                 'method' => 'GET',
-                'routeName' => 'get',
-                'routeParameters' => [
-                    'sourceId' => EntityId::create(),
-                ],
+                'route' => new Route('get', $sourceRouteParameters),
             ],
             'update source' => [
                 'method' => 'PUT',
-                'routeName' => 'update',
-                'routeParameters' => [
-                    'sourceId' => EntityId::create(),
-                ],
+                'route' => new Route('update', $sourceRouteParameters),
             ],
             'delete source' => [
                 'method' => 'DELETE',
-                'routeName' => 'delete',
-                'routeParameters' => [
-                    'sourceId' => EntityId::create(),
-                ],
+                'route' => new Route('delete', $sourceRouteParameters),
             ],
             'list sources' => [
                 'method' => 'GET',
-                'routeName' => 'list',
-                'routeParameters' => [],
+                'route' => new Route('list'),
             ],
         ];
     }
 
     /**
      * @dataProvider requestSourceDataProvider
-     *
-     * @param array<string, string> $routeParameters
      */
-    public function testRequestSourceNotFound(string $method, string $routeName, array $routeParameters): void
+    public function testRequestSourceNotFound(string $method, string $routeName): void
     {
         $sourceId = EntityId::create();
-        $routeParameters['sourceId'] = $sourceId;
 
         $this->mockHandler->append(
             new Response(200, [], $sourceId)
         );
 
-        $response = $this->makeAuthorizedRequest($method, $routeName, $routeParameters);
+        $routeParameters = ['sourceId' => $sourceId];
+        $response = $this->makeAuthorizedRequest($method, new Route($routeName, $routeParameters));
 
         self::assertSame(404, $response->getStatusCode());
     }
 
     /**
      * @dataProvider requestSourceDataProvider
-     *
-     * @param array<string, string> $routeParameters
      */
-    public function testRequestInvalidSourceUser(string $method, string $routeName, array $routeParameters): void
+    public function testRequestInvalidSourceUser(string $method, string $routeName): void
     {
         $sourceUserId = UserId::create();
         $requestUserId = UserId::create();
@@ -174,13 +159,12 @@ class SourcesControllerTest extends WebTestCase
         $sourceId = $source->getId();
         $this->store->add($source);
 
-        $routeParameters['sourceId'] = $sourceId;
-
         $this->mockHandler->append(
             new Response(200, [], $requestUserId)
         );
 
-        $response = $this->makeAuthorizedRequest($method, $routeName, $routeParameters);
+        $routeParameters = ['sourceId' => $sourceId];
+        $response = $this->makeAuthorizedRequest($method, new Route($routeName, $routeParameters));
 
         self::assertSame(401, $response->getStatusCode());
     }
@@ -194,23 +178,14 @@ class SourcesControllerTest extends WebTestCase
             'get source' => [
                 'method' => 'GET',
                 'routeName' => 'get',
-                'routeParameters' => [
-                    'sourceId' => '{{ source_id }}',
-                ],
             ],
             'update source' => [
                 'method' => 'PUT',
                 'routeName' => 'update',
-                'routeParameters' => [
-                    'sourceId' => '{{ source_id }}',
-                ],
             ],
             'delete source' => [
                 'method' => 'DELETE',
                 'routeName' => 'delete',
-                'routeParameters' => [
-                    'sourceId' => '{{ source_id }}',
-                ],
             ],
         ];
     }
@@ -227,7 +202,7 @@ class SourcesControllerTest extends WebTestCase
             new Response(200, [], $userId)
         );
 
-        $response = $this->makeAuthorizedRequest('POST', 'create_git', [], $requestParameters);
+        $response = $this->makeAuthorizedRequest('POST', new Route('create_git'), $requestParameters);
 
         self::assertSame(200, $response->getStatusCode());
         $this->assertAuthorizationRequestIsMade();
@@ -304,7 +279,7 @@ class SourcesControllerTest extends WebTestCase
             new Response(200, [], $userId)
         );
 
-        $response = $this->makeAuthorizedRequest('POST', 'create_file', [], $requestParameters);
+        $response = $this->makeAuthorizedRequest('POST', new Route('create_file'), $requestParameters);
 
         self::assertSame(200, $response->getStatusCode());
         $this->assertAuthorizationRequestIsMade();
@@ -578,7 +553,7 @@ class SourcesControllerTest extends WebTestCase
             new Response(200, [], $userId)
         );
 
-        $response = $this->makeAuthorizedRequest('GET', 'list');
+        $response = $this->makeAuthorizedRequest('GET', new Route('list'));
 
         self::assertSame(200, $response->getStatusCode());
         $this->assertAuthorizationRequestIsMade();
@@ -728,48 +703,26 @@ class SourcesControllerTest extends WebTestCase
         string $sourceId,
         array $parameters = []
     ): SymfonyResponse {
-        return $this->makeAuthorizedRequest(
-            $method,
-            $routeName,
-            ['sourceId' => $sourceId],
-            $parameters
-        );
+        return $this->makeAuthorizedRequest($method, new Route($routeName, ['sourceId' => $sourceId]), $parameters);
     }
 
     /**
-     * @param array<string, string> $routeParameters
      * @param array<string, string> $parameters
      */
-    private function makeAuthorizedRequest(
-        string $method,
-        string $routeName,
-        array $routeParameters = [],
-        array $parameters = []
-    ): SymfonyResponse {
-        return $this->makeRequest(
-            $method,
-            $routeName,
-            $routeParameters,
-            $this->createAuthorizationHeader(),
-            $parameters
-        );
+    private function makeAuthorizedRequest(string $method, Route $route, array $parameters = []): SymfonyResponse
+    {
+        return $this->makeRequest($method, $route, $this->createAuthorizationHeader(), $parameters);
     }
 
     /**
-     * @param array<string, string> $routeParameters
      * @param array<string, string> $headers
      * @param array<string, string> $parameters
      */
-    private function makeRequest(
-        string $method,
-        string $routeName,
-        array $routeParameters,
-        array $headers,
-        array $parameters
-    ): SymfonyResponse {
+    private function makeRequest(string $method, Route $route, array $headers, array $parameters): SymfonyResponse
+    {
         $this->client->request(
             method: $method,
-            uri: $this->router->generate($routeName, $routeParameters),
+            uri: $this->router->generate($route->name, $route->parameters),
             parameters: $parameters,
             server: $this->createRequestServerPropertiesFromHeaders($headers)
         );
