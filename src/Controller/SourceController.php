@@ -6,7 +6,9 @@ namespace App\Controller;
 
 use App\Entity\FileSource;
 use App\Entity\GitSource;
+use App\Entity\RunSource;
 use App\Entity\SourceInterface;
+use App\Message\Prepare;
 use App\Repository\SourceRepository;
 use App\Request\FileSourceRequest;
 use App\Request\GitSourceRequest;
@@ -15,6 +17,7 @@ use App\Services\Source\Mutator;
 use App\Services\Source\Store;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\User\UserInterface;
 
@@ -30,6 +33,7 @@ class SourceController
         private Store $store,
         private Mutator $mutator,
         private SourceRepository $repository,
+        private MessageBusInterface $messageBus,
     ) {
     }
 
@@ -82,6 +86,28 @@ class SourceController
             SourceInterface::TYPE_FILE,
             SourceInterface::TYPE_GIT,
         ]));
+    }
+
+    #[Route(self::ROUTE_SOURCE . '{sourceId<[A-Z90-9]{26}>}/prepare', name: 'prepare', methods: ['POST'])]
+    public function prepare(Request $request, null|FileSource|GitSource $source, UserInterface $user): JsonResponse
+    {
+        return $this->doUserSourceAction(
+            $source,
+            $user,
+            function (FileSource|GitSource $source) use ($request): JsonResponse {
+                $parameters = [];
+                if ($source instanceof GitSource && $request->request->has('ref')) {
+                    $parameters['ref'] = (string) $request->request->get('ref');
+                }
+
+                $runSource = new RunSource($source, $parameters);
+                $this->store->add($runSource);
+
+                $this->messageBus->dispatch(Prepare::createFromRunSource($runSource));
+
+                return new JsonResponse($runSource, 202);
+            }
+        );
     }
 
     private function doUserSourceAction(?SourceInterface $source, UserInterface $user, callable $action): JsonResponse
