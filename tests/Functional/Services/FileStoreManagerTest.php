@@ -94,12 +94,6 @@ class FileStoreManagerTest extends WebTestCase
     public function listDataProvider(): array
     {
         return [
-            'empty directory' => [
-                'fixtureSet' => 'empty',
-                'relativePath' => (string) new FileSource(UserId::create(), ''),
-                'extensions' => [],
-                'expected' => [],
-            ],
             'source_txt, no extensions' => [
                 'fixtureSet' => 'source_txt',
                 'relativePath' => (string) new FileSource(UserId::create(), ''),
