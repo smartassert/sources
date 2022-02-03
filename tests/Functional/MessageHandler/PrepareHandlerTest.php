@@ -8,6 +8,9 @@ use App\Entity\FileSource;
 use App\Entity\GitSource;
 use App\Entity\RunSource;
 use App\Enum\RunSource\State;
+use App\Exception\DirectoryDuplicationException;
+use App\Exception\MessageHandler\PrepareException;
+use App\Exception\UserGitRepositoryException;
 use App\Message\Prepare;
 use App\MessageHandler\PrepareHandler;
 use App\Model\EntityId;
@@ -216,10 +219,58 @@ class PrepareHandlerTest extends WebTestCase
         ];
     }
 
-    private function createRunSourcePreparer(RunSource $runSource): RunSourcePreparer
+    /**
+     * @dataProvider invokeRunSourcePreparerThrowsExceptionDataProvider
+     */
+    public function testInvokeRunSourcePreparerThrowsException(\Exception $runSourcePreparerException): void
+    {
+        $fileRunSource = new RunSource(new FileSource(UserId::create(), 'file source label'));
+        $this->entityManager->persist($fileRunSource);
+        $this->entityManager->flush();
+
+        $runSourcePreparer = $this->createRunSourcePreparer($fileRunSource, $runSourcePreparerException);
+
+        ObjectReflector::setProperty(
+            $this->handler,
+            $this->handler::class,
+            'runSourcePreparer',
+            $runSourcePreparer
+        );
+
+        $message = Prepare::createFromRunSource($fileRunSource);
+
+        $source = $this->sourceRepository->find($message->getSourceId());
+        self::assertInstanceOf(RunSource::class, $source);
+        self::assertNotSame(State::PREPARED, $source->getState());
+
+        try {
+            $this->handler->__invoke($message);
+            self::fail('Prepare exception not thrown');
+        } catch (PrepareException $prepareException) {
+            self::assertSame($runSourcePreparerException, $prepareException->getHandlerException());
+            self::assertSame(State::PREPARING_HALTED, $source->getState());
+        }
+    }
+
+    /**
+     * @return array<mixed>
+     */
+    public function invokeRunSourcePreparerThrowsExceptionDataProvider(): array
+    {
+        return [
+            DirectoryDuplicationException::class => [
+                'runSourcePreparerException' => \Mockery::mock(DirectoryDuplicationException::class),
+            ],
+            UserGitRepositoryException::class => [
+                'runSourcePreparerException' => \Mockery::mock(UserGitRepositoryException::class),
+            ],
+        ];
+    }
+
+    private function createRunSourcePreparer(RunSource $runSource, ?\Exception $exception = null): RunSourcePreparer
     {
         $runSourcePreparer = \Mockery::mock(RunSourcePreparer::class);
-        $runSourcePreparer
+        $expectation = $runSourcePreparer
             ->shouldReceive('prepare')
             ->withArgs(function (RunSource $passedRunSource) use ($runSource) {
                 self::assertSame($runSource->getId(), $passedRunSource->getId());
@@ -227,6 +278,10 @@ class PrepareHandlerTest extends WebTestCase
                 return true;
             })
         ;
+
+        if ($exception instanceof \Exception) {
+            $expectation->andThrow($exception);
+        }
 
         return $runSourcePreparer;
     }
