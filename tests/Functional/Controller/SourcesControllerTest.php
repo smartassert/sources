@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\Controller;
 
-use App\Controller\SourceController;
 use App\Entity\FileSource;
 use App\Entity\GitSource;
 use App\Entity\RunSource;
@@ -82,7 +81,7 @@ class SourcesControllerTest extends WebTestCase
     /**
      * @dataProvider requestForUnauthorizedUserDataProvider
      *
-     * @param array<int, string> $routeParameters
+     * @param array<string, string> $routeParameters
      */
     public function testRequestForUnauthorizedUser(string $method, string $routeName, array $routeParameters): void
     {
@@ -90,11 +89,7 @@ class SourcesControllerTest extends WebTestCase
             new Response(401)
         );
 
-        $response = $this->makeAuthorizedRequest(
-            $method,
-            $this->router->generate($routeName, $routeParameters),
-            []
-        );
+        $response = $this->makeAuthorizedRequest($method, $routeName, $routeParameters);
 
         self::assertSame(401, $response->getStatusCode());
         $this->assertAuthorizationRequestIsMade();
@@ -148,7 +143,7 @@ class SourcesControllerTest extends WebTestCase
     /**
      * @dataProvider requestSourceDataProvider
      *
-     * @param array<int, string> $routeParameters
+     * @param array<string, string> $routeParameters
      */
     public function testRequestSourceNotFound(string $method, string $routeName, array $routeParameters): void
     {
@@ -159,11 +154,7 @@ class SourcesControllerTest extends WebTestCase
             new Response(200, [], $sourceId)
         );
 
-        $response = $this->makeAuthorizedRequest(
-            $method,
-            $this->router->generate($routeName, $routeParameters),
-            []
-        );
+        $response = $this->makeAuthorizedRequest($method, $routeName, $routeParameters);
 
         self::assertSame(404, $response->getStatusCode());
     }
@@ -171,7 +162,7 @@ class SourcesControllerTest extends WebTestCase
     /**
      * @dataProvider requestSourceDataProvider
      *
-     * @param array<int, string> $routeParameters
+     * @param array<string, string> $routeParameters
      */
     public function testRequestInvalidSourceUser(string $method, string $routeName, array $routeParameters): void
     {
@@ -189,11 +180,7 @@ class SourcesControllerTest extends WebTestCase
             new Response(200, [], $requestUserId)
         );
 
-        $response = $this->makeAuthorizedRequest(
-            $method,
-            $this->router->generate($routeName, $routeParameters),
-            []
-        );
+        $response = $this->makeAuthorizedRequest($method, $routeName, $routeParameters);
 
         self::assertSame(401, $response->getStatusCode());
     }
@@ -240,11 +227,7 @@ class SourcesControllerTest extends WebTestCase
             new Response(200, [], $userId)
         );
 
-        $response = $this->makeAuthorizedRequest(
-            'POST',
-            SourceController::ROUTE_GIT_SOURCE_CREATE,
-            $requestParameters
-        );
+        $response = $this->makeAuthorizedRequest('POST', 'create_git', [], $requestParameters);
 
         self::assertSame(200, $response->getStatusCode());
         $this->assertAuthorizationRequestIsMade();
@@ -321,11 +304,7 @@ class SourcesControllerTest extends WebTestCase
             new Response(200, [], $userId)
         );
 
-        $response = $this->makeAuthorizedRequest(
-            'POST',
-            SourceController::ROUTE_FILE_SOURCE_CREATE,
-            $requestParameters
-        );
+        $response = $this->makeAuthorizedRequest('POST', 'create_file', [], $requestParameters);
 
         self::assertSame(200, $response->getStatusCode());
         $this->assertAuthorizationRequestIsMade();
@@ -381,7 +360,7 @@ class SourcesControllerTest extends WebTestCase
             new Response(200, [], $userId)
         );
 
-        $response = $this->makeAuthorizedSourceRequest('GET', $source->getId());
+        $response = $this->makeAuthorizedSourceRequest('GET', 'get', $source->getId());
 
         self::assertSame(200, $response->getStatusCode());
         $this->assertAuthorizationRequestIsMade();
@@ -457,7 +436,7 @@ class SourcesControllerTest extends WebTestCase
             new Response(200, [], $userId)
         );
 
-        $response = $this->makeAuthorizedSourceRequest('PUT', $source->getId(), $requestData);
+        $response = $this->makeAuthorizedSourceRequest('PUT', 'update', $source->getId(), $requestData);
 
         self::assertSame(200, $response->getStatusCode());
         $this->assertAuthorizationRequestIsMade();
@@ -547,7 +526,7 @@ class SourcesControllerTest extends WebTestCase
             new Response(200, [], $userId)
         );
 
-        $response = $this->makeAuthorizedSourceRequest('DELETE', $source->getId());
+        $response = $this->makeAuthorizedSourceRequest('DELETE', 'delete', $source->getId());
 
         self::assertSame(200, $response->getStatusCode());
         $this->assertAuthorizationRequestIsMade();
@@ -599,7 +578,7 @@ class SourcesControllerTest extends WebTestCase
             new Response(200, [], $userId)
         );
 
-        $response = $this->makeAuthorizedRequest('GET', SourceController::ROUTE_SOURCE_LIST);
+        $response = $this->makeAuthorizedRequest('GET', 'list');
 
         self::assertSame(200, $response->getStatusCode());
         $this->assertAuthorizationRequestIsMade();
@@ -745,29 +724,52 @@ class SourcesControllerTest extends WebTestCase
      */
     private function makeAuthorizedSourceRequest(
         string $method,
+        string $routeName,
         string $sourceId,
         array $parameters = []
     ): SymfonyResponse {
-        return $this->makeAuthorizedRequest($method, SourceController::ROUTE_SOURCE . $sourceId, $parameters);
+        return $this->makeAuthorizedRequest(
+            $method,
+            $routeName,
+            ['sourceId' => $sourceId],
+            $parameters
+        );
     }
 
     /**
+     * @param array<string, string> $routeParameters
      * @param array<string, string> $parameters
      */
-    private function makeAuthorizedRequest(string $method, string $uri, array $parameters = []): SymfonyResponse
-    {
-        return $this->makeRequest($method, $uri, $this->createAuthorizationHeader(), $parameters);
+    private function makeAuthorizedRequest(
+        string $method,
+        string $routeName,
+        array $routeParameters = [],
+        array $parameters = []
+    ): SymfonyResponse {
+        return $this->makeRequest(
+            $method,
+            $routeName,
+            $routeParameters,
+            $this->createAuthorizationHeader(),
+            $parameters
+        );
     }
 
     /**
+     * @param array<string, string> $routeParameters
      * @param array<string, string> $headers
      * @param array<string, string> $parameters
      */
-    private function makeRequest(string $method, string $uri, array $headers, array $parameters): SymfonyResponse
-    {
+    private function makeRequest(
+        string $method,
+        string $routeName,
+        array $routeParameters,
+        array $headers,
+        array $parameters
+    ): SymfonyResponse {
         $this->client->request(
             method: $method,
-            uri: $uri,
+            uri: $this->router->generate($routeName, $routeParameters),
             parameters: $parameters,
             server: $this->createRequestServerPropertiesFromHeaders($headers)
         );
