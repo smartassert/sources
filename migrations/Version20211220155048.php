@@ -22,6 +22,9 @@ final class Version20211220155048 extends AbstractMigration
                 id VARCHAR(32) NOT NULL, 
                 parent_id VARCHAR(32), 
                 parameters TEXT DEFAULT NULL,
+                state VARCHAR(255) NOT NULL, 
+                failure_reason VARCHAR(255) DEFAULT NULL, 
+                failure_message TEXT DEFAULT NULL,                 
                 PRIMARY KEY(id)
             )
         ');

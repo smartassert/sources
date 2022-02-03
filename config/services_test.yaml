@@ -1,3 +1,6 @@
+parameters:
+    source_fixtures_path: '%env(resolve:SOURCE_FIXTURES_PATH)%'
+
 services:
     _defaults:
         autowire: true
@@ -17,13 +20,28 @@ services:
         arguments:
             $handler: '@GuzzleHttp\Handler\MockHandler'
 
-    App\Tests\Services\Source\SourceRemover:
+    App\Tests\Services\EntityRemover:
         public: true
-
-    App\Services\FileStoreFactory:
-        public: true
-        arguments:
-            $basePath: '%file_store_base_path%'
 
     App\Services\Source\Finder:
+        public: true
+
+    App\Tests\Services\FileStoreFixtureCreator:
+        public: true
+        arguments:
+            $sourceFixturesPath: '%source_fixtures_path%'
+            $fileStoreBasePath: '%file_store_base_path%'
+
+    App\Services\FileStoreManager:
+        public: true
+        arguments:
+            $basePath: '@app.configuration.file_store_base_path'
+
+    App\Services\GitRepositoryCheckoutHandler:
+        public: true
+
+    App\Services\UserGitRepositoryPreparer:
+        public: true
+
+    App\Services\RunSourcePreparer:
         public: true

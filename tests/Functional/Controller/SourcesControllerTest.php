@@ -8,16 +8,19 @@ use App\Entity\FileSource;
 use App\Entity\GitSource;
 use App\Entity\RunSource;
 use App\Entity\SourceInterface;
+use App\Enum\RunSource\FailureReason;
+use App\Enum\RunSource\State;
 use App\Model\EntityId;
 use App\Repository\FileSourceRepository;
 use App\Repository\GitSourceRepository;
+use App\Repository\RunSourceRepository;
 use App\Repository\SourceRepository;
 use App\Request\FileSourceRequest;
 use App\Request\GitSourceRequest;
 use App\Services\Source\Store;
 use App\Tests\Model\Route;
 use App\Tests\Model\UserId;
-use App\Tests\Services\Source\SourceRemover;
+use App\Tests\Services\EntityRemover;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Middleware;
@@ -39,7 +42,8 @@ class SourcesControllerTest extends WebTestCase
     private KernelBrowser $client;
     private MockHandler $mockHandler;
     private HttpHistoryContainer $httpHistoryContainer;
-    private SourceRepository $repository;
+    private SourceRepository $sourceRepository;
+    private RunSourceRepository $runSourceRepository;
     private Store $store;
     private RouterInterface $router;
 
@@ -65,17 +69,21 @@ class SourcesControllerTest extends WebTestCase
         \assert($store instanceof Store);
         $this->store = $store;
 
-        $repository = self::getContainer()->get(SourceRepository::class);
-        \assert($repository instanceof SourceRepository);
-        $this->repository = $repository;
+        $sourceRepository = self::getContainer()->get(SourceRepository::class);
+        \assert($sourceRepository instanceof SourceRepository);
+        $this->sourceRepository = $sourceRepository;
+
+        $runSourceRepository = self::getContainer()->get(RunSourceRepository::class);
+        \assert($runSourceRepository instanceof RunSourceRepository);
+        $this->runSourceRepository = $runSourceRepository;
 
         $router = self::getContainer()->get(RouterInterface::class);
         \assert($router instanceof RouterInterface);
         $this->router = $router;
 
-        $sourceRemover = self::getContainer()->get(SourceRemover::class);
-        if ($sourceRemover instanceof SourceRemover) {
-            $sourceRemover->removeAll();
+        $entityRemover = self::getContainer()->get(EntityRemover::class);
+        if ($entityRemover instanceof EntityRemover) {
+            $entityRemover->removeAll();
         }
     }
 
@@ -125,6 +133,10 @@ class SourcesControllerTest extends WebTestCase
             'list sources' => [
                 'method' => 'GET',
                 'route' => new Route('list'),
+            ],
+            'prepare source' => [
+                'method' => 'POST',
+                'route' => new Route('prepare', $sourceRouteParameters),
             ],
         ];
     }
@@ -186,6 +198,10 @@ class SourcesControllerTest extends WebTestCase
             'delete source' => [
                 'method' => 'DELETE',
                 'routeName' => 'delete',
+            ],
+            'prepare source' => [
+                'method' => 'POST',
+                'routeName' => 'prepare',
             ],
         ];
     }
@@ -356,6 +372,12 @@ class SourcesControllerTest extends WebTestCase
         $fileSource = new FileSource($userId, 'file source label');
         $runSource = new RunSource($fileSource);
 
+        $failureMessage = 'fatal: repository \'http://example.com/repository.git\' not found';
+        $failedRunSource = (new RunSource($gitSource))->setPreparationFailed(
+            FailureReason::GIT_CLONE,
+            $failureMessage
+        );
+
         return [
             SourceInterface::TYPE_GIT => [
                 'source' => $gitSource,
@@ -388,6 +410,21 @@ class SourcesControllerTest extends WebTestCase
                     'type' => SourceInterface::TYPE_RUN,
                     'parent' => $runSource->getParent()?->getId(),
                     'parameters' => [],
+                    'state' => State::REQUESTED->value,
+                ],
+            ],
+            SourceInterface::TYPE_RUN . ': preparation failed' => [
+                'source' => $failedRunSource,
+                'userId' => $userId,
+                'expectedResponseData' => [
+                    'id' => $failedRunSource->getId(),
+                    'user_id' => $userId,
+                    'type' => SourceInterface::TYPE_RUN,
+                    'parent' => $failedRunSource->getParent()?->getId(),
+                    'parameters' => [],
+                    'state' => State::FAILED->value,
+                    'failure_reason' => FailureReason::GIT_CLONE->value,
+                    'failure_message' => $failureMessage,
                 ],
             ],
         ];
@@ -495,7 +532,7 @@ class SourcesControllerTest extends WebTestCase
     public function testDeleteSuccess(SourceInterface $source, string $userId, int $expectedRepositoryCount): void
     {
         $this->store->add($source);
-        self::assertGreaterThan(0, $this->repository->count([]));
+        self::assertGreaterThan(0, $this->sourceRepository->count([]));
 
         $this->mockHandler->append(
             new Response(200, [], $userId)
@@ -506,7 +543,7 @@ class SourcesControllerTest extends WebTestCase
         self::assertSame(200, $response->getStatusCode());
         $this->assertAuthorizationRequestIsMade();
         self::assertInstanceOf(JsonResponse::class, $response);
-        self::assertSame($expectedRepositoryCount, $this->repository->count([]));
+        self::assertSame($expectedRepositoryCount, $this->sourceRepository->count([]));
     }
 
     /**
@@ -642,6 +679,140 @@ class SourcesControllerTest extends WebTestCase
                 'expectedResponseData' => [
                     $userFileSources[0]->jsonSerialize(),
                     $userGitSources[0]->jsonSerialize(),
+                ],
+            ],
+        ];
+    }
+
+    public function testPrepareRunSource(): void
+    {
+        $userId = UserId::create();
+
+        $fileSource = new FileSource($userId, 'file source label');
+        $source = new RunSource($fileSource);
+
+        $this->store->add($source);
+
+        $this->mockHandler->append(
+            new Response(200, [], $userId)
+        );
+
+        $response = $this->makeAuthorizedSourceRequest('POST', 'prepare', $source->getId());
+
+        self::assertSame(404, $response->getStatusCode());
+        $this->assertAuthorizationRequestIsMade();
+    }
+
+    /**
+     * @dataProvider prepareSuccessDataProvider
+     *
+     * @param array<string, string> $requestParameters
+     * @param array<mixed>          $expectedResponseData
+     */
+    public function testPrepareSuccess(
+        FileSource|GitSource $source,
+        string $userId,
+        array $requestParameters,
+        array $expectedResponseData
+    ): void {
+        $this->store->add($source);
+
+        $this->mockHandler->append(
+            new Response(200, [], $userId)
+        );
+
+        $response = $this->makeAuthorizedSourceRequest(
+            'POST',
+            'prepare',
+            $source->getId(),
+            $requestParameters
+        );
+
+        self::assertSame(202, $response->getStatusCode());
+        $this->assertAuthorizationRequestIsMade();
+        self::assertInstanceOf(JsonResponse::class, $response);
+
+        $responseData = json_decode((string) $response->getContent(), true);
+        self::assertIsArray($responseData);
+
+        $runSource = $this->runSourceRepository->findByParent($source);
+        self::assertInstanceOf(RunSource::class, $runSource);
+
+        $expectedResponseData['id'] = $runSource->getId();
+        self::assertSame($expectedResponseData, $responseData);
+    }
+
+    /**
+     * @return array<mixed>
+     */
+    public function prepareSuccessDataProvider(): array
+    {
+        $userId = UserId::create();
+
+        $fileSource = new FileSource($userId, 'file source label');
+        $gitSource = new GitSource($userId, 'https://example.com/repository.git', '/', md5((string) rand()));
+
+        return [
+            SourceInterface::TYPE_FILE => [
+                'source' => $fileSource,
+                'userId' => $userId,
+                'requestParameters' => [],
+                'expectedResponseData' => [
+                    'id' => '{{ runSourceId }}',
+                    'user_id' => $gitSource->getUserId(),
+                    'type' => SourceInterface::TYPE_RUN,
+                    'parent' => $fileSource->getId(),
+                    'parameters' => [],
+                    'state' => State::REQUESTED->value,
+                ],
+            ],
+            SourceInterface::TYPE_GIT => [
+                'source' => $gitSource,
+                'userId' => $userId,
+                'requestParameters' => [],
+                'expectedResponseData' => [
+                    'id' => '{{ runSourceId }}',
+                    'user_id' => $gitSource->getUserId(),
+                    'type' => SourceInterface::TYPE_RUN,
+                    'parent' => $gitSource->getId(),
+                    'parameters' => [],
+                    'state' => State::REQUESTED->value,
+                ],
+            ],
+            SourceInterface::TYPE_GIT . ' with ref request parameters' => [
+                'source' => $gitSource,
+                'userId' => $userId,
+                'requestParameters' => [
+                    'ref' => 'v1.1',
+                ],
+                'expectedResponseData' => [
+                    'id' => '{{ runSourceId }}',
+                    'user_id' => $gitSource->getUserId(),
+                    'type' => SourceInterface::TYPE_RUN,
+                    'parent' => $gitSource->getId(),
+                    'parameters' => [
+                        'ref' => 'v1.1',
+                    ],
+                    'state' => State::REQUESTED->value,
+                ],
+            ],
+            SourceInterface::TYPE_GIT . ' with request parameters including ref' => [
+                'source' => $gitSource,
+                'userId' => $userId,
+                'requestParameters' => [
+                    'ref' => 'v1.1',
+                    'ignored1' => 'value',
+                    'ignored2' => 'value',
+                ],
+                'expectedResponseData' => [
+                    'id' => '{{ runSourceId }}',
+                    'user_id' => $gitSource->getUserId(),
+                    'type' => SourceInterface::TYPE_RUN,
+                    'parent' => $gitSource->getId(),
+                    'parameters' => [
+                        'ref' => 'v1.1',
+                    ],
+                    'state' => State::REQUESTED->value,
                 ],
             ],
         ];
