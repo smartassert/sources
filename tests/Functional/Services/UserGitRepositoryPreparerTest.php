@@ -180,14 +180,19 @@ class UserGitRepositoryPreparerTest extends WebTestCase
 
     public function testPrepareSuccess(): void
     {
+        $fixtureSetIdentifier = 'source_txt';
+
         $this->setGitRepositoryClonerOutcome(new ProcessOutput(0, 'clone success output', ''));
-        $this->setGitRepositoryCheckoutHandlerOutcome(new ProcessOutput(0, 'checkout output', ''));
+        $this->setGitRepositoryCheckoutHandlerOutcome(
+            new ProcessOutput(0, 'checkout output', ''),
+            $fixtureSetIdentifier
+        );
 
         $runSource = $this->userGitRepositoryPreparer->prepare($this->gitSource, self::REF);
 
         self::assertDirectoryExists($this->repositoryPath);
 
-        $sourceAbsolutePath = Path::canonicalize($this->fixtureCreator->getFixturesPath());
+        $sourceAbsolutePath = Path::canonicalize($this->fixtureCreator->getFixtureSetPath($fixtureSetIdentifier));
         $targetAbsolutePath = Path::canonicalize($this->fileStoreBasePath . '/' . $runSource);
 
         self::assertSame(scandir($sourceAbsolutePath), scandir($targetAbsolutePath));
@@ -203,13 +208,15 @@ class UserGitRepositoryPreparerTest extends WebTestCase
         );
     }
 
-    private function setGitRepositoryCheckoutHandlerOutcome(ProcessOutput|\Exception $outcome): void
-    {
+    private function setGitRepositoryCheckoutHandlerOutcome(
+        ProcessOutput|\Exception $outcome,
+        ?string $fixtureSetIdentifier = null,
+    ): void {
         ObjectReflector::setProperty(
             $this->userGitRepositoryPreparer,
             UserGitRepositoryPreparer::class,
             'gitRepositoryCheckoutHandler',
-            $this->createGitRepositoryCheckoutHandler($outcome)
+            $this->createGitRepositoryCheckoutHandler($outcome, $fixtureSetIdentifier)
         );
     }
 
@@ -235,8 +242,10 @@ class UserGitRepositoryPreparerTest extends WebTestCase
         return $mock;
     }
 
-    private function createGitRepositoryCheckoutHandler(\Exception|ProcessOutput $outcome): GitRepositoryCheckoutHandler
-    {
+    private function createGitRepositoryCheckoutHandler(
+        \Exception|ProcessOutput $outcome,
+        ?string $fixtureSetIdentifier = null,
+    ): GitRepositoryCheckoutHandler {
         $mock = \Mockery::mock(GitRepositoryCheckoutHandler::class);
 
         $expectation = $mock
@@ -250,13 +259,18 @@ class UserGitRepositoryPreparerTest extends WebTestCase
         ;
 
         if ($outcome instanceof ProcessOutput) {
-            $expectation->andReturnUsing(function (string $repositoryPath) use ($outcome): ProcessOutput {
-                $repositoryRelativePath =
-                    (string) (new UnicodeString($repositoryPath))->trimPrefix($this->fileStoreBasePath . '/');
-                $this->fixtureCreator->copyFixturesTo($repositoryRelativePath);
+            $expectation->andReturnUsing(
+                function (string $repositoryPath) use ($outcome, $fixtureSetIdentifier): ProcessOutput {
+                    if (is_string($fixtureSetIdentifier)) {
+                        $repositoryRelativePath = (string) (new UnicodeString($repositoryPath))
+                            ->trimPrefix($this->fileStoreBasePath . '/')
+                        ;
+                        $this->fixtureCreator->copyFixtureSetTo($fixtureSetIdentifier, $repositoryRelativePath);
+                    }
 
-                return $outcome;
-            });
+                    return $outcome;
+                }
+            );
         } else {
             $expectation->andThrow($outcome);
         }

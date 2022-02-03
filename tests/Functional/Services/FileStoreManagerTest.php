@@ -61,7 +61,7 @@ class FileStoreManagerTest extends WebTestCase
         $sourceAbsolutePath = $this->fileStoreManager->create($sourceRelativePath);
         self::assertTrue($this->fileStoreManager->exists($sourceRelativePath));
 
-        $this->fixtureCreator->copyFixturesTo($sourceRelativePath);
+        $this->fixtureCreator->copyFixtureSetTo('source_txt', $sourceRelativePath);
 
         $targetRelativePath = (string) (new RunSource($gitSource));
         self::assertFalse($this->fileStoreManager->exists($targetRelativePath));

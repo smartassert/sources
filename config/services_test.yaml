@@ -1,5 +1,5 @@
 parameters:
-    source_fixtures_path: '%env(resolve:SOURCE_FIXTURES_PATH)%'
+    source_fixtures_base_path: '%env(resolve:SOURCE_FIXTURES_BASE_PATH)%'
 
 services:
     _defaults:
@@ -29,8 +29,8 @@ services:
     App\Tests\Services\FileStoreFixtureCreator:
         public: true
         arguments:
-            $sourceFixturesPath: '%source_fixtures_path%'
             $fileStoreBasePath: '%file_store_base_path%'
+            $sourceFixturesBasePath: '%source_fixtures_base_path%'
 
     App\Services\FileStoreManager:
         public: true
