@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\Services;
 
+use App\Entity\FileSource;
 use App\Entity\GitSource;
 use App\Entity\RunSource;
 use App\Model\UserGitRepository;
@@ -70,6 +71,90 @@ class FileStoreManagerTest extends WebTestCase
         $targetAbsolutePath = $this->fileStoreManager->mirror($sourceRelativePath, $targetRelativePath);
         self::assertSame($expectedTargetPath, $targetAbsolutePath);
         self::assertSame(scandir($sourceAbsolutePath), scandir($expectedTargetPath));
+    }
+
+    /**
+     * @dataProvider listDataProvider
+     *
+     * @param string[] $extensions
+     * @param string[] $expected
+     */
+    public function testListSuccess(string $fixtureSet, string $relativePath, array $extensions, array $expected): void
+    {
+        $this->fixtureCreator->copyFixtureSetTo($fixtureSet, $relativePath);
+
+        $files = $this->fileStoreManager->list($relativePath, $extensions);
+
+        self::assertSame($expected, $files);
+    }
+
+    /**
+     * @return array<mixed>
+     */
+    public function listDataProvider(): array
+    {
+        return [
+            'empty directory' => [
+                'fixtureSet' => 'empty',
+                'relativePath' => (string) new FileSource(UserId::create(), ''),
+                'extensions' => [],
+                'expected' => [],
+            ],
+            'source_txt, no extensions' => [
+                'fixtureSet' => 'source_txt',
+                'relativePath' => (string) new FileSource(UserId::create(), ''),
+                'extensions' => [],
+                'expected' => [
+                    'directory/file3.txt',
+                    'file1.txt',
+                    'file2.txt',
+                ],
+            ],
+            'source_txt, extensions=[txt]' => [
+                'fixtureSet' => 'source_txt',
+                'relativePath' => (string) new FileSource(UserId::create(), ''),
+                'extensions' => ['txt'],
+                'expected' => [
+                    'directory/file3.txt',
+                    'file1.txt',
+                    'file2.txt',
+                ],
+            ],
+            'source_txt, extensions=[yml, yaml]' => [
+                'fixtureSet' => 'source_txt',
+                'relativePath' => (string) new FileSource(UserId::create(), ''),
+                'extensions' => ['yml', 'yaml'],
+                'expected' => [],
+            ],
+            'source_yml_yaml, no extensions' => [
+                'fixtureSet' => 'source_yml_yaml',
+                'relativePath' => (string) new FileSource(UserId::create(), ''),
+                'extensions' => [],
+                'expected' => [
+                    'directory/file3.yml',
+                    'file1.yaml',
+                    'file2.yml',
+                ],
+            ],
+            'source_yml_yaml, extensions=[yml]' => [
+                'fixtureSet' => 'source_yml_yaml',
+                'relativePath' => (string) new FileSource(UserId::create(), ''),
+                'extensions' => ['yml'],
+                'expected' => [
+                    'directory/file3.yml',
+                    'file2.yml',
+                ],
+            ],
+            'source_mixed, extensions=[ yaml]' => [
+                'fixtureSet' => 'source_mixed',
+                'relativePath' => (string) new FileSource(UserId::create(), ''),
+                'extensions' => ['yaml'],
+                'expected' => [
+                    'directory/file3.yaml',
+                    'file1.yaml',
+                ],
+            ],
+        ];
     }
 
     private function createFileStoreAbsolutePath(string $relativePath): string

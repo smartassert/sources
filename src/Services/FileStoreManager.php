@@ -12,6 +12,7 @@ use App\Exception\File\RemoveException;
 use App\Model\AbsoluteFileLocator;
 use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Finder\Finder;
 
 class FileStoreManager
 {
@@ -101,6 +102,37 @@ class FileStoreManager
         }
 
         return $targetPath;
+    }
+
+    /**
+     * @param string[] $extensions
+     *
+     * @throws OutOfScopeException
+     *
+     * @return string[]
+     */
+    public function list(string $relativePath, array $extensions = []): array
+    {
+        $absolutePath = $this->createAbsolutePath($relativePath);
+
+        $finder = new Finder();
+        $finder->files();
+        $finder->in((string) $absolutePath);
+
+        if ([] !== $extensions) {
+            foreach ($extensions as $extension) {
+                $finder->name('*.' . $extension);
+            }
+        }
+
+        $relativePaths = [];
+        foreach ($finder as $file) {
+            $relativePaths[] = $file->getRelativePathname();
+        }
+
+        sort($relativePaths);
+
+        return $relativePaths;
     }
 
     /**
