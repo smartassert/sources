@@ -7,6 +7,7 @@ namespace App\MessageHandler;
 use App\Entity\RunSource;
 use App\Enum\RunSource\State;
 use App\Exception\DirectoryDuplicationException;
+use App\Exception\MessageHandler\PrepareException;
 use App\Exception\UserGitRepositoryException;
 use App\Message\Prepare;
 use App\Repository\SourceRepository;
@@ -25,8 +26,7 @@ class PrepareHandler
     }
 
     /**
-     * @throws DirectoryDuplicationException
-     * @throws UserGitRepositoryException
+     * @throws PrepareException
      */
     public function __invoke(Prepare $message): void
     {
@@ -42,7 +42,14 @@ class PrepareHandler
         $runSource->setState(State::PREPARING_RUNNING);
         $this->sourceStore->add($runSource);
 
-        $this->runSourcePreparer->prepare($runSource);
+        try {
+            $this->runSourcePreparer->prepare($runSource);
+        } catch (DirectoryDuplicationException | UserGitRepositoryException $e) {
+            $runSource->setState(State::PREPARING_HALTED);
+            $this->sourceStore->add($runSource);
+
+            throw new PrepareException($e);
+        }
 
         $runSource->setState(State::PREPARED);
         $this->sourceStore->add($runSource);
