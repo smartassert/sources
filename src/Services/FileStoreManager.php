@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Exception\File\CreateException;
-use App\Exception\File\MirrorException;
-use App\Exception\File\NotExistsException;
 use App\Exception\File\OutOfScopeException;
 use App\Exception\File\RemoveException;
 use App\Exception\File\WriteException;
@@ -58,56 +56,6 @@ class FileStoreManager
     public function exists(string $relativePath): bool
     {
         return $this->doExists($this->createAbsolutePath($relativePath));
-    }
-
-    /**
-     * @throws CreateException
-     * @throws MirrorException
-     * @throws NotExistsException
-     * @throws OutOfScopeException
-     * @throws RemoveException
-     *
-     * @return string The absolute target path
-     */
-    public function mirror(string $sourceRelativePath, string $targetRelativePath): string
-    {
-        try {
-            $sourceAbsolutePath = $this->createAbsolutePath($sourceRelativePath);
-        } catch (OutOfScopeException $sourceOutOfScopeException) {
-            throw $sourceOutOfScopeException->withContext('source');
-        }
-
-        try {
-            $targetAbsolutePath = $this->createAbsolutePath($targetRelativePath);
-        } catch (OutOfScopeException $targetOutOfScopeException) {
-            throw $targetOutOfScopeException->withContext('target');
-        }
-
-        $sourcePath = (string) $sourceAbsolutePath;
-        $targetPath = (string) $targetAbsolutePath;
-
-        if (false === $this->doExists($sourceAbsolutePath)) {
-            throw (new NotExistsException($sourcePath))->withContext('source');
-        }
-
-        if ($sourcePath === $targetPath) {
-            return $targetPath;
-        }
-
-        try {
-            $this->doRemove($targetAbsolutePath);
-            $this->doCreate($targetAbsolutePath);
-        } catch (RemoveException | CreateException $exception) {
-            throw $exception->withContext('target');
-        }
-
-        try {
-            $this->filesystem->mirror($sourcePath, $targetPath);
-        } catch (IOExceptionInterface $IOException) {
-            throw new MirrorException($sourcePath, $targetPath, $IOException);
-        }
-
-        return $targetPath;
     }
 
     /**
