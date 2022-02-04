@@ -10,21 +10,21 @@ class FileStoreFixtureCreator
 {
     public function __construct(
         private Filesystem $filesystem,
-        private string $sourceFixturesPath,
-        private string $fileStoreBasePath
+        private string $fileStoreBasePath,
+        private string $sourceFixturesBasePath,
     ) {
     }
 
-    public function copyFixturesTo(string $relativePath): void
+    public function copyFixtureSetTo(string $setIdentifier, string $relativePath): void
     {
         $this->filesystem->mirror(
-            $this->sourceFixturesPath,
+            $this->getFixtureSetPath($setIdentifier),
             sprintf('%s/%s', $this->fileStoreBasePath, $relativePath)
         );
     }
 
-    public function getFixturesPath(): string
+    public function getFixtureSetPath(string $setIdentifier): string
     {
-        return $this->sourceFixturesPath;
+        return $this->sourceFixturesBasePath . '/' . $setIdentifier;
     }
 }
