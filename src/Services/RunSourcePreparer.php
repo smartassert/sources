@@ -52,14 +52,27 @@ class RunSourcePreparer
     /**
      * @throws WriteException
      * @throws SourceReadExceptionInterface
+     * @throws UserGitRepositoryException
      */
     public function prepareAndSerialize(RunSource $target): void
     {
         $source = $target->getParent();
+        $serializedSourcePath = $target . '/serialized.yaml';
+
         if ($source instanceof FileSource) {
             $content = $this->sourceSerializer->serialize($source);
+            $this->fileStoreManager->add($serializedSourcePath, $content);
+        }
 
-            $this->fileStoreManager->add($target . '/serialized.yaml', $content);
+        if ($source instanceof GitSource) {
+            $gitRepository = $this->gitRepositoryPreparer->prepare($source, $target->getParameters()['ref'] ?? null);
+            $content = $this->sourceSerializer->serialize($gitRepository, $source->getPath());
+            $this->fileStoreManager->add($serializedSourcePath, $content);
+
+            try {
+                $this->fileStoreManager->remove((string) $gitRepository);
+            } catch (OutOfScopeException | RemoveException) {
+            }
         }
     }
 }
