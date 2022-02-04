@@ -58,3 +58,10 @@ services:
 
     Symfony\Component\Yaml\Parser:
         class: Symfony\Component\Yaml\Parser
+
+    League\Flysystem\FilesystemAdapter:
+        class: League\Flysystem\Local\LocalFilesystemAdapter
+        arguments:
+            $location: '@app.configuration.file_store_base_path'
+
+    League\Flysystem\Filesystem:

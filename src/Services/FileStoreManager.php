@@ -9,9 +9,13 @@ use App\Exception\File\MirrorException;
 use App\Exception\File\NotExistsException;
 use App\Exception\File\OutOfScopeException;
 use App\Exception\File\RemoveException;
+use App\Exception\File\WriteException;
 use App\Model\AbsoluteFileLocator;
+use League\Flysystem\Filesystem as FlyFilesystem;
+use League\Flysystem\FilesystemException;
 use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Filesystem\Path;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
 
@@ -19,7 +23,8 @@ class FileStoreManager
 {
     public function __construct(
         private AbsoluteFileLocator $basePath,
-        private Filesystem $filesystem
+        private Filesystem $filesystem,
+        private FlyFilesystem $flyFilesystem,
     ) {
     }
 
@@ -128,6 +133,20 @@ class FileStoreManager
         }
 
         return $finder->getIterator();
+    }
+
+    /**
+     * @throws WriteException
+     */
+    public function add(string $fileRelativePath, string $content): void
+    {
+        $fileRelativePath = Path::canonicalize($fileRelativePath);
+
+        try {
+            $this->flyFilesystem->write($fileRelativePath, $content);
+        } catch (FilesystemException $e) {
+            throw new WriteException($fileRelativePath, $e);
+        }
     }
 
     /**

@@ -162,6 +162,38 @@ class FileStoreManagerTest extends WebTestCase
         ];
     }
 
+    /**
+     * @dataProvider addDataProvider
+     */
+    public function testAdd(string $fileRelativePath, string $content): void
+    {
+        $this->fileStoreManager->add($fileRelativePath, $content);
+
+        $expectedAbsolutePath = Path::canonicalize($this->createFileStoreAbsolutePath($fileRelativePath));
+
+        self::assertFileExists($expectedAbsolutePath);
+        self::assertSame($content, file_get_contents($expectedAbsolutePath));
+
+        unlink($expectedAbsolutePath);
+    }
+
+    /**
+     * @return array<mixed>
+     */
+    public function addDataProvider(): array
+    {
+        return [
+            'single-level relative directory' => [
+                'fileRelativePath' => UserId::create() . '/file.txt',
+                'content' => md5((string) rand()),
+            ],
+            'multi-level relative directory, file-only file path' => [
+                'fileRelativePath' => UserId::create() . '/' . UserId::create() . '/file.txt',
+                'content' => md5((string) rand()),
+            ],
+        ];
+    }
+
     private function createFileStoreAbsolutePath(string $relativePath): string
     {
         return Path::canonicalize($this->fileStoreBasePath . '/' . $relativePath);
