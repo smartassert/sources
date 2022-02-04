@@ -8,15 +8,18 @@ use App\Entity\FileSource;
 use App\Entity\GitSource;
 use App\Entity\RunSource;
 use App\Entity\SourceInterface;
+use App\Exception\SourceRead\SourceReadExceptionInterface;
 use App\Message\Prepare;
 use App\Repository\SourceRepository;
 use App\Request\FileSourceRequest;
 use App\Request\GitSourceRequest;
+use App\Services\RunSourceBuilder;
 use App\Services\Source\Factory;
 use App\Services\Source\Mutator;
 use App\Services\Source\Store;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -50,7 +53,7 @@ class SourceController
     }
 
     #[Route(self::ROUTE_SOURCE . '{sourceId<[A-Z90-9]{26}>}', name: 'get', methods: ['GET'])]
-    public function get(?SourceInterface $source, UserInterface $user): JsonResponse
+    public function get(?SourceInterface $source, UserInterface $user): Response
     {
         return $this->doUserSourceAction($source, $user, function (SourceInterface $source) {
             return new JsonResponse($source);
@@ -58,7 +61,7 @@ class SourceController
     }
 
     #[Route(self::ROUTE_SOURCE . '{sourceId<[A-Z90-9]{26}>}', name: 'update', methods: ['PUT'])]
-    public function update(null|FileSource|GitSource $source, Request $request, UserInterface $user): JsonResponse
+    public function update(null|FileSource|GitSource $source, Request $request, UserInterface $user): Response
     {
         return $this->doUserSourceAction($source, $user, function (FileSource|GitSource $source) use ($request) {
             $source = $source instanceof FileSource
@@ -70,7 +73,7 @@ class SourceController
     }
 
     #[Route(self::ROUTE_SOURCE . '{sourceId<[A-Z90-9]{26}>}', name: 'delete', methods: ['DELETE'])]
-    public function delete(?SourceInterface $source, UserInterface $user): JsonResponse
+    public function delete(?SourceInterface $source, UserInterface $user): Response
     {
         return $this->doUserSourceAction($source, $user, function (SourceInterface $source) {
             $this->store->remove($source);
@@ -89,7 +92,7 @@ class SourceController
     }
 
     #[Route(self::ROUTE_SOURCE . '{sourceId<[A-Z90-9]{26}>}/prepare', name: 'prepare', methods: ['POST'])]
-    public function prepare(Request $request, null|FileSource|GitSource $source, UserInterface $user): JsonResponse
+    public function prepare(Request $request, null|FileSource|GitSource $source, UserInterface $user): Response
     {
         return $this->doUserSourceAction(
             $source,
@@ -110,7 +113,39 @@ class SourceController
         );
     }
 
-    private function doUserSourceAction(?SourceInterface $source, UserInterface $user, callable $action): JsonResponse
+    #[Route(self::ROUTE_SOURCE . '{sourceId<[A-Z90-9]{26}>}/read', name: 'read', methods: ['GET'])]
+    public function read(
+        ?RunSource $source,
+        UserInterface $user,
+        RunSourceBuilder $runSourceBuilder
+    ): Response {
+        return $this->doUserSourceAction($source, $user, function (RunSource $source) use ($runSourceBuilder) {
+            try {
+                return new Response(
+                    $runSourceBuilder->build($source),
+                    200,
+                    [
+                        'content-type' => 'text/x-yaml; charset=utf-8',
+                    ]
+                );
+            } catch (SourceReadExceptionInterface $exception) {
+                return new JsonResponse(
+                    [
+                        'error' => [
+                            'type' => 'source_read_exception',
+                            'payload' => [
+                                'file' => $exception->getSourceFile()->getRelativePathname(),
+                                'message' => $exception->getMessage(),
+                            ],
+                        ],
+                    ],
+                    500
+                );
+            }
+        });
+    }
+
+    private function doUserSourceAction(?SourceInterface $source, UserInterface $user, callable $action): Response
     {
         if (null === $source) {
             return new JsonResponse(null, 404);
