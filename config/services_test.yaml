@@ -50,6 +50,3 @@ services:
 
     App\Services\RunSourcePreparer:
         public: true
-
-    App\Services\RunSourceBuilder:
-        public: true

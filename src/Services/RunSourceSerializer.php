@@ -14,7 +14,7 @@ use Symfony\Component\Finder\SplFileInfo;
 use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Parser as YamlParser;
 
-class RunSourceBuilder
+class RunSourceSerializer
 {
     private const DOCUMENT_TEMPLATE = '---' . "\n" . '%s' . "\n" . '...';
 
@@ -27,7 +27,7 @@ class RunSourceBuilder
     /**
      * @throws SourceReadExceptionInterface
      */
-    public function build(RunSource $source): string
+    public function serialize(RunSource $source): string
     {
         $sourceFiles = [];
 

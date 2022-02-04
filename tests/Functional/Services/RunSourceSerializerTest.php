@@ -6,15 +6,15 @@ namespace App\Tests\Functional\Services;
 
 use App\Entity\FileSource;
 use App\Entity\RunSource;
-use App\Services\RunSourceBuilder;
+use App\Services\RunSourceSerializer;
 use App\Tests\Model\UserId;
 use App\Tests\Services\FileStoreFixtureCreator;
 use App\Tests\Services\FixtureLoader;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
-class RunSourceBuilderTest extends WebTestCase
+class RunSourceSerializerTest extends WebTestCase
 {
-    private RunSourceBuilder $runSourceBuilder;
+    private RunSourceSerializer $runSourceSerializer;
     private FileStoreFixtureCreator $fixtureCreator;
     private FixtureLoader $fixtureLoader;
 
@@ -22,9 +22,9 @@ class RunSourceBuilderTest extends WebTestCase
     {
         parent::setUp();
 
-        $runSourceBuilder = self::getContainer()->get(RunSourceBuilder::class);
-        \assert($runSourceBuilder instanceof RunSourceBuilder);
-        $this->runSourceBuilder = $runSourceBuilder;
+        $runSourceSerializer = self::getContainer()->get(RunSourceSerializer::class);
+        \assert($runSourceSerializer instanceof RunSourceSerializer);
+        $this->runSourceSerializer = $runSourceSerializer;
 
         $fixtureCreator = self::getContainer()->get(FileStoreFixtureCreator::class);
         \assert($fixtureCreator instanceof FileStoreFixtureCreator);
@@ -36,16 +36,16 @@ class RunSourceBuilderTest extends WebTestCase
     }
 
     /**
-     * @dataProvider buildSuccessDataProvider
+     * @dataProvider serializeSuccessDataProvider
      */
-    public function testBuildSuccess(string $fixtureSetIdentifier, callable $expectedCreator): void
+    public function testSerializeSuccess(string $fixtureSetIdentifier, callable $expectedCreator): void
     {
         $fileSource = new FileSource(UserId::create(), 'file source label');
         $source = new RunSource($fileSource);
 
         $this->fixtureCreator->copyFixtureSetTo($fixtureSetIdentifier, (string) $source);
 
-        $content = $this->runSourceBuilder->build($source);
+        $content = $this->runSourceSerializer->serialize($source);
 
         self::assertSame($expectedCreator($this->fixtureLoader), $content);
     }
@@ -53,7 +53,7 @@ class RunSourceBuilderTest extends WebTestCase
     /**
      * @return array<mixed>
      */
-    public function buildSuccessDataProvider(): array
+    public function serializeSuccessDataProvider(): array
     {
         return [
             'yml_yaml_valid' => [
