@@ -38,14 +38,14 @@ class SourceSerializerTest extends WebTestCase
     /**
      * @dataProvider serializeSuccessDataProvider
      */
-    public function testSerializeSuccess(string $fixtureSetIdentifier, callable $expectedCreator): void
+    public function testSerializeSuccess(string $fixtureSetIdentifier, ?string $path, callable $expectedCreator): void
     {
         $fileSource = new FileSource(UserId::create(), 'file source label');
         $source = new RunSource($fileSource);
 
         $this->fixtureCreator->copyFixtureSetTo($fixtureSetIdentifier, (string) $source);
 
-        $content = $this->sourceSerializer->serialize($source);
+        $content = $this->sourceSerializer->serialize($source, $path);
 
         self::assertSame($expectedCreator($this->fixtureLoader), $content);
     }
@@ -56,10 +56,25 @@ class SourceSerializerTest extends WebTestCase
     public function serializeSuccessDataProvider(): array
     {
         return [
-            'yml_yaml_valid' => [
+            'yml_yaml_valid, entire' => [
                 'fixtureSetIdentifier' => 'yml_yaml_valid',
+                'path' => null,
                 'expectedCreator' => function (FixtureLoader $fixtureLoader): string {
-                    return $fixtureLoader->load('/RunSource/source_yml_yaml.yaml');
+                    return $fixtureLoader->load('/RunSource/source_yml_yaml_entire.yaml');
+                },
+            ],
+            'yml_yaml_valid, sub-directory without leading slash' => [
+                'fixtureSetIdentifier' => 'yml_yaml_valid',
+                'path' => 'directory',
+                'expectedCreator' => function (FixtureLoader $fixtureLoader): string {
+                    return $fixtureLoader->load('/RunSource/source_yml_yaml_partial.yaml');
+                },
+            ],
+            'yml_yaml_valid, sub-directory with leading slash' => [
+                'fixtureSetIdentifier' => 'yml_yaml_valid',
+                'path' => '/directory',
+                'expectedCreator' => function (FixtureLoader $fixtureLoader): string {
+                    return $fixtureLoader->load('/RunSource/source_yml_yaml_partial.yaml');
                 },
             ],
         ];

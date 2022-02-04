@@ -874,7 +874,7 @@ class SourcesControllerTest extends WebTestCase
                 'sourceFixtureSetIdentifier' => 'yml_yaml_valid',
                 'expectedResponseCreator' => function (FixtureLoader $fixtureLoader) {
                     return new SymfonyResponse(
-                        $fixtureLoader->load('/RunSource/source_yml_yaml.yaml'),
+                        $fixtureLoader->load('/RunSource/source_yml_yaml_entire.yaml'),
                         200,
                         [
                             'content-type' => 'text/x-yaml; charset=utf-8',

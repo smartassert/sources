@@ -108,12 +108,41 @@ class RunSourcePreparerTest extends WebTestCase
         self::assertDirectoryDoesNotExist($repositoryPath);
     }
 
-    public function testPrepareAndSerialize(): void
+    public function testPrepareAndSerializeForFileSource(): void
     {
         $fileSource = new FileSource(UserId::create(), 'file source label');
         $this->fixtureCreator->copyFixtureSetTo('yml_yaml_valid', (string) $fileSource);
 
         $runSource = new RunSource($fileSource);
+        $this->runSourcePreparer->prepareAndSerialize($runSource);
+
+        $targetAbsolutePath = $this->fileStoreBasePath . '/' . $runSource . '/serialized.yaml';
+
+        self::assertFileExists($targetAbsolutePath);
+        self::assertSame(
+            $this->fixtureLoader->load('/RunSource/source_yml_yaml_entire.yaml'),
+            file_get_contents($targetAbsolutePath)
+        );
+    }
+
+    /**
+     * @dataProvider prepareAndSerializeForGitSourceDataProvider
+     */
+    public function testPrepareAndSerializeForGitSource(
+        RunSource $runSource,
+        UserGitRepository $userGitRepository,
+        string $fixtureSetIdentifier,
+        UserGitRepositoryPreparer $gitRepositoryPreparer,
+        string $expectedSerializedFixturePath,
+    ): void {
+        ObjectReflector::setProperty(
+            $this->runSourcePreparer,
+            $this->runSourcePreparer::class,
+            'gitRepositoryPreparer',
+            $gitRepositoryPreparer
+        );
+
+        $this->fixtureCreator->copyFixtureSetTo('yml_yaml_valid', (string) $userGitRepository);
 
         $this->runSourcePreparer->prepareAndSerialize($runSource);
 
@@ -121,8 +150,54 @@ class RunSourcePreparerTest extends WebTestCase
 
         self::assertFileExists($targetAbsolutePath);
         self::assertSame(
-            $this->fixtureLoader->load('/RunSource/source_yml_yaml.yaml'),
+            $this->fixtureLoader->load($expectedSerializedFixturePath),
             file_get_contents($targetAbsolutePath)
         );
+
+        self::assertDirectoryDoesNotExist($this->fileStoreBasePath . '/' . $userGitRepository);
+    }
+
+    /**
+     * @return array<mixed>
+     */
+    public function prepareAndSerializeForGitSourceDataProvider(): array
+    {
+        $gitRef = 'v1.1';
+        $gitSourceEntire = new GitSource(UserId::create(), 'http://example.com/repository.git');
+        $gitSourceEntireRepository = new UserGitRepository($gitSourceEntire);
+
+        $gitSourceEntireRepositoryPreparer = \Mockery::mock(UserGitRepositoryPreparer::class);
+        $gitSourceEntireRepositoryPreparer
+            ->shouldReceive('prepare')
+            ->with($gitSourceEntire, $gitRef)
+            ->andReturn($gitSourceEntireRepository)
+        ;
+
+        $gitSourcePartial = new GitSource(UserId::create(), 'http://example.com/repository.git', '/directory');
+        $gitSourcePartialRepository = new UserGitRepository($gitSourcePartial);
+
+        $gitSourcePartialRepositoryPreparer = \Mockery::mock(UserGitRepositoryPreparer::class);
+        $gitSourcePartialRepositoryPreparer
+            ->shouldReceive('prepare')
+            ->with($gitSourcePartial, $gitRef)
+            ->andReturn($gitSourcePartialRepository)
+        ;
+
+        return [
+            'git source, entire' => [
+                'runSource' => new RunSource($gitSourceEntire, ['ref' => $gitRef]),
+                'userGitRepository' => $gitSourceEntireRepository,
+                'fixtureSetIdentifier' => 'yml_yaml_valid',
+                'gitRepositoryPreparer' => $gitSourceEntireRepositoryPreparer,
+                'expectedSerializedFixturePath' => '/RunSource/source_yml_yaml_entire.yaml',
+            ],
+            'git source, partial' => [
+                'runSource' => new RunSource($gitSourcePartial, ['ref' => $gitRef]),
+                'userGitRepository' => $gitSourcePartialRepository,
+                'fixtureSetIdentifier' => 'yml_yaml_valid',
+                'gitRepositoryPreparer' => $gitSourcePartialRepositoryPreparer,
+                'expectedSerializedFixturePath' => '/RunSource/source_yml_yaml_partial.yaml',
+            ],
+        ];
     }
 }
