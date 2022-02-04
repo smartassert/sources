@@ -9,12 +9,14 @@ use App\Entity\RunSource;
 use App\Services\RunSourceBuilder;
 use App\Tests\Model\UserId;
 use App\Tests\Services\FileStoreFixtureCreator;
+use App\Tests\Services\FixtureLoader;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 class RunSourceBuilderTest extends WebTestCase
 {
     private RunSourceBuilder $runSourceBuilder;
     private FileStoreFixtureCreator $fixtureCreator;
+    private FixtureLoader $fixtureLoader;
 
     protected function setUp(): void
     {
@@ -27,12 +29,16 @@ class RunSourceBuilderTest extends WebTestCase
         $fixtureCreator = self::getContainer()->get(FileStoreFixtureCreator::class);
         \assert($fixtureCreator instanceof FileStoreFixtureCreator);
         $this->fixtureCreator = $fixtureCreator;
+
+        $fixtureLoader = self::getContainer()->get(FixtureLoader::class);
+        \assert($fixtureLoader instanceof FixtureLoader);
+        $this->fixtureLoader = $fixtureLoader;
     }
 
     /**
      * @dataProvider buildSuccessDataProvider
      */
-    public function testBuildSuccess(string $fixtureSetIdentifier, string $expected): void
+    public function testBuildSuccess(string $fixtureSetIdentifier, callable $expectedCreator): void
     {
         $fileSource = new FileSource(UserId::create(), 'file source label');
         $source = new RunSource($fileSource);
@@ -41,7 +47,7 @@ class RunSourceBuilderTest extends WebTestCase
 
         $content = $this->runSourceBuilder->build($source);
 
-        self::assertSame($expected, $content);
+        self::assertSame($expectedCreator($this->fixtureLoader), $content);
     }
 
     /**
@@ -50,33 +56,11 @@ class RunSourceBuilderTest extends WebTestCase
     public function buildSuccessDataProvider(): array
     {
         return [
-            'source_yml_yaml' => [
-                'fixtureSetIdentifier' => 'source_yml_yaml',
-                'expected' => <<< 'END'
-                    ---
-                    path: "directory/file3.yml"
-                    content_hash: "3e4280d968d34f0ba48296049cf9c88f"
-                    ...
-                    ---
-                    - "file 3 line 1"
-                    ...
-                    ---
-                    path: "file1.yaml"
-                    content_hash: "602226b0406e64e590352b2909029802"
-                    ...
-                    ---
-                    - "file 1 line 1"
-                    - "file 1 line 2"
-                    ...
-                    ---
-                    path: "file2.yml"
-                    content_hash: "6c8ab92eb84c36b79607cb1d0d3f5037"
-                    ...
-                    ---
-                    - "file 2 line 1"
-                    - "file 2 line 2"
-                    ...
-                    END,
+            'yml_yaml_valid' => [
+                'fixtureSetIdentifier' => 'yml_yaml_valid',
+                'expectedCreator' => function (FixtureLoader $fixtureLoader): string {
+                    return $fixtureLoader->load('/RunSource/source_yml_yaml.yaml');
+                },
             ],
         ];
     }

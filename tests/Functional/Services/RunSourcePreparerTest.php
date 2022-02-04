@@ -41,7 +41,7 @@ class RunSourcePreparerTest extends WebTestCase
     public function testPrepareFileSourceSuccess(): void
     {
         $fileSource = new FileSource(UserId::create(), 'file source label');
-        $this->fixtureCreator->copyFixtureSetTo('source_txt', $fileSource->getPath());
+        $this->fixtureCreator->copyFixtureSetTo('txt', $fileSource->getPath());
 
         $runSource = new RunSource($fileSource);
 
@@ -61,7 +61,7 @@ class RunSourcePreparerTest extends WebTestCase
         $userGitRepository = new UserGitRepository($gitSource);
         $repositoryPath = $this->fileStoreBasePath . '/' . $userGitRepository;
 
-        $fixtureSet = 'source_txt';
+        $fixtureSet = 'txt';
 
         $gitRepositoryPreparer = \Mockery::mock(UserGitRepositoryPreparer::class);
         $gitRepositoryPreparer

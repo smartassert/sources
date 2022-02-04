@@ -63,7 +63,7 @@ class FileStoreManagerTest extends WebTestCase
         $sourceAbsolutePath = $this->fileStoreManager->create($sourceRelativePath);
         self::assertTrue($this->fileStoreManager->exists($sourceRelativePath));
 
-        $this->fixtureCreator->copyFixtureSetTo('source_txt', $sourceRelativePath);
+        $this->fixtureCreator->copyFixtureSetTo('txt', $sourceRelativePath);
 
         $targetRelativePath = (string) (new RunSource($gitSource));
         self::assertFalse($this->fileStoreManager->exists($targetRelativePath));
@@ -105,8 +105,8 @@ class FileStoreManagerTest extends WebTestCase
     public function listDataProvider(): array
     {
         return [
-            'source_txt, no extensions' => [
-                'fixtureSet' => 'source_txt',
+            'source: txt, no extensions' => [
+                'fixtureSet' => 'txt',
                 'relativePath' => (string) new FileSource(UserId::create(), ''),
                 'extensions' => [],
                 'expectedRelativePathNames' => [
@@ -115,8 +115,8 @@ class FileStoreManagerTest extends WebTestCase
                     'file2.txt',
                 ],
             ],
-            'source_txt, extensions=[txt]' => [
-                'fixtureSet' => 'source_txt',
+            'source: txt, extensions=[txt]' => [
+                'fixtureSet' => 'txt',
                 'relativePath' => (string) new FileSource(UserId::create(), ''),
                 'extensions' => ['txt'],
                 'expected' => [
@@ -125,14 +125,14 @@ class FileStoreManagerTest extends WebTestCase
                     'file2.txt',
                 ],
             ],
-            'source_txt, extensions=[yml, yaml]' => [
-                'fixtureSet' => 'source_txt',
+            'source: txt, extensions=[yml, yaml]' => [
+                'fixtureSet' => 'txt',
                 'relativePath' => (string) new FileSource(UserId::create(), ''),
                 'extensions' => ['yml', 'yaml'],
                 'expected' => [],
             ],
-            'source_yml_yaml, no extensions' => [
-                'fixtureSet' => 'source_yml_yaml',
+            'source: yml_yaml, no extensions' => [
+                'fixtureSet' => 'yml_yaml_valid',
                 'relativePath' => (string) new FileSource(UserId::create(), ''),
                 'extensions' => [],
                 'expected' => [
@@ -141,8 +141,8 @@ class FileStoreManagerTest extends WebTestCase
                     'file2.yml',
                 ],
             ],
-            'source_yml_yaml, extensions=[yml]' => [
-                'fixtureSet' => 'source_yml_yaml',
+            'source: yml_yaml, extensions=[yml]' => [
+                'fixtureSet' => 'yml_yaml_valid',
                 'relativePath' => (string) new FileSource(UserId::create(), ''),
                 'extensions' => ['yml'],
                 'expected' => [
@@ -150,8 +150,8 @@ class FileStoreManagerTest extends WebTestCase
                     'file2.yml',
                 ],
             ],
-            'source_mixed, extensions=[ yaml]' => [
-                'fixtureSet' => 'source_mixed',
+            'source: mixed, extensions=[ yaml]' => [
+                'fixtureSet' => 'mixed',
                 'relativePath' => (string) new FileSource(UserId::create(), ''),
                 'extensions' => ['yaml'],
                 'expected' => [

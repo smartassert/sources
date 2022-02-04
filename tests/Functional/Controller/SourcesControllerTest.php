@@ -21,6 +21,8 @@ use App\Services\Source\Store;
 use App\Tests\Model\Route;
 use App\Tests\Model\UserId;
 use App\Tests\Services\EntityRemover;
+use App\Tests\Services\FileStoreFixtureCreator;
+use App\Tests\Services\FixtureLoader;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Middleware;
@@ -46,6 +48,8 @@ class SourcesControllerTest extends WebTestCase
     private RunSourceRepository $runSourceRepository;
     private Store $store;
     private RouterInterface $router;
+    private FileStoreFixtureCreator $fixtureCreator;
+    private FixtureLoader $fixtureLoader;
 
     protected function setUp(): void
     {
@@ -80,6 +84,14 @@ class SourcesControllerTest extends WebTestCase
         $router = self::getContainer()->get(RouterInterface::class);
         \assert($router instanceof RouterInterface);
         $this->router = $router;
+
+        $fixtureCreator = self::getContainer()->get(FileStoreFixtureCreator::class);
+        \assert($fixtureCreator instanceof FileStoreFixtureCreator);
+        $this->fixtureCreator = $fixtureCreator;
+
+        $fixtureLoader = self::getContainer()->get(FixtureLoader::class);
+        \assert($fixtureLoader instanceof FixtureLoader);
+        $this->fixtureLoader = $fixtureLoader;
 
         $entityRemover = self::getContainer()->get(EntityRemover::class);
         if ($entityRemover instanceof EntityRemover) {
@@ -814,6 +826,81 @@ class SourcesControllerTest extends WebTestCase
                     ],
                     'state' => State::REQUESTED->value,
                 ],
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider readSuccessDataProvider
+     *
+     * @param callable(FixtureLoader): SymfonyResponse $expectedResponseCreator
+     */
+    public function testReadSuccess(
+        string $sourceFixtureSetIdentifier,
+        callable $expectedResponseCreator
+    ): void {
+        $userId = UserId::create();
+
+        $fileSource = new FileSource($userId, 'file source label');
+        $runSource = new RunSource($fileSource);
+        $this->store->add($runSource);
+
+        $this->fixtureCreator->copyFixtureSetTo($sourceFixtureSetIdentifier, (string) $runSource);
+
+        $this->mockHandler->append(
+            new Response(200, [], $userId)
+        );
+
+        $response = $this->makeAuthorizedSourceRequest(
+            'GET',
+            'read',
+            $runSource->getId()
+        );
+
+        $expectedResponse = $expectedResponseCreator($this->fixtureLoader);
+
+        self::assertSame($expectedResponse->getStatusCode(), $response->getStatusCode());
+        self::assertSame($expectedResponse->headers->get('content-type'), $response->headers->get('content-type'));
+        self::assertSame($expectedResponse->getContent(), $response->getContent());
+    }
+
+    /**
+     * @return array<mixed>
+     */
+    public function readSuccessDataProvider(): array
+    {
+        return [
+            'valid yaml' => [
+                'sourceFixtureSetIdentifier' => 'yml_yaml_valid',
+                'expectedResponseCreator' => function (FixtureLoader $fixtureLoader) {
+                    return new SymfonyResponse(
+                        $fixtureLoader->load('/RunSource/source_yml_yaml.yaml'),
+                        200,
+                        [
+                            'content-type' => 'text/x-yaml; charset=utf-8',
+                        ]
+                    );
+                },
+            ],
+            'invalid yaml' => [
+                'sourceFixtureSetIdentifier' => 'yml_yaml_invalid',
+                'expectedResponseCreator' => function () {
+                    return new SymfonyResponse(
+                        (string) json_encode([
+                            'error' => [
+                                'type' => 'source_read_exception',
+                                'payload' => [
+                                    'file' => 'file2.yml',
+                                    'message' => 'Invalid yaml in file: file2.yml'
+                                ],
+                            ],
+                        ]),
+                        500,
+                        [
+                            'content-type' => 'application/json',
+                        ]
+                    );
+                },
             ],
         ];
     }

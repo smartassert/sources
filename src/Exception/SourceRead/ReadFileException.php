@@ -10,6 +10,6 @@ class ReadFileException extends AbstractSourceReadException
 {
     public function __construct(SplFileInfo $sourceFile)
     {
-        parent::__construct($sourceFile, 'Unable to read file "%s"');
+        parent::__construct($sourceFile, 'Unable to read file: %s');
     }
 }

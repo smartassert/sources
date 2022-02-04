@@ -13,7 +13,7 @@ class InvalidYamlException extends AbstractSourceReadException
         private readonly SplFileInfo $sourceFile,
         private readonly ParseException $parseException
     ) {
-        parent::__construct($sourceFile, 'Invalid yaml in file "%s"', 0, $this->parseException);
+        parent::__construct($sourceFile, 'Invalid yaml in file: %s', 0, $this->parseException);
     }
 
     public function getSourceFile(): SplFileInfo

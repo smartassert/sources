@@ -180,7 +180,7 @@ class UserGitRepositoryPreparerTest extends WebTestCase
 
     public function testPrepareSuccess(): void
     {
-        $fixtureSetIdentifier = 'source_txt';
+        $fixtureSetIdentifier = 'txt';
 
         $this->setGitRepositoryClonerOutcome(new ProcessOutput(0, 'clone success output', ''));
         $this->setGitRepositoryCheckoutHandlerOutcome(

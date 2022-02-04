@@ -14,7 +14,7 @@ abstract class AbstractSourceReadException extends \Exception implements SourceR
         int $code = 0,
         ?\Throwable $previous = null
     ) {
-        parent::__construct(sprintf($message, $sourceFile->getPathname()), $code, $previous);
+        parent::__construct(sprintf($message, $sourceFile->getRelativePathname()), $code, $previous);
     }
 
     public function getSourceFile(): SplFileInfo
