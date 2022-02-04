@@ -13,6 +13,7 @@ use App\Model\AbsoluteFileLocator;
 use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
+use Symfony\Component\Finder\SplFileInfo;
 
 class FileStoreManager
 {
@@ -109,15 +110,16 @@ class FileStoreManager
      *
      * @throws OutOfScopeException
      *
-     * @return string[]
+     * @return \Traversable<string, SplFileInfo>
      */
-    public function list(string $relativePath, array $extensions = []): array
+    public function list(string $relativePath, array $extensions = []): \Traversable
     {
         $absolutePath = $this->createAbsolutePath($relativePath);
 
         $finder = new Finder();
         $finder->files();
         $finder->in((string) $absolutePath);
+        $finder->sortByName();
 
         if ([] !== $extensions) {
             foreach ($extensions as $extension) {
@@ -125,14 +127,7 @@ class FileStoreManager
             }
         }
 
-        $relativePaths = [];
-        foreach ($finder as $file) {
-            $relativePaths[] = $file->getRelativePathname();
-        }
-
-        sort($relativePaths);
-
-        return $relativePaths;
+        return $finder->getIterator();
     }
 
     /**
