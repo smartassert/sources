@@ -13,7 +13,7 @@ use App\Message\Prepare;
 use App\Repository\SourceRepository;
 use App\Request\FileSourceRequest;
 use App\Request\GitSourceRequest;
-use App\Services\RunSourceBuilder;
+use App\Services\RunSourceSerializer;
 use App\Services\Source\Factory;
 use App\Services\Source\Mutator;
 use App\Services\Source\Store;
@@ -117,12 +117,12 @@ class SourceController
     public function read(
         ?RunSource $source,
         UserInterface $user,
-        RunSourceBuilder $runSourceBuilder
+        RunSourceSerializer $runSourceSerializer
     ): Response {
-        return $this->doUserSourceAction($source, $user, function (RunSource $source) use ($runSourceBuilder) {
+        return $this->doUserSourceAction($source, $user, function (RunSource $source) use ($runSourceSerializer) {
             try {
                 return new Response(
-                    $runSourceBuilder->build($source),
+                    $runSourceSerializer->serialize($source),
                     200,
                     [
                         'content-type' => 'text/x-yaml; charset=utf-8',
