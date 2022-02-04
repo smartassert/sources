@@ -64,7 +64,7 @@ class DirectoryDuplicatorTest extends WebTestCase
     {
         $source = new FileSource(UserId::create(), 'file source label');
         $sourceAbsolutePath = $this->fileStoreBasePath . '/' . $source;
-        $this->fixtureCreator->copyFixturesTo($source->getPath());
+        $this->fixtureCreator->copyFixtureSetTo('txt', $source->getPath());
 
         $target = new RunSource($source);
         $targetAbsolutePath = $this->fileStoreBasePath . '/' . $target;
@@ -112,7 +112,7 @@ class DirectoryDuplicatorTest extends WebTestCase
     public function testDuplicateSuccess(): void
     {
         $source = new FileSource(UserId::create(), 'file source label');
-        $this->fixtureCreator->copyFixturesTo($source->getPath());
+        $this->fixtureCreator->copyFixtureSetTo('txt', $source->getPath());
 
         $target = new RunSource($source);
         $this->directoryDuplicator->duplicate((string) $source, (string) $target);

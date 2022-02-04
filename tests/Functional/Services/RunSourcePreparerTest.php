@@ -41,7 +41,7 @@ class RunSourcePreparerTest extends WebTestCase
     public function testPrepareFileSourceSuccess(): void
     {
         $fileSource = new FileSource(UserId::create(), 'file source label');
-        $this->fixtureCreator->copyFixturesTo($fileSource->getPath());
+        $this->fixtureCreator->copyFixtureSetTo('txt', $fileSource->getPath());
 
         $runSource = new RunSource($fileSource);
 
@@ -61,6 +61,8 @@ class RunSourcePreparerTest extends WebTestCase
         $userGitRepository = new UserGitRepository($gitSource);
         $repositoryPath = $this->fileStoreBasePath . '/' . $userGitRepository;
 
+        $fixtureSet = 'txt';
+
         $gitRepositoryPreparer = \Mockery::mock(UserGitRepositoryPreparer::class);
         $gitRepositoryPreparer
             ->shouldReceive('prepare')
@@ -70,11 +72,12 @@ class RunSourcePreparerTest extends WebTestCase
             ) use (
                 $gitSource,
                 $ref,
-                $userGitRepository
+                $userGitRepository,
+                $fixtureSet
             ) {
                 self::assertSame($gitSource, $passedGitSource);
                 self::assertSame($ref, $passedRef);
-                $this->fixtureCreator->copyFixturesTo((string) $userGitRepository);
+                $this->fixtureCreator->copyFixtureSetTo($fixtureSet, (string) $userGitRepository);
 
                 return true;
             })
@@ -92,7 +95,7 @@ class RunSourcePreparerTest extends WebTestCase
 
         $this->runSourcePreparer->prepare($runSource);
 
-        $sourceAbsolutePath = $this->fixtureCreator->getFixturesPath() . $gitSource->getPath();
+        $sourceAbsolutePath = $this->fixtureCreator->getFixtureSetPath($fixtureSet) . $gitSource->getPath();
         $targetAbsolutePath = $this->fileStoreBasePath . '/' . $runSource;
 
         self::assertSame(scandir($sourceAbsolutePath), scandir($targetAbsolutePath));
