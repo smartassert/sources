@@ -44,7 +44,7 @@ class PrepareHandler
         $this->sourceStore->add($runSource);
 
         try {
-            $this->runSourcePreparer->prepareAndSerialize($runSource);
+            $this->runSourcePreparer->prepare($runSource);
         } catch (WriteException | SourceReadExceptionInterface | UserGitRepositoryException $e) {
             $runSource->setState(State::PREPARING_HALTED);
             $this->sourceStore->add($runSource);

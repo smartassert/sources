@@ -44,13 +44,13 @@ class RunSourcePreparerTest extends WebTestCase
         $this->fileStoreBasePath = $fileStoreBasePath;
     }
 
-    public function testPrepareAndSerializeForFileSource(): void
+    public function testPrepareForFileSource(): void
     {
         $fileSource = new FileSource(UserId::create(), 'file source label');
         $this->fixtureCreator->copyFixtureSetTo('yml_yaml_valid', (string) $fileSource);
 
         $runSource = new RunSource($fileSource);
-        $this->runSourcePreparer->prepareAndSerialize($runSource);
+        $this->runSourcePreparer->prepare($runSource);
 
         $targetAbsolutePath = $this->fileStoreBasePath . '/' . $runSource . '/serialized.yaml';
 
@@ -62,9 +62,9 @@ class RunSourcePreparerTest extends WebTestCase
     }
 
     /**
-     * @dataProvider prepareAndSerializeForGitSourceDataProvider
+     * @dataProvider prepareForGitSourceDataProvider
      */
-    public function testPrepareAndSerializeForGitSource(
+    public function testPrepareForGitSource(
         RunSource $runSource,
         UserGitRepository $userGitRepository,
         string $fixtureSetIdentifier,
@@ -80,7 +80,7 @@ class RunSourcePreparerTest extends WebTestCase
 
         $this->fixtureCreator->copyFixtureSetTo('yml_yaml_valid', (string) $userGitRepository);
 
-        $this->runSourcePreparer->prepareAndSerialize($runSource);
+        $this->runSourcePreparer->prepare($runSource);
 
         $targetAbsolutePath = $this->fileStoreBasePath . '/' . $runSource . '/serialized.yaml';
 
@@ -96,7 +96,7 @@ class RunSourcePreparerTest extends WebTestCase
     /**
      * @return array<mixed>
      */
-    public function prepareAndSerializeForGitSourceDataProvider(): array
+    public function prepareForGitSourceDataProvider(): array
     {
         $gitRef = 'v1.1';
         $gitSourceEntire = new GitSource(UserId::create(), 'http://example.com/repository.git');
