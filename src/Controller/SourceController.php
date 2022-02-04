@@ -13,10 +13,10 @@ use App\Message\Prepare;
 use App\Repository\SourceRepository;
 use App\Request\FileSourceRequest;
 use App\Request\GitSourceRequest;
-use App\Services\RunSourceSerializer;
 use App\Services\Source\Factory;
 use App\Services\Source\Mutator;
 use App\Services\Source\Store;
+use App\Services\SourceSerializer;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -117,12 +117,12 @@ class SourceController
     public function read(
         ?RunSource $source,
         UserInterface $user,
-        RunSourceSerializer $runSourceSerializer
+        SourceSerializer $sourceSerializer
     ): Response {
-        return $this->doUserSourceAction($source, $user, function (RunSource $source) use ($runSourceSerializer) {
+        return $this->doUserSourceAction($source, $user, function (RunSource $source) use ($sourceSerializer) {
             try {
                 return new Response(
-                    $runSourceSerializer->serialize($source),
+                    $sourceSerializer->serialize($source),
                     200,
                     [
                         'content-type' => 'text/x-yaml; charset=utf-8',
