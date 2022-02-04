@@ -4,17 +4,19 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Entity\FileSource;
 use App\Entity\RunSource;
 use App\Exception\File\OutOfScopeException;
 use App\Exception\SourceRead\InvalidYamlException;
 use App\Exception\SourceRead\ReadFileException;
 use App\Exception\SourceRead\SourceReadExceptionInterface;
 use App\Model\FilePathIdentifier;
+use App\Model\UserGitRepository;
 use Symfony\Component\Finder\SplFileInfo;
 use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Parser as YamlParser;
 
-class RunSourceSerializer
+class SourceSerializer
 {
     private const DOCUMENT_TEMPLATE = '---' . "\n" . '%s' . "\n" . '...';
 
@@ -27,14 +29,13 @@ class RunSourceSerializer
     /**
      * @throws SourceReadExceptionInterface
      */
-    public function serialize(RunSource $source): string
+    public function serialize(RunSource|FileSource|UserGitRepository $source): string
     {
         $sourceFiles = [];
 
         try {
             $sourceFiles = $this->fileStoreManager->list((string) $source, ['yml', 'yaml']);
         } catch (OutOfScopeException) {
-            // RunSource::getPath() is guaranteed to be relative and not out of scope with the file store base path
         }
 
         $documents = [];

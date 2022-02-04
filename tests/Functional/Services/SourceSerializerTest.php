@@ -6,15 +6,15 @@ namespace App\Tests\Functional\Services;
 
 use App\Entity\FileSource;
 use App\Entity\RunSource;
-use App\Services\RunSourceSerializer;
+use App\Services\SourceSerializer;
 use App\Tests\Model\UserId;
 use App\Tests\Services\FileStoreFixtureCreator;
 use App\Tests\Services\FixtureLoader;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
-class RunSourceSerializerTest extends WebTestCase
+class SourceSerializerTest extends WebTestCase
 {
-    private RunSourceSerializer $runSourceSerializer;
+    private SourceSerializer $sourceSerializer;
     private FileStoreFixtureCreator $fixtureCreator;
     private FixtureLoader $fixtureLoader;
 
@@ -22,9 +22,9 @@ class RunSourceSerializerTest extends WebTestCase
     {
         parent::setUp();
 
-        $runSourceSerializer = self::getContainer()->get(RunSourceSerializer::class);
-        \assert($runSourceSerializer instanceof RunSourceSerializer);
-        $this->runSourceSerializer = $runSourceSerializer;
+        $sourceSerializer = self::getContainer()->get(SourceSerializer::class);
+        \assert($sourceSerializer instanceof SourceSerializer);
+        $this->sourceSerializer = $sourceSerializer;
 
         $fixtureCreator = self::getContainer()->get(FileStoreFixtureCreator::class);
         \assert($fixtureCreator instanceof FileStoreFixtureCreator);
@@ -45,7 +45,7 @@ class RunSourceSerializerTest extends WebTestCase
 
         $this->fixtureCreator->copyFixtureSetTo($fixtureSetIdentifier, (string) $source);
 
-        $content = $this->runSourceSerializer->serialize($source);
+        $content = $this->sourceSerializer->serialize($source);
 
         self::assertSame($expectedCreator($this->fixtureLoader), $content);
     }
