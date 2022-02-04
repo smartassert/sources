@@ -12,6 +12,7 @@ use App\Services\RunSourcePreparer;
 use App\Services\UserGitRepositoryPreparer;
 use App\Tests\Model\UserId;
 use App\Tests\Services\FileStoreFixtureCreator;
+use App\Tests\Services\FixtureLoader;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use webignition\ObjectReflector\ObjectReflector;
 
@@ -19,6 +20,7 @@ class RunSourcePreparerTest extends WebTestCase
 {
     private RunSourcePreparer $runSourcePreparer;
     private FileStoreFixtureCreator $fixtureCreator;
+    private FixtureLoader $fixtureLoader;
     private string $fileStoreBasePath;
 
     protected function setUp(): void
@@ -32,6 +34,10 @@ class RunSourcePreparerTest extends WebTestCase
         $fixtureCreator = self::getContainer()->get(FileStoreFixtureCreator::class);
         \assert($fixtureCreator instanceof FileStoreFixtureCreator);
         $this->fixtureCreator = $fixtureCreator;
+
+        $fixtureLoader = self::getContainer()->get(FixtureLoader::class);
+        \assert($fixtureLoader instanceof FixtureLoader);
+        $this->fixtureLoader = $fixtureLoader;
 
         $fileStoreBasePath = self::getContainer()->getParameter('file_store_base_path');
         \assert(is_string($fileStoreBasePath));
@@ -100,5 +106,23 @@ class RunSourcePreparerTest extends WebTestCase
 
         self::assertSame(scandir($sourceAbsolutePath), scandir($targetAbsolutePath));
         self::assertDirectoryDoesNotExist($repositoryPath);
+    }
+
+    public function testPrepareAndSerialize(): void
+    {
+        $fileSource = new FileSource(UserId::create(), 'file source label');
+        $this->fixtureCreator->copyFixtureSetTo('yml_yaml_valid', (string) $fileSource);
+
+        $runSource = new RunSource($fileSource);
+
+        $this->runSourcePreparer->prepareAndSerialize($runSource);
+
+        $targetAbsolutePath = $this->fileStoreBasePath . '/' . $runSource . '/serialized.yaml';
+
+        self::assertFileExists($targetAbsolutePath);
+        self::assertSame(
+            $this->fixtureLoader->load('/RunSource/source_yml_yaml.yaml'),
+            file_get_contents($targetAbsolutePath)
+        );
     }
 }

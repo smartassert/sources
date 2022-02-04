@@ -13,6 +13,7 @@ use App\Model\UserGitRepository;
 use App\Services\DirectoryDuplicator;
 use App\Services\FileStoreManager;
 use App\Services\RunSourcePreparer;
+use App\Services\SourceSerializer;
 use App\Services\UserGitRepositoryPreparer;
 use App\Tests\Model\UserId;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -29,6 +30,7 @@ class RunSourcePreparerTest extends WebTestCase
             $this->createDirectoryDuplicatorThrowingException((string) $fileSource, $directoryDuplicatorException),
             \Mockery::mock(UserGitRepositoryPreparer::class),
             \Mockery::mock(FileStoreManager::class),
+            \Mockery::mock(SourceSerializer::class),
         );
 
         $runSource = new RunSource($fileSource);
@@ -55,7 +57,8 @@ class RunSourcePreparerTest extends WebTestCase
         $runSourcePreparer = new RunSourcePreparer(
             \Mockery::mock(DirectoryDuplicator::class),
             $gitRepositoryPreparer,
-            \Mockery::mock(FileStoreManager::class)
+            \Mockery::mock(FileStoreManager::class),
+            \Mockery::mock(SourceSerializer::class),
         );
 
         $runSource = new RunSource($gitSource, ['ref' => $ref]);
@@ -85,7 +88,8 @@ class RunSourcePreparerTest extends WebTestCase
         $runSourcePreparer = new RunSourcePreparer(
             $this->createDirectoryDuplicatorThrowingException($expectedSourcePath, $directoryDuplicatorException),
             $gitRepositoryPreparer,
-            \Mockery::mock(FileStoreManager::class)
+            \Mockery::mock(FileStoreManager::class),
+            \Mockery::mock(SourceSerializer::class),
         );
 
         $runSource = new RunSource($gitSource, ['ref' => $ref]);
