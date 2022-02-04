@@ -97,6 +97,12 @@
     "laminas/laminas-code": {
         "version": "4.5.0"
     },
+    "league/flysystem": {
+        "version": "3.0.3"
+    },
+    "league/mime-type-detection": {
+        "version": "1.9.0"
+    },
     "mockery/mockery": {
         "version": "1.4.4"
     },
