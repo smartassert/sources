@@ -55,3 +55,6 @@ services:
     App\Services\FileStoreManager:
         arguments:
             $basePath: '@app.configuration.file_store_base_path'
+
+    Symfony\Component\Yaml\Parser:
+        class: Symfony\Component\Yaml\Parser
