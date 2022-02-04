@@ -13,6 +13,7 @@ use App\Tests\Model\UserId;
 use App\Tests\Services\FileStoreFixtureCreator;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Filesystem\Path;
+use Symfony\Component\Finder\SplFileInfo;
 
 class FileStoreManagerTest extends WebTestCase
 {
@@ -77,15 +78,25 @@ class FileStoreManagerTest extends WebTestCase
      * @dataProvider listDataProvider
      *
      * @param string[] $extensions
-     * @param string[] $expected
+     * @param string[] $expectedRelativePathNames
      */
-    public function testListSuccess(string $fixtureSet, string $relativePath, array $extensions, array $expected): void
-    {
+    public function testListSuccess(
+        string $fixtureSet,
+        string $relativePath,
+        array $extensions,
+        array $expectedRelativePathNames
+    ): void {
         $this->fixtureCreator->copyFixtureSetTo($fixtureSet, $relativePath);
 
         $files = $this->fileStoreManager->list($relativePath, $extensions);
+        self::assertCount(count($expectedRelativePathNames), $files);
 
-        self::assertSame($expected, $files);
+        $iteratorIndex = 0;
+        foreach ($files as $file) {
+            self::assertInstanceOf(SplFileInfo::class, $file);
+            self::assertSame($expectedRelativePathNames[$iteratorIndex], $file->getRelativePathname());
+            ++$iteratorIndex;
+        }
     }
 
     /**
@@ -98,7 +109,7 @@ class FileStoreManagerTest extends WebTestCase
                 'fixtureSet' => 'source_txt',
                 'relativePath' => (string) new FileSource(UserId::create(), ''),
                 'extensions' => [],
-                'expected' => [
+                'expectedRelativePathNames' => [
                     'directory/file3.txt',
                     'file1.txt',
                     'file2.txt',
