@@ -44,77 +44,13 @@ class RunSourcePreparerTest extends WebTestCase
         $this->fileStoreBasePath = $fileStoreBasePath;
     }
 
-    public function testPrepareFileSourceSuccess(): void
-    {
-        $fileSource = new FileSource(UserId::create(), 'file source label');
-        $this->fixtureCreator->copyFixtureSetTo('txt', $fileSource->getPath());
-
-        $runSource = new RunSource($fileSource);
-
-        $this->runSourcePreparer->prepare($runSource);
-
-        $sourceAbsolutePath = $this->fileStoreBasePath . '/' . $fileSource;
-        $targetAbsolutePath = $this->fileStoreBasePath . '/' . $runSource;
-
-        self::assertSame(scandir($sourceAbsolutePath), scandir($targetAbsolutePath));
-    }
-
-    public function testPrepareGitSourceSuccess(): void
-    {
-        $ref = 'v1.1';
-
-        $gitSource = new GitSource(UserId::create(), 'http://example.com/repository.git', '/directory');
-        $userGitRepository = new UserGitRepository($gitSource);
-        $repositoryPath = $this->fileStoreBasePath . '/' . $userGitRepository;
-
-        $fixtureSet = 'txt';
-
-        $gitRepositoryPreparer = \Mockery::mock(UserGitRepositoryPreparer::class);
-        $gitRepositoryPreparer
-            ->shouldReceive('prepare')
-            ->withArgs(function (
-                GitSource $passedGitSource,
-                string $passedRef
-            ) use (
-                $gitSource,
-                $ref,
-                $userGitRepository,
-                $fixtureSet
-            ) {
-                self::assertSame($gitSource, $passedGitSource);
-                self::assertSame($ref, $passedRef);
-                $this->fixtureCreator->copyFixtureSetTo($fixtureSet, (string) $userGitRepository);
-
-                return true;
-            })
-            ->andReturn($userGitRepository)
-        ;
-
-        ObjectReflector::setProperty(
-            $this->runSourcePreparer,
-            $this->runSourcePreparer::class,
-            'gitRepositoryPreparer',
-            $gitRepositoryPreparer
-        );
-
-        $runSource = new RunSource($gitSource, ['ref' => $ref]);
-
-        $this->runSourcePreparer->prepare($runSource);
-
-        $sourceAbsolutePath = $this->fixtureCreator->getFixtureSetPath($fixtureSet) . $gitSource->getPath();
-        $targetAbsolutePath = $this->fileStoreBasePath . '/' . $runSource;
-
-        self::assertSame(scandir($sourceAbsolutePath), scandir($targetAbsolutePath));
-        self::assertDirectoryDoesNotExist($repositoryPath);
-    }
-
-    public function testPrepareAndSerializeForFileSource(): void
+    public function testPrepareForFileSource(): void
     {
         $fileSource = new FileSource(UserId::create(), 'file source label');
         $this->fixtureCreator->copyFixtureSetTo('yml_yaml_valid', (string) $fileSource);
 
         $runSource = new RunSource($fileSource);
-        $this->runSourcePreparer->prepareAndSerialize($runSource);
+        $this->runSourcePreparer->prepare($runSource);
 
         $targetAbsolutePath = $this->fileStoreBasePath . '/' . $runSource . '/serialized.yaml';
 
@@ -126,9 +62,9 @@ class RunSourcePreparerTest extends WebTestCase
     }
 
     /**
-     * @dataProvider prepareAndSerializeForGitSourceDataProvider
+     * @dataProvider prepareForGitSourceDataProvider
      */
-    public function testPrepareAndSerializeForGitSource(
+    public function testPrepareForGitSource(
         RunSource $runSource,
         UserGitRepository $userGitRepository,
         string $fixtureSetIdentifier,
@@ -144,7 +80,7 @@ class RunSourcePreparerTest extends WebTestCase
 
         $this->fixtureCreator->copyFixtureSetTo('yml_yaml_valid', (string) $userGitRepository);
 
-        $this->runSourcePreparer->prepareAndSerialize($runSource);
+        $this->runSourcePreparer->prepare($runSource);
 
         $targetAbsolutePath = $this->fileStoreBasePath . '/' . $runSource . '/serialized.yaml';
 
@@ -160,7 +96,7 @@ class RunSourcePreparerTest extends WebTestCase
     /**
      * @return array<mixed>
      */
-    public function prepareAndSerializeForGitSourceDataProvider(): array
+    public function prepareForGitSourceDataProvider(): array
     {
         $gitRef = 'v1.1';
         $gitSourceEntire = new GitSource(UserId::create(), 'http://example.com/repository.git');

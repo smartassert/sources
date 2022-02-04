@@ -8,8 +8,10 @@ use App\Entity\FileSource;
 use App\Entity\GitSource;
 use App\Entity\RunSource;
 use App\Enum\RunSource\State;
-use App\Exception\DirectoryDuplicationException;
+use App\Exception\File\WriteException;
 use App\Exception\MessageHandler\PrepareException;
+use App\Exception\SourceRead\InvalidYamlException;
+use App\Exception\SourceRead\ReadFileException;
 use App\Exception\UserGitRepositoryException;
 use App\Message\Prepare;
 use App\MessageHandler\PrepareHandler;
@@ -258,8 +260,14 @@ class PrepareHandlerTest extends WebTestCase
     public function invokeRunSourcePreparerThrowsExceptionDataProvider(): array
     {
         return [
-            DirectoryDuplicationException::class => [
-                'runSourcePreparerException' => \Mockery::mock(DirectoryDuplicationException::class),
+            WriteException::class => [
+                'runSourcePreparerException' => \Mockery::mock(WriteException::class),
+            ],
+            ReadFileException::class => [
+                'runSourcePreparerException' => \Mockery::mock(ReadFileException::class),
+            ],
+            InvalidYamlException::class => [
+                'runSourcePreparerException' => \Mockery::mock(InvalidYamlException::class),
             ],
             UserGitRepositoryException::class => [
                 'runSourcePreparerException' => \Mockery::mock(UserGitRepositoryException::class),

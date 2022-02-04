@@ -6,8 +6,9 @@ namespace App\MessageHandler;
 
 use App\Entity\RunSource;
 use App\Enum\RunSource\State;
-use App\Exception\DirectoryDuplicationException;
+use App\Exception\File\WriteException;
 use App\Exception\MessageHandler\PrepareException;
+use App\Exception\SourceRead\SourceReadExceptionInterface;
 use App\Exception\UserGitRepositoryException;
 use App\Message\Prepare;
 use App\Repository\SourceRepository;
@@ -44,7 +45,7 @@ class PrepareHandler
 
         try {
             $this->runSourcePreparer->prepare($runSource);
-        } catch (DirectoryDuplicationException | UserGitRepositoryException $e) {
+        } catch (WriteException | SourceReadExceptionInterface | UserGitRepositoryException $e) {
             $runSource->setState(State::PREPARING_HALTED);
             $this->sourceStore->add($runSource);
 

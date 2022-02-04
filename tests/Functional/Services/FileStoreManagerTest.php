@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace App\Tests\Functional\Services;
 
 use App\Entity\FileSource;
-use App\Entity\GitSource;
-use App\Entity\RunSource;
-use App\Model\UserGitRepository;
 use App\Services\FileStoreManager;
 use App\Tests\Model\UserId;
 use App\Tests\Services\FileStoreFixtureCreator;
@@ -51,27 +48,6 @@ class FileStoreManagerTest extends WebTestCase
         $removedPath = $this->fileStoreManager->remove($relativePath);
         self::assertSame($expectedAbsolutePath, $removedPath);
         self::assertFalse($this->fileStoreManager->exists($relativePath));
-    }
-
-    public function testMirrorSuccess(): void
-    {
-        $userId = UserId::create();
-        $gitSource = new GitSource($userId, 'https://example.com/repository.git');
-        $sourceRelativePath = (string) (new UserGitRepository($gitSource));
-        self::assertFalse($this->fileStoreManager->exists($sourceRelativePath));
-
-        $sourceAbsolutePath = $this->fileStoreManager->create($sourceRelativePath);
-        self::assertTrue($this->fileStoreManager->exists($sourceRelativePath));
-
-        $this->fixtureCreator->copyFixtureSetTo('txt', $sourceRelativePath);
-
-        $targetRelativePath = (string) (new RunSource($gitSource));
-        self::assertFalse($this->fileStoreManager->exists($targetRelativePath));
-
-        $expectedTargetPath = $this->createFileStoreAbsolutePath($targetRelativePath);
-        $targetAbsolutePath = $this->fileStoreManager->mirror($sourceRelativePath, $targetRelativePath);
-        self::assertSame($expectedTargetPath, $targetAbsolutePath);
-        self::assertSame(scandir($sourceAbsolutePath), scandir($expectedTargetPath));
     }
 
     /**
