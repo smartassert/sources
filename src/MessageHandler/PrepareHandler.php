@@ -12,7 +12,7 @@ use App\Exception\SourceRead\SourceReadExceptionInterface;
 use App\Exception\UserGitRepositoryException;
 use App\Message\Prepare;
 use App\Repository\SourceRepository;
-use App\Services\RunSourcePreparer;
+use App\Services\RunSourceSerializer;
 use App\Services\Source\Store;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
@@ -22,7 +22,7 @@ class PrepareHandler
     public function __construct(
         private SourceRepository $sourceRepository,
         private Store $sourceStore,
-        private RunSourcePreparer $runSourcePreparer,
+        private RunSourceSerializer $runSourceSerializer,
     ) {
     }
 
@@ -44,7 +44,7 @@ class PrepareHandler
         $this->sourceStore->add($runSource);
 
         try {
-            $this->runSourcePreparer->write($runSource);
+            $this->runSourceSerializer->write($runSource);
         } catch (WriteException | SourceReadExceptionInterface | UserGitRepositoryException $e) {
             $runSource->setState(State::PREPARING_HALTED);
             $this->sourceStore->add($runSource);

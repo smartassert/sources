@@ -47,6 +47,3 @@ services:
 
     App\Services\UserGitRepositoryPreparer:
         public: true
-
-    App\Services\RunSourcePreparer:
-        public: true

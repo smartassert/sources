@@ -8,7 +8,7 @@ use App\Entity\FileSource;
 use App\Entity\GitSource;
 use App\Entity\RunSource;
 use App\Model\UserGitRepository;
-use App\Services\RunSourcePreparer;
+use App\Services\RunSourceSerializer;
 use App\Services\UserGitRepositoryPreparer;
 use App\Tests\Model\UserId;
 use App\Tests\Services\FileStoreFixtureCreator;
@@ -16,9 +16,9 @@ use App\Tests\Services\FixtureLoader;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use webignition\ObjectReflector\ObjectReflector;
 
-class RunSourcePreparerTest extends WebTestCase
+class RunSourceSerializerTest extends WebTestCase
 {
-    private RunSourcePreparer $runSourcePreparer;
+    private RunSourceSerializer $runSourceSerializer;
     private FileStoreFixtureCreator $fixtureCreator;
     private FixtureLoader $fixtureLoader;
     private string $fileStoreBasePath;
@@ -27,9 +27,9 @@ class RunSourcePreparerTest extends WebTestCase
     {
         parent::setUp();
 
-        $runSourcePreparer = self::getContainer()->get(RunSourcePreparer::class);
-        \assert($runSourcePreparer instanceof RunSourcePreparer);
-        $this->runSourcePreparer = $runSourcePreparer;
+        $runSourceSerializer = self::getContainer()->get(RunSourceSerializer::class);
+        \assert($runSourceSerializer instanceof RunSourceSerializer);
+        $this->runSourceSerializer = $runSourceSerializer;
 
         $fixtureCreator = self::getContainer()->get(FileStoreFixtureCreator::class);
         \assert($fixtureCreator instanceof FileStoreFixtureCreator);
@@ -50,13 +50,13 @@ class RunSourcePreparerTest extends WebTestCase
         $this->fixtureCreator->copySetTo('/Source/yml_yaml_valid', (string) $fileSource);
 
         $runSource = new RunSource($fileSource);
-        $this->runSourcePreparer->write($runSource);
+        $this->runSourceSerializer->write($runSource);
 
         $targetAbsolutePath = sprintf(
             '%s/%s/%s',
             $this->fileStoreBasePath,
             $runSource,
-            RunSourcePreparer::SERIALIZED_FILENAME
+            RunSourceSerializer::SERIALIZED_FILENAME
         );
 
         self::assertFileExists($targetAbsolutePath);
@@ -77,21 +77,21 @@ class RunSourcePreparerTest extends WebTestCase
         string $expectedSerializedFixturePath,
     ): void {
         ObjectReflector::setProperty(
-            $this->runSourcePreparer,
-            $this->runSourcePreparer::class,
+            $this->runSourceSerializer,
+            $this->runSourceSerializer::class,
             'gitRepositoryPreparer',
             $gitRepositoryPreparer
         );
 
         $this->fixtureCreator->copySetTo('/Source/yml_yaml_valid', (string) $userGitRepository);
 
-        $this->runSourcePreparer->write($runSource);
+        $this->runSourceSerializer->write($runSource);
 
         $targetAbsolutePath = sprintf(
             '%s/%s/%s',
             $this->fileStoreBasePath,
             $runSource,
-            RunSourcePreparer::SERIALIZED_FILENAME
+            RunSourceSerializer::SERIALIZED_FILENAME
         );
 
         self::assertFileExists($targetAbsolutePath);
@@ -153,12 +153,12 @@ class RunSourcePreparerTest extends WebTestCase
         $runSource = new RunSource($fileSource);
         $this->fixtureCreator->copyTo(
             '/RunSource/source_yml_yaml_entire.yaml',
-            $runSource . '/' . RunSourcePreparer::SERIALIZED_FILENAME
+            $runSource . '/' . RunSourceSerializer::SERIALIZED_FILENAME
         );
 
         self::assertSame(
             file_get_contents($this->fixtureCreator->getFixturePath('/RunSource/source_yml_yaml_entire.yaml')),
-            $this->runSourcePreparer->read($runSource)
+            $this->runSourceSerializer->read($runSource)
         );
     }
 }

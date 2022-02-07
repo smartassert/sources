@@ -14,7 +14,7 @@ use App\Exception\File\WriteException;
 use App\Exception\SourceRead\SourceReadExceptionInterface;
 use App\Exception\UserGitRepositoryException;
 
-class RunSourcePreparer
+class RunSourceSerializer
 {
     public const SERIALIZED_FILENAME = 'source.yaml';
 
