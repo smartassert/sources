@@ -13,7 +13,7 @@ use App\Exception\SourceRead\SourceReadExceptionInterface;
 use App\Model\FilePathIdentifier;
 use App\Model\UserGitRepository;
 use League\Flysystem\FilesystemException;
-use Symfony\Component\Filesystem\Path;
+use League\Flysystem\PathNormalizer;
 use Symfony\Component\String\UnicodeString;
 use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Parser as YamlParser;
@@ -25,6 +25,7 @@ class SourceSerializer
     public function __construct(
         private FileStoreManager $fileStoreManager,
         private YamlParser $yamlParser,
+        private PathNormalizer $pathNormalizer,
     ) {
     }
 
@@ -33,11 +34,7 @@ class SourceSerializer
      */
     public function serialize(RunSource|FileSource|UserGitRepository $source, ?string $path = null): string
     {
-        $sourceDirectory = (string) $source;
-        if (is_string($path)) {
-            $sourceDirectory = Path::canonicalize($sourceDirectory . '/' . $path);
-        }
-
+        $sourceDirectory = $this->pathNormalizer->normalizePath($source . '/' . $path);
         $sourceFiles = [];
 
         try {
