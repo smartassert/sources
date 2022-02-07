@@ -12,8 +12,7 @@ use App\Exception\File\WriteException;
 use App\Model\AbsoluteFileLocator;
 use League\Flysystem\Filesystem;
 use League\Flysystem\FilesystemException;
-use Symfony\Component\Finder\Finder;
-use Symfony\Component\Finder\SplFileInfo;
+use League\Flysystem\StorageAttributes;
 
 class FileStoreManager
 {
@@ -50,26 +49,38 @@ class FileStoreManager
     /**
      * @param string[] $extensions
      *
-     * @throws OutOfScopeException
+     * @throws FilesystemException
      *
-     * @return \Traversable<string, SplFileInfo>
+     * @return string[]
      */
-    public function list(string $relativePath, array $extensions = []): \Traversable
+    public function list(string $relativePath, array $extensions = []): array
     {
-        $absolutePath = $this->createAbsolutePath($relativePath);
+        $directoryListing = $this->filesystem
+            ->listContents($relativePath, true)
+            ->filter(function (StorageAttributes $item) {
+                return !$item->isDir();
+            })
+            ->filter(function (StorageAttributes $item) use ($extensions) {
+                if (0 === count($extensions)) {
+                    return true;
+                }
 
-        $finder = new Finder();
-        $finder->files();
-        $finder->in((string) $absolutePath);
-        $finder->sortByName();
+                $path = $item->path();
+                foreach ($extensions as $extension) {
+                    if (str_ends_with($path, '.' . $extension)) {
+                        return true;
+                    }
+                }
 
-        if ([] !== $extensions) {
-            foreach ($extensions as $extension) {
-                $finder->name('*.' . $extension);
-            }
-        }
+                return false;
+            })
+            ->sortByPath()
+            ->map(function (StorageAttributes $item) {
+                return $item->path();
+            })
+        ;
 
-        return $finder->getIterator();
+        return $directoryListing->toArray();
     }
 
     /**
