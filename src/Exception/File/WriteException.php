@@ -11,10 +11,9 @@ class WriteException extends \Exception implements PathExceptionInterface
     public function __construct(
         private string $path,
         private FilesystemException $filesystemException,
-        private ?string $context = null
     ) {
         parent::__construct(
-            sprintf('Unable to write to file "%s" (%s)', $path, $context),
+            sprintf('Unable to write to file "%s"', $path),
             0,
             $this->filesystemException
         );
@@ -28,15 +27,5 @@ class WriteException extends \Exception implements PathExceptionInterface
     public function getFilesystemException(): FilesystemException
     {
         return $this->filesystemException;
-    }
-
-    public function getContext(): ?string
-    {
-        return $this->context;
-    }
-
-    public function withContext(string $context): self
-    {
-        return new self($this->path, $this->filesystemException, $context);
     }
 }

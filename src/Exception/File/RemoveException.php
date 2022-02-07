@@ -11,10 +11,9 @@ class RemoveException extends \Exception implements MutationExceptionInterface, 
     public function __construct(
         private string $path,
         private FilesystemException $filesystemException,
-        private ?string $context = null
     ) {
         parent::__construct(
-            sprintf('Unable to remove "%s" (%s)', $path, $context),
+            sprintf('Unable to remove "%s"', $path),
             0,
             $this->filesystemException
         );
@@ -28,15 +27,5 @@ class RemoveException extends \Exception implements MutationExceptionInterface, 
     public function getFilesystemException(): FilesystemException
     {
         return $this->filesystemException;
-    }
-
-    public function getContext(): ?string
-    {
-        return $this->context;
-    }
-
-    public function withContext(string $context): self
-    {
-        return new RemoveException($this->path, $this->filesystemException, $context);
     }
 }
