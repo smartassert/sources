@@ -49,8 +49,10 @@ class UserGitRepositoryPreparer
     {
         $gitRepositoryRelativePath = (string) $gitRepository;
 
-        $gitRepositoryAbsolutePath = $this->fileStoreManager->remove($gitRepositoryRelativePath);
+        $this->fileStoreManager->remove($gitRepositoryRelativePath);
         $this->fileStoreManager->create($gitRepositoryRelativePath);
+
+        $gitRepositoryAbsolutePath = (string) $this->fileStoreManager->createAbsolutePath($gitRepositoryRelativePath);
 
         $gitActionException = null;
         $cloneOutput = null;

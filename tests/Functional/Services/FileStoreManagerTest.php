@@ -8,6 +8,7 @@ use App\Entity\FileSource;
 use App\Services\FileStoreManager;
 use App\Tests\Model\UserId;
 use App\Tests\Services\FileStoreFixtureCreator;
+use League\Flysystem\Filesystem;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Filesystem\Path;
 use Symfony\Component\Finder\SplFileInfo;
@@ -38,15 +39,12 @@ class FileStoreManagerTest extends WebTestCase
     public function testExistsCreateRemoveSuccess(): void
     {
         $relativePath = UserId::create();
-        $expectedAbsolutePath = $this->createFileStoreAbsolutePath($relativePath);
         self::assertFalse($this->fileStoreManager->exists($relativePath));
 
-        $createdPath = $this->fileStoreManager->create($relativePath);
-        self::assertSame($expectedAbsolutePath, $createdPath);
+        $this->fileStoreManager->create($relativePath);
         self::assertTrue($this->fileStoreManager->exists($relativePath));
 
-        $removedPath = $this->fileStoreManager->remove($relativePath);
-        self::assertSame($expectedAbsolutePath, $removedPath);
+        $this->fileStoreManager->remove($relativePath);
         self::assertFalse($this->fileStoreManager->exists($relativePath));
     }
 
@@ -184,4 +182,13 @@ class FileStoreManagerTest extends WebTestCase
     {
         return Path::canonicalize($this->fileStoreBasePath . '/' . $relativePath);
     }
+
+//    public function testFlyFilesystemScope(): void
+//    {
+//        $flyFilesystem = self::getContainer()->get(Filesystem::class);
+//
+//        $flyFilesystem->write('foo01.txt', 'foo01');
+//        $flyFilesystem->write('./foo02.txt', 'foo02');
+//        $flyFilesystem->write('../foo03.txt', 'foo03');
+//    }
 }

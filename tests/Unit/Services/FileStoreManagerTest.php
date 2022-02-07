@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Tests\Unit\Services;
 
 use App\Exception\File\CreateException;
-use App\Exception\File\OutOfScopeException;
 use App\Exception\File\ReadException;
 use App\Exception\File\RemoveException;
 use App\Exception\File\WriteException;
@@ -13,11 +12,13 @@ use App\Model\AbsoluteFileLocator;
 use App\Services\FileStoreManager;
 use App\Tests\Mock\Symfony\Component\Filesystem\MockFileSystem;
 use League\Flysystem\Filesystem;
+use League\Flysystem\UnableToCreateDirectory;
+use League\Flysystem\UnableToDeleteDirectory;
 use League\Flysystem\UnableToReadFile;
 use League\Flysystem\UnableToWriteFile;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Filesystem\Exception\IOException;
+use Symfony\Component\Filesystem\Filesystem as SymfonyFilesystem;
 
 class FileStoreManagerTest extends TestCase
 {
@@ -28,7 +29,6 @@ class FileStoreManagerTest extends TestCase
     private const PATH = self::BASE_PATH . '/' . self::FILE_LOCATOR_PATH;
 
     /**
-     * @dataProvider throwsOutOfScopeExceptionDataProvider
      * @dataProvider throwsCreateExceptionDataProvider
      */
     public function testCreateThrowsException(
@@ -42,7 +42,6 @@ class FileStoreManagerTest extends TestCase
     }
 
     /**
-     * @dataProvider throwsOutOfScopeExceptionDataProvider
      * @dataProvider throwsRemoveExceptionDataProvider
      */
     public function testRemoveThrowsException(
@@ -58,41 +57,26 @@ class FileStoreManagerTest extends TestCase
     /**
      * @return array<mixed>
      */
-    public function throwsOutOfScopeExceptionDataProvider(): array
-    {
-        return [
-            OutOfScopeException::class => [
-                'fileStoreManager' => new FileStoreManager(
-                    new AbsoluteFileLocator(self::BASE_PATH),
-                    (new MockFileSystem())->getMock(),
-                    \Mockery::mock(Filesystem::class),
-                ),
-                'relativePath' => '..',
-                'expected' => new OutOfScopeException('/absolute/base', self::BASE_PATH),
-            ],
-        ];
-    }
-
-    /**
-     * @return array<mixed>
-     */
     public function throwsCreateExceptionDataProvider(): array
     {
-        $cannotCreateIOException = new IOException('Failed to create "' . self::PATH . '"');
+        $cannotCreateException = UnableToCreateDirectory::atLocation(self::PATH);
+
+        $mockFilesystem = (\Mockery::mock(Filesystem::class));
+        $mockFilesystem
+            ->shouldReceive('createDirectory')
+            ->with(self::FILE_LOCATOR_PATH)
+            ->andThrow($cannotCreateException)
+        ;
 
         return [
             CreateException::class => [
                 'fileStoreManager' => new FileStoreManager(
                     new AbsoluteFileLocator(self::BASE_PATH),
-                    (new MockFileSystem())
-                        ->withExistsCall(self::PATH, true)
-                        ->withRemoveCall(self::PATH)
-                        ->withMkdirCallThrowingException(self::PATH, $cannotCreateIOException)
-                        ->getMock(),
-                    \Mockery::mock(Filesystem::class),
+                    \Mockery::mock(SymfonyFilesystem::class),
+                    $mockFilesystem,
                 ),
                 'relativePath' => self::FILE_LOCATOR_PATH,
-                'expected' => new CreateException(self::PATH, $cannotCreateIOException),
+                'expected' => new CreateException(self::FILE_LOCATOR_PATH, $cannotCreateException),
             ],
         ];
     }
@@ -102,20 +86,24 @@ class FileStoreManagerTest extends TestCase
      */
     public function throwsRemoveExceptionDataProvider(): array
     {
-        $cannotRemoveIOException = new IOException('Failed to remove file "' . self::PATH . '"');
+        $cannotRemoveException = UnableToDeleteDirectory::atLocation(self::PATH);
+
+        $mockFilesystem = (\Mockery::mock(Filesystem::class));
+        $mockFilesystem
+            ->shouldReceive('deleteDirectory')
+            ->with(self::FILE_LOCATOR_PATH)
+            ->andThrow($cannotRemoveException)
+        ;
 
         return [
             RemoveException::class => [
                 'fileStoreManager' => new FileStoreManager(
                     new AbsoluteFileLocator(self::BASE_PATH),
-                    (new MockFileSystem())
-                        ->withExistsCall(self::PATH, true)
-                        ->withRemoveCallThrowingException(self::PATH, $cannotRemoveIOException)
-                        ->getMock(),
-                    \Mockery::mock(Filesystem::class),
+                    \Mockery::mock(SymfonyFilesystem::class),
+                    $mockFilesystem,
                 ),
                 'relativePath' => self::FILE_LOCATOR_PATH,
-                'expected' => new RemoveException(self::PATH, $cannotRemoveIOException),
+                'expected' => new RemoveException(self::FILE_LOCATOR_PATH, $cannotRemoveException),
             ],
         ];
     }

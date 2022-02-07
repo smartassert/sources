@@ -12,8 +12,8 @@ use App\Services\FileStoreManager;
 use App\Services\GitRepositoryCheckoutHandler;
 use App\Services\GitRepositoryCloner;
 use App\Services\UserGitRepositoryPreparer;
+use League\Flysystem\UnableToDeleteDirectory;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-use Symfony\Component\Filesystem\Exception\IOException;
 
 class UserGitRepositoryPreparerTest extends WebTestCase
 {
@@ -45,7 +45,9 @@ class UserGitRepositoryPreparerTest extends WebTestCase
      */
     public function prepareFileStoreManagerThrowsExceptionDataProvider(): array
     {
-        $removeException = new RemoveException('/path/to/remove', \Mockery::mock(IOException::class));
+        $unableToDeleteDirectoryException = UnableToDeleteDirectory::atLocation('/path/to/remove');
+
+        $removeException = new RemoveException('/path/to/remove', $unableToDeleteDirectoryException);
         $outOfScopeException = new OutOfScopeException('/path', '/base-path');
 
         $fileStoreManagerThrowingRemoveException = \Mockery::mock(FileStoreManager::class);

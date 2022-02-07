@@ -12,7 +12,6 @@ use App\Exception\File\WriteException;
 use App\Model\AbsoluteFileLocator;
 use League\Flysystem\Filesystem as FlyFilesystem;
 use League\Flysystem\FilesystemException;
-use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Filesystem\Path;
 use Symfony\Component\Finder\Finder;
@@ -29,31 +28,26 @@ class FileStoreManager
 
     /**
      * @throws CreateException
-     * @throws OutOfScopeException
      */
-    public function create(string $relativePath): string
+    public function create(string $relativePath): void
     {
-        $absolutePath = $this->createAbsolutePath($relativePath);
-
         try {
-            $this->filesystem->mkdir((string) $absolutePath);
-        } catch (IOExceptionInterface $IOException) {
-            throw new CreateException((string) $absolutePath, $IOException);
+            $this->flyFilesystem->createDirectory($relativePath);
+        } catch (FilesystemException $filesystemException) {
+            throw new CreateException($relativePath, $filesystemException);
         }
-
-        return (string) $absolutePath;
     }
 
     /**
-     * @throws OutOfScopeException
      * @throws RemoveException
      */
-    public function remove(string $relativePath): string
+    public function remove(string $relativePath): void
     {
-        $absolutePath = $this->createAbsolutePath($relativePath);
-        $this->doRemove($absolutePath);
-
-        return (string) $absolutePath;
+        try {
+            $this->flyFilesystem->deleteDirectory($relativePath);
+        } catch (FilesystemException $filesystemException) {
+            throw new RemoveException($relativePath, $filesystemException);
+        }
     }
 
     /**
@@ -118,21 +112,9 @@ class FileStoreManager
     /**
      * @throws OutOfScopeException
      */
-    private function createAbsolutePath(string $relativePath): AbsoluteFileLocator
+    public function createAbsolutePath(string $relativePath): AbsoluteFileLocator
     {
         return $this->basePath->append($relativePath);
-    }
-
-    /**
-     * @throws RemoveException
-     */
-    private function doRemove(AbsoluteFileLocator $fileLocator): void
-    {
-        try {
-            $this->filesystem->remove((string) $fileLocator);
-        } catch (IOExceptionInterface $IOException) {
-            throw new RemoveException((string) $fileLocator, $IOException);
-        }
     }
 
     private function doExists(AbsoluteFileLocator $fileLocator): bool
