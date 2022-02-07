@@ -12,7 +12,6 @@ use App\Exception\File\WriteException;
 use App\Model\AbsoluteFileLocator;
 use League\Flysystem\Filesystem;
 use League\Flysystem\FilesystemException;
-use Symfony\Component\Filesystem\Path;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
 
@@ -78,8 +77,6 @@ class FileStoreManager
      */
     public function write(string $fileRelativePath, string $content): void
     {
-        $fileRelativePath = Path::canonicalize($fileRelativePath);
-
         try {
             $this->filesystem->write($fileRelativePath, $content);
         } catch (FilesystemException $e) {
