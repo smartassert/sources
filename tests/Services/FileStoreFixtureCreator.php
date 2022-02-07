@@ -15,16 +15,16 @@ class FileStoreFixtureCreator
     ) {
     }
 
-    public function copyFixtureSetTo(string $setIdentifier, string $relativePath): void
+    public function copyFixtureSetTo(string $origin, string $target): void
     {
         $this->filesystem->mirror(
-            $this->getFixtureSetPath($setIdentifier),
-            sprintf('%s/%s', $this->fileStoreBasePath, $relativePath)
+            $this->getFixtureSetPath($origin),
+            sprintf('%s/%s', $this->fileStoreBasePath, $target)
         );
     }
 
-    public function getFixtureSetPath(string $setIdentifier): string
+    public function getFixtureSetPath(string $relativePath): string
     {
-        return $this->fixturesBasePath . $setIdentifier;
+        return $this->fixturesBasePath . $relativePath;
     }
 }
