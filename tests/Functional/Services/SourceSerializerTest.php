@@ -45,7 +45,7 @@ class SourceSerializerTest extends WebTestCase
 
         $this->fixtureCreator->copySetTo('/Source/' . $fixtureSetIdentifier, (string) $source);
 
-        $content = $this->sourceSerializer->serialize($source, $path);
+        $content = $this->sourceSerializer->serialize((string) $source, $path);
 
         self::assertSame($expectedCreator($this->fixtureLoader), $content);
     }
