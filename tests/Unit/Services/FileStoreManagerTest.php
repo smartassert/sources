@@ -6,12 +6,14 @@ namespace App\Tests\Unit\Services;
 
 use App\Exception\File\CreateException;
 use App\Exception\File\OutOfScopeException;
+use App\Exception\File\ReadException;
 use App\Exception\File\RemoveException;
 use App\Exception\File\WriteException;
 use App\Model\AbsoluteFileLocator;
 use App\Services\FileStoreManager;
 use App\Tests\Mock\Symfony\Component\Filesystem\MockFileSystem;
 use League\Flysystem\Filesystem;
+use League\Flysystem\UnableToReadFile;
 use League\Flysystem\UnableToWriteFile;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use PHPUnit\Framework\TestCase;
@@ -141,5 +143,28 @@ class FileStoreManagerTest extends TestCase
         $this->expectExceptionObject(new WriteException($fileRelativePath, $flysystemException));
 
         $fileStoreManager->add($fileRelativePath, $content);
+    }
+
+    public function testWriteThrowsException(): void
+    {
+        $fileRelativePath = 'path/to/file.txt';
+        $flysystemException = new UnableToReadFile();
+
+        $flyFilesystem = \Mockery::mock(Filesystem::class);
+        $flyFilesystem
+            ->shouldReceive('read')
+            ->with($fileRelativePath)
+            ->andThrow($flysystemException)
+        ;
+
+        $fileStoreManager = new FileStoreManager(
+            new AbsoluteFileLocator(self::BASE_PATH),
+            (new MockFileSystem())->getMock(),
+            $flyFilesystem,
+        );
+
+        $this->expectExceptionObject(new ReadException($fileRelativePath, $flysystemException));
+
+        $fileStoreManager->read($fileRelativePath);
     }
 }

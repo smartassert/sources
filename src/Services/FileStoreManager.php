@@ -6,6 +6,7 @@ namespace App\Services;
 
 use App\Exception\File\CreateException;
 use App\Exception\File\OutOfScopeException;
+use App\Exception\File\ReadException;
 use App\Exception\File\RemoveException;
 use App\Exception\File\WriteException;
 use App\Model\AbsoluteFileLocator;
@@ -94,6 +95,18 @@ class FileStoreManager
             $this->flyFilesystem->write($fileRelativePath, $content);
         } catch (FilesystemException $e) {
             throw new WriteException($fileRelativePath, $e);
+        }
+    }
+
+    /**
+     * @throws ReadException
+     */
+    public function read(string $fileRelativePath): string
+    {
+        try {
+            return $this->flyFilesystem->read($fileRelativePath);
+        } catch (FilesystemException $e) {
+            throw new ReadException($fileRelativePath, $e);
         }
     }
 

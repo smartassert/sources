@@ -170,6 +170,16 @@ class FileStoreManagerTest extends WebTestCase
         ];
     }
 
+    public function testReadSuccess(): void
+    {
+        $fileSource = new FileSource(UserId::create(), 'file source label');
+        $this->fixtureCreator->copyFixtureSetTo('txt', (string) $fileSource);
+
+        $fileRelativePath = (string) $fileSource . '/file1.txt';
+
+        self::assertSame('File One' . "\n", $this->fileStoreManager->read($fileRelativePath));
+    }
+
     private function createFileStoreAbsolutePath(string $relativePath): string
     {
         return Path::canonicalize($this->fileStoreBasePath . '/' . $relativePath);
