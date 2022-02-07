@@ -9,7 +9,6 @@ use App\Services\FileStoreManager;
 use App\Tests\Model\UserId;
 use App\Tests\Services\FileStoreFixtureCreator;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-use Symfony\Component\Filesystem\Path;
 
 class FileStoreManagerTest extends WebTestCase
 {
