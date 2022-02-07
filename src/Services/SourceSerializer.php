@@ -4,14 +4,11 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use App\Entity\FileSource;
-use App\Entity\RunSource;
 use App\Exception\File\ReadException;
 use App\Exception\SourceRead\InvalidYamlException;
 use App\Exception\SourceRead\ReadFileException;
 use App\Exception\SourceRead\SourceReadExceptionInterface;
 use App\Model\FilePathIdentifier;
-use App\Model\UserGitRepository;
 use League\Flysystem\FilesystemException;
 use League\Flysystem\PathNormalizer;
 use Symfony\Component\String\UnicodeString;
@@ -32,9 +29,9 @@ class SourceSerializer
     /**
      * @throws SourceReadExceptionInterface
      */
-    public function serialize(RunSource|FileSource|UserGitRepository $source, ?string $path = null): string
+    public function serialize(string $sourceRelativePath, ?string $path = null): string
     {
-        $sourceDirectory = $this->pathNormalizer->normalizePath($source . '/' . $path);
+        $sourceDirectory = $this->pathNormalizer->normalizePath($sourceRelativePath . '/' . $path);
         $sourceFiles = [];
 
         try {

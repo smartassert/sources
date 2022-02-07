@@ -7,7 +7,6 @@ namespace App\Services;
 use App\Entity\FileSource;
 use App\Entity\GitSource;
 use App\Entity\RunSource;
-use App\Exception\File\OutOfScopeException;
 use App\Exception\File\ReadException;
 use App\Exception\File\RemoveException;
 use App\Exception\File\WriteException;
@@ -36,18 +35,18 @@ class RunSourceSerializer
         $serializedSourcePath = $target . '/' . self::SERIALIZED_FILENAME;
 
         if ($source instanceof FileSource) {
-            $content = $this->sourceSerializer->serialize($source);
+            $content = $this->sourceSerializer->serialize((string) $source);
             $this->fileStoreManager->write($serializedSourcePath, $content);
         }
 
         if ($source instanceof GitSource) {
             $gitRepository = $this->gitRepositoryPreparer->prepare($source, $target->getParameters()['ref'] ?? null);
-            $content = $this->sourceSerializer->serialize($gitRepository, $source->getPath());
+            $content = $this->sourceSerializer->serialize((string) $gitRepository, $source->getPath());
             $this->fileStoreManager->write($serializedSourcePath, $content);
 
             try {
                 $this->fileStoreManager->remove((string) $gitRepository);
-            } catch (OutOfScopeException | RemoveException) {
+            } catch (RemoveException) {
             }
         }
     }
