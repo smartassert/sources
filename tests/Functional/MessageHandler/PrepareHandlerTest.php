@@ -82,7 +82,7 @@ class PrepareHandlerTest extends WebTestCase
             $this->handler::class,
             'runSourcePreparer',
             \Mockery::mock(RunSourcePreparer::class)
-                ->shouldNotReceive('prepare')
+                ->shouldNotReceive('write')
                 ->getMock()
         );
 
@@ -279,7 +279,7 @@ class PrepareHandlerTest extends WebTestCase
     {
         $runSourcePreparer = \Mockery::mock(RunSourcePreparer::class);
         $expectation = $runSourcePreparer
-            ->shouldReceive('prepare')
+            ->shouldReceive('write')
             ->withArgs(function (RunSource $passedRunSource) use ($runSource) {
                 self::assertSame($runSource->getId(), $passedRunSource->getId());
 

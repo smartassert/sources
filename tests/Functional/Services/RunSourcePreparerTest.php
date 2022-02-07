@@ -50,7 +50,7 @@ class RunSourcePreparerTest extends WebTestCase
         $this->fixtureCreator->copySetTo('/Source/yml_yaml_valid', (string) $fileSource);
 
         $runSource = new RunSource($fileSource);
-        $this->runSourcePreparer->prepare($runSource);
+        $this->runSourcePreparer->write($runSource);
 
         $targetAbsolutePath = sprintf(
             '%s/%s/%s',
@@ -85,7 +85,7 @@ class RunSourcePreparerTest extends WebTestCase
 
         $this->fixtureCreator->copySetTo('/Source/yml_yaml_valid', (string) $userGitRepository);
 
-        $this->runSourcePreparer->prepare($runSource);
+        $this->runSourcePreparer->write($runSource);
 
         $targetAbsolutePath = sprintf(
             '%s/%s/%s',

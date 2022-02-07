@@ -30,7 +30,7 @@ class RunSourcePreparer
      * @throws SourceReadExceptionInterface
      * @throws UserGitRepositoryException
      */
-    public function prepare(RunSource $target): void
+    public function write(RunSource $target): void
     {
         $source = $target->getParent();
         $serializedSourcePath = $target . '/' . self::SERIALIZED_FILENAME;
