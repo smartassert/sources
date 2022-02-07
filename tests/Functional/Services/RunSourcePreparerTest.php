@@ -52,7 +52,12 @@ class RunSourcePreparerTest extends WebTestCase
         $runSource = new RunSource($fileSource);
         $this->runSourcePreparer->prepare($runSource);
 
-        $targetAbsolutePath = $this->fileStoreBasePath . '/' . $runSource . '/serialized.yaml';
+        $targetAbsolutePath = sprintf(
+            '%s/%s/%s',
+            $this->fileStoreBasePath,
+            $runSource,
+            RunSourcePreparer::SERIALIZED_FILENAME
+        );
 
         self::assertFileExists($targetAbsolutePath);
         self::assertSame(
@@ -82,7 +87,12 @@ class RunSourcePreparerTest extends WebTestCase
 
         $this->runSourcePreparer->prepare($runSource);
 
-        $targetAbsolutePath = $this->fileStoreBasePath . '/' . $runSource . '/serialized.yaml';
+        $targetAbsolutePath = sprintf(
+            '%s/%s/%s',
+            $this->fileStoreBasePath,
+            $runSource,
+            RunSourcePreparer::SERIALIZED_FILENAME
+        );
 
         self::assertFileExists($targetAbsolutePath);
         self::assertSame(
@@ -135,5 +145,20 @@ class RunSourcePreparerTest extends WebTestCase
                 'expectedSerializedFixturePath' => '/RunSource/source_yml_yaml_partial.yaml',
             ],
         ];
+    }
+
+    public function testReadSuccess(): void
+    {
+        $fileSource = new FileSource(UserId::create(), 'file source label');
+        $runSource = new RunSource($fileSource);
+        $this->fixtureCreator->copyTo(
+            '/RunSource/source_yml_yaml_entire.yaml',
+            $runSource . '/' . RunSourcePreparer::SERIALIZED_FILENAME
+        );
+
+        self::assertSame(
+            file_get_contents($this->fixtureCreator->getFixturePath('/RunSource/source_yml_yaml_entire.yaml')),
+            $this->runSourcePreparer->read($runSource)
+        );
     }
 }

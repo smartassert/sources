@@ -20,6 +20,11 @@ class FileStoreFixtureCreator
         $this->filesystem->mirror($this->getFixturePath($origin), sprintf('%s/%s', $this->fileStoreBasePath, $target));
     }
 
+    public function copyTo(string $origin, string $target): void
+    {
+        $this->filesystem->copy($this->getFixturePath($origin), sprintf('%s/%s', $this->fileStoreBasePath, $target));
+    }
+
     public function getFixturePath(string $relativePath): string
     {
         return $this->fixturesBasePath . $relativePath;
