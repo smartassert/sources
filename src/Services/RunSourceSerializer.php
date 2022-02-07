@@ -8,13 +8,16 @@ use App\Entity\FileSource;
 use App\Entity\GitSource;
 use App\Entity\RunSource;
 use App\Exception\File\OutOfScopeException;
+use App\Exception\File\ReadException;
 use App\Exception\File\RemoveException;
 use App\Exception\File\WriteException;
 use App\Exception\SourceRead\SourceReadExceptionInterface;
 use App\Exception\UserGitRepositoryException;
 
-class RunSourcePreparer
+class RunSourceSerializer
 {
+    public const SERIALIZED_FILENAME = 'source.yaml';
+
     public function __construct(
         private UserGitRepositoryPreparer $gitRepositoryPreparer,
         private FileStoreManager $fileStoreManager,
@@ -27,10 +30,10 @@ class RunSourcePreparer
      * @throws SourceReadExceptionInterface
      * @throws UserGitRepositoryException
      */
-    public function prepare(RunSource $target): void
+    public function write(RunSource $target): void
     {
         $source = $target->getParent();
-        $serializedSourcePath = $target . '/serialized.yaml';
+        $serializedSourcePath = $target . '/' . self::SERIALIZED_FILENAME;
 
         if ($source instanceof FileSource) {
             $content = $this->sourceSerializer->serialize($source);
@@ -47,5 +50,13 @@ class RunSourcePreparer
             } catch (OutOfScopeException | RemoveException) {
             }
         }
+    }
+
+    /**
+     * @throws ReadException
+     */
+    public function read(RunSource $runSource): string
+    {
+        return $this->fileStoreManager->read($runSource . '/' . self::SERIALIZED_FILENAME);
     }
 }
