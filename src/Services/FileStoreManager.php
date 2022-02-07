@@ -10,9 +10,8 @@ use App\Exception\File\ReadException;
 use App\Exception\File\RemoveException;
 use App\Exception\File\WriteException;
 use App\Model\AbsoluteFileLocator;
-use League\Flysystem\Filesystem as FlyFilesystem;
+use League\Flysystem\Filesystem;
 use League\Flysystem\FilesystemException;
-use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Filesystem\Path;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
@@ -22,7 +21,6 @@ class FileStoreManager
     public function __construct(
         private AbsoluteFileLocator $basePath,
         private Filesystem $filesystem,
-        private FlyFilesystem $flyFilesystem,
     ) {
     }
 
@@ -32,7 +30,7 @@ class FileStoreManager
     public function create(string $relativePath): void
     {
         try {
-            $this->flyFilesystem->createDirectory($relativePath);
+            $this->filesystem->createDirectory($relativePath);
         } catch (FilesystemException $filesystemException) {
             throw new CreateException($relativePath, $filesystemException);
         }
@@ -44,18 +42,10 @@ class FileStoreManager
     public function remove(string $relativePath): void
     {
         try {
-            $this->flyFilesystem->deleteDirectory($relativePath);
+            $this->filesystem->deleteDirectory($relativePath);
         } catch (FilesystemException $filesystemException) {
             throw new RemoveException($relativePath, $filesystemException);
         }
-    }
-
-    /**
-     * @throws OutOfScopeException
-     */
-    public function exists(string $relativePath): bool
-    {
-        return $this->doExists($this->createAbsolutePath($relativePath));
     }
 
     /**
@@ -91,7 +81,7 @@ class FileStoreManager
         $fileRelativePath = Path::canonicalize($fileRelativePath);
 
         try {
-            $this->flyFilesystem->write($fileRelativePath, $content);
+            $this->filesystem->write($fileRelativePath, $content);
         } catch (FilesystemException $e) {
             throw new WriteException($fileRelativePath, $e);
         }
@@ -103,7 +93,7 @@ class FileStoreManager
     public function read(string $fileRelativePath): string
     {
         try {
-            return $this->flyFilesystem->read($fileRelativePath);
+            return $this->filesystem->read($fileRelativePath);
         } catch (FilesystemException $e) {
             throw new ReadException($fileRelativePath, $e);
         }
@@ -115,10 +105,5 @@ class FileStoreManager
     public function createAbsolutePath(string $relativePath): AbsoluteFileLocator
     {
         return $this->basePath->append($relativePath);
-    }
-
-    private function doExists(AbsoluteFileLocator $fileLocator): bool
-    {
-        return $this->filesystem->exists((string) $fileLocator);
     }
 }

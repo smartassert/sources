@@ -8,7 +8,6 @@ use App\Entity\FileSource;
 use App\Services\FileStoreManager;
 use App\Tests\Model\UserId;
 use App\Tests\Services\FileStoreFixtureCreator;
-use League\Flysystem\Filesystem;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Filesystem\Path;
 use Symfony\Component\Finder\SplFileInfo;
@@ -36,16 +35,17 @@ class FileStoreManagerTest extends WebTestCase
         $this->fileStoreBasePath = $fileStoreBasePath;
     }
 
-    public function testExistsCreateRemoveSuccess(): void
+    public function testCreateRemoveSuccess(): void
     {
         $relativePath = UserId::create();
-        self::assertFalse($this->fileStoreManager->exists($relativePath));
+        $absolutePath = (string) $this->fileStoreManager->createAbsolutePath($relativePath);
+        self::assertDirectoryDoesNotExist($absolutePath);
 
         $this->fileStoreManager->create($relativePath);
-        self::assertTrue($this->fileStoreManager->exists($relativePath));
+        self::assertDirectoryExists($absolutePath);
 
         $this->fileStoreManager->remove($relativePath);
-        self::assertFalse($this->fileStoreManager->exists($relativePath));
+        self::assertDirectoryDoesNotExist($absolutePath);
     }
 
     /**

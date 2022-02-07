@@ -10,7 +10,6 @@ use App\Exception\File\RemoveException;
 use App\Exception\File\WriteException;
 use App\Model\AbsoluteFileLocator;
 use App\Services\FileStoreManager;
-use App\Tests\Mock\Symfony\Component\Filesystem\MockFileSystem;
 use League\Flysystem\Filesystem;
 use League\Flysystem\UnableToCreateDirectory;
 use League\Flysystem\UnableToDeleteDirectory;
@@ -18,7 +17,6 @@ use League\Flysystem\UnableToReadFile;
 use League\Flysystem\UnableToWriteFile;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Filesystem\Filesystem as SymfonyFilesystem;
 
 class FileStoreManagerTest extends TestCase
 {
@@ -72,7 +70,6 @@ class FileStoreManagerTest extends TestCase
             CreateException::class => [
                 'fileStoreManager' => new FileStoreManager(
                     new AbsoluteFileLocator(self::BASE_PATH),
-                    \Mockery::mock(SymfonyFilesystem::class),
                     $mockFilesystem,
                 ),
                 'relativePath' => self::FILE_LOCATOR_PATH,
@@ -99,7 +96,6 @@ class FileStoreManagerTest extends TestCase
             RemoveException::class => [
                 'fileStoreManager' => new FileStoreManager(
                     new AbsoluteFileLocator(self::BASE_PATH),
-                    \Mockery::mock(SymfonyFilesystem::class),
                     $mockFilesystem,
                 ),
                 'relativePath' => self::FILE_LOCATOR_PATH,
@@ -122,11 +118,7 @@ class FileStoreManagerTest extends TestCase
             ->andThrow($flysystemException)
         ;
 
-        $fileStoreManager = new FileStoreManager(
-            new AbsoluteFileLocator(self::BASE_PATH),
-            (new MockFileSystem())->getMock(),
-            $flyFilesystem,
-        );
+        $fileStoreManager = new FileStoreManager(new AbsoluteFileLocator(self::BASE_PATH), $flyFilesystem);
 
         $this->expectExceptionObject(new WriteException($fileRelativePath, $flysystemException));
 
@@ -145,11 +137,7 @@ class FileStoreManagerTest extends TestCase
             ->andThrow($flysystemException)
         ;
 
-        $fileStoreManager = new FileStoreManager(
-            new AbsoluteFileLocator(self::BASE_PATH),
-            (new MockFileSystem())->getMock(),
-            $flyFilesystem,
-        );
+        $fileStoreManager = new FileStoreManager(new AbsoluteFileLocator(self::BASE_PATH), $flyFilesystem);
 
         $this->expectExceptionObject(new ReadException($fileRelativePath, $flysystemException));
 
