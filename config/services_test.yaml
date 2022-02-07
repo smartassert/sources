@@ -30,7 +30,7 @@ services:
         public: true
         arguments:
             $fileStoreBasePath: '%file_store_base_path%'
-            $sourceFixturesBasePath: '%fixtures_base_path%/Source'
+            $fixturesBasePath: '%fixtures_base_path%'
 
     App\Tests\Services\FixtureLoader:
         public: true

@@ -62,7 +62,7 @@ class FileStoreManagerTest extends WebTestCase
         array $extensions,
         array $expectedRelativePathNames
     ): void {
-        $this->fixtureCreator->copyFixtureSetTo($fixtureSet, $relativePath);
+        $this->fixtureCreator->copySetTo('/Source/' . $fixtureSet, $relativePath);
 
         $files = $this->fileStoreManager->list($relativePath, $extensions);
         self::assertCount(count($expectedRelativePathNames), $files);
@@ -173,7 +173,7 @@ class FileStoreManagerTest extends WebTestCase
     public function testReadSuccess(): void
     {
         $fileSource = new FileSource(UserId::create(), 'file source label');
-        $this->fixtureCreator->copyFixtureSetTo('txt', (string) $fileSource);
+        $this->fixtureCreator->copySetTo('/Source/txt', (string) $fileSource);
 
         $fileRelativePath = $fileSource . '/file1.txt';
 
