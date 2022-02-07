@@ -47,21 +47,19 @@ services:
         tags:
             - { name: controller.argument_value_resolver, priority: 50 }
 
-    app.configuration.file_store_base_path:
-        class: App\Model\AbsoluteFileLocator
-        arguments:
-            $path: '%file_store_base_path%'
-
-    App\Services\FileStoreManager:
-        arguments:
-            $basePath: '@app.configuration.file_store_base_path'
-
     Symfony\Component\Yaml\Parser:
         class: Symfony\Component\Yaml\Parser
 
     League\Flysystem\FilesystemAdapter:
         class: League\Flysystem\Local\LocalFilesystemAdapter
         arguments:
-            $location: '@app.configuration.file_store_base_path'
+            $location: '%file_store_base_path%'
+
+    League\Flysystem\PathNormalizer:
+        class: League\Flysystem\WhitespacePathNormalizer
 
     League\Flysystem\Filesystem:
+
+    App\Services\PathFactory:
+        arguments:
+            $basePath: '%file_store_base_path%'

@@ -11,6 +11,7 @@ use App\Exception\UserGitRepositoryException;
 use App\Services\FileStoreManager;
 use App\Services\GitRepositoryCheckoutHandler;
 use App\Services\GitRepositoryCloner;
+use App\Services\PathFactory;
 use App\Services\UserGitRepositoryPreparer;
 use League\Flysystem\UnableToDeleteDirectory;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -28,6 +29,7 @@ class UserGitRepositoryPreparerTest extends WebTestCase
             $fileStoreManager,
             \Mockery::mock(GitRepositoryCloner::class),
             \Mockery::mock(GitRepositoryCheckoutHandler::class),
+            \Mockery::mock(PathFactory::class),
         );
 
         try {
