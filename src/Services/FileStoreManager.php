@@ -34,7 +34,12 @@ class FileStoreManager
     public function create(string $relativePath): string
     {
         $absolutePath = $this->createAbsolutePath($relativePath);
-        $this->doCreate($absolutePath);
+
+        try {
+            $this->filesystem->mkdir((string) $absolutePath);
+        } catch (IOExceptionInterface $IOException) {
+            throw new CreateException((string) $absolutePath, $IOException);
+        }
 
         return (string) $absolutePath;
     }
@@ -116,18 +121,6 @@ class FileStoreManager
     private function createAbsolutePath(string $relativePath): AbsoluteFileLocator
     {
         return $this->basePath->append($relativePath);
-    }
-
-    /**
-     * @throws CreateException
-     */
-    private function doCreate(AbsoluteFileLocator $fileLocator): void
-    {
-        try {
-            $this->filesystem->mkdir((string) $fileLocator);
-        } catch (IOExceptionInterface $IOException) {
-            throw new CreateException((string) $fileLocator, $IOException);
-        }
     }
 
     /**
