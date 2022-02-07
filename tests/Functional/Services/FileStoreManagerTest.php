@@ -141,7 +141,7 @@ class FileStoreManagerTest extends WebTestCase
     {
         $this->fileStoreManager->write($fileRelativePath, $content);
 
-        $expectedAbsolutePath = Path::canonicalize($this->createFileStoreAbsolutePath($fileRelativePath));
+        $expectedAbsolutePath = $this->fileStoreBasePath . '/' . $fileRelativePath;
 
         self::assertFileExists($expectedAbsolutePath);
         self::assertSame($content, file_get_contents($expectedAbsolutePath));
@@ -175,18 +175,4 @@ class FileStoreManagerTest extends WebTestCase
 
         self::assertSame('File One' . "\n", $this->fileStoreManager->read($fileRelativePath));
     }
-
-    private function createFileStoreAbsolutePath(string $relativePath): string
-    {
-        return Path::canonicalize($this->fileStoreBasePath . '/' . $relativePath);
-    }
-
-//    public function testFlyFilesystemScope(): void
-//    {
-//        $flyFilesystem = self::getContainer()->get(Filesystem::class);
-//
-//        $flyFilesystem->write('foo01.txt', 'foo01');
-//        $flyFilesystem->write('./foo02.txt', 'foo02');
-//        $flyFilesystem->write('../foo03.txt', 'foo03');
-//    }
 }

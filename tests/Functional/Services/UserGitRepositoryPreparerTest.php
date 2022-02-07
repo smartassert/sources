@@ -192,8 +192,8 @@ class UserGitRepositoryPreparerTest extends WebTestCase
 
         self::assertDirectoryExists($this->repositoryPath);
 
-        $sourceAbsolutePath = Path::canonicalize($this->fixtureCreator->getFixturePath($fixtureSetIdentifier));
-        $targetAbsolutePath = Path::canonicalize($this->fileStoreBasePath . '/' . $runSource);
+        $sourceAbsolutePath = $this->fixtureCreator->getFixturePath($fixtureSetIdentifier);
+        $targetAbsolutePath = $this->fileStoreBasePath . '/' . $runSource;
 
         self::assertSame(scandir($sourceAbsolutePath), scandir($targetAbsolutePath));
     }
