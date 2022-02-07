@@ -17,6 +17,7 @@ use App\Repository\RunSourceRepository;
 use App\Repository\SourceRepository;
 use App\Request\FileSourceRequest;
 use App\Request\GitSourceRequest;
+use App\Services\RunSourceSerializer;
 use App\Services\Source\Store;
 use App\Tests\Model\Route;
 use App\Tests\Model\UserId;
@@ -830,22 +831,28 @@ class SourcesControllerTest extends WebTestCase
         ];
     }
 
-    /**
-     * @dataProvider readSuccessDataProvider
-     *
-     * @param callable(FixtureLoader): SymfonyResponse $expectedResponseCreator
-     */
-    public function testReadSuccess(
-        string $sourceFixtureSetIdentifier,
-        callable $expectedResponseCreator
-    ): void {
+    public function testReadSuccess(): void
+    {
+        $serializedRunSourceFixturePath = '/RunSource/source_yml_yaml_entire.yaml';
+
+        $expectedResponse = new SymfonyResponse(
+            $this->fixtureLoader->load($serializedRunSourceFixturePath),
+            200,
+            [
+                'content-type' => 'text/x-yaml; charset=utf-8',
+            ]
+        );
+
         $userId = UserId::create();
 
         $fileSource = new FileSource($userId, 'file source label');
         $runSource = new RunSource($fileSource);
         $this->store->add($runSource);
 
-        $this->fixtureCreator->copySetTo('/Source/' . $sourceFixtureSetIdentifier, (string) $runSource);
+        $this->fixtureCreator->copyTo(
+            $serializedRunSourceFixturePath,
+            $runSource . '/' . RunSourceSerializer::SERIALIZED_FILENAME
+        );
 
         $this->mockHandler->append(
             new Response(200, [], $userId)
@@ -857,52 +864,9 @@ class SourcesControllerTest extends WebTestCase
             $runSource->getId()
         );
 
-        $expectedResponse = $expectedResponseCreator($this->fixtureLoader);
-
         self::assertSame($expectedResponse->getStatusCode(), $response->getStatusCode());
         self::assertSame($expectedResponse->headers->get('content-type'), $response->headers->get('content-type'));
         self::assertSame($expectedResponse->getContent(), $response->getContent());
-    }
-
-    /**
-     * @return array<mixed>
-     */
-    public function readSuccessDataProvider(): array
-    {
-        return [
-            'valid yaml' => [
-                'sourceFixtureSetIdentifier' => 'yml_yaml_valid',
-                'expectedResponseCreator' => function (FixtureLoader $fixtureLoader) {
-                    return new SymfonyResponse(
-                        $fixtureLoader->load('/RunSource/source_yml_yaml_entire.yaml'),
-                        200,
-                        [
-                            'content-type' => 'text/x-yaml; charset=utf-8',
-                        ]
-                    );
-                },
-            ],
-            'invalid yaml' => [
-                'sourceFixtureSetIdentifier' => 'yml_yaml_invalid',
-                'expectedResponseCreator' => function () {
-                    return new SymfonyResponse(
-                        (string) json_encode([
-                            'error' => [
-                                'type' => 'source_read_exception',
-                                'payload' => [
-                                    'file' => 'file2.yml',
-                                    'message' => 'Invalid yaml in file: file2.yml'
-                                ],
-                            ],
-                        ]),
-                        500,
-                        [
-                            'content-type' => 'application/json',
-                        ]
-                    );
-                },
-            ],
-        ];
     }
 
     private function assertAuthorizationRequestIsMade(): void
