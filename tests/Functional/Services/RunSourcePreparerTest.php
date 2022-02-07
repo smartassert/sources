@@ -47,7 +47,7 @@ class RunSourcePreparerTest extends WebTestCase
     public function testPrepareForFileSource(): void
     {
         $fileSource = new FileSource(UserId::create(), 'file source label');
-        $this->fixtureCreator->copyFixtureSetTo('/Source/yml_yaml_valid', (string) $fileSource);
+        $this->fixtureCreator->copySetTo('/Source/yml_yaml_valid', (string) $fileSource);
 
         $runSource = new RunSource($fileSource);
         $this->runSourcePreparer->prepare($runSource);
@@ -78,7 +78,7 @@ class RunSourcePreparerTest extends WebTestCase
             $gitRepositoryPreparer
         );
 
-        $this->fixtureCreator->copyFixtureSetTo('/Source/yml_yaml_valid', (string) $userGitRepository);
+        $this->fixtureCreator->copySetTo('/Source/yml_yaml_valid', (string) $userGitRepository);
 
         $this->runSourcePreparer->prepare($runSource);
 
