@@ -6,16 +6,16 @@ namespace App\Exception\File;
 
 use League\Flysystem\FilesystemException;
 
-class CreateException extends \Exception implements MutationExceptionInterface, PathExceptionInterface
+class ReadException extends \Exception implements PathExceptionInterface
 {
     public function __construct(
         private string $path,
         private FilesystemException $filesystemException,
     ) {
         parent::__construct(
-            sprintf('Unable to create "%s"', $path),
+            sprintf('Unable to read file "%s"', $path),
             0,
-            $filesystemException
+            $this->filesystemException
         );
     }
 

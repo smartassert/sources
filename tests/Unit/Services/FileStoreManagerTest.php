@@ -5,16 +5,17 @@ declare(strict_types=1);
 namespace App\Tests\Unit\Services;
 
 use App\Exception\File\CreateException;
-use App\Exception\File\MirrorException;
-use App\Exception\File\NotExistsException;
-use App\Exception\File\OutOfScopeException;
+use App\Exception\File\ReadException;
 use App\Exception\File\RemoveException;
-use App\Model\AbsoluteFileLocator;
+use App\Exception\File\WriteException;
 use App\Services\FileStoreManager;
-use App\Tests\Mock\Symfony\Component\Filesystem\MockFileSystem;
+use League\Flysystem\Filesystem;
+use League\Flysystem\UnableToCreateDirectory;
+use League\Flysystem\UnableToDeleteDirectory;
+use League\Flysystem\UnableToReadFile;
+use League\Flysystem\UnableToWriteFile;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Filesystem\Exception\IOException;
 
 class FileStoreManagerTest extends TestCase
 {
@@ -25,7 +26,6 @@ class FileStoreManagerTest extends TestCase
     private const PATH = self::BASE_PATH . '/' . self::FILE_LOCATOR_PATH;
 
     /**
-     * @dataProvider throwsOutOfScopeExceptionDataProvider
      * @dataProvider throwsCreateExceptionDataProvider
      */
     public function testCreateThrowsException(
@@ -39,7 +39,6 @@ class FileStoreManagerTest extends TestCase
     }
 
     /**
-     * @dataProvider throwsOutOfScopeExceptionDataProvider
      * @dataProvider throwsRemoveExceptionDataProvider
      */
     public function testRemoveThrowsException(
@@ -55,40 +54,22 @@ class FileStoreManagerTest extends TestCase
     /**
      * @return array<mixed>
      */
-    public function throwsOutOfScopeExceptionDataProvider(): array
-    {
-        return [
-            OutOfScopeException::class => [
-                'fileStoreManager' => new FileStoreManager(
-                    new AbsoluteFileLocator(self::BASE_PATH),
-                    (new MockFileSystem())
-                        ->getMock()
-                ),
-                'relativePath' => '..',
-                'expected' => new OutOfScopeException('/absolute/base', self::BASE_PATH),
-            ],
-        ];
-    }
-
-    /**
-     * @return array<mixed>
-     */
     public function throwsCreateExceptionDataProvider(): array
     {
-        $cannotCreateIOException = new IOException('Failed to create "' . self::PATH . '"');
+        $cannotCreateException = UnableToCreateDirectory::atLocation(self::PATH);
+
+        $mockFilesystem = (\Mockery::mock(Filesystem::class));
+        $mockFilesystem
+            ->shouldReceive('createDirectory')
+            ->with(self::FILE_LOCATOR_PATH)
+            ->andThrow($cannotCreateException)
+        ;
 
         return [
             CreateException::class => [
-                'fileStoreManager' => new FileStoreManager(
-                    new AbsoluteFileLocator(self::BASE_PATH),
-                    (new MockFileSystem())
-                        ->withExistsCall(self::PATH, true)
-                        ->withRemoveCall(self::PATH)
-                        ->withMkdirCallThrowingException(self::PATH, $cannotCreateIOException)
-                        ->getMock()
-                ),
+                'fileStoreManager' => new FileStoreManager($mockFilesystem),
                 'relativePath' => self::FILE_LOCATOR_PATH,
-                'expected' => new CreateException(self::PATH, $cannotCreateIOException),
+                'expected' => new CreateException(self::FILE_LOCATOR_PATH, $cannotCreateException),
             ],
         ];
     }
@@ -98,142 +79,61 @@ class FileStoreManagerTest extends TestCase
      */
     public function throwsRemoveExceptionDataProvider(): array
     {
-        $cannotRemoveIOException = new IOException('Failed to remove file "' . self::PATH . '"');
+        $cannotRemoveException = UnableToDeleteDirectory::atLocation(self::PATH);
+
+        $mockFilesystem = (\Mockery::mock(Filesystem::class));
+        $mockFilesystem
+            ->shouldReceive('deleteDirectory')
+            ->with(self::FILE_LOCATOR_PATH)
+            ->andThrow($cannotRemoveException)
+        ;
 
         return [
             RemoveException::class => [
-                'fileStoreManager' => new FileStoreManager(
-                    new AbsoluteFileLocator(self::BASE_PATH),
-                    (new MockFileSystem())
-                        ->withExistsCall(self::PATH, true)
-                        ->withRemoveCallThrowingException(self::PATH, $cannotRemoveIOException)
-                        ->getMock()
-                ),
+                'fileStoreManager' => new FileStoreManager($mockFilesystem),
                 'relativePath' => self::FILE_LOCATOR_PATH,
-                'expected' => new RemoveException(self::PATH, $cannotRemoveIOException),
+                'expected' => new RemoveException(self::FILE_LOCATOR_PATH, $cannotRemoveException),
             ],
         ];
     }
 
-    /**
-     * @dataProvider mirrorThrowsExceptionDataProvider
-     */
-    public function testMirrorThrowsExceptionDataProvider(
-        FileStoreManager $fileStoreManager,
-        string $sourceRelativePath,
-        string $targetRelativePath,
-        \Exception $expected
-    ): void {
-        $this->expectExceptionObject($expected);
+    public function testWriteThrowsException(): void
+    {
+        $fileRelativePath = 'path/to/file.txt';
+        $content = 'file content';
 
-        $fileStoreManager->mirror($sourceRelativePath, $targetRelativePath);
+        $flysystemException = new UnableToWriteFile();
+
+        $flyFilesystem = \Mockery::mock(Filesystem::class);
+        $flyFilesystem
+            ->shouldReceive('write')
+            ->with($fileRelativePath, $content)
+            ->andThrow($flysystemException)
+        ;
+
+        $fileStoreManager = new FileStoreManager($flyFilesystem);
+
+        $this->expectExceptionObject(new WriteException($fileRelativePath, $flysystemException));
+
+        $fileStoreManager->write($fileRelativePath, $content);
     }
 
-    /**
-     * @return array<mixed>
-     */
-    public function mirrorThrowsExceptionDataProvider(): array
+    public function testReadThrowsException(): void
     {
-        $sourceRelativePath = 'source-path';
-        $targetRelativePath = 'target-path';
+        $fileRelativePath = 'path/to/file.txt';
+        $flysystemException = new UnableToReadFile();
 
-        $sourcePath = self::BASE_PATH . '/' . $sourceRelativePath;
-        $targetPath = self::BASE_PATH . '/' . $targetRelativePath;
+        $flyFilesystem = \Mockery::mock(Filesystem::class);
+        $flyFilesystem
+            ->shouldReceive('read')
+            ->with($fileRelativePath)
+            ->andThrow($flysystemException)
+        ;
 
-        $cannotCreateIOException = new IOException('Failed to create "' . $targetPath . '"');
-        $cannotRemoveIOException = new IOException('Failed to remove file "' . $targetPath . '"');
-        $cannotMirrorIOException = new IOException('Unable to guess "/var/foo" file type.');
+        $fileStoreManager = new FileStoreManager($flyFilesystem);
 
-        return [
-            'source ' . OutOfScopeException::class => [
-                'fileStoreManager' => new FileStoreManager(
-                    new AbsoluteFileLocator(self::BASE_PATH),
-                    (new MockFileSystem())->getMock()
-                ),
-                'sourceRelativePath' => '../source-out-of-scope',
-                'targetRelativePath' => $targetRelativePath,
-                'expected' => (new OutOfScopeException(
-                    '/absolute/base/source-out-of-scope',
-                    self::BASE_PATH
-                ))->withContext('source'),
-            ],
-            'target ' . OutOfScopeException::class => [
-                'fileStoreManager' => new FileStoreManager(
-                    new AbsoluteFileLocator(self::BASE_PATH),
-                    (new MockFileSystem())->getMock()
-                ),
-                'sourceRelativePath' => $sourceRelativePath,
-                'targetRelativePath' => '../target-out-of-scope',
-                'expected' => (new OutOfScopeException(
-                    '/absolute/base/target-out-of-scope',
-                    self::BASE_PATH
-                ))->withContext('target'),
-            ],
-            'source ' . NotExistsException::class => [
-                'fileStoreManager' => new FileStoreManager(
-                    new AbsoluteFileLocator(self::BASE_PATH),
-                    (new MockFileSystem())
-                        ->withExistsCall($sourcePath, false)
-                        ->getMock()
-                ),
-                'sourceRelativePath' => $sourceRelativePath,
-                'targetRelativePath' => $targetRelativePath,
-                'expected' => (new NotExistsException($sourcePath))->withContext('source'),
-            ],
-            'target ' . RemoveException::class => [
-                'fileStoreManager' => new FileStoreManager(
-                    new AbsoluteFileLocator(self::BASE_PATH),
-                    (new MockFileSystem())
-                        ->withExistsCall($sourcePath, true)
-                        ->withRemoveCallThrowingException($targetPath, $cannotRemoveIOException)
-                        ->getMock()
-                ),
-                'sourceRelativePath' => $sourceRelativePath,
-                'targetRelativePath' => $targetRelativePath,
-                'expected' => (new RemoveException($targetPath, $cannotRemoveIOException))->withContext('target'),
-            ],
-            'target ' . CreateException::class => [
-                'fileStoreManager' => new FileStoreManager(
-                    new AbsoluteFileLocator(self::BASE_PATH),
-                    (new MockFileSystem())
-                        ->withExistsCall($sourcePath, true)
-                        ->withRemoveCall($targetPath)
-                        ->withMkdirCallThrowingException($targetPath, $cannotCreateIOException)
-                        ->getMock()
-                ),
-                'sourceRelativePath' => $sourceRelativePath,
-                'targetRelativePath' => $targetRelativePath,
-                'expected' => (new CreateException($targetPath, $cannotCreateIOException))->withContext('target'),
-            ],
-            MirrorException::class => [
-                'fileStoreManager' => new FileStoreManager(
-                    new AbsoluteFileLocator(self::BASE_PATH),
-                    (new MockFileSystem())
-                        ->withExistsCall($sourcePath, true)
-                        ->withRemoveCall($targetPath)
-                        ->withMkdirCall($targetPath)
-                        ->withMirrorCallThrowingException($sourcePath, $targetPath, $cannotMirrorIOException)
-                        ->getMock()
-                ),
-                'sourceRelativePath' => $sourceRelativePath,
-                'targetRelativePath' => $targetRelativePath,
-                'expected' => new MirrorException($sourcePath, $targetPath, $cannotMirrorIOException),
-            ],
-        ];
-    }
+        $this->expectExceptionObject(new ReadException($fileRelativePath, $flysystemException));
 
-    public function testMirrorSourcePathAndTargetPathAreEqual(): void
-    {
-        $fileStoreManager = new FileStoreManager(
-            new AbsoluteFileLocator(self::BASE_PATH),
-            (new MockFileSystem())
-                ->withExistsCall(self::PATH, true)
-                ->withoutRemoveCall()
-                ->withoutMkdirCall()
-                ->withoutMirrorCall()
-                ->getMock()
-        );
-
-        $fileStoreManager->mirror(self::FILE_LOCATOR_PATH, self::FILE_LOCATOR_PATH);
+        $fileStoreManager->read($fileRelativePath);
     }
 }

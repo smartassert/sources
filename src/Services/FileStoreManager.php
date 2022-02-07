@@ -5,165 +5,102 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Exception\File\CreateException;
-use App\Exception\File\MirrorException;
-use App\Exception\File\NotExistsException;
-use App\Exception\File\OutOfScopeException;
+use App\Exception\File\ReadException;
 use App\Exception\File\RemoveException;
-use App\Model\AbsoluteFileLocator;
-use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
-use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\Finder\Finder;
-use Symfony\Component\Finder\SplFileInfo;
+use App\Exception\File\WriteException;
+use League\Flysystem\Filesystem;
+use League\Flysystem\FilesystemException;
+use League\Flysystem\StorageAttributes;
 
 class FileStoreManager
 {
     public function __construct(
-        private AbsoluteFileLocator $basePath,
-        private Filesystem $filesystem
+        private Filesystem $filesystem,
     ) {
     }
 
     /**
      * @throws CreateException
-     * @throws OutOfScopeException
      */
-    public function create(string $relativePath): string
+    public function create(string $relativePath): void
     {
-        $absolutePath = $this->createAbsolutePath($relativePath);
-        $this->doCreate($absolutePath);
-
-        return (string) $absolutePath;
+        try {
+            $this->filesystem->createDirectory($relativePath);
+        } catch (FilesystemException $filesystemException) {
+            throw new CreateException($relativePath, $filesystemException);
+        }
     }
 
     /**
-     * @throws OutOfScopeException
      * @throws RemoveException
      */
-    public function remove(string $relativePath): string
-    {
-        $absolutePath = $this->createAbsolutePath($relativePath);
-        $this->doRemove($absolutePath);
-
-        return (string) $absolutePath;
-    }
-
-    /**
-     * @throws OutOfScopeException
-     */
-    public function exists(string $relativePath): bool
-    {
-        return $this->doExists($this->createAbsolutePath($relativePath));
-    }
-
-    /**
-     * @throws CreateException
-     * @throws MirrorException
-     * @throws NotExistsException
-     * @throws OutOfScopeException
-     * @throws RemoveException
-     *
-     * @return string The absolute target path
-     */
-    public function mirror(string $sourceRelativePath, string $targetRelativePath): string
+    public function remove(string $relativePath): void
     {
         try {
-            $sourceAbsolutePath = $this->createAbsolutePath($sourceRelativePath);
-        } catch (OutOfScopeException $sourceOutOfScopeException) {
-            throw $sourceOutOfScopeException->withContext('source');
+            $this->filesystem->deleteDirectory($relativePath);
+        } catch (FilesystemException $filesystemException) {
+            throw new RemoveException($relativePath, $filesystemException);
         }
-
-        try {
-            $targetAbsolutePath = $this->createAbsolutePath($targetRelativePath);
-        } catch (OutOfScopeException $targetOutOfScopeException) {
-            throw $targetOutOfScopeException->withContext('target');
-        }
-
-        $sourcePath = (string) $sourceAbsolutePath;
-        $targetPath = (string) $targetAbsolutePath;
-
-        if (false === $this->doExists($sourceAbsolutePath)) {
-            throw (new NotExistsException($sourcePath))->withContext('source');
-        }
-
-        if ($sourcePath === $targetPath) {
-            return $targetPath;
-        }
-
-        try {
-            $this->doRemove($targetAbsolutePath);
-            $this->doCreate($targetAbsolutePath);
-        } catch (RemoveException | CreateException $exception) {
-            throw $exception->withContext('target');
-        }
-
-        try {
-            $this->filesystem->mirror($sourcePath, $targetPath);
-        } catch (IOExceptionInterface $IOException) {
-            throw new MirrorException($sourcePath, $targetPath, $IOException);
-        }
-
-        return $targetPath;
     }
 
     /**
      * @param string[] $extensions
      *
-     * @throws OutOfScopeException
+     * @throws FilesystemException
      *
-     * @return \Traversable<string, SplFileInfo>
+     * @return string[]
      */
-    public function list(string $relativePath, array $extensions = []): \Traversable
+    public function list(string $relativePath, array $extensions = []): array
     {
-        $absolutePath = $this->createAbsolutePath($relativePath);
+        $directoryListing = $this->filesystem
+            ->listContents($relativePath, true)
+            ->filter(function (StorageAttributes $item) {
+                return !$item->isDir();
+            })
+            ->filter(function (StorageAttributes $item) use ($extensions) {
+                if (0 === count($extensions)) {
+                    return true;
+                }
 
-        $finder = new Finder();
-        $finder->files();
-        $finder->in((string) $absolutePath);
-        $finder->sortByName();
+                $path = $item->path();
+                foreach ($extensions as $extension) {
+                    if (str_ends_with($path, '.' . $extension)) {
+                        return true;
+                    }
+                }
 
-        if ([] !== $extensions) {
-            foreach ($extensions as $extension) {
-                $finder->name('*.' . $extension);
-            }
-        }
+                return false;
+            })
+            ->sortByPath()
+            ->map(function (StorageAttributes $item) {
+                return $item->path();
+            })
+        ;
 
-        return $finder->getIterator();
+        return $directoryListing->toArray();
     }
 
     /**
-     * @throws OutOfScopeException
+     * @throws WriteException
      */
-    private function createAbsolutePath(string $relativePath): AbsoluteFileLocator
-    {
-        return $this->basePath->append($relativePath);
-    }
-
-    /**
-     * @throws CreateException
-     */
-    private function doCreate(AbsoluteFileLocator $fileLocator): void
+    public function write(string $fileRelativePath, string $content): void
     {
         try {
-            $this->filesystem->mkdir((string) $fileLocator);
-        } catch (IOExceptionInterface $IOException) {
-            throw new CreateException((string) $fileLocator, $IOException);
+            $this->filesystem->write($fileRelativePath, $content);
+        } catch (FilesystemException $e) {
+            throw new WriteException($fileRelativePath, $e);
         }
     }
 
     /**
-     * @throws RemoveException
+     * @throws ReadException
      */
-    private function doRemove(AbsoluteFileLocator $fileLocator): void
+    public function read(string $fileRelativePath): string
     {
         try {
-            $this->filesystem->remove((string) $fileLocator);
-        } catch (IOExceptionInterface $IOException) {
-            throw new RemoveException((string) $fileLocator, $IOException);
+            return $this->filesystem->read($fileRelativePath);
+        } catch (FilesystemException $e) {
+            throw new ReadException($fileRelativePath, $e);
         }
-    }
-
-    private function doExists(AbsoluteFileLocator $fileLocator): bool
-    {
-        return $this->filesystem->exists((string) $fileLocator);
     }
 }

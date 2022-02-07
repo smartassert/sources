@@ -17,7 +17,6 @@ use App\Tests\Services\EntityRemover;
 use App\Tests\Services\FileStoreFixtureCreator;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-use Symfony\Component\Filesystem\Path;
 use Symfony\Component\Process\Exception\RuntimeException as SymfonyProcessRuntimeException;
 use Symfony\Component\String\UnicodeString;
 use webignition\ObjectReflector\ObjectReflector;
@@ -180,7 +179,7 @@ class UserGitRepositoryPreparerTest extends WebTestCase
 
     public function testPrepareSuccess(): void
     {
-        $fixtureSetIdentifier = 'txt';
+        $fixtureSetIdentifier = '/Source/txt';
 
         $this->setGitRepositoryClonerOutcome(new ProcessOutput(0, 'clone success output', ''));
         $this->setGitRepositoryCheckoutHandlerOutcome(
@@ -192,8 +191,8 @@ class UserGitRepositoryPreparerTest extends WebTestCase
 
         self::assertDirectoryExists($this->repositoryPath);
 
-        $sourceAbsolutePath = Path::canonicalize($this->fixtureCreator->getFixtureSetPath($fixtureSetIdentifier));
-        $targetAbsolutePath = Path::canonicalize($this->fileStoreBasePath . '/' . $runSource);
+        $sourceAbsolutePath = $this->fixtureCreator->getFixturePath($fixtureSetIdentifier);
+        $targetAbsolutePath = $this->fileStoreBasePath . '/' . $runSource;
 
         self::assertSame(scandir($sourceAbsolutePath), scandir($targetAbsolutePath));
     }
@@ -265,7 +264,10 @@ class UserGitRepositoryPreparerTest extends WebTestCase
                         $repositoryRelativePath = (string) (new UnicodeString($repositoryPath))
                             ->trimPrefix($this->fileStoreBasePath . '/')
                         ;
-                        $this->fixtureCreator->copyFixtureSetTo($fixtureSetIdentifier, $repositoryRelativePath);
+                        $this->fixtureCreator->copySetTo(
+                            $fixtureSetIdentifier,
+                            $repositoryRelativePath
+                        );
                     }
 
                     return $outcome;

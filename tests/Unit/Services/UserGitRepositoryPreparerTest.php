@@ -5,15 +5,17 @@ declare(strict_types=1);
 namespace App\Tests\Unit\Services;
 
 use App\Entity\GitSource;
-use App\Exception\File\OutOfScopeException;
+use App\Exception\File\CreateException;
 use App\Exception\File\RemoveException;
 use App\Exception\UserGitRepositoryException;
 use App\Services\FileStoreManager;
 use App\Services\GitRepositoryCheckoutHandler;
 use App\Services\GitRepositoryCloner;
+use App\Services\PathFactory;
 use App\Services\UserGitRepositoryPreparer;
+use League\Flysystem\UnableToCreateDirectory;
+use League\Flysystem\UnableToDeleteDirectory;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-use Symfony\Component\Filesystem\Exception\IOException;
 
 class UserGitRepositoryPreparerTest extends WebTestCase
 {
@@ -28,6 +30,7 @@ class UserGitRepositoryPreparerTest extends WebTestCase
             $fileStoreManager,
             \Mockery::mock(GitRepositoryCloner::class),
             \Mockery::mock(GitRepositoryCheckoutHandler::class),
+            \Mockery::mock(PathFactory::class),
         );
 
         try {
@@ -45,8 +48,10 @@ class UserGitRepositoryPreparerTest extends WebTestCase
      */
     public function prepareFileStoreManagerThrowsExceptionDataProvider(): array
     {
-        $removeException = new RemoveException('/path/to/remove', \Mockery::mock(IOException::class));
-        $outOfScopeException = new OutOfScopeException('/path', '/base-path');
+        $unableToDeleteDirectoryException = UnableToDeleteDirectory::atLocation('/path/to/remove');
+
+        $removeException = new RemoveException('/path/to/remove', $unableToDeleteDirectoryException);
+        $createException = new CreateException('/path/to/create', UnableToCreateDirectory::atLocation('/path'));
 
         $fileStoreManagerThrowingRemoveException = \Mockery::mock(FileStoreManager::class);
         $fileStoreManagerThrowingRemoveException
@@ -61,7 +66,7 @@ class UserGitRepositoryPreparerTest extends WebTestCase
         ;
         $fileStoreManagerThrowingCreateException
             ->shouldReceive('create')
-            ->andThrow($outOfScopeException)
+            ->andThrow($createException)
         ;
 
         return [
@@ -71,7 +76,7 @@ class UserGitRepositoryPreparerTest extends WebTestCase
             ],
             'create throws exception' => [
                 'fileStoreManager' => $fileStoreManagerThrowingCreateException,
-                'expectedPrevious' => $outOfScopeException,
+                'expectedPrevious' => $createException,
             ],
         ];
     }

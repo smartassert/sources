@@ -4,18 +4,19 @@ declare(strict_types=1);
 
 namespace App\Exception\MessageHandler;
 
-use App\Exception\DirectoryDuplicationException;
+use App\Exception\File\WriteException;
+use App\Exception\SourceRead\SourceReadExceptionInterface;
 use App\Exception\UserGitRepositoryException;
 
 class PrepareException extends \Exception
 {
     public function __construct(
-        private DirectoryDuplicationException|UserGitRepositoryException $exception
+        private WriteException|SourceReadExceptionInterface|UserGitRepositoryException $exception
     ) {
         parent::__construct($exception->getMessage(), $exception->getCode(), $exception);
     }
 
-    public function getHandlerException(): DirectoryDuplicationException|UserGitRepositoryException
+    public function getHandlerException(): WriteException|SourceReadExceptionInterface|UserGitRepositoryException
     {
         return $this->exception;
     }

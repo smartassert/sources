@@ -6,7 +6,6 @@ namespace App\Services;
 
 use App\Entity\GitSource;
 use App\Exception\File\CreateException;
-use App\Exception\File\OutOfScopeException;
 use App\Exception\File\RemoveException;
 use App\Exception\GitActionException;
 use App\Exception\UserGitRepositoryException;
@@ -20,6 +19,7 @@ class UserGitRepositoryPreparer
         private FileStoreManager $fileStoreManager,
         private GitRepositoryCloner $gitRepositoryCloner,
         private GitRepositoryCheckoutHandler $gitRepositoryCheckoutHandler,
+        private PathFactory $pathFactory,
     ) {
     }
 
@@ -42,15 +42,16 @@ class UserGitRepositoryPreparer
     /**
      * @throws CreateException
      * @throws GitActionException
-     * @throws OutOfScopeException
      * @throws RemoveException
      */
     private function doPrepare(UserGitRepository $gitRepository, ?string $ref = null): void
     {
         $gitRepositoryRelativePath = (string) $gitRepository;
 
-        $gitRepositoryAbsolutePath = $this->fileStoreManager->remove($gitRepositoryRelativePath);
+        $this->fileStoreManager->remove($gitRepositoryRelativePath);
         $this->fileStoreManager->create($gitRepositoryRelativePath);
+
+        $gitRepositoryAbsolutePath = $this->pathFactory->createAbsolutePath($gitRepositoryRelativePath);
 
         $gitActionException = null;
         $cloneOutput = null;

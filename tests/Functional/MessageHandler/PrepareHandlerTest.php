@@ -8,14 +8,16 @@ use App\Entity\FileSource;
 use App\Entity\GitSource;
 use App\Entity\RunSource;
 use App\Enum\RunSource\State;
-use App\Exception\DirectoryDuplicationException;
+use App\Exception\File\WriteException;
 use App\Exception\MessageHandler\PrepareException;
+use App\Exception\SourceRead\InvalidYamlException;
+use App\Exception\SourceRead\ReadFileException;
 use App\Exception\UserGitRepositoryException;
 use App\Message\Prepare;
 use App\MessageHandler\PrepareHandler;
 use App\Model\EntityId;
 use App\Repository\SourceRepository;
-use App\Services\RunSourcePreparer;
+use App\Services\RunSourceSerializer;
 use App\Services\Source\Store;
 use App\Tests\Model\UserId;
 use App\Tests\Services\EntityRemover;
@@ -78,9 +80,9 @@ class PrepareHandlerTest extends WebTestCase
         ObjectReflector::setProperty(
             $this->handler,
             $this->handler::class,
-            'runSourcePreparer',
-            \Mockery::mock(RunSourcePreparer::class)
-                ->shouldNotReceive('prepare')
+            'runSourceSerializer',
+            \Mockery::mock(RunSourceSerializer::class)
+                ->shouldNotReceive('write')
                 ->getMock()
         );
 
@@ -155,7 +157,7 @@ class PrepareHandlerTest extends WebTestCase
      */
     public function testInvokeDoesPrepare(
         array $entities,
-        RunSourcePreparer $runSourcePreparer,
+        RunSourceSerializer $runSourcePreparer,
         Prepare $message,
     ): void {
         foreach ($entities as $entity) {
@@ -166,7 +168,7 @@ class PrepareHandlerTest extends WebTestCase
         ObjectReflector::setProperty(
             $this->handler,
             $this->handler::class,
-            'runSourcePreparer',
+            'runSourceSerializer',
             $runSourcePreparer
         );
 
@@ -197,7 +199,7 @@ class PrepareHandlerTest extends WebTestCase
                     $fileSource,
                     $fileRunSource,
                 ],
-                'runSourcePreparer' => $this->createRunSourcePreparer($fileRunSource),
+                'runSourceSerializer' => $this->createRunSourcePreparer($fileRunSource),
                 'message' => Prepare::createFromRunSource($fileRunSource),
             ],
             'run source is parent of git source, state is "requested"' => [
@@ -205,7 +207,7 @@ class PrepareHandlerTest extends WebTestCase
                     $gitSource,
                     $gitRunSource,
                 ],
-                'runSourcePreparer' => $this->createRunSourcePreparer($gitRunSource),
+                'runSourceSerializer' => $this->createRunSourcePreparer($gitRunSource),
                 'message' => Prepare::createFromRunSource($gitRunSource),
             ],
             'run source is parent of file source, state is "preparing/halted"' => [
@@ -213,7 +215,7 @@ class PrepareHandlerTest extends WebTestCase
                     $fileSource,
                     $fileRunSourceStatePreparingHalted,
                 ],
-                'runSourcePreparer' => $this->createRunSourcePreparer($fileRunSourceStatePreparingHalted),
+                'runSourceSerializer' => $this->createRunSourcePreparer($fileRunSourceStatePreparingHalted),
                 'message' => Prepare::createFromRunSource($fileRunSourceStatePreparingHalted),
             ],
         ];
@@ -233,7 +235,7 @@ class PrepareHandlerTest extends WebTestCase
         ObjectReflector::setProperty(
             $this->handler,
             $this->handler::class,
-            'runSourcePreparer',
+            'runSourceSerializer',
             $runSourcePreparer
         );
 
@@ -258,8 +260,14 @@ class PrepareHandlerTest extends WebTestCase
     public function invokeRunSourcePreparerThrowsExceptionDataProvider(): array
     {
         return [
-            DirectoryDuplicationException::class => [
-                'runSourcePreparerException' => \Mockery::mock(DirectoryDuplicationException::class),
+            WriteException::class => [
+                'runSourcePreparerException' => \Mockery::mock(WriteException::class),
+            ],
+            ReadFileException::class => [
+                'runSourcePreparerException' => \Mockery::mock(ReadFileException::class),
+            ],
+            InvalidYamlException::class => [
+                'runSourcePreparerException' => \Mockery::mock(InvalidYamlException::class),
             ],
             UserGitRepositoryException::class => [
                 'runSourcePreparerException' => \Mockery::mock(UserGitRepositoryException::class),
@@ -267,11 +275,11 @@ class PrepareHandlerTest extends WebTestCase
         ];
     }
 
-    private function createRunSourcePreparer(RunSource $runSource, ?\Exception $exception = null): RunSourcePreparer
+    private function createRunSourcePreparer(RunSource $runSource, ?\Exception $exception = null): RunSourceSerializer
     {
-        $runSourcePreparer = \Mockery::mock(RunSourcePreparer::class);
-        $expectation = $runSourcePreparer
-            ->shouldReceive('prepare')
+        $runSourceSerializer = \Mockery::mock(RunSourceSerializer::class);
+        $expectation = $runSourceSerializer
+            ->shouldReceive('write')
             ->withArgs(function (RunSource $passedRunSource) use ($runSource) {
                 self::assertSame($runSource->getId(), $passedRunSource->getId());
 
@@ -283,6 +291,6 @@ class PrepareHandlerTest extends WebTestCase
             $expectation->andThrow($exception);
         }
 
-        return $runSourcePreparer;
+        return $runSourceSerializer;
     }
 }
