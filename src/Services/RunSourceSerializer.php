@@ -57,6 +57,6 @@ class RunSourceSerializer
      */
     public function read(RunSource $runSource): string
     {
-        return $this->fileStoreManager->read($runSource . '/' . self::SERIALIZED_FILENAME);
+        return trim($this->fileStoreManager->read($runSource . '/' . self::SERIALIZED_FILENAME));
     }
 }

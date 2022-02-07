@@ -156,9 +156,9 @@ class RunSourceSerializerTest extends WebTestCase
             $runSource . '/' . RunSourceSerializer::SERIALIZED_FILENAME
         );
 
-        self::assertSame(
-            file_get_contents($this->fixtureCreator->getFixturePath('/RunSource/source_yml_yaml_entire.yaml')),
-            $this->runSourceSerializer->read($runSource)
-        );
+        $fixturePath = $this->fixtureCreator->getFixturePath('/RunSource/source_yml_yaml_entire.yaml');
+        $expected = trim((string) file_get_contents($fixturePath));
+
+        self::assertSame($expected, $this->runSourceSerializer->read($runSource));
     }
 }
