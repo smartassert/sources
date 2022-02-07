@@ -34,13 +34,13 @@ class RunSourcePreparer
 
         if ($source instanceof FileSource) {
             $content = $this->sourceSerializer->serialize($source);
-            $this->fileStoreManager->add($serializedSourcePath, $content);
+            $this->fileStoreManager->write($serializedSourcePath, $content);
         }
 
         if ($source instanceof GitSource) {
             $gitRepository = $this->gitRepositoryPreparer->prepare($source, $target->getParameters()['ref'] ?? null);
             $content = $this->sourceSerializer->serialize($gitRepository, $source->getPath());
-            $this->fileStoreManager->add($serializedSourcePath, $content);
+            $this->fileStoreManager->write($serializedSourcePath, $content);
 
             try {
                 $this->fileStoreManager->remove((string) $gitRepository);
