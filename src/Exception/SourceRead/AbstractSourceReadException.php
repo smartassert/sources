@@ -4,20 +4,18 @@ declare(strict_types=1);
 
 namespace App\Exception\SourceRead;
 
-use Symfony\Component\Finder\SplFileInfo;
-
 abstract class AbstractSourceReadException extends \Exception implements SourceReadExceptionInterface
 {
     public function __construct(
-        private readonly SplFileInfo $sourceFile,
+        private readonly string $sourceFile,
         string $message,
         int $code = 0,
         ?\Throwable $previous = null
     ) {
-        parent::__construct(sprintf($message, $sourceFile->getRelativePathname()), $code, $previous);
+        parent::__construct(sprintf($message, $sourceFile), $code, $previous);
     }
 
-    public function getSourceFile(): SplFileInfo
+    public function getSourceFile(): string
     {
         return $this->sourceFile;
     }
