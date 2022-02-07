@@ -37,7 +37,7 @@ class FileStoreManagerTest extends WebTestCase
     public function testCreateRemoveSuccess(): void
     {
         $relativePath = UserId::create();
-        $absolutePath = (string) $this->fileStoreManager->createAbsolutePath($relativePath);
+        $absolutePath = $this->fileStoreBasePath . '/' . $relativePath;
         self::assertDirectoryDoesNotExist($absolutePath);
 
         $this->fileStoreManager->create($relativePath);

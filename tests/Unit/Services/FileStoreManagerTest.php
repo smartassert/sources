@@ -8,7 +8,6 @@ use App\Exception\File\CreateException;
 use App\Exception\File\ReadException;
 use App\Exception\File\RemoveException;
 use App\Exception\File\WriteException;
-use App\Model\AbsoluteFileLocator;
 use App\Services\FileStoreManager;
 use League\Flysystem\Filesystem;
 use League\Flysystem\UnableToCreateDirectory;
@@ -68,10 +67,7 @@ class FileStoreManagerTest extends TestCase
 
         return [
             CreateException::class => [
-                'fileStoreManager' => new FileStoreManager(
-                    new AbsoluteFileLocator(self::BASE_PATH),
-                    $mockFilesystem,
-                ),
+                'fileStoreManager' => new FileStoreManager($mockFilesystem),
                 'relativePath' => self::FILE_LOCATOR_PATH,
                 'expected' => new CreateException(self::FILE_LOCATOR_PATH, $cannotCreateException),
             ],
@@ -94,10 +90,7 @@ class FileStoreManagerTest extends TestCase
 
         return [
             RemoveException::class => [
-                'fileStoreManager' => new FileStoreManager(
-                    new AbsoluteFileLocator(self::BASE_PATH),
-                    $mockFilesystem,
-                ),
+                'fileStoreManager' => new FileStoreManager($mockFilesystem),
                 'relativePath' => self::FILE_LOCATOR_PATH,
                 'expected' => new RemoveException(self::FILE_LOCATOR_PATH, $cannotRemoveException),
             ],
@@ -118,7 +111,7 @@ class FileStoreManagerTest extends TestCase
             ->andThrow($flysystemException)
         ;
 
-        $fileStoreManager = new FileStoreManager(new AbsoluteFileLocator(self::BASE_PATH), $flyFilesystem);
+        $fileStoreManager = new FileStoreManager($flyFilesystem);
 
         $this->expectExceptionObject(new WriteException($fileRelativePath, $flysystemException));
 
@@ -137,7 +130,7 @@ class FileStoreManagerTest extends TestCase
             ->andThrow($flysystemException)
         ;
 
-        $fileStoreManager = new FileStoreManager(new AbsoluteFileLocator(self::BASE_PATH), $flyFilesystem);
+        $fileStoreManager = new FileStoreManager($flyFilesystem);
 
         $this->expectExceptionObject(new ReadException($fileRelativePath, $flysystemException));
 

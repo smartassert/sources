@@ -5,11 +5,9 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Exception\File\CreateException;
-use App\Exception\File\OutOfScopeException;
 use App\Exception\File\ReadException;
 use App\Exception\File\RemoveException;
 use App\Exception\File\WriteException;
-use App\Model\AbsoluteFileLocator;
 use League\Flysystem\Filesystem;
 use League\Flysystem\FilesystemException;
 use League\Flysystem\StorageAttributes;
@@ -17,7 +15,6 @@ use League\Flysystem\StorageAttributes;
 class FileStoreManager
 {
     public function __construct(
-        private AbsoluteFileLocator $basePath,
         private Filesystem $filesystem,
     ) {
     }
@@ -105,13 +102,5 @@ class FileStoreManager
         } catch (FilesystemException $e) {
             throw new ReadException($fileRelativePath, $e);
         }
-    }
-
-    /**
-     * @throws OutOfScopeException
-     */
-    public function createAbsolutePath(string $relativePath): AbsoluteFileLocator
-    {
-        return $this->basePath->append($relativePath);
     }
 }
