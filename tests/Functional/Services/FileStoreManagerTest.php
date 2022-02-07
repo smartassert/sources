@@ -35,19 +35,17 @@ class FileStoreManagerTest extends WebTestCase
         $this->fileStoreBasePath = $fileStoreBasePath;
     }
 
-    public function testExistsCreateRemoveSuccess(): void
+    public function testCreateRemoveSuccess(): void
     {
         $relativePath = UserId::create();
-        $expectedAbsolutePath = $this->createFileStoreAbsolutePath($relativePath);
-        self::assertFalse($this->fileStoreManager->exists($relativePath));
+        $absolutePath = (string) $this->fileStoreManager->createAbsolutePath($relativePath);
+        self::assertDirectoryDoesNotExist($absolutePath);
 
-        $createdPath = $this->fileStoreManager->create($relativePath);
-        self::assertSame($expectedAbsolutePath, $createdPath);
-        self::assertTrue($this->fileStoreManager->exists($relativePath));
+        $this->fileStoreManager->create($relativePath);
+        self::assertDirectoryExists($absolutePath);
 
-        $removedPath = $this->fileStoreManager->remove($relativePath);
-        self::assertSame($expectedAbsolutePath, $removedPath);
-        self::assertFalse($this->fileStoreManager->exists($relativePath));
+        $this->fileStoreManager->remove($relativePath);
+        self::assertDirectoryDoesNotExist($absolutePath);
     }
 
     /**
@@ -184,4 +182,13 @@ class FileStoreManagerTest extends WebTestCase
     {
         return Path::canonicalize($this->fileStoreBasePath . '/' . $relativePath);
     }
+
+//    public function testFlyFilesystemScope(): void
+//    {
+//        $flyFilesystem = self::getContainer()->get(Filesystem::class);
+//
+//        $flyFilesystem->write('foo01.txt', 'foo01');
+//        $flyFilesystem->write('./foo02.txt', 'foo02');
+//        $flyFilesystem->write('../foo03.txt', 'foo03');
+//    }
 }

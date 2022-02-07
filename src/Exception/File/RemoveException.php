@@ -4,19 +4,19 @@ declare(strict_types=1);
 
 namespace App\Exception\File;
 
-use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
+use League\Flysystem\FilesystemException;
 
 class RemoveException extends \Exception implements MutationExceptionInterface, PathExceptionInterface
 {
     public function __construct(
         private string $path,
-        private IOExceptionInterface $IOException,
+        private FilesystemException $filesystemException,
         private ?string $context = null
     ) {
         parent::__construct(
             sprintf('Unable to remove "%s" (%s)', $path, $context),
             0,
-            $this->IOException
+            $this->filesystemException
         );
     }
 
@@ -25,9 +25,9 @@ class RemoveException extends \Exception implements MutationExceptionInterface, 
         return $this->path;
     }
 
-    public function getIOException(): IOExceptionInterface
+    public function getFilesystemException(): FilesystemException
     {
-        return $this->IOException;
+        return $this->filesystemException;
     }
 
     public function getContext(): ?string
@@ -37,6 +37,6 @@ class RemoveException extends \Exception implements MutationExceptionInterface, 
 
     public function withContext(string $context): self
     {
-        return new RemoveException($this->path, $this->IOException, $context);
+        return new RemoveException($this->path, $this->filesystemException, $context);
     }
 }
