@@ -87,7 +87,7 @@ class FileStoreManager
     /**
      * @throws WriteException
      */
-    public function add(string $fileRelativePath, string $content): void
+    public function write(string $fileRelativePath, string $content): void
     {
         $fileRelativePath = Path::canonicalize($fileRelativePath);
 

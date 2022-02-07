@@ -139,11 +139,11 @@ class FileStoreManagerTest extends WebTestCase
     }
 
     /**
-     * @dataProvider addDataProvider
+     * @dataProvider writeDataProvider
      */
-    public function testAdd(string $fileRelativePath, string $content): void
+    public function testWrite(string $fileRelativePath, string $content): void
     {
-        $this->fileStoreManager->add($fileRelativePath, $content);
+        $this->fileStoreManager->write($fileRelativePath, $content);
 
         $expectedAbsolutePath = Path::canonicalize($this->createFileStoreAbsolutePath($fileRelativePath));
 
@@ -156,7 +156,7 @@ class FileStoreManagerTest extends WebTestCase
     /**
      * @return array<mixed>
      */
-    public function addDataProvider(): array
+    public function writeDataProvider(): array
     {
         return [
             'single-level relative directory' => [
@@ -175,7 +175,7 @@ class FileStoreManagerTest extends WebTestCase
         $fileSource = new FileSource(UserId::create(), 'file source label');
         $this->fixtureCreator->copyFixtureSetTo('txt', (string) $fileSource);
 
-        $fileRelativePath = (string) $fileSource . '/file1.txt';
+        $fileRelativePath = $fileSource . '/file1.txt';
 
         self::assertSame('File One' . "\n", $this->fileStoreManager->read($fileRelativePath));
     }

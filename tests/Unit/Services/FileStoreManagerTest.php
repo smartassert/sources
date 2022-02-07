@@ -120,7 +120,7 @@ class FileStoreManagerTest extends TestCase
         ];
     }
 
-    public function testAddThrowsException(): void
+    public function testWriteThrowsException(): void
     {
         $fileRelativePath = 'path/to/file.txt';
         $content = 'file content';
@@ -142,10 +142,10 @@ class FileStoreManagerTest extends TestCase
 
         $this->expectExceptionObject(new WriteException($fileRelativePath, $flysystemException));
 
-        $fileStoreManager->add($fileRelativePath, $content);
+        $fileStoreManager->write($fileRelativePath, $content);
     }
 
-    public function testWriteThrowsException(): void
+    public function testReadThrowsException(): void
     {
         $fileRelativePath = 'path/to/file.txt';
         $flysystemException = new UnableToReadFile();
