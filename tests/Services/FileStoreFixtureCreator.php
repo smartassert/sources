@@ -11,7 +11,7 @@ class FileStoreFixtureCreator
     public function __construct(
         private Filesystem $filesystem,
         private string $fileStoreBasePath,
-        private string $sourceFixturesBasePath,
+        private string $fixturesBasePath,
     ) {
     }
 
@@ -25,6 +25,6 @@ class FileStoreFixtureCreator
 
     public function getFixtureSetPath(string $setIdentifier): string
     {
-        return $this->sourceFixturesBasePath . '/' . $setIdentifier;
+        return $this->fixturesBasePath . $setIdentifier;
     }
 }

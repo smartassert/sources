@@ -43,7 +43,7 @@ class SourceSerializerTest extends WebTestCase
         $fileSource = new FileSource(UserId::create(), 'file source label');
         $source = new RunSource($fileSource);
 
-        $this->fixtureCreator->copyFixtureSetTo($fixtureSetIdentifier, (string) $source);
+        $this->fixtureCreator->copyFixtureSetTo('/Source/' . $fixtureSetIdentifier, (string) $source);
 
         $content = $this->sourceSerializer->serialize($source, $path);
 

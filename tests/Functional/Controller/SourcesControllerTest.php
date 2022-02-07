@@ -845,7 +845,7 @@ class SourcesControllerTest extends WebTestCase
         $runSource = new RunSource($fileSource);
         $this->store->add($runSource);
 
-        $this->fixtureCreator->copyFixtureSetTo($sourceFixtureSetIdentifier, (string) $runSource);
+        $this->fixtureCreator->copyFixtureSetTo('/Source/' . $sourceFixtureSetIdentifier, (string) $runSource);
 
         $this->mockHandler->append(
             new Response(200, [], $userId)
