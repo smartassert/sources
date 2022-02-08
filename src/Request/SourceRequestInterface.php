@@ -24,4 +24,6 @@ interface SourceRequestInterface
      * @return string[]
      */
     public function getMissingRequiredFields(): array;
+
+    public function getType(): string;
 }

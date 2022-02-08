@@ -35,7 +35,7 @@ class InvalidSourceRequest implements SourceRequestInterface
         return false;
     }
 
-    public function getSourceType(): string
+    public function getType(): string
     {
         return $this->sourceType;
     }
