@@ -7,8 +7,8 @@ namespace App\Services\Source;
 use App\Entity\FileSource;
 use App\Entity\GitSource;
 use App\Entity\SourceInterface;
-use App\Request\FooFileSourceRequest;
-use App\Request\FooGitSourceRequest;
+use App\Request\FileSourceRequest;
+use App\Request\GitSourceRequest;
 use App\Request\SourceRequestInterface;
 
 class Mutator
@@ -18,18 +18,18 @@ class Mutator
     ) {
     }
 
-    public function update(SourceInterface $source, SourceRequestInterface $sourceRequest): SourceInterface
+    public function update(SourceInterface $source, SourceRequestInterface $request): SourceInterface
     {
         $isMutated = false;
-        if ($source instanceof FileSource && $sourceRequest instanceof FooFileSourceRequest) {
-            $source->setLabel($sourceRequest->getParameter(FooFileSourceRequest::PARAMETER_LABEL));
+        if ($source instanceof FileSource && $request instanceof FileSourceRequest) {
+            $source->setLabel($request->getParameter(FileSourceRequest::PARAMETER_LABEL));
             $isMutated = true;
         }
 
-        if ($source instanceof GitSource && $sourceRequest instanceof FooGitSourceRequest) {
-            $source->setHostUrl($sourceRequest->getParameter(FooGitSourceRequest::PARAMETER_HOST_URL));
-            $source->setPath($sourceRequest->getParameter(FooGitSourceRequest::PARAMETER_PATH));
-            $source->setCredentials($sourceRequest->getParameter(FooGitSourceRequest::PARAMETER_CREDENTIALS));
+        if ($source instanceof GitSource && $request instanceof GitSourceRequest) {
+            $source->setHostUrl($request->getParameter(GitSourceRequest::PARAMETER_HOST_URL));
+            $source->setPath($request->getParameter(GitSourceRequest::PARAMETER_PATH));
+            $source->setCredentials($request->getParameter(GitSourceRequest::PARAMETER_CREDENTIALS));
             $isMutated = true;
         }
 

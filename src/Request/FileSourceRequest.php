@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Request;
 
-class FooFileSourceRequest extends AbstractSourceRequest
+class FileSourceRequest extends AbstractSourceRequest
 {
     public const PARAMETER_LABEL = 'label';
 

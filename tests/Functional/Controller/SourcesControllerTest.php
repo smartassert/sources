@@ -15,8 +15,8 @@ use App\Model\EntityId;
 use App\Repository\RunSourceRepository;
 use App\Repository\SourceRepository;
 use App\Request\AbstractSourceRequest;
-use App\Request\FooFileSourceRequest;
-use App\Request\FooGitSourceRequest;
+use App\Request\FileSourceRequest;
+use App\Request\GitSourceRequest;
 use App\Services\RunSourceSerializer;
 use App\Services\Source\Store;
 use App\Tests\Model\Route;
@@ -259,8 +259,8 @@ class SourcesControllerTest extends WebTestCase
                 'userId' => $userId,
                 'requestParameters' => [
                     AbstractSourceRequest::KEY_POST_TYPE => Type::GIT->value,
-                    FooGitSourceRequest::PARAMETER_HOST_URL => $hostUrl,
-                    FooGitSourceRequest::PARAMETER_PATH => $path
+                    GitSourceRequest::PARAMETER_HOST_URL => $hostUrl,
+                    GitSourceRequest::PARAMETER_PATH => $path
                 ],
                 'expected' => [
                     'user_id' => $userId,
@@ -274,9 +274,9 @@ class SourcesControllerTest extends WebTestCase
                 'userId' => $userId,
                 'requestParameters' => [
                     AbstractSourceRequest::KEY_POST_TYPE => Type::GIT->value,
-                    FooGitSourceRequest::PARAMETER_HOST_URL => $hostUrl,
-                    FooGitSourceRequest::PARAMETER_PATH => $path,
-                    FooGitSourceRequest::PARAMETER_CREDENTIALS => $credentials,
+                    GitSourceRequest::PARAMETER_HOST_URL => $hostUrl,
+                    GitSourceRequest::PARAMETER_PATH => $path,
+                    GitSourceRequest::PARAMETER_CREDENTIALS => $credentials,
                 ],
                 'expected' => [
                     'user_id' => $userId,
@@ -290,7 +290,7 @@ class SourcesControllerTest extends WebTestCase
                 'userId' => $userId,
                 'requestParameters' => [
                     AbstractSourceRequest::KEY_POST_TYPE => Type::FILE->value,
-                    FooFileSourceRequest::PARAMETER_LABEL => $label
+                    FileSourceRequest::PARAMETER_LABEL => $label
                 ],
                 'expected' => [
                     'user_id' => $userId,
@@ -445,7 +445,7 @@ class SourcesControllerTest extends WebTestCase
                 'userId' => $userId,
                 'requestData' => [
                     AbstractSourceRequest::KEY_POST_TYPE => Type::FILE->value,
-                    FooFileSourceRequest::PARAMETER_LABEL => $newLabel,
+                    FileSourceRequest::PARAMETER_LABEL => $newLabel,
                 ],
                 'expectedResponseData' => [
                     'id' => $fileSource->getId(),
@@ -459,9 +459,9 @@ class SourcesControllerTest extends WebTestCase
                 'userId' => $userId,
                 'requestData' => [
                     AbstractSourceRequest::KEY_POST_TYPE => Type::GIT->value,
-                    FooGitSourceRequest::PARAMETER_HOST_URL => $newHostUrl,
-                    FooGitSourceRequest::PARAMETER_PATH => $newPath,
-                    FooGitSourceRequest::PARAMETER_CREDENTIALS => null,
+                    GitSourceRequest::PARAMETER_HOST_URL => $newHostUrl,
+                    GitSourceRequest::PARAMETER_PATH => $newPath,
+                    GitSourceRequest::PARAMETER_CREDENTIALS => null,
                 ],
                 'expectedResponseData' => [
                     'id' => $gitSource->getId(),
@@ -477,8 +477,8 @@ class SourcesControllerTest extends WebTestCase
                 'userId' => $userId,
                 'requestData' => [
                     AbstractSourceRequest::KEY_POST_TYPE => Type::GIT->value,
-                    FooGitSourceRequest::PARAMETER_HOST_URL => $newHostUrl,
-                    FooGitSourceRequest::PARAMETER_PATH => $newPath,
+                    GitSourceRequest::PARAMETER_HOST_URL => $newHostUrl,
+                    GitSourceRequest::PARAMETER_PATH => $newPath,
                 ],
                 'expectedResponseData' => [
                     'id' => $gitSource->getId(),

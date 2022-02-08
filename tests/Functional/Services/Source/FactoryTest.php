@@ -9,8 +9,8 @@ use App\Entity\FileSource;
 use App\Entity\GitSource;
 use App\Entity\SourceInterface;
 use App\Repository\SourceRepository;
-use App\Request\FooFileSourceRequest;
-use App\Request\FooGitSourceRequest;
+use App\Request\FileSourceRequest;
+use App\Request\GitSourceRequest;
 use App\Services\Source\Factory;
 use App\Tests\Model\UserId;
 use App\Tests\Services\EntityRemover;
@@ -47,7 +47,7 @@ class FactoryTest extends WebTestCase
      */
     public function testCreateFromSourceRequest(
         UserInterface $user,
-        FooFileSourceRequest|FooGitSourceRequest $request,
+        FileSourceRequest|GitSourceRequest $request,
         SourceInterface $expected
     ): void {
         self::assertCount(0, $this->repository->findAll());
@@ -81,26 +81,26 @@ class FactoryTest extends WebTestCase
         return [
             'git, empty credentials' => [
                 'user' => $user,
-                'request' => new FooGitSourceRequest([
-                    FooGitSourceRequest::PARAMETER_HOST_URL => $gitSourceHostUrl,
-                    FooGitSourceRequest::PARAMETER_PATH => $gitSourcePath,
-                    FooGitSourceRequest::PARAMETER_CREDENTIALS => '',
+                'request' => new GitSourceRequest([
+                    GitSourceRequest::PARAMETER_HOST_URL => $gitSourceHostUrl,
+                    GitSourceRequest::PARAMETER_PATH => $gitSourcePath,
+                    GitSourceRequest::PARAMETER_CREDENTIALS => '',
                 ]),
                 'expected' => new GitSource($userId, $gitSourceHostUrl, $gitSourcePath, ''),
             ],
             'git, non-empty credentials' => [
                 'user' => $user,
-                'request' => new FooGitSourceRequest([
-                    FooGitSourceRequest::PARAMETER_HOST_URL => $gitSourceHostUrl,
-                    FooGitSourceRequest::PARAMETER_PATH => $gitSourcePath,
-                    FooGitSourceRequest::PARAMETER_CREDENTIALS => 'credentials',
+                'request' => new GitSourceRequest([
+                    GitSourceRequest::PARAMETER_HOST_URL => $gitSourceHostUrl,
+                    GitSourceRequest::PARAMETER_PATH => $gitSourcePath,
+                    GitSourceRequest::PARAMETER_CREDENTIALS => 'credentials',
                 ]),
                 'expected' => new GitSource($userId, $gitSourceHostUrl, $gitSourcePath, 'credentials'),
             ],
             'file' => [
                 'user' => $user,
-                'request' => new FooFileSourceRequest([
-                    FooFileSourceRequest::PARAMETER_LABEL => 'file source label',
+                'request' => new FileSourceRequest([
+                    FileSourceRequest::PARAMETER_LABEL => 'file source label',
                 ]),
                 'expected' => new FileSource($userId, 'file source label'),
             ],

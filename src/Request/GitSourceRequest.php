@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Request;
 
-class FooGitSourceRequest extends AbstractSourceRequest
+class GitSourceRequest extends AbstractSourceRequest
 {
     public const PARAMETER_HOST_URL = 'host-url';
     public const PARAMETER_PATH = 'path';
