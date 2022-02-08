@@ -8,11 +8,7 @@ use App\Controller\SourceController;
 use App\Entity\FileSource;
 use App\Entity\RunSource;
 use App\Message\Prepare;
-use App\Repository\SourceRepository;
 use App\Services\RunSourceFactory;
-use App\Services\Source\Factory;
-use App\Services\Source\Mutator;
-use App\Services\Source\Store;
 use App\Tests\Model\UserId;
 use SmartAssert\UsersSecurityBundle\Security\User;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -29,16 +25,6 @@ class SourceControllerTest extends WebTestCase
 
         $fileSource = new FileSource($userId, 'file source label');
         $runSource = new RunSource($fileSource);
-
-        $sourceStore = \Mockery::mock(Store::class);
-        $sourceStore
-            ->shouldReceive('add')
-            ->withArgs(function (RunSource $passedRunSource) use ($runSource) {
-                self::assertSame($runSource, $passedRunSource);
-
-                return true;
-            })
-        ;
 
         $createdMessage = null;
         $messageBus = \Mockery::mock(MessageBusInterface::class);
@@ -66,15 +52,6 @@ class SourceControllerTest extends WebTestCase
             ->andReturn($runSource)
         ;
 
-        $controller = new SourceController(
-            \Mockery::mock(Factory::class),
-            $sourceStore,
-            \Mockery::mock(Mutator::class),
-            \Mockery::mock(SourceRepository::class),
-            $messageBus,
-            $runSourceFactory,
-        );
-
-        $controller->prepare($request, $fileSource, $user);
+        (new SourceController())->prepare($request, $fileSource, $user, $messageBus, $runSourceFactory);
     }
 }
