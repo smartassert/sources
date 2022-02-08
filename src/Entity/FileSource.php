@@ -9,7 +9,7 @@ use App\Model\UserSourceFileLocatorTrait;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity]
-class FileSource extends AbstractSource implements UserFileLocatorInterface, \JsonSerializable
+class FileSource extends AbstractSource implements OriginSourceInterface, UserFileLocatorInterface, \JsonSerializable
 {
     use UserSourceFileLocatorTrait;
 
@@ -41,6 +41,11 @@ class FileSource extends AbstractSource implements UserFileLocatorInterface, \Js
     public function getType(): string
     {
         return SourceInterface::TYPE_FILE;
+    }
+
+    public function getRunParameterNames(): array
+    {
+        return [];
     }
 
     /**

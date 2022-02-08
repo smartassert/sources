@@ -7,7 +7,7 @@ namespace App\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity]
-class GitSource extends AbstractSource implements \JsonSerializable
+class GitSource extends AbstractSource implements OriginSourceInterface, \JsonSerializable
 {
     #[ORM\Column(type: 'string', length: 255)]
     private string $hostUrl;
@@ -63,6 +63,13 @@ class GitSource extends AbstractSource implements \JsonSerializable
     public function getType(): string
     {
         return SourceInterface::TYPE_GIT;
+    }
+
+    public function getRunParameterNames(): array
+    {
+        return [
+            'ref'
+        ];
     }
 
     /**

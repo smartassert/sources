@@ -14,7 +14,7 @@ class RunSourceResolver extends AbstractSourceResolver
         return RunSource::class === $type;
     }
 
-    protected function doYield(?SourceInterface $source): ?SourceInterface
+    protected function doYield(?SourceInterface $source): ?RunSource
     {
         return $source instanceof RunSource ? $source : null;
     }
