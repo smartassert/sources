@@ -7,6 +7,7 @@ namespace App\ArgumentResolver;
 use App\Enum\Source\Type;
 use App\Request\FileSourceRequest;
 use App\Request\GitSourceRequest;
+use App\Request\InvalidSourceRequest;
 use App\Request\SourceRequestInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Controller\ArgumentValueResolverInterface;
@@ -27,12 +28,12 @@ class SourceRequestResolver implements ArgumentValueResolverInterface
         $sourceTypeParameter = $request->request->get('type');
         $sourceTypeParameter = is_string($sourceTypeParameter) ? trim($sourceTypeParameter) : '';
 
-        $sourceType = Type::FILE;
+        $type = Type::FILE;
 
         try {
-            $sourceType = Type::from($sourceTypeParameter);
+            $type = Type::from($sourceTypeParameter);
         } catch (\ValueError) {
-            yield null;
+            yield new InvalidSourceRequest($sourceTypeParameter, []);
         }
 
         $parameters = [];
@@ -42,8 +43,14 @@ class SourceRequestResolver implements ArgumentValueResolverInterface
             }
         }
 
-        yield Type::FILE === $sourceType
-            ? new FileSourceRequest($parameters)
-            : new GitSourceRequest($parameters);
+        $sourceRequest = Type::FILE === $type ? new FileSourceRequest($parameters) : new GitSourceRequest($parameters);
+
+        if (false === $sourceRequest->isValid()) {
+            yield null;
+
+            $sourceRequest = new InvalidSourceRequest($sourceTypeParameter, $sourceRequest->getMissingRequiredFields());
+        } else {
+            yield $sourceRequest;
+        }
     }
 }
