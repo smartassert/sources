@@ -10,11 +10,13 @@ use App\Entity\RunSource;
 use App\Entity\SourceInterface;
 use App\Enum\RunSource\FailureReason;
 use App\Enum\RunSource\State;
+use App\Enum\Source\Type;
 use App\Model\EntityId;
 use App\Repository\FileSourceRepository;
 use App\Repository\GitSourceRepository;
 use App\Repository\RunSourceRepository;
 use App\Repository\SourceRepository;
+use App\Request\AbstractSourceRequest;
 use App\Request\FileSourceRequest;
 use App\Request\GitSourceRequest;
 use App\Services\RunSourceSerializer;
@@ -123,13 +125,9 @@ class SourcesControllerTest extends WebTestCase
         $sourceRouteParameters = ['sourceId' => EntityId::create()];
 
         return [
-            'create git source' => [
+            'create source' => [
                 'method' => 'POST',
-                'route' => new Route('create_git'),
-            ],
-            'create file source' => [
-                'method' => 'POST',
-                'route' => new Route('create_file'),
+                'route' => new Route('create'),
             ],
             'get source' => [
                 'method' => 'GET',
@@ -231,7 +229,7 @@ class SourcesControllerTest extends WebTestCase
             new Response(200, [], $userId)
         );
 
-        $response = $this->makeAuthorizedRequest('POST', new Route('create_git'), $requestParameters);
+        $response = $this->makeAuthorizedRequest('POST', new Route('create'), $requestParameters);
 
         self::assertSame(200, $response->getStatusCode());
         $this->assertAuthorizationRequestIsMade();
@@ -267,6 +265,7 @@ class SourcesControllerTest extends WebTestCase
             'credentials missing' => [
                 'userId' => $userId,
                 'requestParameters' => [
+                    AbstractSourceRequest::KEY_POST_TYPE => Type::GIT->value,
                     GitSourceRequest::KEY_POST_HOST_URL => $hostUrl,
                     GitSourceRequest::KEY_POST_PATH => $path
                 ],
@@ -281,6 +280,7 @@ class SourcesControllerTest extends WebTestCase
             'credentials present' => [
                 'userId' => $userId,
                 'requestParameters' => [
+                    AbstractSourceRequest::KEY_POST_TYPE => Type::GIT->value,
                     GitSourceRequest::KEY_POST_HOST_URL => $hostUrl,
                     GitSourceRequest::KEY_POST_PATH => $path,
                     GitSourceRequest::KEY_POST_CREDENTIALS => $credentials,
@@ -308,7 +308,7 @@ class SourcesControllerTest extends WebTestCase
             new Response(200, [], $userId)
         );
 
-        $response = $this->makeAuthorizedRequest('POST', new Route('create_file'), $requestParameters);
+        $response = $this->makeAuthorizedRequest('POST', new Route('create'), $requestParameters);
 
         self::assertSame(200, $response->getStatusCode());
         $this->assertAuthorizationRequestIsMade();
@@ -340,6 +340,7 @@ class SourcesControllerTest extends WebTestCase
             'default' => [
                 'userId' => $userId,
                 'requestParameters' => [
+                    AbstractSourceRequest::KEY_POST_TYPE => Type::FILE->value,
                     FileSourceRequest::KEY_POST_LABEL => $label
                 ],
                 'expected' => [
