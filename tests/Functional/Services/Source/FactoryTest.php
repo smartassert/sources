@@ -9,17 +9,14 @@ use App\Entity\FileSource;
 use App\Entity\GitSource;
 use App\Entity\SourceInterface;
 use App\Repository\SourceRepository;
-use App\Request\FileSourceRequest;
 use App\Request\FooFileSourceRequest;
 use App\Request\FooGitSourceRequest;
-use App\Request\GitSourceRequest;
 use App\Services\Source\Factory;
 use App\Tests\Model\UserId;
 use App\Tests\Services\EntityRemover;
 use SmartAssert\UsersSecurityBundle\Security\User;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Security\Core\User\UserInterface;
-use Symfony\Component\Uid\Ulid;
 use webignition\ObjectReflector\ObjectReflector;
 
 class FactoryTest extends WebTestCase
@@ -45,80 +42,6 @@ class FactoryTest extends WebTestCase
         }
     }
 
-    public function testCreateFileSourceFromRequest(): void
-    {
-        $user = new User(UserId::create());
-        $request = new FileSourceRequest('file source label');
-        $source = $this->factory->createFileSourceFromRequest($user, $request);
-
-        $this->assertCreatedFileSource($source, $user->getUserIdentifier(), $request->getLabel());
-    }
-
-    public function testCreateFileSourceFromRequestIsIdempotent(): void
-    {
-        self::assertCount(0, $this->repository->findAll());
-
-        $user = new User(UserId::create());
-        $request = new FileSourceRequest('file source label');
-
-        $this->factory->createFileSourceFromRequest($user, $request);
-        $this->factory->createFileSourceFromRequest($user, $request);
-        $this->factory->createFileSourceFromRequest($user, $request);
-
-        self::assertCount(1, $this->repository->findAll());
-    }
-
-    /**
-     * @dataProvider createGitSourceFromRequestDataProvider
-     */
-    public function testCreateGitSourceFromRequest(UserInterface $user, GitSourceRequest $request): void
-    {
-        $source = $this->factory->createGitSourceFromRequest($user, $request);
-
-        $this->assertCreatedGitSource(
-            $source,
-            $user->getUserIdentifier(),
-            $request->getHostUrl(),
-            $request->getPath(),
-            $request->getCredentials()
-        );
-    }
-
-    /**
-     * @return array<mixed>
-     */
-    public function createGitSourceFromRequestDataProvider(): array
-    {
-        $user = new User(UserId::create());
-        $hostUrl = 'https://example.com/repository.git';
-        $path = '/';
-
-        return [
-            'empty credentials' => [
-                'user' => $user,
-                'request' => new GitSourceRequest($hostUrl, $path, ''),
-            ],
-            'non-empty credentials' => [
-                'user' => $user,
-                'request' => new GitSourceRequest($hostUrl, $path, 'credentials'),
-            ],
-        ];
-    }
-
-    public function testCreateGitSourceFromRequestIsIdempotent(): void
-    {
-        self::assertCount(0, $this->repository->findAll());
-
-        $user = new User(UserId::create());
-        $request = new GitSourceRequest('https://example.com/repository.git', '/', '');
-
-        $this->factory->createGitSourceFromRequest($user, $request);
-        $this->factory->createGitSourceFromRequest($user, $request);
-        $this->factory->createGitSourceFromRequest($user, $request);
-
-        self::assertCount(1, $this->repository->findAll());
-    }
-
     /**
      * @dataProvider createFromSourceRequestDataProvider
      */
@@ -127,7 +50,13 @@ class FactoryTest extends WebTestCase
         FooFileSourceRequest|FooGitSourceRequest $request,
         SourceInterface $expected
     ): void {
+        self::assertCount(0, $this->repository->findAll());
+
         $source = $this->factory->createFromSourceRequest($user, $request);
+        $this->factory->createFromSourceRequest($user, $request);
+        $this->factory->createFromSourceRequest($user, $request);
+
+        self::assertCount(1, $this->repository->findAll());
 
         ObjectReflector::setProperty(
             $expected,
@@ -176,35 +105,5 @@ class FactoryTest extends WebTestCase
                 'expected' => new FileSource($userId, 'file source label'),
             ],
         ];
-    }
-
-    private function assertCreatedGitSource(
-        GitSource $source,
-        string $expectedUserId,
-        string $expectedHostUrl,
-        string $expectedPath,
-        ?string $expectedCredentials
-    ): void {
-        $this->assertCreatedSource($source, $expectedUserId);
-
-        self::assertSame($expectedHostUrl, $source->getHostUrl());
-        self::assertSame($expectedPath, $source->getPath());
-        self::assertSame($expectedCredentials, $source->getCredentials());
-    }
-
-    private function assertCreatedFileSource(
-        FileSource $source,
-        string $expectedUserId,
-        string $expectedLabel
-    ): void {
-        $this->assertCreatedSource($source, $expectedUserId);
-
-        self::assertSame($expectedLabel, $source->getLabel());
-    }
-
-    private function assertCreatedSource(SourceInterface $source, string $expectedUserId): void
-    {
-        self::assertTrue(Ulid::isValid($source->getId()));
-        self::assertSame($expectedUserId, $source->getUserId());
     }
 }
