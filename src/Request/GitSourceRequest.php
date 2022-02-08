@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Request;
 
+use App\Enum\Source\Type;
+
 class GitSourceRequest extends AbstractSourceRequest
 {
     public const PARAMETER_HOST_URL = 'host-url';
@@ -25,5 +27,10 @@ class GitSourceRequest extends AbstractSourceRequest
         $fields[] = self::PARAMETER_CREDENTIALS;
 
         return $fields;
+    }
+
+    public function getType(): string
+    {
+        return Type::GIT->value;
     }
 }

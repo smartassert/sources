@@ -11,8 +11,10 @@ use App\Enum\Source\Type;
 use App\Exception\File\ReadException;
 use App\Message\Prepare;
 use App\Repository\SourceRepository;
-use App\Request\InvalidSourceRequest;
 use App\Request\SourceRequestInterface;
+use App\Response\SourceReadExceptionResponse;
+use App\Response\SourceRequestInvalidResponse;
+use App\Services\ErrorResponseFactory;
 use App\Services\RunSourceFactory;
 use App\Services\RunSourceSerializer;
 use App\Services\Source\Factory;
@@ -30,11 +32,16 @@ class SourceController
     public const ROUTE_SOURCE = '/';
     public const ROUTE_SOURCE_LIST = '/list';
 
+    public function __construct(
+        private ErrorResponseFactory $errorResponseFactory,
+    ) {
+    }
+
     #[Route(self::ROUTE_SOURCE, name: 'create', methods: ['POST'])]
     public function create(UserInterface $user, Factory $factory, SourceRequestInterface $request): JsonResponse
     {
-        if ($request instanceof InvalidSourceRequest) {
-            return $this->createResponseForInvalidSourceRequest($request);
+        if (false === $request->isValid()) {
+            return $this->errorResponseFactory->createResponse(new SourceRequestInvalidResponse($request), 400);
         }
 
         return new JsonResponse($factory->createFromSourceRequest($user, $request));
@@ -56,8 +63,8 @@ class SourceController
         SourceRequestInterface $request
     ): Response {
         return $this->doUserSourceAction($source, $user, function (OriginSource $source) use ($request, $mutator) {
-            if ($request instanceof InvalidSourceRequest) {
-                return $this->createResponseForInvalidSourceRequest($request);
+            if (false === $request->isValid()) {
+                return $this->errorResponseFactory->createResponse(new SourceRequestInvalidResponse($request), 400);
             }
 
             return new JsonResponse($mutator->update($source, $request));
@@ -116,18 +123,7 @@ class SourceController
                     ]
                 );
             } catch (ReadException $exception) {
-                return new JsonResponse(
-                    [
-                        'error' => [
-                            'type' => 'source_read_exception',
-                            'payload' => [
-                                'file' => $exception->getPath(),
-                                'message' => $exception->getMessage(),
-                            ],
-                        ],
-                    ],
-                    500
-                );
+                return $this->errorResponseFactory->createResponse(new SourceReadExceptionResponse($exception), 500);
             }
         });
     }
@@ -143,21 +139,5 @@ class SourceController
         }
 
         return $action($source);
-    }
-
-    private function createResponseForInvalidSourceRequest(InvalidSourceRequest $request): JsonResponse
-    {
-        return new JsonResponse(
-            [
-                'error' => [
-                    'type' => 'invalid_source_request',
-                    'payload' => [
-                        'source_type' => $request->getSourceType(),
-                        'missing_required_fields' => $request->getMissingRequiredFields(),
-                    ],
-                ],
-            ],
-            400
-        );
     }
 }
