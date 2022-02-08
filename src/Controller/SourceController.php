@@ -11,8 +11,8 @@ use App\Entity\SourceInterface;
 use App\Exception\File\ReadException;
 use App\Message\Prepare;
 use App\Repository\SourceRepository;
-use App\Request\FooFileSourceRequest;
-use App\Request\FooGitSourceRequest;
+use App\Request\FileSourceRequest;
+use App\Request\GitSourceRequest;
 use App\Request\SourceRequestInterface;
 use App\Services\RunSourceSerializer;
 use App\Services\Source\Factory;
@@ -40,9 +40,9 @@ class SourceController
     }
 
     #[Route(self::ROUTE_SOURCE, name: 'create', methods: ['POST'])]
-    public function create(UserInterface $user, ?SourceRequestInterface $sourceRequest): JsonResponse
+    public function create(UserInterface $user, ?SourceRequestInterface $request): JsonResponse
     {
-        if (!($sourceRequest instanceof FooFileSourceRequest || $sourceRequest instanceof FooGitSourceRequest)) {
+        if (!($request instanceof FileSourceRequest || $request instanceof GitSourceRequest)) {
             return new JsonResponse(
                 [
                     'error' => [
@@ -53,19 +53,19 @@ class SourceController
             );
         }
 
-        if (false === $sourceRequest->isValid()) {
+        if (false === $request->isValid()) {
             return new JsonResponse(
                 [
                     'error' => [
                         'type' => 'required_fields_missing',
-                        'missing_fields' => $sourceRequest->getMissingRequiredFields(),
+                        'missing_fields' => $request->getMissingRequiredFields(),
                     ],
                 ],
                 400
             );
         }
 
-        return new JsonResponse($this->factory->createFromSourceRequest($user, $sourceRequest));
+        return new JsonResponse($this->factory->createFromSourceRequest($user, $request));
     }
 
     #[Route(self::ROUTE_SOURCE . '{sourceId<[A-Z90-9]{26}>}', name: 'get', methods: ['GET'])]
@@ -80,10 +80,10 @@ class SourceController
     public function update(
         null|FileSource|GitSource $source,
         UserInterface $user,
-        ?SourceRequestInterface $sourceRequest
+        ?SourceRequestInterface $request
     ): Response {
-        return $this->doUserSourceAction($source, $user, function (FileSource|GitSource $source) use ($sourceRequest) {
-            if (!($sourceRequest instanceof FooFileSourceRequest || $sourceRequest instanceof FooGitSourceRequest)) {
+        return $this->doUserSourceAction($source, $user, function (FileSource|GitSource $source) use ($request) {
+            if (!($request instanceof FileSourceRequest || $request instanceof GitSourceRequest)) {
                 return new JsonResponse(
                     [
                         'error' => [
@@ -94,7 +94,7 @@ class SourceController
                 );
             }
 
-            return new JsonResponse($this->mutator->update($source, $sourceRequest));
+            return new JsonResponse($this->mutator->update($source, $request));
         });
     }
 

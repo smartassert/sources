@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\ArgumentResolver;
 
 use App\Enum\Source\Type;
-use App\Request\FooFileSourceRequest;
-use App\Request\FooGitSourceRequest;
+use App\Request\FileSourceRequest;
+use App\Request\GitSourceRequest;
 use App\Request\SourceRequestInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Controller\ArgumentValueResolverInterface;
@@ -43,7 +43,7 @@ class SourceRequestResolver implements ArgumentValueResolverInterface
         }
 
         yield Type::FILE === $sourceType
-            ? new FooFileSourceRequest($parameters)
-            : new FooGitSourceRequest($parameters);
+            ? new FileSourceRequest($parameters)
+            : new GitSourceRequest($parameters);
     }
 }
