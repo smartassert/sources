@@ -6,4 +6,8 @@ namespace App\Entity;
 
 interface OriginSourceInterface extends SourceInterface
 {
+    /**
+     * @return string[]
+     */
+    public function getRunParameterNames(): array;
 }

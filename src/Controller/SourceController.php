@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
-use App\Entity\FileSource;
-use App\Entity\GitSource;
+use App\Entity\OriginSourceInterface;
 use App\Entity\RunSource;
 use App\Entity\SourceInterface;
 use App\Exception\File\ReadException;
@@ -13,6 +12,7 @@ use App\Message\Prepare;
 use App\Repository\SourceRepository;
 use App\Request\InvalidSourceRequest;
 use App\Request\SourceRequestInterface;
+use App\Services\RunSourceFactory;
 use App\Services\RunSourceSerializer;
 use App\Services\Source\Factory;
 use App\Services\Source\Mutator;
@@ -35,6 +35,7 @@ class SourceController
         private Mutator $mutator,
         private SourceRepository $repository,
         private MessageBusInterface $messageBus,
+        private RunSourceFactory $runSourceFactory,
     ) {
     }
 
@@ -58,11 +59,11 @@ class SourceController
 
     #[Route(self::ROUTE_SOURCE . '{sourceId<[A-Z90-9]{26}>}', name: 'update', methods: ['PUT'])]
     public function update(
-        null|FileSource|GitSource $source,
+        ?OriginSourceInterface $source,
         UserInterface $user,
         SourceRequestInterface $request
     ): Response {
-        return $this->doUserSourceAction($source, $user, function (FileSource|GitSource $source) use ($request) {
+        return $this->doUserSourceAction($source, $user, function (OriginSourceInterface $source) use ($request) {
             if ($request instanceof InvalidSourceRequest) {
                 return $this->createResponseForInvalidSourceRequest($request);
             }
@@ -91,18 +92,13 @@ class SourceController
     }
 
     #[Route(self::ROUTE_SOURCE . '{sourceId<[A-Z90-9]{26}>}/prepare', name: 'prepare', methods: ['POST'])]
-    public function prepare(Request $request, null|FileSource|GitSource $source, UserInterface $user): Response
+    public function prepare(Request $request, ?OriginSourceInterface $source, UserInterface $user): Response
     {
         return $this->doUserSourceAction(
             $source,
             $user,
-            function (FileSource|GitSource $source) use ($request): JsonResponse {
-                $parameters = [];
-                if ($source instanceof GitSource && $request->request->has('ref')) {
-                    $parameters['ref'] = (string) $request->request->get('ref');
-                }
-
-                $runSource = new RunSource($source, $parameters);
+            function (OriginSourceInterface $source) use ($request): JsonResponse {
+                $runSource = $this->runSourceFactory->createFromRequest($source, $request);
                 $this->store->add($runSource);
 
                 $this->messageBus->dispatch(Prepare::createFromRunSource($runSource));

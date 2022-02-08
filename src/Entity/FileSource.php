@@ -43,6 +43,11 @@ class FileSource extends AbstractSource implements OriginSourceInterface, UserFi
         return SourceInterface::TYPE_FILE;
     }
 
+    public function getRunParameterNames(): array
+    {
+        return [];
+    }
+
     /**
      * @return array{
      *     "id": string,

@@ -65,6 +65,13 @@ class GitSource extends AbstractSource implements OriginSourceInterface, \JsonSe
         return SourceInterface::TYPE_GIT;
     }
 
+    public function getRunParameterNames(): array
+    {
+        return [
+            'ref'
+        ];
+    }
+
     /**
      * @return array{
      *     "id": string,
