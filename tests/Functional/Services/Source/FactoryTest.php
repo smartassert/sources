@@ -4,11 +4,14 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\Services\Source;
 
+use App\Entity\AbstractSource;
 use App\Entity\FileSource;
 use App\Entity\GitSource;
 use App\Entity\SourceInterface;
 use App\Repository\SourceRepository;
 use App\Request\FileSourceRequest;
+use App\Request\FooFileSourceRequest;
+use App\Request\FooGitSourceRequest;
 use App\Request\GitSourceRequest;
 use App\Services\Source\Factory;
 use App\Tests\Model\UserId;
@@ -17,6 +20,7 @@ use SmartAssert\UsersSecurityBundle\Security\User;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Uid\Ulid;
+use webignition\ObjectReflector\ObjectReflector;
 
 class FactoryTest extends WebTestCase
 {
@@ -113,6 +117,65 @@ class FactoryTest extends WebTestCase
         $this->factory->createGitSourceFromRequest($user, $request);
 
         self::assertCount(1, $this->repository->findAll());
+    }
+
+    /**
+     * @dataProvider createFromSourceRequestDataProvider
+     */
+    public function testCreateFromSourceRequest(
+        UserInterface $user,
+        FooFileSourceRequest|FooGitSourceRequest $request,
+        SourceInterface $expected
+    ): void {
+        $source = $this->factory->createFromSourceRequest($user, $request);
+
+        ObjectReflector::setProperty(
+            $expected,
+            AbstractSource::class,
+            'id',
+            $source->getId()
+        );
+
+        self::assertEquals($expected, $source);
+    }
+
+    /**
+     * @return array<mixed>
+     */
+    public function createFromSourceRequestDataProvider(): array
+    {
+        $userId = UserId::create();
+        $user = new User($userId);
+        $gitSourceHostUrl = 'https://example.com/repository.git';
+        $gitSourcePath = '/';
+
+        return [
+            'git, empty credentials' => [
+                'user' => $user,
+                'request' => new FooGitSourceRequest([
+                    FooGitSourceRequest::PARAMETER_HOST_URL => $gitSourceHostUrl,
+                    FooGitSourceRequest::PARAMETER_PATH => $gitSourcePath,
+                    FooGitSourceRequest::PARAMETER_CREDENTIALS => '',
+                ]),
+                'expected' => new GitSource($userId, $gitSourceHostUrl, $gitSourcePath, ''),
+            ],
+            'git, non-empty credentials' => [
+                'user' => $user,
+                'request' => new FooGitSourceRequest([
+                    FooGitSourceRequest::PARAMETER_HOST_URL => $gitSourceHostUrl,
+                    FooGitSourceRequest::PARAMETER_PATH => $gitSourcePath,
+                    FooGitSourceRequest::PARAMETER_CREDENTIALS => 'credentials',
+                ]),
+                'expected' => new GitSource($userId, $gitSourceHostUrl, $gitSourcePath, 'credentials'),
+            ],
+            'file' => [
+                'user' => $user,
+                'request' => new FooFileSourceRequest([
+                    FooFileSourceRequest::PARAMETER_LABEL => 'file source label',
+                ]),
+                'expected' => new FileSource($userId, 'file source label'),
+            ],
+        ];
     }
 
     private function assertCreatedGitSource(

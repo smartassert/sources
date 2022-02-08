@@ -12,7 +12,10 @@ use App\Exception\File\ReadException;
 use App\Message\Prepare;
 use App\Repository\SourceRepository;
 use App\Request\FileSourceRequest;
+use App\Request\FooFileSourceRequest;
+use App\Request\FooGitSourceRequest;
 use App\Request\GitSourceRequest;
+use App\Request\SourceRequestInterface;
 use App\Services\RunSourceSerializer;
 use App\Services\Source\Factory;
 use App\Services\Source\Mutator;
@@ -26,8 +29,6 @@ use Symfony\Component\Security\Core\User\UserInterface;
 
 class SourceController
 {
-    public const ROUTE_GIT_SOURCE_CREATE = '/git';
-    public const ROUTE_FILE_SOURCE_CREATE = '/file';
     public const ROUTE_SOURCE = '/';
     public const ROUTE_SOURCE_LIST = '/list';
 
@@ -40,16 +41,33 @@ class SourceController
     ) {
     }
 
-    #[Route(self::ROUTE_GIT_SOURCE_CREATE, name: 'create_git', methods: ['POST'])]
-    public function createGitSource(UserInterface $user, GitSourceRequest $request): JsonResponse
+    #[Route(self::ROUTE_SOURCE, name: 'create', methods: ['POST'])]
+    public function create(UserInterface $user, ?SourceRequestInterface $sourceRequest): JsonResponse
     {
-        return new JsonResponse($this->factory->createGitSourceFromRequest($user, $request));
-    }
+        if (!($sourceRequest instanceof FooFileSourceRequest || $sourceRequest instanceof FooGitSourceRequest)) {
+            return new JsonResponse(
+                [
+                    'error' => [
+                        'type' => 'invalid_source_type',
+                    ],
+                ],
+                400
+            );
+        }
 
-    #[Route(self::ROUTE_FILE_SOURCE_CREATE, name: 'create_file', methods: ['POST'])]
-    public function createFileSource(UserInterface $user, FileSourceRequest $request): JsonResponse
-    {
-        return new JsonResponse($this->factory->createFileSourceFromRequest($user, $request));
+        if (false === $sourceRequest->isValid()) {
+            return new JsonResponse(
+                [
+                    'error' => [
+                        'type' => 'required_fields_missing',
+                        'missing_fields' => $sourceRequest->getMissingRequiredFields(),
+                    ],
+                ],
+                400
+            );
+        }
+
+        return new JsonResponse($this->factory->createFromSourceRequest($user, $sourceRequest));
     }
 
     #[Route(self::ROUTE_SOURCE . '{sourceId<[A-Z90-9]{26}>}', name: 'get', methods: ['GET'])]
