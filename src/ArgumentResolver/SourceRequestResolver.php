@@ -46,11 +46,9 @@ class SourceRequestResolver implements ArgumentValueResolverInterface
         $sourceRequest = Type::FILE === $type ? new FileSourceRequest($parameters) : new GitSourceRequest($parameters);
 
         if (false === $sourceRequest->isValid()) {
-            yield null;
-
             $sourceRequest = new InvalidSourceRequest($sourceTypeParameter, $sourceRequest->getMissingRequiredFields());
-        } else {
-            yield $sourceRequest;
         }
+
+        yield $sourceRequest;
     }
 }

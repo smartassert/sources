@@ -216,6 +216,69 @@ class SourcesControllerTest extends WebTestCase
     }
 
     /**
+     * @dataProvider createInvalidRequestDataProvider
+     *
+     * @param array<string, string> $requestParameters
+     * @param array<string, string> $expectedResponseData
+     */
+    public function testCreateInvalidSourceRequest(array $requestParameters, array $expectedResponseData): void
+    {
+        $userId = UserId::create();
+        $this->mockHandler->append(
+            new Response(200, [], $userId)
+        );
+
+        $response = $this->makeAuthorizedRequest('POST', new Route('create'), $requestParameters);
+
+        self::assertSame(400, $response->getStatusCode());
+        self::assertInstanceOf(JsonResponse::class, $response);
+
+        self::assertSame(
+            $expectedResponseData,
+            json_decode((string) $response->getContent(), true)
+        );
+    }
+
+    /**
+     * @return array<mixed>
+     */
+    public function createInvalidRequestDataProvider(): array
+    {
+        return [
+            'invalid source type' => [
+                'requestParameters' => [
+                    AbstractSourceRequest::KEY_POST_TYPE => 'invalid',
+                ],
+                'expectedResponseData' => [
+                    'error' => [
+                        'type' => 'invalid_source_request',
+                        'payload' => [
+                            'source_type' => 'invalid',
+                            'missing_required_fields' => [],
+                        ],
+                    ],
+                ],
+            ],
+            'git source missing host url' => [
+                'requestParameters' => [
+                    AbstractSourceRequest::KEY_POST_TYPE => Type::GIT->value,
+                ],
+                'expectedResponseData' => [
+                    'error' => [
+                        'type' => 'invalid_source_request',
+                        'payload' => [
+                            'source_type' => 'git',
+                            'missing_required_fields' => [
+                                GitSourceRequest::PARAMETER_HOST_URL,
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+    }
+
+    /**
      * @dataProvider createSuccessDataProvider
      *
      * @param array<string, string> $requestParameters
