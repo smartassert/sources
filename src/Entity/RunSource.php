@@ -17,7 +17,7 @@ class RunSource extends AbstractSource implements UserFileLocatorInterface, \Jso
 
     #[ORM\ManyToOne(targetEntity: AbstractSource::class, cascade: ['persist'])]
     #[ORM\JoinColumn(nullable: true)]
-    private FileSource|GitSource|null $parent;
+    private ?OriginSourceInterface $parent;
 
     /**
      * @var array<string, string>
@@ -37,7 +37,7 @@ class RunSource extends AbstractSource implements UserFileLocatorInterface, \Jso
     /**
      * @param array<string, string> $parameters
      */
-    public function __construct(FileSource|GitSource $parent, array $parameters = [])
+    public function __construct(OriginSourceInterface $parent, array $parameters = [])
     {
         parent::__construct($parent->getUserId());
 
@@ -47,7 +47,7 @@ class RunSource extends AbstractSource implements UserFileLocatorInterface, \Jso
         $this->state = State::REQUESTED;
     }
 
-    public function getParent(): FileSource|GitSource|null
+    public function getParent(): ?OriginSourceInterface
     {
         return $this->parent;
     }
