@@ -495,6 +495,7 @@ class SourcesControllerTest extends WebTestCase
                 'source' => $fileSource,
                 'userId' => $userId,
                 'requestData' => [
+                    AbstractSourceRequest::KEY_POST_TYPE => Type::FILE->value,
                     FileSourceRequest::KEY_POST_LABEL => $newLabel,
                 ],
                 'expectedResponseData' => [
@@ -508,6 +509,7 @@ class SourcesControllerTest extends WebTestCase
                 'source' => $gitSource,
                 'userId' => $userId,
                 'requestData' => [
+                    AbstractSourceRequest::KEY_POST_TYPE => Type::GIT->value,
                     GitSourceRequest::KEY_POST_HOST_URL => $newHostUrl,
                     GitSourceRequest::KEY_POST_PATH => $newPath,
                     GitSourceRequest::KEY_POST_CREDENTIALS => null,
@@ -525,6 +527,7 @@ class SourcesControllerTest extends WebTestCase
                 'source' => $gitSource,
                 'userId' => $userId,
                 'requestData' => [
+                    AbstractSourceRequest::KEY_POST_TYPE => Type::GIT->value,
                     GitSourceRequest::KEY_POST_HOST_URL => $newHostUrl,
                     GitSourceRequest::KEY_POST_PATH => $newPath,
                 ],

@@ -6,10 +6,11 @@ namespace App\Tests\Functional\Services\Source;
 
 use App\Entity\FileSource;
 use App\Entity\GitSource;
-use App\Request\FileSourceRequest;
-use App\Request\GitSourceRequest;
+use App\Entity\SourceInterface;
+use App\Request\FooFileSourceRequest;
+use App\Request\FooGitSourceRequest;
+use App\Request\SourceRequestInterface;
 use App\Services\Source\Mutator;
-use App\Services\Source\Store;
 use App\Tests\Model\UserId;
 use App\Tests\Services\EntityRemover;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -17,7 +18,6 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 class MutatorTest extends WebTestCase
 {
     private Mutator $mutator;
-    private Store $store;
 
     protected function setUp(): void
     {
@@ -27,10 +27,6 @@ class MutatorTest extends WebTestCase
         \assert($mutator instanceof Mutator);
         $this->mutator = $mutator;
 
-        $store = self::getContainer()->get(Store::class);
-        \assert($store instanceof Store);
-        $this->store = $store;
-
         $entityRemover = self::getContainer()->get(EntityRemover::class);
         if ($entityRemover instanceof EntityRemover) {
             $entityRemover->removeAll();
@@ -38,12 +34,11 @@ class MutatorTest extends WebTestCase
     }
 
     /**
-     * @dataProvider updateGitSourceNoChangesDataProvider
+     * @dataProvider updateNoChangesDataProvider
      */
-    public function testUpdateGitSourceNoChanges(GitSource $source, GitSourceRequest $request): void
+    public function testUpdateNoChanges(SourceInterface $source, SourceRequestInterface $request): void
     {
-        $this->store->add($source);
-        $mutatedSource = $this->mutator->updateGitSource($source, $request);
+        $mutatedSource = $this->mutator->update($source, $request);
 
         self::assertSame($source, $mutatedSource);
     }
@@ -51,40 +46,61 @@ class MutatorTest extends WebTestCase
     /**
      * @return array<mixed>
      */
-    public function updateGitSourceNoChangesDataProvider(): array
+    public function updateNoChangesDataProvider(): array
     {
         $userId = UserId::create();
         $hostUrl = 'https://example.com/repository.git';
         $path = '/path';
         $credentials = 'credentials';
+        $label = 'file source label';
+
+        $gitSourceNoCredentials = new GitSource($userId, $hostUrl, $path, '');
+        $gitSourceHasCredentials = new GitSource($userId, $hostUrl, $path, $credentials);
+        $fileSource = new FileSource($userId, $label);
 
         return [
-            'empty credentials' => [
-                'source' => new GitSource($userId, $hostUrl, $path, ''),
-                'request' => new GitSourceRequest($hostUrl, $path, ''),
+            'git source, no credentials, no changes' => [
+                'source' => $gitSourceNoCredentials,
+                'request' => new FooGitSourceRequest([
+                    FooGitSourceRequest::PARAMETER_HOST_URL => $hostUrl,
+                    FooGitSourceRequest::PARAMETER_PATH => $path,
+                    FooGitSourceRequest::PARAMETER_CREDENTIALS => '',
+                ]),
             ],
-            'non-empty credentials' => [
-                'source' => new GitSource($userId, $hostUrl, $path, $credentials),
-                'request' => new GitSourceRequest($hostUrl, $path, $credentials),
+            'git source, has credentials, no changes' => [
+                'source' => $gitSourceHasCredentials,
+                'request' => new FooGitSourceRequest([
+                    FooGitSourceRequest::PARAMETER_HOST_URL => $hostUrl,
+                    FooGitSourceRequest::PARAMETER_PATH => $path,
+                    FooGitSourceRequest::PARAMETER_CREDENTIALS => $credentials,
+                ]),
+            ],
+            'file source, no changes' => [
+                'source' => $fileSource,
+                'request' => new FooGitSourceRequest([
+                    FooFileSourceRequest::PARAMETER_LABEL => $label,
+                ]),
             ],
         ];
     }
 
     /**
-     * @dataProvider updateGitSourceDataProvider
+     * @dataProvider updateDataProvider
      */
-    public function testUpdateGitSource(GitSource $source, GitSourceRequest $request, callable $assertions): void
-    {
-        $this->store->add($source);
-        $mutatedSource = $this->mutator->updateGitSource($source, $request);
+    public function testUpdateFoo(
+        SourceInterface $source,
+        SourceRequestInterface $request,
+        SourceInterface $expected,
+    ): void {
+        $mutatedSource = $this->mutator->update($source, $request);
 
-        $assertions($mutatedSource);
+        self::assertEquals($expected, $mutatedSource);
     }
 
     /**
      * @return array<mixed>
      */
-    public function updateGitSourceDataProvider(): array
+    public function updateDataProvider(): array
     {
         $userId = UserId::create();
         $hostUrl = 'https://example.com/repository.git';
@@ -93,72 +109,72 @@ class MutatorTest extends WebTestCase
         $newHostUrl = 'https://new.example.com/repository.git';
         $newPath = '/path/new';
         $newCredentials = 'new credentials';
-
-        return [
-            'changes' => [
-                'source' => new GitSource($userId, $hostUrl, $path, $credentials),
-                'request' => new GitSourceRequest($newHostUrl, $newPath, $newCredentials),
-                'assertions' => function (GitSource $mutatedSource) use (
-                    $userId,
-                    $newHostUrl,
-                    $newPath,
-                    $newCredentials
-                ): void {
-                    self::assertSame($userId, $mutatedSource->getUserId());
-                    self::assertSame($newHostUrl, $mutatedSource->getHostUrl());
-                    self::assertSame($newPath, $mutatedSource->getPath());
-                    self::assertSame($newCredentials, $mutatedSource->getCredentials());
-                }
-            ],
-            'nullify credentials' => [
-                'source' => new GitSource($userId, $hostUrl, $path, $credentials),
-                'request' => new GitSourceRequest($hostUrl, $path, ''),
-                'assertions' => function (GitSource $mutatedSource) use ($userId, $hostUrl, $path): void {
-                    self::assertSame($userId, $mutatedSource->getUserId());
-                    self::assertSame($hostUrl, $mutatedSource->getHostUrl());
-                    self::assertSame($path, $mutatedSource->getPath());
-                    self::assertSame('', $mutatedSource->getCredentials());
-                }
-            ],
-        ];
-    }
-
-    /**
-     * @dataProvider updateFileSourceDataProvider
-     */
-    public function testUpdateFileSource(FileSource $source, FileSourceRequest $request, callable $assertions): void
-    {
-        $this->store->add($source);
-        $mutatedSource = $this->mutator->updateFileSource($source, $request);
-
-        $assertions($mutatedSource);
-    }
-
-    /**
-     * @return array<mixed>
-     */
-    public function updateFileSourceDataProvider(): array
-    {
-        $userId = UserId::create();
         $label = 'file source label';
         $newLabel = 'new file source label';
 
+        $originalGitSourceWithoutCredentials = new GitSource($userId, $hostUrl, $path, '');
+        $originalGitSourceWithCredentials = new GitSource($userId, $hostUrl, $path, $credentials);
+        $originalGitSourceWithNullifiedCredentials = clone $originalGitSourceWithCredentials;
+        $originalGitSourceWithNullifiedCredentials->setCredentials('');
+        $updatedGitSource = clone $originalGitSourceWithCredentials;
+        $updatedGitSource->setHostUrl($newHostUrl);
+        $updatedGitSource->setPath($newPath);
+        $updatedGitSource->setCredentials($newCredentials);
+
+        $originalFileSource = new FileSource($userId, $label);
+        $updatedFileSource = clone $originalFileSource;
+        $updatedFileSource->setLabel($newLabel);
+
         return [
-            'no changes' => [
-                'source' => new FileSource($userId, $label),
-                'request' => new FileSourceRequest($label),
-                'assertions' => function (FileSource $mutatedFileSource) use ($userId, $label): void {
-                    self::assertSame($userId, $mutatedFileSource->getUserId());
-                    self::assertSame($label, $mutatedFileSource->getLabel());
-                }
+            'git source, no credentials, no changes' => [
+                'source' => $originalGitSourceWithoutCredentials,
+                'request' => new FooGitSourceRequest([
+                    FooGitSourceRequest::PARAMETER_HOST_URL => $hostUrl,
+                    FooGitSourceRequest::PARAMETER_PATH => $path,
+                    FooGitSourceRequest::PARAMETER_CREDENTIALS => '',
+                ]),
+                'expected' => $originalGitSourceWithoutCredentials,
             ],
-            'changes' => [
-                'source' => new FileSource($userId, $label),
-                'request' => new FileSourceRequest($newLabel),
-                'assertions' => function (FileSource $mutatedFileSource) use ($userId, $newLabel): void {
-                    self::assertSame($userId, $mutatedFileSource->getUserId());
-                    self::assertSame($newLabel, $mutatedFileSource->getLabel());
-                }
+            'git source, has credentials, no changes' => [
+                'source' => $originalGitSourceWithCredentials,
+                'request' => new FooGitSourceRequest([
+                    FooGitSourceRequest::PARAMETER_HOST_URL => $hostUrl,
+                    FooGitSourceRequest::PARAMETER_PATH => $path,
+                    FooGitSourceRequest::PARAMETER_CREDENTIALS => $credentials,
+                ]),
+                'expected' => $originalGitSourceWithCredentials,
+            ],
+            'file source, no changes' => [
+                'source' => $originalFileSource,
+                'request' => new FooGitSourceRequest([
+                    FooFileSourceRequest::PARAMETER_LABEL => $label,
+                ]),
+                'expected' => $originalFileSource,
+            ],
+            'git source, update all' => [
+                'source' => $originalGitSourceWithCredentials,
+                'request' => new FooGitSourceRequest([
+                    FooGitSourceRequest::PARAMETER_HOST_URL => $newHostUrl,
+                    FooGitSourceRequest::PARAMETER_PATH => $newPath,
+                    FooGitSourceRequest::PARAMETER_CREDENTIALS => $newCredentials,
+                ]),
+                'expected' => $updatedGitSource,
+            ],
+            'git source, nullify credentials' => [
+                'source' => $originalGitSourceWithCredentials,
+                'request' => new FooGitSourceRequest([
+                    FooGitSourceRequest::PARAMETER_HOST_URL => $hostUrl,
+                    FooGitSourceRequest::PARAMETER_PATH => $path,
+                    FooGitSourceRequest::PARAMETER_CREDENTIALS => '',
+                ]),
+                'expected' => $originalGitSourceWithNullifiedCredentials,
+            ],
+            'file source, update label' => [
+                'source' => $originalFileSource,
+                'request' => new FooFileSourceRequest([
+                    FooFileSourceRequest::PARAMETER_LABEL => $newLabel,
+                ]),
+                'expected' => $updatedFileSource,
             ],
         ];
     }

@@ -11,10 +11,8 @@ use App\Entity\SourceInterface;
 use App\Exception\File\ReadException;
 use App\Message\Prepare;
 use App\Repository\SourceRepository;
-use App\Request\FileSourceRequest;
 use App\Request\FooFileSourceRequest;
 use App\Request\FooGitSourceRequest;
-use App\Request\GitSourceRequest;
 use App\Request\SourceRequestInterface;
 use App\Services\RunSourceSerializer;
 use App\Services\Source\Factory;
@@ -79,14 +77,24 @@ class SourceController
     }
 
     #[Route(self::ROUTE_SOURCE . '{sourceId<[A-Z90-9]{26}>}', name: 'update', methods: ['PUT'])]
-    public function update(null|FileSource|GitSource $source, Request $request, UserInterface $user): Response
-    {
-        return $this->doUserSourceAction($source, $user, function (FileSource|GitSource $source) use ($request) {
-            $source = $source instanceof FileSource
-                ? $this->mutator->updateFileSource($source, FileSourceRequest::create($request))
-                : $this->mutator->updateGitSource($source, GitSourceRequest::create($request));
+    public function update(
+        null|FileSource|GitSource $source,
+        UserInterface $user,
+        ?SourceRequestInterface $sourceRequest
+    ): Response {
+        return $this->doUserSourceAction($source, $user, function (FileSource|GitSource $source) use ($sourceRequest) {
+            if (!($sourceRequest instanceof FooFileSourceRequest || $sourceRequest instanceof FooGitSourceRequest)) {
+                return new JsonResponse(
+                    [
+                        'error' => [
+                            'type' => 'invalid_source_type',
+                        ],
+                    ],
+                    400
+                );
+            }
 
-            return new JsonResponse($source);
+            return new JsonResponse($this->mutator->update($source, $sourceRequest));
         });
     }
 
