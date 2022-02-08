@@ -30,12 +30,6 @@ class SourceController
     public const ROUTE_SOURCE = '/';
     public const ROUTE_SOURCE_LIST = '/list';
 
-    public function __construct(
-        private MessageBusInterface $messageBus,
-        private RunSourceFactory $runSourceFactory,
-    ) {
-    }
-
     #[Route(self::ROUTE_SOURCE, name: 'create', methods: ['POST'])]
     public function create(UserInterface $user, Factory $factory, SourceRequestInterface $request): JsonResponse
     {
@@ -87,14 +81,19 @@ class SourceController
     }
 
     #[Route(self::ROUTE_SOURCE . '{sourceId<[A-Z90-9]{26}>}/prepare', name: 'prepare', methods: ['POST'])]
-    public function prepare(Request $request, ?OriginSource $source, UserInterface $user): Response
-    {
+    public function prepare(
+        Request $request,
+        ?OriginSource $source,
+        UserInterface $user,
+        MessageBusInterface $messageBus,
+        RunSourceFactory $runSourceFactory,
+    ): Response {
         return $this->doUserSourceAction(
             $source,
             $user,
-            function (OriginSource $source) use ($request): JsonResponse {
-                $runSource = $this->runSourceFactory->createFromRequest($source, $request);
-                $this->messageBus->dispatch(Prepare::createFromRunSource($runSource));
+            function (OriginSource $source) use ($request, $messageBus, $runSourceFactory): JsonResponse {
+                $runSource = $runSourceFactory->createFromRequest($source, $request);
+                $messageBus->dispatch(Prepare::createFromRunSource($runSource));
 
                 return new JsonResponse($runSource, 202);
             }

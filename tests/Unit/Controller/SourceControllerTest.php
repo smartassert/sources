@@ -52,8 +52,6 @@ class SourceControllerTest extends WebTestCase
             ->andReturn($runSource)
         ;
 
-        $controller = new SourceController($messageBus, $runSourceFactory);
-
-        $controller->prepare($request, $fileSource, $user);
+        (new SourceController())->prepare($request, $fileSource, $user, $messageBus, $runSourceFactory);
     }
 }
