@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
-use App\Entity\OriginSourceInterface;
+use App\Entity\OriginSourceInterface as OriginSource;
 use App\Entity\RunSource;
 use App\Entity\SourceInterface;
 use App\Enum\Source\Type;
@@ -31,8 +31,6 @@ class SourceController
     public const ROUTE_SOURCE_LIST = '/list';
 
     public function __construct(
-        private Mutator $mutator,
-        private SourceRepository $repository,
         private MessageBusInterface $messageBus,
         private RunSourceFactory $runSourceFactory,
     ) {
@@ -58,16 +56,17 @@ class SourceController
 
     #[Route(self::ROUTE_SOURCE . '{sourceId<[A-Z90-9]{26}>}', name: 'update', methods: ['PUT'])]
     public function update(
-        ?OriginSourceInterface $source,
+        ?OriginSource $source,
         UserInterface $user,
+        Mutator $mutator,
         SourceRequestInterface $request
     ): Response {
-        return $this->doUserSourceAction($source, $user, function (OriginSourceInterface $source) use ($request) {
+        return $this->doUserSourceAction($source, $user, function (OriginSource $source) use ($request, $mutator) {
             if ($request instanceof InvalidSourceRequest) {
                 return $this->createResponseForInvalidSourceRequest($request);
             }
 
-            return new JsonResponse($this->mutator->update($source, $request));
+            return new JsonResponse($mutator->update($source, $request));
         });
     }
 
@@ -82,18 +81,18 @@ class SourceController
     }
 
     #[Route(self::ROUTE_SOURCE_LIST, name: 'list', methods: ['GET'])]
-    public function list(UserInterface $user): JsonResponse
+    public function list(UserInterface $user, SourceRepository $repository): JsonResponse
     {
-        return new JsonResponse($this->repository->findByUserAndType($user, [Type::FILE, Type::GIT]));
+        return new JsonResponse($repository->findByUserAndType($user, [Type::FILE, Type::GIT]));
     }
 
     #[Route(self::ROUTE_SOURCE . '{sourceId<[A-Z90-9]{26}>}/prepare', name: 'prepare', methods: ['POST'])]
-    public function prepare(Request $request, ?OriginSourceInterface $source, UserInterface $user): Response
+    public function prepare(Request $request, ?OriginSource $source, UserInterface $user): Response
     {
         return $this->doUserSourceAction(
             $source,
             $user,
-            function (OriginSourceInterface $source) use ($request): JsonResponse {
+            function (OriginSource $source) use ($request): JsonResponse {
                 $runSource = $this->runSourceFactory->createFromRequest($source, $request);
                 $this->messageBus->dispatch(Prepare::createFromRunSource($runSource));
 

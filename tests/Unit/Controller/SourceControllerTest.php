@@ -8,9 +8,7 @@ use App\Controller\SourceController;
 use App\Entity\FileSource;
 use App\Entity\RunSource;
 use App\Message\Prepare;
-use App\Repository\SourceRepository;
 use App\Services\RunSourceFactory;
-use App\Services\Source\Mutator;
 use App\Tests\Model\UserId;
 use SmartAssert\UsersSecurityBundle\Security\User;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -54,12 +52,7 @@ class SourceControllerTest extends WebTestCase
             ->andReturn($runSource)
         ;
 
-        $controller = new SourceController(
-            \Mockery::mock(Mutator::class),
-            \Mockery::mock(SourceRepository::class),
-            $messageBus,
-            $runSourceFactory,
-        );
+        $controller = new SourceController($messageBus, $runSourceFactory);
 
         $controller->prepare($request, $fileSource, $user);
     }
