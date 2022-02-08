@@ -11,6 +11,7 @@ use App\Entity\SourceInterface;
 use App\Repository\SourceRepository;
 use App\Request\FileSourceRequest;
 use App\Request\GitSourceRequest;
+use App\Request\InvalidSourceRequest;
 use App\Services\Source\Factory;
 use App\Tests\Model\UserId;
 use App\Tests\Services\EntityRemover;
@@ -42,6 +43,14 @@ class FactoryTest extends WebTestCase
         }
     }
 
+    public function testCreateFromInvalidSourceRequest(): void
+    {
+        self::assertNull($this->factory->createFromSourceRequest(
+            \Mockery::mock(UserInterface::class),
+            new InvalidSourceRequest('invalid', [])
+        ));
+    }
+
     /**
      * @dataProvider createFromSourceRequestDataProvider
      */
@@ -53,9 +62,11 @@ class FactoryTest extends WebTestCase
         self::assertCount(0, $this->repository->findAll());
 
         $source = $this->factory->createFromSourceRequest($user, $request);
-        $this->factory->createFromSourceRequest($user, $request);
-        $this->factory->createFromSourceRequest($user, $request);
+        self::assertInstanceOf(SourceInterface::class, $source);
 
+        self::assertCount(1, $this->repository->findAll());
+        $this->factory->createFromSourceRequest($user, $request);
+        $this->factory->createFromSourceRequest($user, $request);
         self::assertCount(1, $this->repository->findAll());
 
         ObjectReflector::setProperty(

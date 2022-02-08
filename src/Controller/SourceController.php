@@ -11,8 +11,7 @@ use App\Entity\SourceInterface;
 use App\Exception\File\ReadException;
 use App\Message\Prepare;
 use App\Repository\SourceRepository;
-use App\Request\FileSourceRequest;
-use App\Request\GitSourceRequest;
+use App\Request\InvalidSourceRequest;
 use App\Request\SourceRequestInterface;
 use App\Services\RunSourceSerializer;
 use App\Services\Source\Factory;
@@ -40,29 +39,10 @@ class SourceController
     }
 
     #[Route(self::ROUTE_SOURCE, name: 'create', methods: ['POST'])]
-    public function create(UserInterface $user, ?SourceRequestInterface $request): JsonResponse
+    public function create(UserInterface $user, SourceRequestInterface $request): JsonResponse
     {
-        if (!($request instanceof FileSourceRequest || $request instanceof GitSourceRequest)) {
-            return new JsonResponse(
-                [
-                    'error' => [
-                        'type' => 'invalid_source_type',
-                    ],
-                ],
-                400
-            );
-        }
-
-        if (false === $request->isValid()) {
-            return new JsonResponse(
-                [
-                    'error' => [
-                        'type' => 'required_fields_missing',
-                        'missing_fields' => $request->getMissingRequiredFields(),
-                    ],
-                ],
-                400
-            );
+        if ($request instanceof InvalidSourceRequest) {
+            return $this->createResponseForInvalidSourceRequest($request);
         }
 
         return new JsonResponse($this->factory->createFromSourceRequest($user, $request));
@@ -80,18 +60,11 @@ class SourceController
     public function update(
         null|FileSource|GitSource $source,
         UserInterface $user,
-        ?SourceRequestInterface $request
+        SourceRequestInterface $request
     ): Response {
         return $this->doUserSourceAction($source, $user, function (FileSource|GitSource $source) use ($request) {
-            if (!($request instanceof FileSourceRequest || $request instanceof GitSourceRequest)) {
-                return new JsonResponse(
-                    [
-                        'error' => [
-                            'type' => 'invalid_source_type',
-                        ],
-                    ],
-                    400
-                );
+            if ($request instanceof InvalidSourceRequest) {
+                return $this->createResponseForInvalidSourceRequest($request);
             }
 
             return new JsonResponse($this->mutator->update($source, $request));
@@ -182,5 +155,21 @@ class SourceController
         }
 
         return $action($source);
+    }
+
+    private function createResponseForInvalidSourceRequest(InvalidSourceRequest $request): JsonResponse
+    {
+        return new JsonResponse(
+            [
+                'error' => [
+                    'type' => 'invalid_source_request',
+                    'payload' => [
+                        'source_type' => $request->getSourceType(),
+                        'missing_required_fields' => $request->getMissingRequiredFields(),
+                    ],
+                ],
+            ],
+            400
+        );
     }
 }

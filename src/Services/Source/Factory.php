@@ -9,6 +9,7 @@ use App\Entity\GitSource;
 use App\Entity\SourceInterface;
 use App\Request\FileSourceRequest;
 use App\Request\GitSourceRequest;
+use App\Request\SourceRequestInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 class Factory
@@ -21,8 +22,8 @@ class Factory
 
     public function createFromSourceRequest(
         UserInterface $user,
-        FileSourceRequest|GitSourceRequest $request
-    ): SourceInterface {
+        SourceRequestInterface $request
+    ): ?SourceInterface {
         $source = null;
 
         if ($request instanceof FileSourceRequest) {

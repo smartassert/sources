@@ -38,7 +38,7 @@ abstract class AbstractSourceRequest implements SourceRequestInterface
         $missingRequiredFields = [];
 
         foreach ($this->getRequiredFields() as $name) {
-            if ('' === $this->parameters[$name]) {
+            if ('' === ($this->parameters[$name] ?? '')) {
                 $missingRequiredFields[] = $name;
             }
         }
