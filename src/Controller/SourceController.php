@@ -31,7 +31,6 @@ class SourceController
     public const ROUTE_SOURCE_LIST = '/list';
 
     public function __construct(
-        private Factory $factory,
         private Store $store,
         private Mutator $mutator,
         private SourceRepository $repository,
@@ -41,13 +40,13 @@ class SourceController
     }
 
     #[Route(self::ROUTE_SOURCE, name: 'create', methods: ['POST'])]
-    public function create(UserInterface $user, SourceRequestInterface $request): JsonResponse
+    public function create(UserInterface $user, Factory $factory, SourceRequestInterface $request): JsonResponse
     {
         if ($request instanceof InvalidSourceRequest) {
             return $this->createResponseForInvalidSourceRequest($request);
         }
 
-        return new JsonResponse($this->factory->createFromSourceRequest($user, $request));
+        return new JsonResponse($factory->createFromSourceRequest($user, $request));
     }
 
     #[Route(self::ROUTE_SOURCE . '{sourceId<[A-Z90-9]{26}>}', name: 'get', methods: ['GET'])]

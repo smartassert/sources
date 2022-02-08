@@ -10,7 +10,6 @@ use App\Entity\RunSource;
 use App\Message\Prepare;
 use App\Repository\SourceRepository;
 use App\Services\RunSourceFactory;
-use App\Services\Source\Factory;
 use App\Services\Source\Mutator;
 use App\Services\Source\Store;
 use App\Tests\Model\UserId;
@@ -67,7 +66,6 @@ class SourceControllerTest extends WebTestCase
         ;
 
         $controller = new SourceController(
-            \Mockery::mock(Factory::class),
             $sourceStore,
             \Mockery::mock(Mutator::class),
             \Mockery::mock(SourceRepository::class),
