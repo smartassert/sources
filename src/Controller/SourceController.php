@@ -7,6 +7,7 @@ namespace App\Controller;
 use App\Entity\OriginSourceInterface;
 use App\Entity\RunSource;
 use App\Entity\SourceInterface;
+use App\Enum\Source\Type;
 use App\Exception\File\ReadException;
 use App\Message\Prepare;
 use App\Repository\SourceRepository;
@@ -85,10 +86,7 @@ class SourceController
     #[Route(self::ROUTE_SOURCE_LIST, name: 'list', methods: ['GET'])]
     public function list(UserInterface $user): JsonResponse
     {
-        return new JsonResponse($this->repository->findByUserAndType($user, [
-            SourceInterface::TYPE_FILE,
-            SourceInterface::TYPE_GIT,
-        ]));
+        return new JsonResponse($this->repository->findByUserAndType($user, [Type::FILE, Type::GIT]));
     }
 
     #[Route(self::ROUTE_SOURCE . '{sourceId<[A-Z90-9]{26}>}/prepare', name: 'prepare', methods: ['POST'])]

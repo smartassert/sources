@@ -6,6 +6,7 @@ namespace App\Entity;
 
 use App\Enum\RunSource\FailureReason;
 use App\Enum\RunSource\State;
+use App\Enum\Source\Type;
 use App\Model\UserFileLocatorInterface;
 use App\Model\UserSourceFileLocatorTrait;
 use Doctrine\ORM\Mapping as ORM;
@@ -67,12 +68,9 @@ class RunSource extends AbstractSource implements UserFileLocatorInterface, \Jso
         return $this->parameters;
     }
 
-    /**
-     * @return SourceInterface::TYPE_RUN
-     */
-    public function getType(): string
+    public function getType(): Type
     {
-        return SourceInterface::TYPE_RUN;
+        return Type::RUN;
     }
 
     public function setState(State $state): self
@@ -112,7 +110,7 @@ class RunSource extends AbstractSource implements UserFileLocatorInterface, \Jso
      * @return array{
      *     "id": string,
      *     "user_id": string,
-     *     "type": SourceInterface::TYPE_RUN,
+     *     "type": 'run',
      *     "parent": string|null,
      *     "parameters": array<string, string>,
      *     "state": string,
@@ -125,7 +123,7 @@ class RunSource extends AbstractSource implements UserFileLocatorInterface, \Jso
         $data = [
             'id' => $this->id,
             'user_id' => $this->getUserId(),
-            'type' => $this->getType(),
+            'type' => Type::RUN->value,
             'parent' => $this->parent?->getId(),
             'parameters' => $this->parameters,
             'state' => $this->state->value,

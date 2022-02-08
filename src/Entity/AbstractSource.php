@@ -14,9 +14,9 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\InheritanceType('JOINED')]
 #[ORM\DiscriminatorColumn(name: 'type', type: 'string', length: self::TYPE_DISCRIMINATOR_LENGTH)]
 #[ORM\DiscriminatorMap([
-    SourceInterface::TYPE_GIT => GitSource::class,
-    SourceInterface::TYPE_FILE => FileSource::class,
-    SourceInterface::TYPE_RUN => RunSource::class,
+    'git' => GitSource::class,
+    'file' => FileSource::class,
+    'run' => RunSource::class,
 ])]
 abstract class AbstractSource implements SourceInterface
 {

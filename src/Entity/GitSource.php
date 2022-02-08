@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
+use App\Enum\Source\Type;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity]
@@ -57,12 +58,9 @@ class GitSource extends AbstractSource implements OriginSourceInterface, \JsonSe
         return $this->credentials;
     }
 
-    /**
-     * @return SourceInterface::TYPE_GIT
-     */
-    public function getType(): string
+    public function getType(): Type
     {
-        return SourceInterface::TYPE_GIT;
+        return Type::GIT;
     }
 
     public function getRunParameterNames(): array
@@ -76,7 +74,7 @@ class GitSource extends AbstractSource implements OriginSourceInterface, \JsonSe
      * @return array{
      *     "id": string,
      *     "user_id": string,
-     *     "type": SourceInterface::TYPE_GIT,
+     *     "type": 'git',
      *     "host_url": string,
      *     "path": string,
      *     "has_credentials": bool
@@ -87,7 +85,7 @@ class GitSource extends AbstractSource implements OriginSourceInterface, \JsonSe
         return [
             'id' => $this->id,
             'user_id' => $this->getUserId(),
-            'type' => $this->getType(),
+            'type' => Type::GIT->value,
             'host_url' => $this->hostUrl,
             'path' => $this->path,
             'has_credentials' => '' !== $this->credentials

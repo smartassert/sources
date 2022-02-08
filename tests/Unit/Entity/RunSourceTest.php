@@ -6,9 +6,9 @@ namespace App\Tests\Unit\Entity;
 
 use App\Entity\FileSource;
 use App\Entity\RunSource;
-use App\Entity\SourceInterface;
 use App\Enum\RunSource\FailureReason;
 use App\Enum\RunSource\State;
+use App\Enum\Source\Type;
 use App\Tests\Model\UserId;
 use PHPUnit\Framework\TestCase;
 
@@ -58,7 +58,7 @@ class RunSourceTest extends TestCase
                 'expected' => [
                     'id' => $withoutParent->getId(),
                     'user_id' => $withoutParent->getUserId(),
-                    'type' => SourceInterface::TYPE_RUN,
+                    'type' => Type::RUN->value,
                     'parent' => null,
                     'parameters' => [],
                     'state' => State::REQUESTED->value,
@@ -69,7 +69,7 @@ class RunSourceTest extends TestCase
                 'expected' => [
                     'id' => $withoutParentWithParameters->getId(),
                     'user_id' => $withoutParentWithParameters->getUserId(),
-                    'type' => SourceInterface::TYPE_RUN,
+                    'type' => Type::RUN->value,
                     'parent' => null,
                     'parameters' => $withoutParentWithParameters->getParameters(),
                     'state' => State::REQUESTED->value,
@@ -80,7 +80,7 @@ class RunSourceTest extends TestCase
                 'expected' => [
                     'id' => $withoutParameters->getId(),
                     'user_id' => $withoutParameters->getUserId(),
-                    'type' => SourceInterface::TYPE_RUN,
+                    'type' => Type::RUN->value,
                     'parent' => $withoutParameters->getParent()?->getId(),
                     'parameters' => [],
                     'state' => State::REQUESTED->value,
@@ -91,7 +91,7 @@ class RunSourceTest extends TestCase
                 'expected' => [
                     'id' => $withParameters->getId(),
                     'user_id' => $withParameters->getUserId(),
-                    'type' => SourceInterface::TYPE_RUN,
+                    'type' => Type::RUN->value,
                     'parent' => $withParameters->getParent()?->getId(),
                     'parameters' => $parameters,
                     'state' => State::REQUESTED->value,
@@ -102,7 +102,7 @@ class RunSourceTest extends TestCase
                 'expected' => [
                     'id' => $withNonDefaultState->getId(),
                     'user_id' => $withNonDefaultState->getUserId(),
-                    'type' => SourceInterface::TYPE_RUN,
+                    'type' => Type::RUN->value,
                     'parent' => $withParameters->getParent()?->getId(),
                     'parameters' => [],
                     'state' => State::PREPARED->value,
@@ -113,7 +113,7 @@ class RunSourceTest extends TestCase
                 'expected' => [
                     'id' => $hasPreparationFailed->getId(),
                     'user_id' => $hasPreparationFailed->getUserId(),
-                    'type' => SourceInterface::TYPE_RUN,
+                    'type' => Type::RUN->value,
                     'parent' => $withParameters->getParent()?->getId(),
                     'parameters' => [],
                     'state' => State::FAILED->value,

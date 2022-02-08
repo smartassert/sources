@@ -15,11 +15,6 @@ class GitSourceFinder implements TypeFinderInterface
     ) {
     }
 
-    public function supports(string $type): bool
-    {
-        return SourceInterface::TYPE_GIT === $type;
-    }
-
     public function find(SourceInterface $source): ?GitSource
     {
         if (!$source instanceof GitSource) {

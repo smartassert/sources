@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Services\Source;
 
+use App\Entity\FileSource;
+use App\Entity\GitSource;
 use App\Entity\SourceInterface;
 
 class Finder
@@ -16,13 +18,11 @@ class Finder
 
     public function find(SourceInterface $source): ?SourceInterface
     {
-        $type = $source->getType();
-
-        if ($this->fileSourceFinder->supports($type)) {
+        if ($source instanceof FileSource) {
             return $this->fileSourceFinder->find($source);
         }
 
-        if ($this->gitSourceFinder->supports($type)) {
+        if ($source instanceof GitSource) {
             return $this->gitSourceFinder->find($source);
         }
 
