@@ -6,10 +6,16 @@ namespace App\Services;
 
 use App\Entity\OriginSourceInterface;
 use App\Entity\RunSource;
+use App\Services\Source\Store;
 use Symfony\Component\HttpFoundation\Request;
 
 class RunSourceFactory
 {
+    public function __construct(
+        private Store $store
+    ) {
+    }
+
     public function createFromRequest(OriginSourceInterface $source, Request $request): RunSource
     {
         $parameters = [];
@@ -19,6 +25,9 @@ class RunSourceFactory
             }
         }
 
-        return new RunSource($source, $parameters);
+        $source = new RunSource($source, $parameters);
+        $this->store->add($source);
+
+        return $source;
     }
 }

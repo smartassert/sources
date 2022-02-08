@@ -31,7 +31,6 @@ class SourceController
     public const ROUTE_SOURCE_LIST = '/list';
 
     public function __construct(
-        private Store $store,
         private Mutator $mutator,
         private SourceRepository $repository,
         private MessageBusInterface $messageBus,
@@ -73,10 +72,10 @@ class SourceController
     }
 
     #[Route(self::ROUTE_SOURCE . '{sourceId<[A-Z90-9]{26}>}', name: 'delete', methods: ['DELETE'])]
-    public function delete(?SourceInterface $source, UserInterface $user): Response
+    public function delete(?SourceInterface $source, Store $store, UserInterface $user): Response
     {
-        return $this->doUserSourceAction($source, $user, function (SourceInterface $source) {
-            $this->store->remove($source);
+        return $this->doUserSourceAction($source, $user, function (SourceInterface $source) use ($store) {
+            $store->remove($source);
 
             return new JsonResponse();
         });
@@ -96,8 +95,6 @@ class SourceController
             $user,
             function (OriginSourceInterface $source) use ($request): JsonResponse {
                 $runSource = $this->runSourceFactory->createFromRequest($source, $request);
-                $this->store->add($runSource);
-
                 $this->messageBus->dispatch(Prepare::createFromRunSource($runSource));
 
                 return new JsonResponse($runSource, 202);
