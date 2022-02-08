@@ -6,8 +6,10 @@ namespace App\Services\Source;
 
 use App\Entity\FileSource;
 use App\Entity\GitSource;
+use App\Entity\SourceInterface;
 use App\Request\FileSourceRequest;
 use App\Request\GitSourceRequest;
+use App\Request\SourceRequestInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 class Factory
@@ -18,27 +20,29 @@ class Factory
     ) {
     }
 
-    public function createGitSourceFromRequest(UserInterface $user, GitSourceRequest $request): GitSource
-    {
-        $source = new GitSource(
-            $user->getUserIdentifier(),
-            $request->getHostUrl(),
-            $request->getPath(),
-            $request->getCredentials()
-        );
+    public function createFromSourceRequest(
+        UserInterface $user,
+        SourceRequestInterface $request
+    ): ?SourceInterface {
+        $source = null;
 
-        if (null === $this->finder->find($source)) {
-            $this->store->add($source);
+        if ($request instanceof FileSourceRequest) {
+            $source = new FileSource(
+                $user->getUserIdentifier(),
+                $request->getParameter(FileSourceRequest::PARAMETER_LABEL)
+            );
         }
 
-        return $source;
-    }
+        if ($request instanceof GitSourceRequest) {
+            $source = new GitSource(
+                $user->getUserIdentifier(),
+                $request->getParameter(GitSourceRequest::PARAMETER_HOST_URL),
+                $request->getParameter(GitSourceRequest::PARAMETER_PATH),
+                $request->getParameter(GitSourceRequest::PARAMETER_CREDENTIALS),
+            );
+        }
 
-    public function createFileSourceFromRequest(UserInterface $user, FileSourceRequest $request): FileSource
-    {
-        $source = new FileSource($user->getUserIdentifier(), $request->getLabel());
-
-        if (null === $this->finder->find($source)) {
+        if ($source instanceof SourceInterface && null === $this->finder->find($source)) {
             $this->store->add($source);
         }
 

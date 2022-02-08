@@ -10,11 +10,11 @@ use App\Entity\RunSource;
 use App\Entity\SourceInterface;
 use App\Enum\RunSource\FailureReason;
 use App\Enum\RunSource\State;
+use App\Enum\Source\Type;
 use App\Model\EntityId;
-use App\Repository\FileSourceRepository;
-use App\Repository\GitSourceRepository;
 use App\Repository\RunSourceRepository;
 use App\Repository\SourceRepository;
+use App\Request\AbstractSourceRequest;
 use App\Request\FileSourceRequest;
 use App\Request\GitSourceRequest;
 use App\Services\RunSourceSerializer;
@@ -123,13 +123,9 @@ class SourcesControllerTest extends WebTestCase
         $sourceRouteParameters = ['sourceId' => EntityId::create()];
 
         return [
-            'create git source' => [
+            'create source' => [
                 'method' => 'POST',
-                'route' => new Route('create_git'),
-            ],
-            'create file source' => [
-                'method' => 'POST',
-                'route' => new Route('create_file'),
+                'route' => new Route('create'),
             ],
             'get source' => [
                 'method' => 'GET',
@@ -220,55 +216,114 @@ class SourcesControllerTest extends WebTestCase
     }
 
     /**
-     * @dataProvider createGitSourceDataProvider
+     * @dataProvider createInvalidRequestDataProvider
+     *
+     * @param array<string, string> $requestParameters
+     * @param array<string, string> $expectedResponseData
+     */
+    public function testCreateInvalidSourceRequest(array $requestParameters, array $expectedResponseData): void
+    {
+        $userId = UserId::create();
+        $this->mockHandler->append(
+            new Response(200, [], $userId)
+        );
+
+        $response = $this->makeAuthorizedRequest('POST', new Route('create'), $requestParameters);
+
+        self::assertSame(400, $response->getStatusCode());
+        self::assertInstanceOf(JsonResponse::class, $response);
+
+        self::assertSame(
+            $expectedResponseData,
+            json_decode((string) $response->getContent(), true)
+        );
+    }
+
+    /**
+     * @return array<mixed>
+     */
+    public function createInvalidRequestDataProvider(): array
+    {
+        return [
+            'invalid source type' => [
+                'requestParameters' => [
+                    AbstractSourceRequest::KEY_POST_TYPE => 'invalid',
+                ],
+                'expectedResponseData' => [
+                    'error' => [
+                        'type' => 'invalid_source_request',
+                        'payload' => [
+                            'source_type' => 'invalid',
+                            'missing_required_fields' => [],
+                        ],
+                    ],
+                ],
+            ],
+            'git source missing host url' => [
+                'requestParameters' => [
+                    AbstractSourceRequest::KEY_POST_TYPE => Type::GIT->value,
+                ],
+                'expectedResponseData' => [
+                    'error' => [
+                        'type' => 'invalid_source_request',
+                        'payload' => [
+                            'source_type' => 'git',
+                            'missing_required_fields' => [
+                                GitSourceRequest::PARAMETER_HOST_URL,
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider createSuccessDataProvider
      *
      * @param array<string, string> $requestParameters
      * @param array<mixed>          $expected
      */
-    public function testCreateGitSourceSuccess(string $userId, array $requestParameters, array $expected): void
+    public function testCreateSuccess(string $userId, array $requestParameters, array $expected): void
     {
         $this->mockHandler->append(
             new Response(200, [], $userId)
         );
 
-        $response = $this->makeAuthorizedRequest('POST', new Route('create_git'), $requestParameters);
+        $response = $this->makeAuthorizedRequest('POST', new Route('create'), $requestParameters);
 
         self::assertSame(200, $response->getStatusCode());
         $this->assertAuthorizationRequestIsMade();
 
-        $repository = self::getContainer()->get(GitSourceRepository::class);
-        \assert($repository instanceof GitSourceRepository);
+        $sources = $this->sourceRepository->findAll();
+        self::assertIsArray($sources);
+        self::assertCount(1, $sources);
 
-        $source = $repository->findOneBy([
-            'userId' => $userId,
-            'hostUrl' => $requestParameters[GitSourceRequest::KEY_POST_HOST_URL],
-            'path' => $requestParameters[GitSourceRequest::KEY_POST_PATH],
-            'credentials' => $requestParameters[GitSourceRequest::KEY_POST_CREDENTIALS] ?? '',
-        ]);
-
+        $source = $sources[0];
         self::assertInstanceOf(SourceInterface::class, $source);
-        \assert($source instanceof SourceInterface);
-        $expected['id'] = $source->getId();
 
+        $expected['id'] = $source->getId();
         self::assertEquals($expected, json_decode((string) $response->getContent(), true));
     }
 
     /**
      * @return array<mixed>
      */
-    public function createGitSourceDataProvider(): array
+    public function createSuccessDataProvider(): array
     {
         $userId = UserId::create();
         $hostUrl = 'https://example.com/repository.git';
         $path = '/';
         $credentials = md5((string) rand());
+        $label = 'file source label';
 
         return [
-            'credentials missing' => [
+            'git source, credentials missing' => [
                 'userId' => $userId,
                 'requestParameters' => [
-                    GitSourceRequest::KEY_POST_HOST_URL => $hostUrl,
-                    GitSourceRequest::KEY_POST_PATH => $path
+                    AbstractSourceRequest::KEY_POST_TYPE => Type::GIT->value,
+                    GitSourceRequest::PARAMETER_HOST_URL => $hostUrl,
+                    GitSourceRequest::PARAMETER_PATH => $path
                 ],
                 'expected' => [
                     'user_id' => $userId,
@@ -278,12 +333,13 @@ class SourcesControllerTest extends WebTestCase
                     'has_credentials' => false,
                 ],
             ],
-            'credentials present' => [
+            'git source, credentials present' => [
                 'userId' => $userId,
                 'requestParameters' => [
-                    GitSourceRequest::KEY_POST_HOST_URL => $hostUrl,
-                    GitSourceRequest::KEY_POST_PATH => $path,
-                    GitSourceRequest::KEY_POST_CREDENTIALS => $credentials,
+                    AbstractSourceRequest::KEY_POST_TYPE => Type::GIT->value,
+                    GitSourceRequest::PARAMETER_HOST_URL => $hostUrl,
+                    GitSourceRequest::PARAMETER_PATH => $path,
+                    GitSourceRequest::PARAMETER_CREDENTIALS => $credentials,
                 ],
                 'expected' => [
                     'user_id' => $userId,
@@ -293,54 +349,11 @@ class SourcesControllerTest extends WebTestCase
                     'has_credentials' => true,
                 ],
             ],
-        ];
-    }
-
-    /**
-     * @dataProvider createFileSourceDataProvider
-     *
-     * @param array<string, string> $requestParameters
-     * @param array<mixed>          $expected
-     */
-    public function testCreateFileSourceSuccess(string $userId, array $requestParameters, array $expected): void
-    {
-        $this->mockHandler->append(
-            new Response(200, [], $userId)
-        );
-
-        $response = $this->makeAuthorizedRequest('POST', new Route('create_file'), $requestParameters);
-
-        self::assertSame(200, $response->getStatusCode());
-        $this->assertAuthorizationRequestIsMade();
-
-        $repository = self::getContainer()->get(FileSourceRepository::class);
-        \assert($repository instanceof FileSourceRepository);
-
-        $source = $repository->findOneBy([
-            'userId' => $userId,
-            'label' => $requestParameters[FileSourceRequest::KEY_POST_LABEL],
-        ]);
-
-        self::assertInstanceOf(SourceInterface::class, $source);
-        \assert($source instanceof SourceInterface);
-        $expected['id'] = $source->getId();
-
-        self::assertEquals($expected, json_decode((string) $response->getContent(), true));
-    }
-
-    /**
-     * @return array<mixed>
-     */
-    public function createFileSourceDataProvider(): array
-    {
-        $userId = UserId::create();
-        $label = 'file source label';
-
-        return [
-            'default' => [
+            'file source' => [
                 'userId' => $userId,
                 'requestParameters' => [
-                    FileSourceRequest::KEY_POST_LABEL => $label
+                    AbstractSourceRequest::KEY_POST_TYPE => Type::FILE->value,
+                    FileSourceRequest::PARAMETER_LABEL => $label
                 ],
                 'expected' => [
                     'user_id' => $userId,
@@ -494,7 +507,8 @@ class SourcesControllerTest extends WebTestCase
                 'source' => $fileSource,
                 'userId' => $userId,
                 'requestData' => [
-                    FileSourceRequest::KEY_POST_LABEL => $newLabel,
+                    AbstractSourceRequest::KEY_POST_TYPE => Type::FILE->value,
+                    FileSourceRequest::PARAMETER_LABEL => $newLabel,
                 ],
                 'expectedResponseData' => [
                     'id' => $fileSource->getId(),
@@ -507,9 +521,10 @@ class SourcesControllerTest extends WebTestCase
                 'source' => $gitSource,
                 'userId' => $userId,
                 'requestData' => [
-                    GitSourceRequest::KEY_POST_HOST_URL => $newHostUrl,
-                    GitSourceRequest::KEY_POST_PATH => $newPath,
-                    GitSourceRequest::KEY_POST_CREDENTIALS => null,
+                    AbstractSourceRequest::KEY_POST_TYPE => Type::GIT->value,
+                    GitSourceRequest::PARAMETER_HOST_URL => $newHostUrl,
+                    GitSourceRequest::PARAMETER_PATH => $newPath,
+                    GitSourceRequest::PARAMETER_CREDENTIALS => null,
                 ],
                 'expectedResponseData' => [
                     'id' => $gitSource->getId(),
@@ -524,8 +539,9 @@ class SourcesControllerTest extends WebTestCase
                 'source' => $gitSource,
                 'userId' => $userId,
                 'requestData' => [
-                    GitSourceRequest::KEY_POST_HOST_URL => $newHostUrl,
-                    GitSourceRequest::KEY_POST_PATH => $newPath,
+                    AbstractSourceRequest::KEY_POST_TYPE => Type::GIT->value,
+                    GitSourceRequest::PARAMETER_HOST_URL => $newHostUrl,
+                    GitSourceRequest::PARAMETER_PATH => $newPath,
                 ],
                 'expectedResponseData' => [
                     'id' => $gitSource->getId(),

@@ -11,8 +11,8 @@ use App\Entity\SourceInterface;
 use App\Exception\File\ReadException;
 use App\Message\Prepare;
 use App\Repository\SourceRepository;
-use App\Request\FileSourceRequest;
-use App\Request\GitSourceRequest;
+use App\Request\InvalidSourceRequest;
+use App\Request\SourceRequestInterface;
 use App\Services\RunSourceSerializer;
 use App\Services\Source\Factory;
 use App\Services\Source\Mutator;
@@ -26,8 +26,6 @@ use Symfony\Component\Security\Core\User\UserInterface;
 
 class SourceController
 {
-    public const ROUTE_GIT_SOURCE_CREATE = '/git';
-    public const ROUTE_FILE_SOURCE_CREATE = '/file';
     public const ROUTE_SOURCE = '/';
     public const ROUTE_SOURCE_LIST = '/list';
 
@@ -40,16 +38,14 @@ class SourceController
     ) {
     }
 
-    #[Route(self::ROUTE_GIT_SOURCE_CREATE, name: 'create_git', methods: ['POST'])]
-    public function createGitSource(UserInterface $user, GitSourceRequest $request): JsonResponse
+    #[Route(self::ROUTE_SOURCE, name: 'create', methods: ['POST'])]
+    public function create(UserInterface $user, SourceRequestInterface $request): JsonResponse
     {
-        return new JsonResponse($this->factory->createGitSourceFromRequest($user, $request));
-    }
+        if ($request instanceof InvalidSourceRequest) {
+            return $this->createResponseForInvalidSourceRequest($request);
+        }
 
-    #[Route(self::ROUTE_FILE_SOURCE_CREATE, name: 'create_file', methods: ['POST'])]
-    public function createFileSource(UserInterface $user, FileSourceRequest $request): JsonResponse
-    {
-        return new JsonResponse($this->factory->createFileSourceFromRequest($user, $request));
+        return new JsonResponse($this->factory->createFromSourceRequest($user, $request));
     }
 
     #[Route(self::ROUTE_SOURCE . '{sourceId<[A-Z90-9]{26}>}', name: 'get', methods: ['GET'])]
@@ -61,14 +57,17 @@ class SourceController
     }
 
     #[Route(self::ROUTE_SOURCE . '{sourceId<[A-Z90-9]{26}>}', name: 'update', methods: ['PUT'])]
-    public function update(null|FileSource|GitSource $source, Request $request, UserInterface $user): Response
-    {
+    public function update(
+        null|FileSource|GitSource $source,
+        UserInterface $user,
+        SourceRequestInterface $request
+    ): Response {
         return $this->doUserSourceAction($source, $user, function (FileSource|GitSource $source) use ($request) {
-            $source = $source instanceof FileSource
-                ? $this->mutator->updateFileSource($source, FileSourceRequest::create($request))
-                : $this->mutator->updateGitSource($source, GitSourceRequest::create($request));
+            if ($request instanceof InvalidSourceRequest) {
+                return $this->createResponseForInvalidSourceRequest($request);
+            }
 
-            return new JsonResponse($source);
+            return new JsonResponse($this->mutator->update($source, $request));
         });
     }
 
@@ -156,5 +155,21 @@ class SourceController
         }
 
         return $action($source);
+    }
+
+    private function createResponseForInvalidSourceRequest(InvalidSourceRequest $request): JsonResponse
+    {
+        return new JsonResponse(
+            [
+                'error' => [
+                    'type' => 'invalid_source_request',
+                    'payload' => [
+                        'source_type' => $request->getSourceType(),
+                        'missing_required_fields' => $request->getMissingRequiredFields(),
+                    ],
+                ],
+            ],
+            400
+        );
     }
 }
