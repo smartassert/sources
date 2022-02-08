@@ -7,6 +7,7 @@ namespace App\Repository;
 use App\Entity\AbstractSource;
 use App\Entity\OriginSourceInterface;
 use App\Entity\SourceInterface;
+use App\Enum\Source\Type;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -27,7 +28,7 @@ class SourceRepository extends ServiceEntityRepository
     }
 
     /**
-     * @param array<SourceInterface::TYPE_*> $types
+     * @param Type[] $types
      *
      * @return OriginSourceInterface[]
      */
@@ -57,7 +58,7 @@ class SourceRepository extends ServiceEntityRepository
     }
 
     /**
-     * @param array<SourceInterface::TYPE_*> $types
+     * @param Type[] $types
      *
      * @return string[]
      */
@@ -72,7 +73,7 @@ class SourceRepository extends ServiceEntityRepository
     }
 
     /**
-     * @param array<SourceInterface::TYPE_*> $types
+     * @param Type[] $types
      *
      * @return string[]
      */
@@ -80,7 +81,7 @@ class SourceRepository extends ServiceEntityRepository
     {
         $parameters = [];
         foreach ($types as $typeIndex => $type) {
-            $parameters[':Type' . $typeIndex] = $type;
+            $parameters[':Type' . $typeIndex] = $type->value;
         }
 
         return $parameters;

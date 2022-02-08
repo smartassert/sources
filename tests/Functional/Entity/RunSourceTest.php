@@ -7,7 +7,7 @@ namespace App\Tests\Functional\Entity;
 use App\Entity\FileSource;
 use App\Entity\GitSource;
 use App\Entity\RunSource;
-use App\Entity\SourceInterface;
+use App\Enum\Source\Type;
 use App\Repository\SourceRepository;
 use App\Services\Source\Store;
 use App\Tests\Model\UserId;
@@ -75,10 +75,10 @@ class RunSourceTest extends WebTestCase
     public function deleteParentDataProvider(): array
     {
         return [
-            SourceInterface::TYPE_FILE => [
+            Type::FILE->value => [
                 'parent' => new FileSource(UserId::create(), 'label'),
             ],
-            SourceInterface::TYPE_GIT => [
+            Type::GIT->value => [
                 'parent' => new GitSource(UserId::create(), 'https://example.com/repository.git'),
             ],
         ];

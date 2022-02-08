@@ -15,11 +15,6 @@ class FileSourceFinder implements TypeFinderInterface
     ) {
     }
 
-    public function supports(string $type): bool
-    {
-        return SourceInterface::TYPE_FILE === $type;
-    }
-
     public function find(SourceInterface $source): ?FileSource
     {
         if (!$source instanceof FileSource) {

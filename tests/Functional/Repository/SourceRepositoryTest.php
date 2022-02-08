@@ -8,6 +8,7 @@ use App\Entity\FileSource;
 use App\Entity\GitSource;
 use App\Entity\RunSource;
 use App\Entity\SourceInterface;
+use App\Enum\Source\Type;
 use App\Repository\SourceRepository;
 use App\Services\Source\Store;
 use App\Tests\Model\UserId;
@@ -91,9 +92,9 @@ class SourceRepositoryTest extends WebTestCase
     /**
      * @dataProvider findByUserAndTypeDataProvider
      *
-     * @param SourceInterface[]              $sources
-     * @param array<SourceInterface::TYPE_*> $types
-     * @param SourceInterface[]              $expected
+     * @param SourceInterface[] $sources
+     * @param Type[]            $types
+     * @param SourceInterface[] $expected
      */
     public function testFindByUserAndType(array $sources, UserInterface $user, array $types, array $expected): void
     {
@@ -130,9 +131,9 @@ class SourceRepositoryTest extends WebTestCase
                 'sources' => [],
                 'user' => $user,
                 'types' => [
-                    SourceInterface::TYPE_FILE,
-                    SourceInterface::TYPE_GIT,
-                    SourceInterface::TYPE_RUN,
+                    Type::FILE,
+                    Type::GIT,
+                    Type::RUN,
                 ],
                 'expected' => [],
             ],
@@ -146,9 +147,9 @@ class SourceRepositoryTest extends WebTestCase
                 ],
                 'user' => $user,
                 'types' => [
-                    SourceInterface::TYPE_FILE,
-                    SourceInterface::TYPE_GIT,
-                    SourceInterface::TYPE_RUN,
+                    Type::FILE,
+                    Type::GIT,
+                    Type::RUN,
                 ],
                 'expected' => [],
             ],
@@ -159,8 +160,8 @@ class SourceRepositoryTest extends WebTestCase
                 ],
                 'user' => $user,
                 'types' => [
-                    SourceInterface::TYPE_FILE,
-                    SourceInterface::TYPE_GIT,
+                    Type::FILE,
+                    Type::GIT,
                 ],
                 'expected' => [
                     $userFileSources[0],
@@ -176,8 +177,8 @@ class SourceRepositoryTest extends WebTestCase
                 ],
                 'user' => $user,
                 'types' => [
-                    SourceInterface::TYPE_FILE,
-                    SourceInterface::TYPE_GIT,
+                    Type::FILE,
+                    Type::GIT,
                 ],
                 'expected' => [
                     $userFileSources[0],
@@ -201,8 +202,8 @@ class SourceRepositoryTest extends WebTestCase
                 ],
                 'user' => $user,
                 'types' => [
-                    SourceInterface::TYPE_FILE,
-                    SourceInterface::TYPE_GIT,
+                    Type::FILE,
+                    Type::GIT,
                 ],
                 'expected' => [
                     $userFileSources[0],

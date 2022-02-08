@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
+use App\Enum\Source\Type;
 use App\Model\UserFileLocatorInterface;
 use App\Model\UserSourceFileLocatorTrait;
 use Doctrine\ORM\Mapping as ORM;
@@ -35,12 +36,9 @@ class FileSource extends AbstractSource implements OriginSourceInterface, UserFi
         return $this;
     }
 
-    /**
-     * @return SourceInterface::TYPE_FILE
-     */
-    public function getType(): string
+    public function getType(): Type
     {
-        return SourceInterface::TYPE_FILE;
+        return Type::FILE;
     }
 
     public function getRunParameterNames(): array
@@ -52,7 +50,7 @@ class FileSource extends AbstractSource implements OriginSourceInterface, UserFi
      * @return array{
      *     "id": string,
      *     "user_id": string,
-     *     "type": SourceInterface::TYPE_FILE,
+     *     "type": 'file',
      *     "label": string
      * }
      */
@@ -61,7 +59,7 @@ class FileSource extends AbstractSource implements OriginSourceInterface, UserFi
         return [
             'id' => $this->id,
             'user_id' => $this->getUserId(),
-            'type' => $this->getType(),
+            'type' => Type::FILE->value,
             'label' => $this->label
         ];
     }

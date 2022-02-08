@@ -327,7 +327,7 @@ class SourcesControllerTest extends WebTestCase
                 ],
                 'expected' => [
                     'user_id' => $userId,
-                    'type' => SourceInterface::TYPE_GIT,
+                    'type' => Type::GIT->value,
                     'host_url' => $hostUrl,
                     'path' => $path,
                     'has_credentials' => false,
@@ -343,7 +343,7 @@ class SourcesControllerTest extends WebTestCase
                 ],
                 'expected' => [
                     'user_id' => $userId,
-                    'type' => SourceInterface::TYPE_GIT,
+                    'type' => Type::GIT->value,
                     'host_url' => $hostUrl,
                     'path' => $path,
                     'has_credentials' => true,
@@ -357,7 +357,7 @@ class SourcesControllerTest extends WebTestCase
                 ],
                 'expected' => [
                     'user_id' => $userId,
-                    'type' => SourceInterface::TYPE_FILE,
+                    'type' => Type::FILE->value,
                     'label' => $label,
                 ],
             ],
@@ -405,47 +405,47 @@ class SourcesControllerTest extends WebTestCase
         );
 
         return [
-            SourceInterface::TYPE_GIT => [
+            Type::GIT->value => [
                 'source' => $gitSource,
                 'userId' => $userId,
                 'expectedResponseData' => [
                     'id' => $gitSource->getId(),
                     'user_id' => $gitSource->getUserId(),
-                    'type' => SourceInterface::TYPE_GIT,
+                    'type' => Type::GIT->value,
                     'host_url' => $gitSource->getHostUrl(),
                     'path' => $gitSource->getPath(),
                     'has_credentials' => true,
                 ],
             ],
-            SourceInterface::TYPE_FILE => [
+            Type::FILE->value => [
                 'source' => $fileSource,
                 'userId' => $userId,
                 'expectedResponseData' => [
                     'id' => $fileSource->getId(),
                     'user_id' => $fileSource->getUserId(),
-                    'type' => SourceInterface::TYPE_FILE,
+                    'type' => Type::FILE->value,
                     'label' => $fileSource->getLabel(),
                 ],
             ],
-            SourceInterface::TYPE_RUN => [
+            Type::RUN->value => [
                 'source' => $runSource,
                 'userId' => $userId,
                 'expectedResponseData' => [
                     'id' => $runSource->getId(),
                     'user_id' => $userId,
-                    'type' => SourceInterface::TYPE_RUN,
+                    'type' => Type::RUN->value,
                     'parent' => $runSource->getParent()?->getId(),
                     'parameters' => [],
                     'state' => State::REQUESTED->value,
                 ],
             ],
-            SourceInterface::TYPE_RUN . ': preparation failed' => [
+            Type::RUN->value . ': preparation failed' => [
                 'source' => $failedRunSource,
                 'userId' => $userId,
                 'expectedResponseData' => [
                     'id' => $failedRunSource->getId(),
                     'user_id' => $userId,
-                    'type' => SourceInterface::TYPE_RUN,
+                    'type' => Type::RUN->value,
                     'parent' => $failedRunSource->getParent()?->getId(),
                     'parameters' => [],
                     'state' => State::FAILED->value,
@@ -503,7 +503,7 @@ class SourcesControllerTest extends WebTestCase
         $gitSource = new GitSource($userId, $hostUrl, $path, $credentials);
 
         return [
-            SourceInterface::TYPE_FILE => [
+            Type::FILE->value => [
                 'source' => $fileSource,
                 'userId' => $userId,
                 'requestData' => [
@@ -513,11 +513,11 @@ class SourcesControllerTest extends WebTestCase
                 'expectedResponseData' => [
                     'id' => $fileSource->getId(),
                     'user_id' => $fileSource->getUserId(),
-                    'type' => SourceInterface::TYPE_FILE,
+                    'type' => Type::FILE->value,
                     'label' => $newLabel,
                 ],
             ],
-            SourceInterface::TYPE_GIT . ' credentials present and empty' => [
+            Type::GIT->value . ' credentials present and empty' => [
                 'source' => $gitSource,
                 'userId' => $userId,
                 'requestData' => [
@@ -529,13 +529,13 @@ class SourcesControllerTest extends WebTestCase
                 'expectedResponseData' => [
                     'id' => $gitSource->getId(),
                     'user_id' => $gitSource->getUserId(),
-                    'type' => SourceInterface::TYPE_GIT,
+                    'type' => Type::GIT->value,
                     'host_url' => $newHostUrl,
                     'path' => $newPath,
                     'has_credentials' => false,
                 ],
             ],
-            SourceInterface::TYPE_GIT . ' credentials not present' => [
+            Type::GIT->value . ' credentials not present' => [
                 'source' => $gitSource,
                 'userId' => $userId,
                 'requestData' => [
@@ -546,7 +546,7 @@ class SourcesControllerTest extends WebTestCase
                 'expectedResponseData' => [
                     'id' => $gitSource->getId(),
                     'user_id' => $gitSource->getUserId(),
-                    'type' => SourceInterface::TYPE_GIT,
+                    'type' => Type::GIT->value,
                     'host_url' => $newHostUrl,
                     'path' => $newPath,
                     'has_credentials' => false,
@@ -583,17 +583,17 @@ class SourcesControllerTest extends WebTestCase
         $userId = UserId::create();
 
         return [
-            SourceInterface::TYPE_FILE => [
+            Type::FILE->value => [
                 'source' => new FileSource($userId, 'label'),
                 'userId' => $userId,
                 'expectedRepositoryCount' => 0,
             ],
-            SourceInterface::TYPE_GIT => [
+            Type::GIT->value => [
                 'source' => new GitSource($userId, 'https://example.com/repository.git'),
                 'userId' => $userId,
                 'expectedRepositoryCount' => 0,
             ],
-            SourceInterface::TYPE_RUN => [
+            Type::RUN->value => [
                 'source' => new RunSource(
                     new FileSource($userId, 'label')
                 ),
@@ -782,33 +782,33 @@ class SourcesControllerTest extends WebTestCase
         $gitSource = new GitSource($userId, 'https://example.com/repository.git', '/', md5((string) rand()));
 
         return [
-            SourceInterface::TYPE_FILE => [
+            Type::FILE->value => [
                 'source' => $fileSource,
                 'userId' => $userId,
                 'requestParameters' => [],
                 'expectedResponseData' => [
                     'id' => '{{ runSourceId }}',
                     'user_id' => $gitSource->getUserId(),
-                    'type' => SourceInterface::TYPE_RUN,
+                    'type' => Type::RUN->value,
                     'parent' => $fileSource->getId(),
                     'parameters' => [],
                     'state' => State::REQUESTED->value,
                 ],
             ],
-            SourceInterface::TYPE_GIT => [
+            Type::GIT->value => [
                 'source' => $gitSource,
                 'userId' => $userId,
                 'requestParameters' => [],
                 'expectedResponseData' => [
                     'id' => '{{ runSourceId }}',
                     'user_id' => $gitSource->getUserId(),
-                    'type' => SourceInterface::TYPE_RUN,
+                    'type' => Type::RUN->value,
                     'parent' => $gitSource->getId(),
                     'parameters' => [],
                     'state' => State::REQUESTED->value,
                 ],
             ],
-            SourceInterface::TYPE_GIT . ' with ref request parameters' => [
+            Type::GIT->value . ' with ref request parameters' => [
                 'source' => $gitSource,
                 'userId' => $userId,
                 'requestParameters' => [
@@ -817,7 +817,7 @@ class SourcesControllerTest extends WebTestCase
                 'expectedResponseData' => [
                     'id' => '{{ runSourceId }}',
                     'user_id' => $gitSource->getUserId(),
-                    'type' => SourceInterface::TYPE_RUN,
+                    'type' => Type::RUN->value,
                     'parent' => $gitSource->getId(),
                     'parameters' => [
                         'ref' => 'v1.1',
@@ -825,7 +825,7 @@ class SourcesControllerTest extends WebTestCase
                     'state' => State::REQUESTED->value,
                 ],
             ],
-            SourceInterface::TYPE_GIT . ' with request parameters including ref' => [
+            Type::GIT->value . ' with request parameters including ref' => [
                 'source' => $gitSource,
                 'userId' => $userId,
                 'requestParameters' => [
@@ -836,7 +836,7 @@ class SourcesControllerTest extends WebTestCase
                 'expectedResponseData' => [
                     'id' => '{{ runSourceId }}',
                     'user_id' => $gitSource->getUserId(),
-                    'type' => SourceInterface::TYPE_RUN,
+                    'type' => Type::RUN->value,
                     'parent' => $gitSource->getId(),
                     'parameters' => [
                         'ref' => 'v1.1',
