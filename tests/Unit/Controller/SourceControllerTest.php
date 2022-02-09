@@ -8,7 +8,7 @@ use App\Controller\SourceController;
 use App\Entity\FileSource;
 use App\Entity\RunSource;
 use App\Message\Prepare;
-use App\Services\InvalidSourceRequestResponseFactory;
+use App\Services\InvalidRequestResponseFactory;
 use App\Services\ResponseFactory;
 use App\Services\RunSourceFactory;
 use App\Tests\Model\UserId;
@@ -58,7 +58,7 @@ class SourceControllerTest extends WebTestCase
         (new SourceController(
             \Mockery::mock(ResponseFactory::class),
             \Mockery::mock(ValidatorInterface::class),
-            \Mockery::mock(InvalidSourceRequestResponseFactory::class),
+            \Mockery::mock(InvalidRequestResponseFactory::class),
         ))
             ->prepare($request, $fileSource, $user, $messageBus, $runSourceFactory)
         ;

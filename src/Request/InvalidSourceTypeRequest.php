@@ -8,14 +8,16 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 class InvalidSourceTypeRequest implements SourceRequestInterface
 {
+    public const ERROR_MESSAGE = 'type must be one of ["file", "git"]';
+
     public function __construct(
-        #[Assert\Choice(['file', 'git'])]
-        private string $sourceType,
+        #[Assert\Choice(['file', 'git'], message: self::ERROR_MESSAGE)]
+        private string $type,
     ) {
     }
 
     public function getType(): string
     {
-        return $this->sourceType;
+        return $this->type;
     }
 }

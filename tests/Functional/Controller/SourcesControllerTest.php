@@ -16,6 +16,7 @@ use App\Repository\RunSourceRepository;
 use App\Repository\SourceRepository;
 use App\Request\FileSourceRequest;
 use App\Request\GitSourceRequest;
+use App\Request\InvalidSourceTypeRequest;
 use App\Request\SourceRequestInterface;
 use App\Services\RunSourceSerializer;
 use App\Services\Source\Store;
@@ -251,10 +252,12 @@ class SourcesControllerTest extends WebTestCase
                 ],
                 'expectedResponseData' => [
                     'error' => [
-                        'type' => 'invalid_source_request',
+                        'type' => 'invalid_request',
                         'payload' => [
-                            'source_type' => 'invalid',
-                            'missing_required_fields' => [],
+                            'type' => [
+                                'value' => 'invalid',
+                                'message' => InvalidSourceTypeRequest::ERROR_MESSAGE,
+                            ],
                         ],
                     ],
                 ],
@@ -265,11 +268,11 @@ class SourcesControllerTest extends WebTestCase
                 ],
                 'expectedResponseData' => [
                     'error' => [
-                        'type' => 'invalid_source_request',
+                        'type' => 'invalid_request',
                         'payload' => [
-                            'source_type' => 'git',
-                            'missing_required_fields' => [
-                                GitSourceRequest::PARAMETER_HOST_URL,
+                            'host-url' => [
+                                'value' => '',
+                                'message' => 'This value should not be blank.',
                             ],
                         ],
                     ],
@@ -567,11 +570,11 @@ class SourcesControllerTest extends WebTestCase
                 'expectedResponseStatusCode' => 400,
                 'expectedResponseData' => [
                     'error' => [
-                        'type' => 'invalid_source_request',
+                        'type' => 'invalid_request',
                         'payload' => [
-                            'source_type' => 'git',
-                            'missing_required_fields' => [
-                                GitSourceRequest::PARAMETER_HOST_URL,
+                            'host-url' => [
+                                'value' => '',
+                                'message' => 'This value should not be blank.',
                             ],
                         ],
                     ],
