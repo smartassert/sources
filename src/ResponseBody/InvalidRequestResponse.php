@@ -26,9 +26,9 @@ class InvalidRequestResponse implements ErrorInterface
         $payload = [];
 
         foreach ($this->invalidFields as $invalidField) {
-            $payload[$invalidField->getName()] = [
-                'value' => $invalidField->getValue(),
-                'message' => $invalidField->getMessage(),
+            $payload[$invalidField->name] = [
+                'value' => $invalidField->value,
+                'message' => $invalidField->message,
             ];
         }
 
