@@ -6,7 +6,6 @@ namespace App\Services;
 
 use App\ResponseBody\InvalidField;
 use App\ResponseBody\InvalidRequestResponse;
-use Symfony\Component\Validator\ConstraintViolationInterface;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
 
 class InvalidRequestResponseFactory
@@ -16,14 +15,10 @@ class InvalidRequestResponseFactory
     ) {
     }
 
-    public function createFromConstraintViolations(
-        ConstraintViolationListInterface $errors
-    ): InvalidRequestResponse {
+    public function createFromConstraintViolations(ConstraintViolationListInterface $errors): InvalidRequestResponse
+    {
         $invalidFields = [];
 
-        /**
-         * @var ConstraintViolationInterface $error
-         */
         foreach ($errors as $error) {
             $invalidValue = $error->getInvalidValue();
             $invalidValue = is_scalar($invalidValue) ? (string) $invalidValue : '';
