@@ -13,7 +13,7 @@ use App\Message\Prepare;
 use App\Repository\SourceRepository;
 use App\Request\SourceRequestInterface;
 use App\ResponseBody\SourceReadExceptionResponse;
-use App\ResponseBody\SourceRequestInvalidResponse;
+use App\Services\InvalidSourceRequestResponseFactory;
 use App\Services\ResponseFactory;
 use App\Services\RunSourceFactory;
 use App\Services\RunSourceSerializer;
@@ -26,6 +26,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class SourceController
 {
@@ -34,14 +35,23 @@ class SourceController
 
     public function __construct(
         private ResponseFactory $responseFactory,
+        private ValidatorInterface $validator,
+        private InvalidSourceRequestResponseFactory $invalidSourceResponseFactory,
     ) {
     }
 
     #[Route(self::ROUTE_SOURCE, name: 'create', methods: ['POST'])]
-    public function create(UserInterface $user, Factory $factory, SourceRequestInterface $request): JsonResponse
-    {
-        if (false === $request->isValid()) {
-            return $this->responseFactory->createErrorResponse(new SourceRequestInvalidResponse($request), 400);
+    public function create(
+        UserInterface $user,
+        Factory $factory,
+        SourceRequestInterface $request,
+    ): JsonResponse {
+        $errors = $this->validator->validate($request);
+        if (0 !== count($errors)) {
+            return $this->responseFactory->createErrorResponse(
+                $this->invalidSourceResponseFactory->createFromConstraintViolations($request->getType(), $errors),
+                400
+            );
         }
 
         return new JsonResponse($factory->createFromSourceRequest($user, $request));
@@ -63,8 +73,12 @@ class SourceController
         SourceRequestInterface $request
     ): Response {
         return $this->doUserSourceAction($source, $user, function (OriginSource $source) use ($request, $mutator) {
-            if (false === $request->isValid()) {
-                return $this->responseFactory->createErrorResponse(new SourceRequestInvalidResponse($request), 400);
+            $errors = $this->validator->validate($request);
+            if (0 !== count($errors)) {
+                return $this->responseFactory->createErrorResponse(
+                    $this->invalidSourceResponseFactory->createFromConstraintViolations($request->getType(), $errors),
+                    400
+                );
             }
 
             return new JsonResponse($mutator->update($source, $request));

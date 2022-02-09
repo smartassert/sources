@@ -9,7 +9,7 @@ interface ErrorInterface
     public function getType(): string;
 
     /**
-     * @return array<string, array<string, string>|string>
+     * @return array<string, array<int|string, string>|string>
      */
     public function getPayload(): array;
 }

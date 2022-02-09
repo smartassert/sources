@@ -14,9 +14,9 @@ use App\Enum\Source\Type;
 use App\Model\EntityId;
 use App\Repository\RunSourceRepository;
 use App\Repository\SourceRepository;
-use App\Request\AbstractSourceRequest;
 use App\Request\FileSourceRequest;
 use App\Request\GitSourceRequest;
+use App\Request\SourceRequestInterface;
 use App\Services\RunSourceSerializer;
 use App\Services\Source\Store;
 use App\Tests\Model\Route;
@@ -247,7 +247,7 @@ class SourcesControllerTest extends WebTestCase
         return [
             'invalid source type' => [
                 'requestParameters' => [
-                    AbstractSourceRequest::KEY_POST_TYPE => 'invalid',
+                    SourceRequestInterface::PARAMETER_TYPE => 'invalid',
                 ],
                 'expectedResponseData' => [
                     'error' => [
@@ -261,7 +261,7 @@ class SourcesControllerTest extends WebTestCase
             ],
             'git source missing host url' => [
                 'requestParameters' => [
-                    AbstractSourceRequest::KEY_POST_TYPE => Type::GIT->value,
+                    SourceRequestInterface::PARAMETER_TYPE => Type::GIT->value,
                 ],
                 'expectedResponseData' => [
                     'error' => [
@@ -321,7 +321,7 @@ class SourcesControllerTest extends WebTestCase
             'git source, credentials missing' => [
                 'userId' => $userId,
                 'requestParameters' => [
-                    AbstractSourceRequest::KEY_POST_TYPE => Type::GIT->value,
+                    SourceRequestInterface::PARAMETER_TYPE => Type::GIT->value,
                     GitSourceRequest::PARAMETER_HOST_URL => $hostUrl,
                     GitSourceRequest::PARAMETER_PATH => $path
                 ],
@@ -336,7 +336,7 @@ class SourcesControllerTest extends WebTestCase
             'git source, credentials present' => [
                 'userId' => $userId,
                 'requestParameters' => [
-                    AbstractSourceRequest::KEY_POST_TYPE => Type::GIT->value,
+                    SourceRequestInterface::PARAMETER_TYPE => Type::GIT->value,
                     GitSourceRequest::PARAMETER_HOST_URL => $hostUrl,
                     GitSourceRequest::PARAMETER_PATH => $path,
                     GitSourceRequest::PARAMETER_CREDENTIALS => $credentials,
@@ -352,7 +352,7 @@ class SourcesControllerTest extends WebTestCase
             'file source' => [
                 'userId' => $userId,
                 'requestParameters' => [
-                    AbstractSourceRequest::KEY_POST_TYPE => Type::FILE->value,
+                    SourceRequestInterface::PARAMETER_TYPE => Type::FILE->value,
                     FileSourceRequest::PARAMETER_LABEL => $label
                 ],
                 'expected' => [
@@ -457,15 +457,16 @@ class SourcesControllerTest extends WebTestCase
     }
 
     /**
-     * @dataProvider updateSuccessDataProvider
+     * @dataProvider updateDataProvider
      *
      * @param array<string, string> $requestData
      * @param array<mixed>          $expectedResponseData
      */
-    public function testUpdateSuccess(
+    public function testUpdate(
         SourceInterface $source,
         string $userId,
         array $requestData,
+        int $expectedResponseStatusCode,
         array $expectedResponseData
     ): void {
         $this->store->add($source);
@@ -476,7 +477,7 @@ class SourcesControllerTest extends WebTestCase
 
         $response = $this->makeAuthorizedSourceRequest('PUT', 'update', $source->getId(), $requestData);
 
-        self::assertSame(200, $response->getStatusCode());
+        self::assertSame($expectedResponseStatusCode, $response->getStatusCode());
         $this->assertAuthorizationRequestIsMade();
         self::assertInstanceOf(JsonResponse::class, $response);
 
@@ -487,7 +488,7 @@ class SourcesControllerTest extends WebTestCase
     /**
      * @return array<mixed>
      */
-    public function updateSuccessDataProvider(): array
+    public function updateDataProvider(): array
     {
         $userId = UserId::create();
         $hostUrl = 'https://example.com/repository.git';
@@ -507,9 +508,10 @@ class SourcesControllerTest extends WebTestCase
                 'source' => $fileSource,
                 'userId' => $userId,
                 'requestData' => [
-                    AbstractSourceRequest::KEY_POST_TYPE => Type::FILE->value,
+                    SourceRequestInterface::PARAMETER_TYPE => Type::FILE->value,
                     FileSourceRequest::PARAMETER_LABEL => $newLabel,
                 ],
+                'expectedResponseStatusCode' => 200,
                 'expectedResponseData' => [
                     'id' => $fileSource->getId(),
                     'user_id' => $fileSource->getUserId(),
@@ -521,11 +523,12 @@ class SourcesControllerTest extends WebTestCase
                 'source' => $gitSource,
                 'userId' => $userId,
                 'requestData' => [
-                    AbstractSourceRequest::KEY_POST_TYPE => Type::GIT->value,
+                    SourceRequestInterface::PARAMETER_TYPE => Type::GIT->value,
                     GitSourceRequest::PARAMETER_HOST_URL => $newHostUrl,
                     GitSourceRequest::PARAMETER_PATH => $newPath,
                     GitSourceRequest::PARAMETER_CREDENTIALS => null,
                 ],
+                'expectedResponseStatusCode' => 200,
                 'expectedResponseData' => [
                     'id' => $gitSource->getId(),
                     'user_id' => $gitSource->getUserId(),
@@ -539,10 +542,11 @@ class SourcesControllerTest extends WebTestCase
                 'source' => $gitSource,
                 'userId' => $userId,
                 'requestData' => [
-                    AbstractSourceRequest::KEY_POST_TYPE => Type::GIT->value,
+                    SourceRequestInterface::PARAMETER_TYPE => Type::GIT->value,
                     GitSourceRequest::PARAMETER_HOST_URL => $newHostUrl,
                     GitSourceRequest::PARAMETER_PATH => $newPath,
                 ],
+                'expectedResponseStatusCode' => 200,
                 'expectedResponseData' => [
                     'id' => $gitSource->getId(),
                     'user_id' => $gitSource->getUserId(),
@@ -550,6 +554,27 @@ class SourcesControllerTest extends WebTestCase
                     'host_url' => $newHostUrl,
                     'path' => $newPath,
                     'has_credentials' => false,
+                ],
+            ],
+            Type::GIT->value . ' missing host url' => [
+                'source' => $gitSource,
+                'userId' => $userId,
+                'requestData' => [
+                    SourceRequestInterface::PARAMETER_TYPE => Type::GIT->value,
+                    GitSourceRequest::PARAMETER_HOST_URL => '',
+                    GitSourceRequest::PARAMETER_PATH => $path,
+                ],
+                'expectedResponseStatusCode' => 400,
+                'expectedResponseData' => [
+                    'error' => [
+                        'type' => 'invalid_source_request',
+                        'payload' => [
+                            'source_type' => 'git',
+                            'missing_required_fields' => [
+                                GitSourceRequest::PARAMETER_HOST_URL,
+                            ],
+                        ],
+                    ],
                 ],
             ],
         ];

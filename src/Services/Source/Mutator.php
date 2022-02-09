@@ -23,14 +23,14 @@ class Mutator
     {
         $isMutated = false;
         if ($source instanceof FileSource && $request instanceof FileSourceRequest) {
-            $source->setLabel($request->getParameter(FileSourceRequest::PARAMETER_LABEL));
+            $source->setLabel($request->getLabel());
             $isMutated = true;
         }
 
         if ($source instanceof GitSource && $request instanceof GitSourceRequest) {
-            $source->setHostUrl($request->getParameter(GitSourceRequest::PARAMETER_HOST_URL));
-            $source->setPath($request->getParameter(GitSourceRequest::PARAMETER_PATH));
-            $source->setCredentials($request->getParameter(GitSourceRequest::PARAMETER_CREDENTIALS));
+            $source->setHostUrl($request->getHostUrl());
+            $source->setPath($request->getPath());
+            $source->setCredentials($request->getCredentials());
             $isMutated = true;
         }
 
