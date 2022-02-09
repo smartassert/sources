@@ -6,26 +6,10 @@ namespace App\Exception\File;
 
 use League\Flysystem\FilesystemException;
 
-class WriteException extends \Exception implements PathExceptionInterface
+class WriteException extends AbstractFileException
 {
-    public function __construct(
-        private string $path,
-        private FilesystemException $filesystemException,
-    ) {
-        parent::__construct(
-            sprintf('Unable to write to file "%s"', $path),
-            0,
-            $this->filesystemException
-        );
-    }
-
-    public function getPath(): string
+    public function __construct(string $path, FilesystemException $filesystemException)
     {
-        return $this->path;
-    }
-
-    public function getFilesystemException(): FilesystemException
-    {
-        return $this->filesystemException;
+        parent::__construct('write', $path, $filesystemException);
     }
 }
