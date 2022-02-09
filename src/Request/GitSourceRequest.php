@@ -6,6 +6,7 @@ namespace App\Request;
 
 use App\Enum\Source\Type;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Validator\Constraints as Assert;
 
 class GitSourceRequest implements SourceRequestInterface
 {
@@ -13,6 +14,7 @@ class GitSourceRequest implements SourceRequestInterface
     public const PARAMETER_PATH = 'path';
     public const PARAMETER_CREDENTIALS = 'credentials';
 
+    #[Assert\NotBlank]
     private string $hostUrl;
     private string $path;
     private string $credentials;

@@ -457,6 +457,67 @@ class SourcesControllerTest extends WebTestCase
     }
 
     /**
+     * @dataProvider updateInvalidRequestDataProvider
+     *
+     * @param array<string, string> $requestData
+     * @param array<mixed>          $expectedResponseData
+     */
+    public function testUpdateInvalidSourceRequest(
+        SourceInterface $source,
+        string $userId,
+        array $requestData,
+        array $expectedResponseData
+    ): void {
+        $this->store->add($source);
+
+        $this->mockHandler->append(
+            new Response(200, [], $userId)
+        );
+
+        $response = $this->makeAuthorizedSourceRequest('PUT', 'update', $source->getId(), $requestData);
+
+        self::assertSame(400, $response->getStatusCode());
+        $this->assertAuthorizationRequestIsMade();
+        self::assertInstanceOf(JsonResponse::class, $response);
+
+        $responseData = json_decode((string) $response->getContent(), true);
+        self::assertEquals($expectedResponseData, $responseData);
+    }
+
+    /**
+     * @return array<mixed>
+     */
+    public function updateInvalidRequestDataProvider(): array
+    {
+        $userId = UserId::create();
+        $path = '/';
+        $gitSource = new GitSource($userId, 'https://example.com/repository.git', $path, '');
+
+        return [
+            Type::GIT->value . ' missing host url' => [
+                'source' => $gitSource,
+                'userId' => $userId,
+                'requestData' => [
+                    SourceRequestInterface::PARAMETER_TYPE => Type::GIT->value,
+                    GitSourceRequest::PARAMETER_HOST_URL => '',
+                    GitSourceRequest::PARAMETER_PATH => $path,
+                ],
+                'expectedResponseData' => [
+                    'error' => [
+                        'type' => 'invalid_source_request',
+                        'payload' => [
+                            'source_type' => 'git',
+                            'missing_required_fields' => [
+                                GitSourceRequest::PARAMETER_HOST_URL,
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+    }
+
+    /**
      * @dataProvider updateSuccessDataProvider
      *
      * @param array<string, string> $requestData
