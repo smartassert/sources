@@ -8,7 +8,7 @@ use App\Controller\SourceController;
 use App\Entity\FileSource;
 use App\Entity\RunSource;
 use App\Message\Prepare;
-use App\Services\ErrorResponseFactory;
+use App\Services\ResponseFactory;
 use App\Services\RunSourceFactory;
 use App\Tests\Model\UserId;
 use SmartAssert\UsersSecurityBundle\Security\User;
@@ -53,7 +53,7 @@ class SourceControllerTest extends WebTestCase
             ->andReturn($runSource)
         ;
 
-        (new SourceController(\Mockery::mock(ErrorResponseFactory::class)))
+        (new SourceController(\Mockery::mock(ResponseFactory::class)))
             ->prepare($request, $fileSource, $user, $messageBus, $runSourceFactory)
         ;
     }
