@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use App\Response\ErrorResponseInterface;
+use App\ResponseBody\ErrorInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
-class ErrorResponseFactory
+class ResponseFactory
 {
-    public function createResponse(ErrorResponseInterface $error, int $statusCode): JsonResponse
+    public function createErrorResponse(ErrorInterface $error, int $statusCode): JsonResponse
     {
         return new JsonResponse(
             [

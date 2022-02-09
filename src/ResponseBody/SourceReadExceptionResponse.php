@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace App\Response;
+namespace App\ResponseBody;
 
 use App\Exception\File\ReadException;
 
-class SourceReadExceptionResponse implements ErrorResponseInterface
+class SourceReadExceptionResponse implements ErrorInterface
 {
     public function __construct(
         private ReadException $exception

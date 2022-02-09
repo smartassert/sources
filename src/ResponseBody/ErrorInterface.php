@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\Response;
+namespace App\ResponseBody;
 
-interface ErrorResponseInterface
+interface ErrorInterface
 {
     public function getType(): string;
 

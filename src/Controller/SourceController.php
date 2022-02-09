@@ -12,9 +12,9 @@ use App\Exception\File\ReadException;
 use App\Message\Prepare;
 use App\Repository\SourceRepository;
 use App\Request\SourceRequestInterface;
-use App\Response\SourceReadExceptionResponse;
-use App\Response\SourceRequestInvalidResponse;
-use App\Services\ErrorResponseFactory;
+use App\ResponseBody\SourceReadExceptionResponse;
+use App\ResponseBody\SourceRequestInvalidResponse;
+use App\Services\ResponseFactory;
 use App\Services\RunSourceFactory;
 use App\Services\RunSourceSerializer;
 use App\Services\Source\Factory;
@@ -33,7 +33,7 @@ class SourceController
     public const ROUTE_SOURCE_LIST = '/list';
 
     public function __construct(
-        private ErrorResponseFactory $errorResponseFactory,
+        private ResponseFactory $responseFactory,
     ) {
     }
 
@@ -41,7 +41,7 @@ class SourceController
     public function create(UserInterface $user, Factory $factory, SourceRequestInterface $request): JsonResponse
     {
         if (false === $request->isValid()) {
-            return $this->errorResponseFactory->createResponse(new SourceRequestInvalidResponse($request), 400);
+            return $this->responseFactory->createErrorResponse(new SourceRequestInvalidResponse($request), 400);
         }
 
         return new JsonResponse($factory->createFromSourceRequest($user, $request));
@@ -64,7 +64,7 @@ class SourceController
     ): Response {
         return $this->doUserSourceAction($source, $user, function (OriginSource $source) use ($request, $mutator) {
             if (false === $request->isValid()) {
-                return $this->errorResponseFactory->createResponse(new SourceRequestInvalidResponse($request), 400);
+                return $this->responseFactory->createErrorResponse(new SourceRequestInvalidResponse($request), 400);
             }
 
             return new JsonResponse($mutator->update($source, $request));
@@ -123,7 +123,7 @@ class SourceController
                     ]
                 );
             } catch (ReadException $exception) {
-                return $this->errorResponseFactory->createResponse(new SourceReadExceptionResponse($exception), 500);
+                return $this->responseFactory->createErrorResponse(new SourceReadExceptionResponse($exception), 500);
             }
         });
     }

@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace App\Response;
+namespace App\ResponseBody;
 
 use App\Request\SourceRequestInterface;
 
-class SourceRequestInvalidResponse implements ErrorResponseInterface
+class SourceRequestInvalidResponse implements ErrorInterface
 {
     public function __construct(
         private SourceRequestInterface $request
