@@ -44,6 +44,7 @@
         "phpunit/phpunit": "^9.5",
         "squizlabs/php_codesniffer": "dev-master#498a939c8ff49f0b00769144bdd07933352d77e8",
         "symfony/browser-kit": "6.0.*",
+        "symfony/expression-language": "6.0.*",
         "symfony/maker-bundle": "^1.36",
         "symfony/phpunit-bridge": "^6.0",
         "webignition/http-history-container": "^2.5",

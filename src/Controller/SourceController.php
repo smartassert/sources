@@ -4,15 +4,19 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use App\Entity\FileSource;
 use App\Entity\OriginSourceInterface as OriginSource;
 use App\Entity\RunSource;
 use App\Entity\SourceInterface;
 use App\Enum\Source\Type;
 use App\Exception\File\ReadException;
+use App\Exception\File\WriteException;
 use App\Message\Prepare;
 use App\Repository\SourceRepository;
+use App\Request\AddFileRequest;
 use App\Request\SourceRequestInterface;
-use App\ResponseBody\SourceReadExceptionResponse;
+use App\ResponseBody\FileExceptionResponse;
+use App\Services\FileStoreManager;
 use App\Services\InvalidRequestResponseFactory;
 use App\Services\ResponseFactory;
 use App\Services\RunSourceFactory;
@@ -129,9 +133,37 @@ class SourceController
                     ]
                 );
             } catch (ReadException $exception) {
-                return $this->responseFactory->createErrorResponse(new SourceReadExceptionResponse($exception), 500);
+                return $this->responseFactory->createErrorResponse(new FileExceptionResponse($exception), 500);
             }
         });
+    }
+
+    #[Route(self::ROUTE_SOURCE . '{sourceId<[A-Z90-9]{26}>}/add', name: 'add_file', methods: ['POST'])]
+    public function addFile(
+        ?FileSource $source,
+        AddFileRequest $request,
+        UserInterface $user,
+        FileStoreManager $fileStoreManager,
+    ): Response {
+        return $this->doUserSourceAction(
+            $source,
+            $user,
+            function (FileSource $source) use ($request, $fileStoreManager) {
+                if (($response = $this->validateRequest($request, 'file.')) instanceof JsonResponse) {
+                    return $response;
+                }
+
+                $yamlFile = $request->getYamlFile();
+
+                try {
+                    $fileStoreManager->write($source . '/' . $yamlFile->name, $yamlFile->content);
+                } catch (WriteException $exception) {
+                    return $this->responseFactory->createErrorResponse(new FileExceptionResponse($exception), 500);
+                }
+
+                return new Response();
+            }
+        );
     }
 
     private function doUserSourceAction(?SourceInterface $source, UserInterface $user, callable $action): Response
@@ -147,12 +179,15 @@ class SourceController
         return $action($source);
     }
 
-    private function validateRequest(object $request): ?JsonResponse
+    private function validateRequest(object $request, string $propertyNamePrefixToRemove = ''): ?JsonResponse
     {
         $errors = $this->validator->validate($request);
         if (0 !== count($errors)) {
             return $this->responseFactory->createErrorResponse(
-                $this->invalidRequestResponseFactory->createFromConstraintViolations($errors),
+                $this->invalidRequestResponseFactory->createFromConstraintViolations(
+                    $errors,
+                    $propertyNamePrefixToRemove
+                ),
                 400
             );
         }
