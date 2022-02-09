@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\Response;
+namespace App\ResponseBody;
 
-class ErrorResponse implements ErrorResponseInterface
+class ErrorResponse implements ErrorInterface
 {
     /**
      * @param array<string, array<int|string, string>|string> $payload
