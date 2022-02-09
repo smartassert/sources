@@ -13,7 +13,7 @@ use App\Message\Prepare;
 use App\Repository\SourceRepository;
 use App\Request\SourceRequestInterface;
 use App\ResponseBody\SourceReadExceptionResponse;
-use App\Services\InvalidSourceRequestResponseFactory;
+use App\Services\InvalidRequestResponseFactory;
 use App\Services\ResponseFactory;
 use App\Services\RunSourceFactory;
 use App\Services\RunSourceSerializer;
@@ -36,7 +36,7 @@ class SourceController
     public function __construct(
         private ResponseFactory $responseFactory,
         private ValidatorInterface $validator,
-        private InvalidSourceRequestResponseFactory $invalidSourceResponseFactory,
+        private InvalidRequestResponseFactory $invalidRequestResponseFactory,
     ) {
     }
 
@@ -46,12 +46,8 @@ class SourceController
         Factory $factory,
         SourceRequestInterface $request,
     ): JsonResponse {
-        $errors = $this->validator->validate($request);
-        if (0 !== count($errors)) {
-            return $this->responseFactory->createErrorResponse(
-                $this->invalidSourceResponseFactory->createFromConstraintViolations($request->getType(), $errors),
-                400
-            );
+        if (($response = $this->validateRequest($request)) instanceof JsonResponse) {
+            return $response;
         }
 
         return new JsonResponse($factory->createFromSourceRequest($user, $request));
@@ -73,12 +69,8 @@ class SourceController
         SourceRequestInterface $request
     ): Response {
         return $this->doUserSourceAction($source, $user, function (OriginSource $source) use ($request, $mutator) {
-            $errors = $this->validator->validate($request);
-            if (0 !== count($errors)) {
-                return $this->responseFactory->createErrorResponse(
-                    $this->invalidSourceResponseFactory->createFromConstraintViolations($request->getType(), $errors),
-                    400
-                );
+            if (($response = $this->validateRequest($request)) instanceof JsonResponse) {
+                return $response;
             }
 
             return new JsonResponse($mutator->update($source, $request));
@@ -153,5 +145,18 @@ class SourceController
         }
 
         return $action($source);
+    }
+
+    private function validateRequest(object $request): ?JsonResponse
+    {
+        $errors = $this->validator->validate($request);
+        if (0 !== count($errors)) {
+            return $this->responseFactory->createErrorResponse(
+                $this->invalidRequestResponseFactory->createFromConstraintViolations($errors),
+                400
+            );
+        }
+
+        return null;
     }
 }
