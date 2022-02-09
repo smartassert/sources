@@ -61,7 +61,7 @@ class UserGitRepositoryPreparerTest extends WebTestCase
     /**
      * @dataProvider prepareThrowsExceptionDataProvider
      *
-     * @param callable(ProcessOutput|\Exception, null|ProcessOutput|\Exception, RepositoryException): void $assertions
+     * @param callable(\Exception|ProcessOutput, null|\Exception|ProcessOutput, RepositoryException): void $assertions
      */
     public function testPrepareThrowsException(
         ProcessOutput|\Exception $cloneProcessOutcome,
