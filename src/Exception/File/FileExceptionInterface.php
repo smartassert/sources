@@ -11,4 +11,6 @@ interface FileExceptionInterface extends \Throwable
     public function getPath(): string;
 
     public function getFilesystemException(): FilesystemException;
+
+    public function getAction(): string;
 }

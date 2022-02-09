@@ -9,7 +9,7 @@ use League\Flysystem\FilesystemException;
 abstract class AbstractFileException extends \Exception implements FileExceptionInterface
 {
     public function __construct(
-        string $action,
+        private string $action,
         private string $path,
         private FilesystemException $filesystemException,
     ) {
@@ -28,5 +28,10 @@ abstract class AbstractFileException extends \Exception implements FileException
     public function getFilesystemException(): FilesystemException
     {
         return $this->filesystemException;
+    }
+
+    public function getAction(): string
+    {
+        return $this->action;
     }
 }

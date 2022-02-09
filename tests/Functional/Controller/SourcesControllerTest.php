@@ -14,6 +14,7 @@ use App\Enum\Source\Type;
 use App\Model\EntityId;
 use App\Repository\RunSourceRepository;
 use App\Repository\SourceRepository;
+use App\Request\AddFileRequest;
 use App\Request\FileSourceRequest;
 use App\Request\GitSourceRequest;
 use App\Request\InvalidSourceTypeRequest;
@@ -25,6 +26,7 @@ use App\Tests\Model\UserId;
 use App\Tests\Services\EntityRemover;
 use App\Tests\Services\FileStoreFixtureCreator;
 use App\Tests\Services\FixtureLoader;
+use App\Validator\YamlFileConstraint;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Middleware;
@@ -911,6 +913,219 @@ class SourcesControllerTest extends WebTestCase
         self::assertSame($expectedResponse->getStatusCode(), $response->getStatusCode());
         self::assertSame($expectedResponse->headers->get('content-type'), $response->headers->get('content-type'));
         self::assertSame($expectedResponse->getContent(), $response->getContent());
+    }
+
+    /**
+     * @dataProvider addFileInvalidRequestDataProvider
+     *
+     * @param array<string, string> $requestData
+     * @param array<mixed>          $expectedResponseData
+     */
+    public function testAddFileInvalidRequest(
+        SourceInterface $source,
+        string $userId,
+        array $requestData,
+        array $expectedResponseData
+    ): void {
+        $this->store->add($source);
+
+        $this->mockHandler->append(
+            new Response(200, [], $userId)
+        );
+
+        $response = $this->makeAuthorizedSourceRequest('POST', 'add_file', $source->getId(), $requestData);
+
+        self::assertSame(400, $response->getStatusCode());
+        $this->assertAuthorizationRequestIsMade();
+        self::assertInstanceOf(JsonResponse::class, $response);
+
+        $responseData = json_decode((string) $response->getContent(), true);
+        self::assertEquals($expectedResponseData, $responseData);
+    }
+
+    /**
+     * @return array<mixed>
+     */
+    public function addFileInvalidRequestDataProvider(): array
+    {
+        $userId = UserId::create();
+        $label = 'file source label';
+
+        $fileSource = new FileSource($userId, $label);
+
+        return [
+            'name empty, content non-empty' => [
+                'source' => $fileSource,
+                'userId' => $userId,
+                'requestData' => [
+                    'name' => '',
+                    'content' => 'non-empty value',
+                ],
+                'expectedResponseData' => [
+                    'error' => [
+                        'type' => 'invalid_request',
+                        'payload' => [
+                            'name' => [
+                                'value' => '',
+                                'message' => YamlFileConstraint::MESSAGE_NAME_INVALID,
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+            'name contains backslash characters, content non-empty' => [
+                'source' => $fileSource,
+                'userId' => $userId,
+                'requestData' => [
+                    'name' => 'one two \\ three',
+                    'content' => 'non-empty value',
+                ],
+                'expectedResponseData' => [
+                    'error' => [
+                        'type' => 'invalid_request',
+                        'payload' => [
+                            'name' => [
+                                'value' => '',
+                                'message' => YamlFileConstraint::MESSAGE_NAME_INVALID,
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+            'name contains null byte characters, content non-empty' => [
+                'source' => $fileSource,
+                'userId' => $userId,
+                'requestData' => [
+                    'name' => 'one ' . chr(0) . ' two three' . chr(0),
+                    'content' => 'non-empty value',
+                ],
+                'expectedResponseData' => [
+                    'error' => [
+                        'type' => 'invalid_request',
+                        'payload' => [
+                            'name' => [
+                                'value' => '',
+                                'message' => YamlFileConstraint::MESSAGE_NAME_INVALID,
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+            'name does not end with .yml or .yaml, content non-empty' => [
+                'source' => $fileSource,
+                'userId' => $userId,
+                'requestData' => [
+                    'name' => 'filename',
+                    'content' => 'non-empty value',
+                ],
+                'expectedResponseData' => [
+                    'error' => [
+                        'type' => 'invalid_request',
+                        'payload' => [
+                            'name' => [
+                                'value' => '',
+                                'message' => YamlFileConstraint::MESSAGE_NAME_INVALID,
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+            'name valid, content empty' => [
+                'source' => $fileSource,
+                'userId' => $userId,
+                'requestData' => [
+                    'name' => 'filename.yaml',
+                    'content' => '',
+                ],
+                'expectedResponseData' => [
+                    'error' => [
+                        'type' => 'invalid_request',
+                        'payload' => [
+                            'content' => [
+                                'value' => '',
+                                'message' => 'File content must not be empty.',
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+            'name valid, content invalid yaml' => [
+                'source' => $fileSource,
+                'userId' => $userId,
+                'requestData' => [
+                    'name' => 'filename.yml',
+                    'content' => "- item\ncontent",
+                ],
+                'expectedResponseData' => [
+                    'error' => [
+                        'type' => 'invalid_request',
+                        'payload' => [
+                            'content' => [
+                                'value' => '',
+                                'message' => 'Content must be valid YAML: Unable to parse at line 2 (near "content").',
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider addFileSuccessDataProvider
+     *
+     * @param array<string, string> $requestData
+     */
+    public function testAddFileSuccess(FileSource $source, string $userId, array $requestData): void
+    {
+        $this->store->add($source);
+
+        $this->mockHandler->append(
+            new Response(200, [], $userId)
+        );
+
+        $response = $this->makeAuthorizedSourceRequest('POST', 'add_file', $source->getId(), $requestData);
+
+        self::assertSame(200, $response->getStatusCode());
+        $this->assertAuthorizationRequestIsMade();
+
+        $fileStoreBasePath = self::getContainer()->getParameter('file_store_base_path');
+        self::assertIsString($fileStoreBasePath);
+
+        $requestFileName = $requestData[AddFileRequest::KEY_POST_NAME] ?? null;
+        $requestFileName = is_string($requestFileName) ? $requestFileName : null;
+        self::assertIsString($requestFileName);
+
+        $expectedFilePath = $fileStoreBasePath . '/' . $source . '/' . $requestFileName;
+        self::assertFileExists($expectedFilePath);
+
+        $requestContent = $requestData[AddFileRequest::KEY_POST_CONTENT] ?? null;
+        $requestContent = is_string($requestContent) ? $requestContent : null;
+        self::assertIsString($requestContent);
+
+        self::assertSame($requestContent, file_get_contents($expectedFilePath));
+    }
+
+    /**
+     * @return array<mixed>
+     */
+    public function addFileSuccessDataProvider(): array
+    {
+        $userId = UserId::create();
+        $label = 'file source label';
+
+        $fileSource = new FileSource($userId, $label);
+
+        return [
+            'default' => [
+                'source' => $fileSource,
+                'userId' => $userId,
+                'requestData' => [
+                    'name' => 'filename.yaml',
+                    'content' => '- list item',
+                ],
+            ],
+        ];
     }
 
     private function assertAuthorizationRequestIsMade(): void
