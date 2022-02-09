@@ -14,9 +14,9 @@ use App\Enum\Source\Type;
 use App\Model\EntityId;
 use App\Repository\RunSourceRepository;
 use App\Repository\SourceRepository;
-use App\Request\AbstractSourceRequest;
 use App\Request\FileSourceRequest;
 use App\Request\GitSourceRequest;
+use App\Request\SourceRequestInterface;
 use App\Services\RunSourceSerializer;
 use App\Services\Source\Store;
 use App\Tests\Model\Route;
@@ -247,7 +247,7 @@ class SourcesControllerTest extends WebTestCase
         return [
             'invalid source type' => [
                 'requestParameters' => [
-                    AbstractSourceRequest::KEY_POST_TYPE => 'invalid',
+                    SourceRequestInterface::PARAMETER_TYPE => 'invalid',
                 ],
                 'expectedResponseData' => [
                     'error' => [
@@ -261,7 +261,7 @@ class SourcesControllerTest extends WebTestCase
             ],
             'git source missing host url' => [
                 'requestParameters' => [
-                    AbstractSourceRequest::KEY_POST_TYPE => Type::GIT->value,
+                    SourceRequestInterface::PARAMETER_TYPE => Type::GIT->value,
                 ],
                 'expectedResponseData' => [
                     'error' => [
@@ -321,7 +321,7 @@ class SourcesControllerTest extends WebTestCase
             'git source, credentials missing' => [
                 'userId' => $userId,
                 'requestParameters' => [
-                    AbstractSourceRequest::KEY_POST_TYPE => Type::GIT->value,
+                    SourceRequestInterface::PARAMETER_TYPE => Type::GIT->value,
                     GitSourceRequest::PARAMETER_HOST_URL => $hostUrl,
                     GitSourceRequest::PARAMETER_PATH => $path
                 ],
@@ -336,7 +336,7 @@ class SourcesControllerTest extends WebTestCase
             'git source, credentials present' => [
                 'userId' => $userId,
                 'requestParameters' => [
-                    AbstractSourceRequest::KEY_POST_TYPE => Type::GIT->value,
+                    SourceRequestInterface::PARAMETER_TYPE => Type::GIT->value,
                     GitSourceRequest::PARAMETER_HOST_URL => $hostUrl,
                     GitSourceRequest::PARAMETER_PATH => $path,
                     GitSourceRequest::PARAMETER_CREDENTIALS => $credentials,
@@ -352,7 +352,7 @@ class SourcesControllerTest extends WebTestCase
             'file source' => [
                 'userId' => $userId,
                 'requestParameters' => [
-                    AbstractSourceRequest::KEY_POST_TYPE => Type::FILE->value,
+                    SourceRequestInterface::PARAMETER_TYPE => Type::FILE->value,
                     FileSourceRequest::PARAMETER_LABEL => $label
                 ],
                 'expected' => [
@@ -507,7 +507,7 @@ class SourcesControllerTest extends WebTestCase
                 'source' => $fileSource,
                 'userId' => $userId,
                 'requestData' => [
-                    AbstractSourceRequest::KEY_POST_TYPE => Type::FILE->value,
+                    SourceRequestInterface::PARAMETER_TYPE => Type::FILE->value,
                     FileSourceRequest::PARAMETER_LABEL => $newLabel,
                 ],
                 'expectedResponseData' => [
@@ -521,7 +521,7 @@ class SourcesControllerTest extends WebTestCase
                 'source' => $gitSource,
                 'userId' => $userId,
                 'requestData' => [
-                    AbstractSourceRequest::KEY_POST_TYPE => Type::GIT->value,
+                    SourceRequestInterface::PARAMETER_TYPE => Type::GIT->value,
                     GitSourceRequest::PARAMETER_HOST_URL => $newHostUrl,
                     GitSourceRequest::PARAMETER_PATH => $newPath,
                     GitSourceRequest::PARAMETER_CREDENTIALS => null,
@@ -539,7 +539,7 @@ class SourcesControllerTest extends WebTestCase
                 'source' => $gitSource,
                 'userId' => $userId,
                 'requestData' => [
-                    AbstractSourceRequest::KEY_POST_TYPE => Type::GIT->value,
+                    SourceRequestInterface::PARAMETER_TYPE => Type::GIT->value,
                     GitSourceRequest::PARAMETER_HOST_URL => $newHostUrl,
                     GitSourceRequest::PARAMETER_PATH => $newPath,
                 ],

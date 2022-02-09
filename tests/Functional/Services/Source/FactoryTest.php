@@ -11,12 +11,13 @@ use App\Entity\SourceInterface;
 use App\Repository\SourceRepository;
 use App\Request\FileSourceRequest;
 use App\Request\GitSourceRequest;
-use App\Request\InvalidSourceRequest;
+use App\Request\InvalidSourceTypeRequest;
 use App\Services\Source\Factory;
 use App\Tests\Model\UserId;
 use App\Tests\Services\EntityRemover;
 use SmartAssert\UsersSecurityBundle\Security\User;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\User\UserInterface;
 use webignition\ObjectReflector\ObjectReflector;
 
@@ -47,7 +48,7 @@ class FactoryTest extends WebTestCase
     {
         self::assertNull($this->factory->createFromSourceRequest(
             \Mockery::mock(UserInterface::class),
-            new InvalidSourceRequest('invalid', [])
+            new InvalidSourceTypeRequest('invalid')
         ));
     }
 
@@ -92,27 +93,33 @@ class FactoryTest extends WebTestCase
         return [
             'git, empty credentials' => [
                 'user' => $user,
-                'request' => new GitSourceRequest([
-                    GitSourceRequest::PARAMETER_HOST_URL => $gitSourceHostUrl,
-                    GitSourceRequest::PARAMETER_PATH => $gitSourcePath,
-                    GitSourceRequest::PARAMETER_CREDENTIALS => '',
-                ]),
+                'request' => new GitSourceRequest(new Request(
+                    request: [
+                        GitSourceRequest::PARAMETER_HOST_URL => $gitSourceHostUrl,
+                        GitSourceRequest::PARAMETER_PATH => $gitSourcePath,
+                        GitSourceRequest::PARAMETER_CREDENTIALS => '',
+                    ]
+                )),
                 'expected' => new GitSource($userId, $gitSourceHostUrl, $gitSourcePath, ''),
             ],
             'git, non-empty credentials' => [
                 'user' => $user,
-                'request' => new GitSourceRequest([
-                    GitSourceRequest::PARAMETER_HOST_URL => $gitSourceHostUrl,
-                    GitSourceRequest::PARAMETER_PATH => $gitSourcePath,
-                    GitSourceRequest::PARAMETER_CREDENTIALS => 'credentials',
-                ]),
+                'request' => new GitSourceRequest(new Request(
+                    request: [
+                        GitSourceRequest::PARAMETER_HOST_URL => $gitSourceHostUrl,
+                        GitSourceRequest::PARAMETER_PATH => $gitSourcePath,
+                        GitSourceRequest::PARAMETER_CREDENTIALS => 'credentials',
+                    ]
+                )),
                 'expected' => new GitSource($userId, $gitSourceHostUrl, $gitSourcePath, 'credentials'),
             ],
             'file' => [
                 'user' => $user,
-                'request' => new FileSourceRequest([
-                    FileSourceRequest::PARAMETER_LABEL => 'file source label',
-                ]),
+                'request' => new FileSourceRequest(new Request(
+                    request: [
+                        FileSourceRequest::PARAMETER_LABEL => 'file source label',
+                    ]
+                )),
                 'expected' => new FileSource($userId, 'file source label'),
             ],
         ];
