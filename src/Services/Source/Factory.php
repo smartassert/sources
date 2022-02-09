@@ -27,18 +27,15 @@ class Factory
         $source = null;
 
         if ($request instanceof FileSourceRequest) {
-            $source = new FileSource(
-                $user->getUserIdentifier(),
-                $request->getParameter(FileSourceRequest::PARAMETER_LABEL)
-            );
+            $source = new FileSource($user->getUserIdentifier(), $request->getLabel());
         }
 
         if ($request instanceof GitSourceRequest) {
             $source = new GitSource(
                 $user->getUserIdentifier(),
-                $request->getParameter(GitSourceRequest::PARAMETER_HOST_URL),
-                $request->getParameter(GitSourceRequest::PARAMETER_PATH),
-                $request->getParameter(GitSourceRequest::PARAMETER_CREDENTIALS),
+                $request->getHostUrl(),
+                $request->getPath(),
+                $request->getCredentials(),
             );
         }
 

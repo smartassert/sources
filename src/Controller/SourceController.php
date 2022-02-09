@@ -11,7 +11,9 @@ use App\Enum\Source\Type;
 use App\Exception\File\ReadException;
 use App\Message\Prepare;
 use App\Repository\SourceRepository;
+use App\Request\GitSourceRequest;
 use App\Request\SourceRequestInterface;
+use App\ResponseBody\ErrorResponse;
 use App\ResponseBody\SourceReadExceptionResponse;
 use App\ResponseBody\SourceRequestInvalidResponse;
 use App\Services\ResponseFactory;
@@ -40,8 +42,28 @@ class SourceController
     #[Route(self::ROUTE_SOURCE, name: 'create', methods: ['POST'])]
     public function create(UserInterface $user, Factory $factory, SourceRequestInterface $request): JsonResponse
     {
-        if (false === $request->isValid()) {
-            return $this->responseFactory->createErrorResponse(new SourceRequestInvalidResponse($request), 400);
+        try {
+            Type::from($request->getType());
+        } catch (\ValueError) {
+            return $this->responseFactory->createErrorResponse(
+                new ErrorResponse('invalid_source_request', [
+                    'source_type' => $request->getType(),
+                    'missing_required_fields' => [],
+                ]),
+                400
+            );
+        }
+
+        if ($request instanceof GitSourceRequest && '' === $request->getHostUrl()) {
+            return $this->responseFactory->createErrorResponse(
+                new ErrorResponse('invalid_source_request', [
+                    'source_type' => 'git',
+                    'missing_required_fields' => [
+                        'host-url',
+                    ],
+                ]),
+                400
+            );
         }
 
         return new JsonResponse($factory->createFromSourceRequest($user, $request));
@@ -63,8 +85,16 @@ class SourceController
         SourceRequestInterface $request
     ): Response {
         return $this->doUserSourceAction($source, $user, function (OriginSource $source) use ($request, $mutator) {
-            if (false === $request->isValid()) {
-                return $this->responseFactory->createErrorResponse(new SourceRequestInvalidResponse($request), 400);
+            if ($request instanceof GitSourceRequest && '' === $request->getHostUrl()) {
+                return $this->responseFactory->createErrorResponse(
+                    new ErrorResponse('invalid_source_request', [
+                        'source_type' => 'git',
+                        'missing_required_fields' => [
+                            'host-url',
+                        ],
+                    ]),
+                    400
+                );
             }
 
             return new JsonResponse($mutator->update($source, $request));
