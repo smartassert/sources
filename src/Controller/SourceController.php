@@ -14,8 +14,8 @@ use App\Exception\File\RemoveException;
 use App\Exception\File\WriteException;
 use App\Message\Prepare;
 use App\Repository\SourceRepository;
-use App\Request\AddFileRequest;
-use App\Request\RemoveFileRequest;
+use App\Request\AddYamlFileRequest;
+use App\Request\RemoveYamlFileRequest;
 use App\Request\SourceRequestInterface;
 use App\ResponseBody\FileExceptionResponse;
 use App\Services\FileStoreManager;
@@ -146,7 +146,7 @@ class SourceController
     #[Route(self::ROUTE_SOURCE_FILE, name: 'add_file', methods: ['POST'])]
     public function addFile(
         ?FileSource $source,
-        AddFileRequest $request,
+        AddYamlFileRequest $request,
         UserInterface $user,
         FileStoreManager $fileStoreManager,
     ): Response {
@@ -174,7 +174,7 @@ class SourceController
     #[Route(self::ROUTE_SOURCE_FILE, name: 'remove_file', methods: ['DELETE'])]
     public function removeFile(
         ?FileSource $source,
-        RemoveFileRequest $request,
+        RemoveYamlFileRequest $request,
         UserInterface $user,
         FileStoreManager $fileStoreManager,
     ): Response {

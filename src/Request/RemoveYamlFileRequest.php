@@ -7,7 +7,7 @@ namespace App\Request;
 use Symfony\Component\HttpFoundation\Request;
 use webignition\EncapsulatingRequestResolverBundle\Model\EncapsulatingRequestInterface;
 
-class RemoveFileRequest extends AbstractYamlFileRequest implements EncapsulatingRequestInterface
+class RemoveYamlFileRequest extends AbstractYamlFileRequest implements EncapsulatingRequestInterface
 {
     public static function create(Request $request): self
     {

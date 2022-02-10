@@ -7,7 +7,7 @@ namespace App\Validator;
 use Symfony\Component\Validator\Constraint;
 
 #[\Attribute]
-class FilenameConstraint extends Constraint
+class YamlFilenameConstraint extends Constraint
 {
     public const MESSAGE_NAME_INVALID =
         'File name must be non-empty and contain no backslash or null byte characters.';

@@ -26,7 +26,7 @@ use App\Tests\Services\ApplicationClient;
 use App\Tests\Services\EntityRemover;
 use App\Tests\Services\FileStoreFixtureCreator;
 use App\Tests\Services\FixtureLoader;
-use App\Validator\FilenameConstraint;
+use App\Validator\YamlFilenameConstraint;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Middleware;
 use Psr\Http\Message\RequestInterface;
@@ -967,7 +967,7 @@ class SourcesControllerTest extends AbstractSourceControllerTest
                         'payload' => [
                             'name' => [
                                 'value' => '',
-                                'message' => FilenameConstraint::MESSAGE_NAME_INVALID,
+                                'message' => YamlFilenameConstraint::MESSAGE_NAME_INVALID,
                             ],
                         ],
                     ],
@@ -984,7 +984,7 @@ class SourcesControllerTest extends AbstractSourceControllerTest
                         'payload' => [
                             'name' => [
                                 'value' => '',
-                                'message' => FilenameConstraint::MESSAGE_NAME_INVALID,
+                                'message' => YamlFilenameConstraint::MESSAGE_NAME_INVALID,
                             ],
                         ],
                     ],
@@ -1001,7 +1001,7 @@ class SourcesControllerTest extends AbstractSourceControllerTest
                         'payload' => [
                             'name' => [
                                 'value' => '',
-                                'message' => FilenameConstraint::MESSAGE_NAME_INVALID,
+                                'message' => YamlFilenameConstraint::MESSAGE_NAME_INVALID,
                             ],
                         ],
                     ],
@@ -1096,7 +1096,7 @@ class SourcesControllerTest extends AbstractSourceControllerTest
                         'payload' => [
                             'name' => [
                                 'value' => '',
-                                'message' => FilenameConstraint::MESSAGE_NAME_INVALID,
+                                'message' => YamlFilenameConstraint::MESSAGE_NAME_INVALID,
                             ],
                         ],
                     ],
@@ -1112,7 +1112,7 @@ class SourcesControllerTest extends AbstractSourceControllerTest
                         'payload' => [
                             'name' => [
                                 'value' => '',
-                                'message' => FilenameConstraint::MESSAGE_NAME_INVALID,
+                                'message' => YamlFilenameConstraint::MESSAGE_NAME_INVALID,
                             ],
                         ],
                     ],
@@ -1128,7 +1128,7 @@ class SourcesControllerTest extends AbstractSourceControllerTest
                         'payload' => [
                             'name' => [
                                 'value' => '',
-                                'message' => FilenameConstraint::MESSAGE_NAME_INVALID,
+                                'message' => YamlFilenameConstraint::MESSAGE_NAME_INVALID,
                             ],
                         ],
                     ],

@@ -11,11 +11,11 @@ use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 use Symfony\Component\Validator\Exception\UnexpectedValueException;
 
-class FilenameConstraintValidator extends ConstraintValidator
+class YamlFilenameConstraintValidator extends ConstraintValidator
 {
     public function validate(mixed $value, Constraint $constraint): void
     {
-        if (!$constraint instanceof FilenameConstraint) {
+        if (!$constraint instanceof YamlFilenameConstraint) {
             throw new UnexpectedTypeException($constraint, YamlFileConstraint::class);
         }
 

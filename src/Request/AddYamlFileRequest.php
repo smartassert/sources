@@ -9,7 +9,7 @@ use App\Validator\YamlFileConstraint;
 use Symfony\Component\HttpFoundation\Request;
 use webignition\EncapsulatingRequestResolverBundle\Model\EncapsulatingRequestInterface;
 
-class AddFileRequest extends AbstractYamlFileRequest implements EncapsulatingRequestInterface
+class AddYamlFileRequest extends AbstractYamlFileRequest implements EncapsulatingRequestInterface
 {
     public const KEY_POST_CONTENT = 'content';
 

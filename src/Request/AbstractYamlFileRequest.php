@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Request;
 
 use App\Model\Filename;
-use App\Validator\FilenameConstraint;
+use App\Validator\YamlFilenameConstraint;
 use Symfony\Component\HttpFoundation\Request;
 use webignition\EncapsulatingRequestResolverBundle\Model\EncapsulatingRequestInterface;
 
@@ -14,7 +14,7 @@ abstract class AbstractYamlFileRequest implements EncapsulatingRequestInterface
     public const KEY_ATTRIBUTE_FILENAME = 'filename';
 
     public function __construct(
-        #[FilenameConstraint]
+        #[YamlFilenameConstraint]
         private Filename $filename,
     ) {
     }
