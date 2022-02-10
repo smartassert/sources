@@ -21,11 +21,17 @@ class Filename implements \Stringable
         return $this->value;
     }
 
-    public function isValid(): bool
+    public function getExtension(): string
     {
-        return
-            '' !== trim($this->value)
-            && !str_contains($this->value, '\\')
-            && !str_contains($this->value, chr(0));
+        return substr($this->value, ((int) strrpos($this->value, '.')) + 1);
+    }
+
+    public function getName(): string
+    {
+        $lastDotPosition = strrpos($this->value, '.');
+
+        return false === $lastDotPosition
+            ? $this->value
+            : substr($this->value, 0, $lastDotPosition);
     }
 }

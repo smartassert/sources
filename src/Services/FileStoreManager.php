@@ -103,4 +103,16 @@ class FileStoreManager
             throw new ReadException($fileRelativePath, $e);
         }
     }
+
+    /**
+     * @throws RemoveException
+     */
+    public function removeFile(string $fileRelativePath): void
+    {
+        try {
+            $this->filesystem->delete($fileRelativePath);
+        } catch (FilesystemException $e) {
+            throw new RemoveException($fileRelativePath, $e);
+        }
+    }
 }

@@ -8,10 +8,11 @@ use App\Entity\AbstractSource;
 use App\Entity\FileSource;
 use App\Services\FileStoreManager;
 use App\Services\Source\Store;
+use App\Tests\Model\Route;
 use App\Tests\Services\EntityRemover;
 use webignition\ObjectReflector\ObjectReflector;
 
-class SourceControllerAddFileTest extends AbstractSourceControllerTest
+class SourceControllerAddFileRemoveFileTest extends AbstractSourceControllerTest
 {
     private const USER_ID = '01FVHKTM3V53JVCW1HPN1125NF';
     private const SOURCE_ID = '01FVHM0XGXGAD463JTW05CN2TF';
@@ -22,12 +23,10 @@ class SourceControllerAddFileTest extends AbstractSourceControllerTest
     private const CONTENT = '- list item';
 
     private const CREATE_DATA = [
-        'name' => self::FILENAME,
         'content' => self::CONTENT,
     ];
 
     private const UPDATE_DATA = [
-        'name' => self::FILENAME,
         'content' => self::CONTENT . ' updated',
     ];
 
@@ -68,29 +67,62 @@ class SourceControllerAddFileTest extends AbstractSourceControllerTest
 
         $this->setUserServiceAuthorizedResponse(self::USER_ID);
 
-        $response = $this->applicationClient->makeAuthorizedSourceRequest(
+        $response = $this->applicationClient->makeAuthorizedRequest(
             'POST',
-            'add_file',
-            self::SOURCE_ID,
+            new Route('add_file', [
+                'sourceId' => self::SOURCE_ID,
+                'filename' => self::FILENAME,
+            ]),
             self::CREATE_DATA
         );
 
         self::assertSame(200, $response->getStatusCode());
+        self::assertFileExists($this->expectedFilePath);
         self::assertSame(self::CREATE_DATA['content'], file_get_contents($this->expectedFilePath));
     }
 
+    /**
+     * @depends testAddFile
+     */
     public function testUpdateAddedFile(): void
     {
+        self::assertFileExists($this->expectedFilePath);
+        self::assertSame(self::CREATE_DATA['content'], file_get_contents($this->expectedFilePath));
+
         $this->setUserServiceAuthorizedResponse(self::USER_ID);
 
-        $response = $this->applicationClient->makeAuthorizedSourceRequest(
+        $response = $this->applicationClient->makeAuthorizedRequest(
             'POST',
-            'add_file',
-            self::SOURCE_ID,
+            new Route('add_file', [
+                'sourceId' => self::SOURCE_ID,
+                'filename' => self::FILENAME,
+            ]),
             self::UPDATE_DATA
         );
 
         self::assertSame(200, $response->getStatusCode());
+        self::assertFileExists($this->expectedFilePath);
         self::assertSame(self::UPDATE_DATA['content'], file_get_contents($this->expectedFilePath));
+    }
+
+    /**
+     * @depends testUpdateAddedFile
+     */
+    public function testRemoveFile(): void
+    {
+        self::assertFileExists($this->expectedFilePath);
+
+        $this->setUserServiceAuthorizedResponse(self::USER_ID);
+
+        $response = $this->applicationClient->makeAuthorizedRequest(
+            'DELETE',
+            new Route('remove_file', [
+                'sourceId' => self::SOURCE_ID,
+                'filename' => self::FILENAME,
+            ])
+        );
+
+        self::assertSame(200, $response->getStatusCode());
+        self::assertFileDoesNotExist($this->expectedFilePath);
     }
 }

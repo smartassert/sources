@@ -26,7 +26,7 @@ use App\Tests\Services\ApplicationClient;
 use App\Tests\Services\EntityRemover;
 use App\Tests\Services\FileStoreFixtureCreator;
 use App\Tests\Services\FixtureLoader;
-use App\Validator\YamlFileConstraint;
+use App\Validator\YamlFilenameConstraint;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Middleware;
 use Psr\Http\Message\RequestInterface;
@@ -127,19 +127,35 @@ class SourcesControllerTest extends AbstractSourceControllerTest
                 'method' => 'POST',
                 'route' => new Route('prepare', $sourceRouteParameters),
             ],
+            'add file' => [
+                'method' => 'POST',
+                'route' => new Route('add_file', array_merge(
+                    $sourceRouteParameters,
+                    [
+                        'filename' => 'filename.yaml',
+                    ]
+                )),
+            ],
+            'remove file' => [
+                'method' => 'POST',
+                'route' => new Route('remove_file', array_merge(
+                    $sourceRouteParameters,
+                    [
+                        'filename' => 'filename.yaml',
+                    ]
+                )),
+            ],
         ];
     }
 
     /**
      * @dataProvider requestSourceDataProvider
      */
-    public function testRequestSourceNotFound(string $method, string $routeName): void
+    public function testRequestSourceNotFound(string $method, Route $route): void
     {
-        $sourceId = EntityId::create();
         $this->setUserServiceAuthorizedResponse(UserId::create());
 
-        $routeParameters = ['sourceId' => $sourceId];
-        $response = $this->applicationClient->makeAuthorizedRequest($method, new Route($routeName, $routeParameters));
+        $response = $this->applicationClient->makeAuthorizedRequest($method, $route);
 
         self::assertSame(404, $response->getStatusCode());
     }
@@ -147,7 +163,7 @@ class SourcesControllerTest extends AbstractSourceControllerTest
     /**
      * @dataProvider requestSourceDataProvider
      */
-    public function testRequestInvalidSourceUser(string $method, string $routeName): void
+    public function testRequestInvalidSourceUser(string $method, Route $route): void
     {
         $sourceUserId = UserId::create();
         $requestUserId = UserId::create();
@@ -159,8 +175,12 @@ class SourcesControllerTest extends AbstractSourceControllerTest
 
         $this->setUserServiceAuthorizedResponse($requestUserId);
 
-        $routeParameters = ['sourceId' => $sourceId];
-        $response = $this->applicationClient->makeAuthorizedRequest($method, new Route($routeName, $routeParameters));
+        $routeWithSourceId = new Route(
+            $route->name,
+            array_merge($route->parameters, ['sourceId' => $sourceId])
+        );
+
+        $response = $this->applicationClient->makeAuthorizedRequest($method, $routeWithSourceId);
 
         self::assertSame(401, $response->getStatusCode());
     }
@@ -170,22 +190,42 @@ class SourcesControllerTest extends AbstractSourceControllerTest
      */
     public function requestSourceDataProvider(): array
     {
+        $sourceRouteParameters = ['sourceId' => EntityId::create()];
+
         return [
             'get source' => [
                 'method' => 'GET',
-                'routeName' => 'get',
+                'route' => new Route('get', $sourceRouteParameters),
             ],
             'update source' => [
                 'method' => 'PUT',
-                'routeName' => 'update',
+                'route' => new Route('update', $sourceRouteParameters),
             ],
             'delete source' => [
                 'method' => 'DELETE',
-                'routeName' => 'delete',
+                'route' => new Route('delete', $sourceRouteParameters),
             ],
             'prepare source' => [
                 'method' => 'POST',
-                'routeName' => 'prepare',
+                'route' => new Route('prepare', $sourceRouteParameters),
+            ],
+            'add file' => [
+                'method' => 'POST',
+                'route' => new Route('add_file', array_merge(
+                    $sourceRouteParameters,
+                    [
+                        'filename' => 'filename.yaml',
+                    ]
+                )),
+            ],
+            'remove file' => [
+                'method' => 'POST',
+                'route' => new Route('remove_file', array_merge(
+                    $sourceRouteParameters,
+                    [
+                        'filename' => 'filename.yaml',
+                    ]
+                )),
             ],
         ];
     }
@@ -873,24 +913,28 @@ class SourcesControllerTest extends AbstractSourceControllerTest
     /**
      * @dataProvider addFileInvalidRequestDataProvider
      *
-     * @param array<string, string> $requestData
-     * @param array<mixed>          $expectedResponseData
+     * @param array<mixed> $expectedResponseData
      */
     public function testAddFileInvalidRequest(
         SourceInterface $source,
         string $userId,
-        array $requestData,
+        string $filename,
+        string $content,
         array $expectedResponseData
     ): void {
         $this->store->add($source);
 
         $this->setUserServiceAuthorizedResponse($userId);
 
-        $response = $this->applicationClient->makeAuthorizedSourceRequest(
+        $response = $this->applicationClient->makeAuthorizedRequest(
             'POST',
-            'add_file',
-            $source->getId(),
-            $requestData
+            new Route('add_file', [
+                'sourceId' => $source->getId(),
+                'filename' => $filename,
+            ]),
+            [
+                'content' => $content,
+            ]
         );
 
         self::assertSame(400, $response->getStatusCode());
@@ -911,90 +955,35 @@ class SourcesControllerTest extends AbstractSourceControllerTest
 
         $fileSource = new FileSource($userId, $label);
 
+        $expectedInvalidFilenameResponseData = $this->createExpectedInvalidFilenameResponseData();
+
         return [
-            'name empty, content non-empty' => [
+            'name empty with .yaml extension, content non-empty' => [
                 'source' => $fileSource,
                 'userId' => $userId,
-                'requestData' => [
-                    'name' => '',
-                    'content' => 'non-empty value',
-                ],
-                'expectedResponseData' => [
-                    'error' => [
-                        'type' => 'invalid_request',
-                        'payload' => [
-                            'name' => [
-                                'value' => '',
-                                'message' => YamlFileConstraint::MESSAGE_NAME_INVALID,
-                            ],
-                        ],
-                    ],
-                ],
+                'filename' => '.yaml',
+                'content' => 'non-empty value',
+                'expectedResponseData' => $expectedInvalidFilenameResponseData,
             ],
             'name contains backslash characters, content non-empty' => [
                 'source' => $fileSource,
                 'userId' => $userId,
-                'requestData' => [
-                    'name' => 'one two \\ three',
-                    'content' => 'non-empty value',
-                ],
-                'expectedResponseData' => [
-                    'error' => [
-                        'type' => 'invalid_request',
-                        'payload' => [
-                            'name' => [
-                                'value' => '',
-                                'message' => YamlFileConstraint::MESSAGE_NAME_INVALID,
-                            ],
-                        ],
-                    ],
-                ],
+                'filename' => 'one two \\ three.yaml',
+                'content' => 'non-empty value',
+                'expectedResponseData' => $expectedInvalidFilenameResponseData,
             ],
             'name contains null byte characters, content non-empty' => [
                 'source' => $fileSource,
                 'userId' => $userId,
-                'requestData' => [
-                    'name' => 'one ' . chr(0) . ' two three' . chr(0),
-                    'content' => 'non-empty value',
-                ],
-                'expectedResponseData' => [
-                    'error' => [
-                        'type' => 'invalid_request',
-                        'payload' => [
-                            'name' => [
-                                'value' => '',
-                                'message' => YamlFileConstraint::MESSAGE_NAME_INVALID,
-                            ],
-                        ],
-                    ],
-                ],
-            ],
-            'name does not end with .yml or .yaml, content non-empty' => [
-                'source' => $fileSource,
-                'userId' => $userId,
-                'requestData' => [
-                    'name' => 'filename',
-                    'content' => 'non-empty value',
-                ],
-                'expectedResponseData' => [
-                    'error' => [
-                        'type' => 'invalid_request',
-                        'payload' => [
-                            'name' => [
-                                'value' => '',
-                                'message' => YamlFileConstraint::MESSAGE_NAME_INVALID,
-                            ],
-                        ],
-                    ],
-                ],
+                'filename' => 'one ' . chr(0) . ' two three' . chr(0) . '.yaml',
+                'content' => 'non-empty value',
+                'expectedResponseData' => $expectedInvalidFilenameResponseData,
             ],
             'name valid, content empty' => [
                 'source' => $fileSource,
                 'userId' => $userId,
-                'requestData' => [
-                    'name' => 'filename.yaml',
-                    'content' => '',
-                ],
+                'filename' => 'filename.yaml',
+                'content' => '',
                 'expectedResponseData' => [
                     'error' => [
                         'type' => 'invalid_request',
@@ -1010,10 +999,8 @@ class SourcesControllerTest extends AbstractSourceControllerTest
             'name valid, content invalid yaml' => [
                 'source' => $fileSource,
                 'userId' => $userId,
-                'requestData' => [
-                    'name' => 'filename.yml',
-                    'content' => "- item\ncontent",
-                ],
+                'filename' => 'filename.yaml',
+                'content' => "- item\ncontent",
                 'expectedResponseData' => [
                     'error' => [
                         'type' => 'invalid_request',
@@ -1025,6 +1012,71 @@ class SourcesControllerTest extends AbstractSourceControllerTest
                         ],
                     ],
                 ],
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider removeFileInvalidRequestDataProvider
+     *
+     * @param array<mixed> $expectedResponseData
+     */
+    public function testRemoveFileInvalidRequest(
+        SourceInterface $source,
+        string $userId,
+        string $filename,
+        array $expectedResponseData
+    ): void {
+        $this->store->add($source);
+
+        $this->setUserServiceAuthorizedResponse($userId);
+
+        $response = $this->applicationClient->makeAuthorizedRequest(
+            'DELETE',
+            new Route('remove_file', [
+                'sourceId' => $source->getId(),
+                'filename' => $filename,
+            ])
+        );
+
+        self::assertSame(400, $response->getStatusCode());
+        $this->assertAuthorizationRequestIsMade();
+        self::assertInstanceOf(JsonResponse::class, $response);
+
+        $responseData = json_decode((string) $response->getContent(), true);
+        self::assertEquals($expectedResponseData, $responseData);
+    }
+
+    /**
+     * @return array<mixed>
+     */
+    public function removeFileInvalidRequestDataProvider(): array
+    {
+        $userId = UserId::create();
+        $label = 'file source label';
+
+        $fileSource = new FileSource($userId, $label);
+
+        $expectedInvalidFilenameResponseData = $this->createExpectedInvalidFilenameResponseData();
+
+        return [
+            'name empty with .yaml extension' => [
+                'source' => $fileSource,
+                'userId' => $userId,
+                'filename' => '.yaml',
+                'expectedResponseData' => $expectedInvalidFilenameResponseData,
+            ],
+            'name contains backslash characters' => [
+                'source' => $fileSource,
+                'userId' => $userId,
+                'filename' => 'one two \\ three.yaml',
+                'expectedResponseData' => $expectedInvalidFilenameResponseData,
+            ],
+            'name contains null byte characters' => [
+                'source' => $fileSource,
+                'userId' => $userId,
+                'filename' => 'one ' . chr(0) . ' two three' . chr(0) . '.yaml',
+                'expectedResponseData' => $expectedInvalidFilenameResponseData,
             ],
         ];
     }
@@ -1044,5 +1096,23 @@ class SourcesControllerTest extends AbstractSourceControllerTest
             ApplicationClient::AUTH_HEADER_VALUE,
             $request->getHeaderLine(ApplicationClient::AUTH_HEADER_KEY)
         );
+    }
+
+    /**
+     * @return array<mixed>
+     */
+    private function createExpectedInvalidFilenameResponseData(): array
+    {
+        return [
+            'error' => [
+                'type' => 'invalid_request',
+                'payload' => [
+                    'name' => [
+                        'value' => '',
+                        'message' => YamlFilenameConstraint::MESSAGE_NAME_INVALID,
+                    ],
+                ],
+            ],
+        ];
     }
 }
