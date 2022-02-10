@@ -9,7 +9,6 @@ use App\Entity\FileSource;
 use App\Services\FileStoreManager;
 use App\Services\Source\Store;
 use App\Tests\Services\EntityRemover;
-use GuzzleHttp\Psr7\Response;
 use webignition\ObjectReflector\ObjectReflector;
 
 class SourceControllerAddFileTest extends AbstractSourceControllerTest
@@ -67,9 +66,7 @@ class SourceControllerAddFileTest extends AbstractSourceControllerTest
         $fileStoreManager->remove(self::SOURCE_RELATIVE_PATH);
         self::assertDirectoryDoesNotExist(self::SOURCE_RELATIVE_PATH);
 
-        $this->mockHandler->append(
-            new Response(200, [], self::USER_ID),
-        );
+        $this->setUserServiceAuthorizedResponse(self::USER_ID);
 
         $response = $this->applicationClient->makeAuthorizedSourceRequest(
             'POST',
@@ -84,9 +81,7 @@ class SourceControllerAddFileTest extends AbstractSourceControllerTest
 
     public function testUpdateAddedFile(): void
     {
-        $this->mockHandler->append(
-            new Response(200, [], self::USER_ID)
-        );
+        $this->setUserServiceAuthorizedResponse(self::USER_ID);
 
         $response = $this->applicationClient->makeAuthorizedSourceRequest(
             'POST',

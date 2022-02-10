@@ -28,7 +28,6 @@ use App\Tests\Services\FixtureLoader;
 use App\Validator\YamlFileConstraint;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Middleware;
-use GuzzleHttp\Psr7\Response;
 use Psr\Http\Message\RequestInterface;
 use SmartAssert\UsersClient\Routes;
 use SmartAssert\UsersSecurityBundle\Security\AuthorizationProperties;
@@ -90,9 +89,7 @@ class SourcesControllerTest extends AbstractSourceControllerTest
      */
     public function testRequestForUnauthorizedUser(string $method, Route $route): void
     {
-        $this->mockHandler->append(
-            new Response(401)
-        );
+        $this->setUserServiceUnauthorizedResponse();
 
         $response = $this->applicationClient->makeAuthorizedRequest($method, $route);
 
@@ -141,10 +138,7 @@ class SourcesControllerTest extends AbstractSourceControllerTest
     public function testRequestSourceNotFound(string $method, string $routeName): void
     {
         $sourceId = EntityId::create();
-
-        $this->mockHandler->append(
-            new Response(200, [], $sourceId)
-        );
+        $this->setUserServiceAuthorizedResponse(UserId::create());
 
         $routeParameters = ['sourceId' => $sourceId];
         $response = $this->applicationClient->makeAuthorizedRequest($method, new Route($routeName, $routeParameters));
@@ -165,9 +159,7 @@ class SourcesControllerTest extends AbstractSourceControllerTest
         $sourceId = $source->getId();
         $this->store->add($source);
 
-        $this->mockHandler->append(
-            new Response(200, [], $requestUserId)
-        );
+        $this->setUserServiceAuthorizedResponse($requestUserId);
 
         $routeParameters = ['sourceId' => $sourceId];
         $response = $this->applicationClient->makeAuthorizedRequest($method, new Route($routeName, $routeParameters));
@@ -209,9 +201,7 @@ class SourcesControllerTest extends AbstractSourceControllerTest
     public function testCreateInvalidSourceRequest(array $requestParameters, array $expectedResponseData): void
     {
         $userId = UserId::create();
-        $this->mockHandler->append(
-            new Response(200, [], $userId)
-        );
+        $this->setUserServiceAuthorizedResponse($userId);
 
         $response = $this->applicationClient->makeAuthorizedRequest('POST', new Route('create'), $requestParameters);
 
@@ -273,9 +263,7 @@ class SourcesControllerTest extends AbstractSourceControllerTest
      */
     public function testCreateSuccess(string $userId, array $requestParameters, array $expected): void
     {
-        $this->mockHandler->append(
-            new Response(200, [], $userId)
-        );
+        $this->setUserServiceAuthorizedResponse($userId);
 
         $response = $this->applicationClient->makeAuthorizedRequest('POST', new Route('create'), $requestParameters);
 
@@ -360,9 +348,7 @@ class SourcesControllerTest extends AbstractSourceControllerTest
     {
         $this->store->add($source);
 
-        $this->mockHandler->append(
-            new Response(200, [], $userId)
-        );
+        $this->setUserServiceAuthorizedResponse($userId);
 
         $response = $this->applicationClient->makeAuthorizedSourceRequest('GET', 'get', $source->getId());
 
@@ -458,9 +444,7 @@ class SourcesControllerTest extends AbstractSourceControllerTest
     ): void {
         $this->store->add($source);
 
-        $this->mockHandler->append(
-            new Response(200, [], $userId)
-        );
+        $this->setUserServiceAuthorizedResponse($userId);
 
         $response = $this->applicationClient->makeAuthorizedSourceRequest(
             'PUT',
@@ -580,9 +564,7 @@ class SourcesControllerTest extends AbstractSourceControllerTest
         $this->store->add($source);
         self::assertGreaterThan(0, $this->sourceRepository->count([]));
 
-        $this->mockHandler->append(
-            new Response(200, [], $userId)
-        );
+        $this->setUserServiceAuthorizedResponse($userId);
 
         $response = $this->applicationClient->makeAuthorizedSourceRequest('DELETE', 'delete', $source->getId());
 
@@ -632,9 +614,7 @@ class SourcesControllerTest extends AbstractSourceControllerTest
             $this->store->add($source);
         }
 
-        $this->mockHandler->append(
-            new Response(200, [], $userId)
-        );
+        $this->setUserServiceAuthorizedResponse($userId);
 
         $response = $this->applicationClient->makeAuthorizedRequest('GET', new Route('list'));
 
@@ -739,9 +719,7 @@ class SourcesControllerTest extends AbstractSourceControllerTest
 
         $this->store->add($source);
 
-        $this->mockHandler->append(
-            new Response(200, [], $userId)
-        );
+        $this->setUserServiceAuthorizedResponse($userId);
 
         $response = $this->applicationClient->makeAuthorizedSourceRequest('POST', 'prepare', $source->getId());
 
@@ -763,9 +741,7 @@ class SourcesControllerTest extends AbstractSourceControllerTest
     ): void {
         $this->store->add($source);
 
-        $this->mockHandler->append(
-            new Response(200, [], $userId)
-        );
+        $this->setUserServiceAuthorizedResponse($userId);
 
         $response = $this->applicationClient->makeAuthorizedSourceRequest(
             'POST',
@@ -887,9 +863,7 @@ class SourcesControllerTest extends AbstractSourceControllerTest
             $runSource . '/' . RunSourceSerializer::SERIALIZED_FILENAME
         );
 
-        $this->mockHandler->append(
-            new Response(200, [], $userId)
-        );
+        $this->setUserServiceAuthorizedResponse($userId);
 
         $response = $this->applicationClient->makeAuthorizedSourceRequest('GET', 'read', $runSource->getId());
 
@@ -912,9 +886,7 @@ class SourcesControllerTest extends AbstractSourceControllerTest
     ): void {
         $this->store->add($source);
 
-        $this->mockHandler->append(
-            new Response(200, [], $userId)
-        );
+        $this->setUserServiceAuthorizedResponse($userId);
 
         $response = $this->applicationClient->makeAuthorizedSourceRequest(
             'POST',

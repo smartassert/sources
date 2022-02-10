@@ -6,11 +6,12 @@ namespace App\Tests\Functional\Controller;
 
 use App\Tests\Services\ApplicationClient;
 use GuzzleHttp\Handler\MockHandler;
+use GuzzleHttp\Psr7\Response;
+use Psr\Http\Message\ResponseInterface;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 abstract class AbstractSourceControllerTest extends WebTestCase
 {
-    protected MockHandler $mockHandler;
     protected ApplicationClient $applicationClient;
 
     protected function setUp(): void
@@ -23,9 +24,22 @@ abstract class AbstractSourceControllerTest extends WebTestCase
         \assert($applicationClient instanceof ApplicationClient);
         $this->applicationClient = $applicationClient;
         $applicationClient->setClient($client);
+    }
 
+    protected function setUserServiceAuthorizedResponse(string $userId): void
+    {
+        $this->setUserServiceResponse(new Response(200, [], $userId));
+    }
+
+    protected function setUserServiceUnauthorizedResponse(): void
+    {
+        $this->setUserServiceResponse(new Response(401));
+    }
+
+    private function setUserServiceResponse(ResponseInterface $response): void
+    {
         $mockHandler = self::getContainer()->get(MockHandler::class);
         \assert($mockHandler instanceof MockHandler);
-        $this->mockHandler = $mockHandler;
+        $mockHandler->append($response);
     }
 }
