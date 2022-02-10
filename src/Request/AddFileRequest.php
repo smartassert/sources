@@ -12,7 +12,7 @@ use webignition\EncapsulatingRequestResolverBundle\Model\EncapsulatingRequestInt
 
 class AddFileRequest implements EncapsulatingRequestInterface
 {
-    public const KEY_POST_NAME = 'name';
+    public const KEY_ATTRIBUTE_FILENAME = 'filename';
     public const KEY_POST_CONTENT = 'content';
 
     public function __construct(
@@ -23,9 +23,12 @@ class AddFileRequest implements EncapsulatingRequestInterface
 
     public static function create(Request $request): self
     {
+        $filename = $request->attributes->get(self::KEY_ATTRIBUTE_FILENAME);
+        $filename = is_scalar($filename) ? (string) $filename : '';
+
         return new self(
             new YamlFile(
-                new Filename(trim((string) $request->request->get(self::KEY_POST_NAME))),
+                new Filename(trim($filename)),
                 trim((string) $request->request->get(self::KEY_POST_CONTENT))
             )
         );

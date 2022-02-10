@@ -33,15 +33,13 @@ class YamlFileConstraintValidator extends ConstraintValidator
             throw new UnexpectedValueException($value, 'string');
         }
 
-        if (false === $value->name->isValid()) {
-            $this->context->buildViolation($constraint::MESSAGE_NAME_INVALID)
-                ->atPath('name')
-                ->addViolation()
-            ;
-        }
+        $filename = $value->name;
 
-        $filename = $value->name->getValue();
-        if (!(str_ends_with($filename, '.yml') || str_ends_with($filename, '.yaml'))) {
+        if (
+            !$value->name->isValid()
+            || '' === $filename->getName()
+            || !in_array($filename->getExtension(), YamlFile::EXTENSIONS)
+        ) {
             $this->context->buildViolation($constraint::MESSAGE_NAME_INVALID)
                 ->atPath('name')
                 ->addViolation()

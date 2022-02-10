@@ -34,8 +34,11 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class SourceController
 {
-    public const ROUTE_SOURCE = '/';
-    public const ROUTE_SOURCE_LIST = '/list';
+    private const ROUTE_SOURCE_ID_PATTERN = '{sourceId<[A-Z90-9]{26}>}';
+    private const ROUTE_FILENAME_PATTERN = '{filename<.*\.yaml>}';
+    private const ROUTE_SOURCE = '/' . self::ROUTE_SOURCE_ID_PATTERN;
+    private const ROUTE_SOURCE_FILE = self::ROUTE_SOURCE . '/' . self::ROUTE_FILENAME_PATTERN;
+    private const ROUTE_SOURCE_LIST = '/list';
 
     public function __construct(
         private ResponseFactory $responseFactory,
@@ -44,7 +47,7 @@ class SourceController
     ) {
     }
 
-    #[Route(self::ROUTE_SOURCE, name: 'create', methods: ['POST'])]
+    #[Route('/', name: 'create', methods: ['POST'])]
     public function create(
         UserInterface $user,
         Factory $factory,
@@ -57,7 +60,7 @@ class SourceController
         return new JsonResponse($factory->createFromSourceRequest($user, $request));
     }
 
-    #[Route(self::ROUTE_SOURCE . '{sourceId<[A-Z90-9]{26}>}', name: 'get', methods: ['GET'])]
+    #[Route(self::ROUTE_SOURCE, name: 'get', methods: ['GET'])]
     public function get(?SourceInterface $source, UserInterface $user): Response
     {
         return $this->doUserSourceAction($source, $user, function (SourceInterface $source) {
@@ -65,7 +68,7 @@ class SourceController
         });
     }
 
-    #[Route(self::ROUTE_SOURCE . '{sourceId<[A-Z90-9]{26}>}', name: 'update', methods: ['PUT'])]
+    #[Route(self::ROUTE_SOURCE, name: 'update', methods: ['PUT'])]
     public function update(
         ?OriginSource $source,
         UserInterface $user,
@@ -81,7 +84,7 @@ class SourceController
         });
     }
 
-    #[Route(self::ROUTE_SOURCE . '{sourceId<[A-Z90-9]{26}>}', name: 'delete', methods: ['DELETE'])]
+    #[Route(self::ROUTE_SOURCE, name: 'delete', methods: ['DELETE'])]
     public function delete(?SourceInterface $source, Store $store, UserInterface $user): Response
     {
         return $this->doUserSourceAction($source, $user, function (SourceInterface $source) use ($store) {
@@ -97,7 +100,7 @@ class SourceController
         return new JsonResponse($repository->findByUserAndType($user, [Type::FILE, Type::GIT]));
     }
 
-    #[Route(self::ROUTE_SOURCE . '{sourceId<[A-Z90-9]{26}>}/prepare', name: 'prepare', methods: ['POST'])]
+    #[Route(self::ROUTE_SOURCE . '/prepare', name: 'prepare', methods: ['POST'])]
     public function prepare(
         Request $request,
         ?OriginSource $source,
@@ -117,7 +120,7 @@ class SourceController
         );
     }
 
-    #[Route(self::ROUTE_SOURCE . '{sourceId<[A-Z90-9]{26}>}/read', name: 'read', methods: ['GET'])]
+    #[Route(self::ROUTE_SOURCE . '/read', name: 'read', methods: ['GET'])]
     public function read(
         ?RunSource $source,
         UserInterface $user,
@@ -138,7 +141,7 @@ class SourceController
         });
     }
 
-    #[Route(self::ROUTE_SOURCE . '{sourceId<[A-Z90-9]{26}>}/add', name: 'add_file', methods: ['POST'])]
+    #[Route(self::ROUTE_SOURCE_FILE, name: 'add_file', methods: ['POST'])]
     public function addFile(
         ?FileSource $source,
         AddFileRequest $request,

@@ -873,24 +873,28 @@ class SourcesControllerTest extends AbstractSourceControllerTest
     /**
      * @dataProvider addFileInvalidRequestDataProvider
      *
-     * @param array<string, string> $requestData
-     * @param array<mixed>          $expectedResponseData
+     * @param array<mixed> $expectedResponseData
      */
     public function testAddFileInvalidRequest(
         SourceInterface $source,
         string $userId,
-        array $requestData,
+        string $filename,
+        string $content,
         array $expectedResponseData
     ): void {
         $this->store->add($source);
 
         $this->setUserServiceAuthorizedResponse($userId);
 
-        $response = $this->applicationClient->makeAuthorizedSourceRequest(
+        $response = $this->applicationClient->makeAuthorizedRequest(
             'POST',
-            'add_file',
-            $source->getId(),
-            $requestData
+            new Route('add_file', [
+                'sourceId' => $source->getId(),
+                'filename' => $filename,
+            ]),
+            [
+                'content' => $content,
+            ]
         );
 
         self::assertSame(400, $response->getStatusCode());
@@ -912,13 +916,11 @@ class SourcesControllerTest extends AbstractSourceControllerTest
         $fileSource = new FileSource($userId, $label);
 
         return [
-            'name empty, content non-empty' => [
+            'name empty with .yaml extension, content non-empty' => [
                 'source' => $fileSource,
                 'userId' => $userId,
-                'requestData' => [
-                    'name' => '',
-                    'content' => 'non-empty value',
-                ],
+                'filename' => '.yaml',
+                'content' => 'non-empty value',
                 'expectedResponseData' => [
                     'error' => [
                         'type' => 'invalid_request',
@@ -934,10 +936,8 @@ class SourcesControllerTest extends AbstractSourceControllerTest
             'name contains backslash characters, content non-empty' => [
                 'source' => $fileSource,
                 'userId' => $userId,
-                'requestData' => [
-                    'name' => 'one two \\ three',
-                    'content' => 'non-empty value',
-                ],
+                'filename' => 'one two \\ three.yaml',
+                'content' => 'non-empty value',
                 'expectedResponseData' => [
                     'error' => [
                         'type' => 'invalid_request',
@@ -953,29 +953,8 @@ class SourcesControllerTest extends AbstractSourceControllerTest
             'name contains null byte characters, content non-empty' => [
                 'source' => $fileSource,
                 'userId' => $userId,
-                'requestData' => [
-                    'name' => 'one ' . chr(0) . ' two three' . chr(0),
-                    'content' => 'non-empty value',
-                ],
-                'expectedResponseData' => [
-                    'error' => [
-                        'type' => 'invalid_request',
-                        'payload' => [
-                            'name' => [
-                                'value' => '',
-                                'message' => YamlFileConstraint::MESSAGE_NAME_INVALID,
-                            ],
-                        ],
-                    ],
-                ],
-            ],
-            'name does not end with .yml or .yaml, content non-empty' => [
-                'source' => $fileSource,
-                'userId' => $userId,
-                'requestData' => [
-                    'name' => 'filename',
-                    'content' => 'non-empty value',
-                ],
+                'filename' => 'one ' . chr(0) . ' two three' . chr(0) . '.yaml',
+                'content' => 'non-empty value',
                 'expectedResponseData' => [
                     'error' => [
                         'type' => 'invalid_request',
@@ -991,10 +970,8 @@ class SourcesControllerTest extends AbstractSourceControllerTest
             'name valid, content empty' => [
                 'source' => $fileSource,
                 'userId' => $userId,
-                'requestData' => [
-                    'name' => 'filename.yaml',
-                    'content' => '',
-                ],
+                'filename' => 'filename.yaml',
+                'content' => '',
                 'expectedResponseData' => [
                     'error' => [
                         'type' => 'invalid_request',
@@ -1010,10 +987,8 @@ class SourcesControllerTest extends AbstractSourceControllerTest
             'name valid, content invalid yaml' => [
                 'source' => $fileSource,
                 'userId' => $userId,
-                'requestData' => [
-                    'name' => 'filename.yml',
-                    'content' => "- item\ncontent",
-                ],
+                'filename' => 'filename.yaml',
+                'content' => "- item\ncontent",
                 'expectedResponseData' => [
                     'error' => [
                         'type' => 'invalid_request',
