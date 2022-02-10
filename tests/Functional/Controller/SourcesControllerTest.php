@@ -22,6 +22,7 @@ use App\Services\RunSourceSerializer;
 use App\Services\Source\Store;
 use App\Tests\Model\Route;
 use App\Tests\Model\UserId;
+use App\Tests\Services\ApplicationClient;
 use App\Tests\Services\EntityRemover;
 use App\Tests\Services\FileStoreFixtureCreator;
 use App\Tests\Services\FixtureLoader;
@@ -30,15 +31,12 @@ use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Middleware;
 use Psr\Http\Message\RequestInterface;
 use SmartAssert\UsersClient\Routes;
-use SmartAssert\UsersSecurityBundle\Security\AuthorizationProperties;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 use webignition\HttpHistoryContainer\Container as HttpHistoryContainer;
 
 class SourcesControllerTest extends AbstractSourceControllerTest
 {
-    private const AUTHORIZATION_TOKEN = 'authorization-token';
-
     private HttpHistoryContainer $httpHistoryContainer;
     private SourceRepository $sourceRepository;
     private RunSourceRepository $runSourceRepository;
@@ -1042,11 +1040,9 @@ class SourcesControllerTest extends AbstractSourceControllerTest
         $expectedUrl = $usersServiceBaseUrl . Routes::DEFAULT_VERIFY_API_TOKEN_PATH;
 
         self::assertSame($expectedUrl, (string) $request->getUri());
-
-        $authorizationHeader = $request->getHeaderLine(AuthorizationProperties::DEFAULT_HEADER_NAME);
-
-        $expectedAuthorizationHeader = AuthorizationProperties::DEFAULT_VALUE_PREFIX . self::AUTHORIZATION_TOKEN;
-
-        self::assertSame($expectedAuthorizationHeader, $authorizationHeader);
+        self::assertSame(
+            ApplicationClient::AUTH_HEADER_VALUE,
+            $request->getHeaderLine(ApplicationClient::AUTH_HEADER_KEY)
+        );
     }
 }

@@ -12,6 +12,12 @@ use Symfony\Component\Routing\RouterInterface;
 
 class ApplicationClient
 {
+    public const AUTH_HEADER_KEY = AuthProperties::DEFAULT_HEADER_NAME;
+    public const AUTH_HEADER_VALUE = AuthProperties::DEFAULT_VALUE_PREFIX . self::AUTH_TOKEN;
+    public const AUTH_HEADER = [
+        self::AUTH_HEADER_KEY => self::AUTH_HEADER_VALUE
+    ];
+
     private const AUTH_TOKEN = 'authorization-token';
     private KernelBrowser $client;
 
