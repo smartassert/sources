@@ -955,57 +955,29 @@ class SourcesControllerTest extends AbstractSourceControllerTest
 
         $fileSource = new FileSource($userId, $label);
 
+        $expectedInvalidFilenameResponseData = $this->createExpectedInvalidFilenameResponseData();
+
         return [
             'name empty with .yaml extension, content non-empty' => [
                 'source' => $fileSource,
                 'userId' => $userId,
                 'filename' => '.yaml',
                 'content' => 'non-empty value',
-                'expectedResponseData' => [
-                    'error' => [
-                        'type' => 'invalid_request',
-                        'payload' => [
-                            'name' => [
-                                'value' => '',
-                                'message' => YamlFilenameConstraint::MESSAGE_NAME_INVALID,
-                            ],
-                        ],
-                    ],
-                ],
+                'expectedResponseData' => $expectedInvalidFilenameResponseData,
             ],
             'name contains backslash characters, content non-empty' => [
                 'source' => $fileSource,
                 'userId' => $userId,
                 'filename' => 'one two \\ three.yaml',
                 'content' => 'non-empty value',
-                'expectedResponseData' => [
-                    'error' => [
-                        'type' => 'invalid_request',
-                        'payload' => [
-                            'name' => [
-                                'value' => '',
-                                'message' => YamlFilenameConstraint::MESSAGE_NAME_INVALID,
-                            ],
-                        ],
-                    ],
-                ],
+                'expectedResponseData' => $expectedInvalidFilenameResponseData,
             ],
             'name contains null byte characters, content non-empty' => [
                 'source' => $fileSource,
                 'userId' => $userId,
                 'filename' => 'one ' . chr(0) . ' two three' . chr(0) . '.yaml',
                 'content' => 'non-empty value',
-                'expectedResponseData' => [
-                    'error' => [
-                        'type' => 'invalid_request',
-                        'payload' => [
-                            'name' => [
-                                'value' => '',
-                                'message' => YamlFilenameConstraint::MESSAGE_NAME_INVALID,
-                            ],
-                        ],
-                    ],
-                ],
+                'expectedResponseData' => $expectedInvalidFilenameResponseData,
             ],
             'name valid, content empty' => [
                 'source' => $fileSource,
@@ -1085,54 +1057,26 @@ class SourcesControllerTest extends AbstractSourceControllerTest
 
         $fileSource = new FileSource($userId, $label);
 
+        $expectedInvalidFilenameResponseData = $this->createExpectedInvalidFilenameResponseData();
+
         return [
             'name empty with .yaml extension' => [
                 'source' => $fileSource,
                 'userId' => $userId,
                 'filename' => '.yaml',
-                'expectedResponseData' => [
-                    'error' => [
-                        'type' => 'invalid_request',
-                        'payload' => [
-                            'name' => [
-                                'value' => '',
-                                'message' => YamlFilenameConstraint::MESSAGE_NAME_INVALID,
-                            ],
-                        ],
-                    ],
-                ],
+                'expectedResponseData' => $expectedInvalidFilenameResponseData,
             ],
             'name contains backslash characters' => [
                 'source' => $fileSource,
                 'userId' => $userId,
                 'filename' => 'one two \\ three.yaml',
-                'expectedResponseData' => [
-                    'error' => [
-                        'type' => 'invalid_request',
-                        'payload' => [
-                            'name' => [
-                                'value' => '',
-                                'message' => YamlFilenameConstraint::MESSAGE_NAME_INVALID,
-                            ],
-                        ],
-                    ],
-                ],
+                'expectedResponseData' => $expectedInvalidFilenameResponseData,
             ],
             'name contains null byte characters' => [
                 'source' => $fileSource,
                 'userId' => $userId,
                 'filename' => 'one ' . chr(0) . ' two three' . chr(0) . '.yaml',
-                'expectedResponseData' => [
-                    'error' => [
-                        'type' => 'invalid_request',
-                        'payload' => [
-                            'name' => [
-                                'value' => '',
-                                'message' => YamlFilenameConstraint::MESSAGE_NAME_INVALID,
-                            ],
-                        ],
-                    ],
-                ],
+                'expectedResponseData' => $expectedInvalidFilenameResponseData,
             ],
         ];
     }
@@ -1152,5 +1096,23 @@ class SourcesControllerTest extends AbstractSourceControllerTest
             ApplicationClient::AUTH_HEADER_VALUE,
             $request->getHeaderLine(ApplicationClient::AUTH_HEADER_KEY)
         );
+    }
+
+    /**
+     * @return array<mixed>
+     */
+    private function createExpectedInvalidFilenameResponseData(): array
+    {
+        return [
+            'error' => [
+                'type' => 'invalid_request',
+                'payload' => [
+                    'name' => [
+                        'value' => '',
+                        'message' => YamlFilenameConstraint::MESSAGE_NAME_INVALID,
+                    ],
+                ],
+            ],
+        ];
     }
 }
