@@ -27,8 +27,11 @@ class FilenameConstraintValidator extends ConstraintValidator
             throw new UnexpectedValueException($value, Filename::class);
         }
 
+        $filename = $value->getValue();
         if (
-            !$value->isValid()
+            '' === $filename
+            || str_contains($filename, '\\')
+            || str_contains($filename, chr(0))
             || '' === $value->getName()
             || !in_array($value->getExtension(), YamlFile::EXTENSIONS)
         ) {

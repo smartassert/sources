@@ -9,7 +9,7 @@ use App\Validator\FilenameConstraint;
 use Symfony\Component\HttpFoundation\Request;
 use webignition\EncapsulatingRequestResolverBundle\Model\EncapsulatingRequestInterface;
 
-abstract class AbstractFileActionRequest implements EncapsulatingRequestInterface
+abstract class AbstractYamlFileRequest implements EncapsulatingRequestInterface
 {
     public const KEY_ATTRIBUTE_FILENAME = 'filename';
 
