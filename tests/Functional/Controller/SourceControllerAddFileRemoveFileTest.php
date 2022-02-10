@@ -12,7 +12,7 @@ use App\Tests\Model\Route;
 use App\Tests\Services\EntityRemover;
 use webignition\ObjectReflector\ObjectReflector;
 
-class SourceControllerAddFileTest extends AbstractSourceControllerTest
+class SourceControllerAddFileRemoveFileTest extends AbstractSourceControllerTest
 {
     private const USER_ID = '01FVHKTM3V53JVCW1HPN1125NF';
     private const SOURCE_ID = '01FVHM0XGXGAD463JTW05CN2TF';
@@ -77,11 +77,18 @@ class SourceControllerAddFileTest extends AbstractSourceControllerTest
         );
 
         self::assertSame(200, $response->getStatusCode());
+        self::assertFileExists($this->expectedFilePath);
         self::assertSame(self::CREATE_DATA['content'], file_get_contents($this->expectedFilePath));
     }
 
+    /**
+     * @depends testAddFile
+     */
     public function testUpdateAddedFile(): void
     {
+        self::assertFileExists($this->expectedFilePath);
+        self::assertSame(self::CREATE_DATA['content'], file_get_contents($this->expectedFilePath));
+
         $this->setUserServiceAuthorizedResponse(self::USER_ID);
 
         $response = $this->applicationClient->makeAuthorizedRequest(
@@ -94,6 +101,28 @@ class SourceControllerAddFileTest extends AbstractSourceControllerTest
         );
 
         self::assertSame(200, $response->getStatusCode());
+        self::assertFileExists($this->expectedFilePath);
         self::assertSame(self::UPDATE_DATA['content'], file_get_contents($this->expectedFilePath));
+    }
+
+    /**
+     * @depends testUpdateAddedFile
+     */
+    public function testRemoveFile(): void
+    {
+        self::assertFileExists($this->expectedFilePath);
+
+        $this->setUserServiceAuthorizedResponse(self::USER_ID);
+
+        $response = $this->applicationClient->makeAuthorizedRequest(
+            'DELETE',
+            new Route('remove_file', [
+                'sourceId' => self::SOURCE_ID,
+                'filename' => self::FILENAME,
+            ])
+        );
+
+        self::assertSame(200, $response->getStatusCode());
+        self::assertFileDoesNotExist($this->expectedFilePath);
     }
 }
