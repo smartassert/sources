@@ -17,6 +17,8 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\MessageBusInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class SourceControllerTest extends WebTestCase
@@ -55,12 +57,25 @@ class SourceControllerTest extends WebTestCase
             ->andReturn($runSource)
         ;
 
+        $userToken = \Mockery::mock(TokenInterface::class);
+        $userToken
+            ->shouldReceive('getUser')
+            ->andReturn($user)
+        ;
+
+        $tokenStorage = \Mockery::mock(TokenStorageInterface::class);
+        $tokenStorage
+            ->shouldReceive('getToken')
+            ->andReturn($userToken)
+        ;
+
         (new SourceController(
             \Mockery::mock(ResponseFactory::class),
             \Mockery::mock(ValidatorInterface::class),
             \Mockery::mock(InvalidRequestResponseFactory::class),
+            $tokenStorage,
         ))
-            ->prepare($request, $fileSource, $user, $messageBus, $runSourceFactory)
+            ->prepare($request, $fileSource, $messageBus, $runSourceFactory)
         ;
     }
 }
