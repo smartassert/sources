@@ -1077,68 +1077,6 @@ class SourcesControllerTest extends WebTestCase
         ];
     }
 
-    /**
-     * @dataProvider addFileSuccessDataProvider
-     *
-     * @param array<string, string> $requestData
-     */
-    public function testAddFileSuccess(FileSource $source, string $userId, array $requestData): void
-    {
-        $this->store->add($source);
-
-        $this->mockHandler->append(
-            new Response(200, [], $userId)
-        );
-
-        $response = $this->applicationClient->makeAuthorizedSourceRequest(
-            'POST',
-            'add_file',
-            $source->getId(),
-            $requestData
-        );
-
-        self::assertSame(200, $response->getStatusCode());
-        $this->assertAuthorizationRequestIsMade();
-
-        $fileStoreBasePath = self::getContainer()->getParameter('file_store_base_path');
-        self::assertIsString($fileStoreBasePath);
-
-        $requestFileName = $requestData[AddFileRequest::KEY_POST_NAME] ?? null;
-        $requestFileName = is_string($requestFileName) ? $requestFileName : null;
-        self::assertIsString($requestFileName);
-
-        $expectedFilePath = $fileStoreBasePath . '/' . $source . '/' . $requestFileName;
-        self::assertFileExists($expectedFilePath);
-
-        $requestContent = $requestData[AddFileRequest::KEY_POST_CONTENT] ?? null;
-        $requestContent = is_string($requestContent) ? $requestContent : null;
-        self::assertIsString($requestContent);
-
-        self::assertSame($requestContent, file_get_contents($expectedFilePath));
-    }
-
-    /**
-     * @return array<mixed>
-     */
-    public function addFileSuccessDataProvider(): array
-    {
-        $userId = UserId::create();
-        $label = 'file source label';
-
-        $fileSource = new FileSource($userId, $label);
-
-        return [
-            'default' => [
-                'source' => $fileSource,
-                'userId' => $userId,
-                'requestData' => [
-                    'name' => 'filename.yaml',
-                    'content' => '- list item',
-                ],
-            ],
-        ];
-    }
-
     private function assertAuthorizationRequestIsMade(): void
     {
         $request = $this->httpHistoryContainer->getTransactions()->getRequests()->getLast();
