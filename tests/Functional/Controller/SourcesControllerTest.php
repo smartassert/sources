@@ -26,6 +26,7 @@ use App\Tests\Model\UserId;
 use App\Tests\Services\EntityRemover;
 use App\Tests\Services\FileStoreFixtureCreator;
 use App\Tests\Services\FixtureLoader;
+use App\Tests\Services\ApplicationClient;
 use App\Validator\YamlFileConstraint;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
@@ -34,32 +35,29 @@ use GuzzleHttp\Psr7\Response;
 use Psr\Http\Message\RequestInterface;
 use SmartAssert\UsersClient\Routes;
 use SmartAssert\UsersSecurityBundle\Security\AuthorizationProperties;
-use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
-use Symfony\Component\Routing\RouterInterface;
 use webignition\HttpHistoryContainer\Container as HttpHistoryContainer;
 
 class SourcesControllerTest extends WebTestCase
 {
     private const AUTHORIZATION_TOKEN = 'authorization-token';
 
-    private KernelBrowser $client;
     private MockHandler $mockHandler;
     private HttpHistoryContainer $httpHistoryContainer;
     private SourceRepository $sourceRepository;
     private RunSourceRepository $runSourceRepository;
     private Store $store;
-    private RouterInterface $router;
     private FileStoreFixtureCreator $fixtureCreator;
     private FixtureLoader $fixtureLoader;
+    private ApplicationClient $applicationClient;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->client = static::createClient();
+        $client = static::createClient();
 
         $mockHandler = self::getContainer()->get(MockHandler::class);
         \assert($mockHandler instanceof MockHandler);
@@ -85,10 +83,6 @@ class SourcesControllerTest extends WebTestCase
         \assert($runSourceRepository instanceof RunSourceRepository);
         $this->runSourceRepository = $runSourceRepository;
 
-        $router = self::getContainer()->get(RouterInterface::class);
-        \assert($router instanceof RouterInterface);
-        $this->router = $router;
-
         $fixtureCreator = self::getContainer()->get(FileStoreFixtureCreator::class);
         \assert($fixtureCreator instanceof FileStoreFixtureCreator);
         $this->fixtureCreator = $fixtureCreator;
@@ -96,6 +90,12 @@ class SourcesControllerTest extends WebTestCase
         $fixtureLoader = self::getContainer()->get(FixtureLoader::class);
         \assert($fixtureLoader instanceof FixtureLoader);
         $this->fixtureLoader = $fixtureLoader;
+
+        $applicationClient = self::getContainer()->get(ApplicationClient::class);
+        \assert($applicationClient instanceof ApplicationClient);
+        $applicationClient->setClient($client);
+
+        $this->applicationClient = $applicationClient;
 
         $entityRemover = self::getContainer()->get(EntityRemover::class);
         if ($entityRemover instanceof EntityRemover) {
@@ -112,7 +112,7 @@ class SourcesControllerTest extends WebTestCase
             new Response(401)
         );
 
-        $response = $this->makeAuthorizedRequest($method, $route);
+        $response = $this->applicationClient->makeAuthorizedRequest($method, $route);
 
         self::assertSame(401, $response->getStatusCode());
         $this->assertAuthorizationRequestIsMade();
@@ -165,7 +165,7 @@ class SourcesControllerTest extends WebTestCase
         );
 
         $routeParameters = ['sourceId' => $sourceId];
-        $response = $this->makeAuthorizedRequest($method, new Route($routeName, $routeParameters));
+        $response = $this->applicationClient->makeAuthorizedRequest($method, new Route($routeName, $routeParameters));
 
         self::assertSame(404, $response->getStatusCode());
     }
@@ -188,7 +188,7 @@ class SourcesControllerTest extends WebTestCase
         );
 
         $routeParameters = ['sourceId' => $sourceId];
-        $response = $this->makeAuthorizedRequest($method, new Route($routeName, $routeParameters));
+        $response = $this->applicationClient->makeAuthorizedRequest($method, new Route($routeName, $routeParameters));
 
         self::assertSame(401, $response->getStatusCode());
     }
@@ -231,7 +231,7 @@ class SourcesControllerTest extends WebTestCase
             new Response(200, [], $userId)
         );
 
-        $response = $this->makeAuthorizedRequest('POST', new Route('create'), $requestParameters);
+        $response = $this->applicationClient->makeAuthorizedRequest('POST', new Route('create'), $requestParameters);
 
         self::assertSame(400, $response->getStatusCode());
         self::assertInstanceOf(JsonResponse::class, $response);
@@ -295,7 +295,7 @@ class SourcesControllerTest extends WebTestCase
             new Response(200, [], $userId)
         );
 
-        $response = $this->makeAuthorizedRequest('POST', new Route('create'), $requestParameters);
+        $response = $this->applicationClient->makeAuthorizedRequest('POST', new Route('create'), $requestParameters);
 
         self::assertSame(200, $response->getStatusCode());
         $this->assertAuthorizationRequestIsMade();
@@ -382,7 +382,7 @@ class SourcesControllerTest extends WebTestCase
             new Response(200, [], $userId)
         );
 
-        $response = $this->makeAuthorizedSourceRequest('GET', 'get', $source->getId());
+        $response = $this->applicationClient->makeAuthorizedSourceRequest('GET', 'get', $source->getId());
 
         self::assertSame(200, $response->getStatusCode());
         $this->assertAuthorizationRequestIsMade();
@@ -480,7 +480,12 @@ class SourcesControllerTest extends WebTestCase
             new Response(200, [], $userId)
         );
 
-        $response = $this->makeAuthorizedSourceRequest('PUT', 'update', $source->getId(), $requestData);
+        $response = $this->applicationClient->makeAuthorizedSourceRequest(
+            'PUT',
+            'update',
+            $source->getId(),
+            $requestData
+        );
 
         self::assertSame($expectedResponseStatusCode, $response->getStatusCode());
         $this->assertAuthorizationRequestIsMade();
@@ -597,7 +602,7 @@ class SourcesControllerTest extends WebTestCase
             new Response(200, [], $userId)
         );
 
-        $response = $this->makeAuthorizedSourceRequest('DELETE', 'delete', $source->getId());
+        $response = $this->applicationClient->makeAuthorizedSourceRequest('DELETE', 'delete', $source->getId());
 
         self::assertSame(200, $response->getStatusCode());
         $this->assertAuthorizationRequestIsMade();
@@ -649,7 +654,7 @@ class SourcesControllerTest extends WebTestCase
             new Response(200, [], $userId)
         );
 
-        $response = $this->makeAuthorizedRequest('GET', new Route('list'));
+        $response = $this->applicationClient->makeAuthorizedRequest('GET', new Route('list'));
 
         self::assertSame(200, $response->getStatusCode());
         $this->assertAuthorizationRequestIsMade();
@@ -756,7 +761,7 @@ class SourcesControllerTest extends WebTestCase
             new Response(200, [], $userId)
         );
 
-        $response = $this->makeAuthorizedSourceRequest('POST', 'prepare', $source->getId());
+        $response = $this->applicationClient->makeAuthorizedSourceRequest('POST', 'prepare', $source->getId());
 
         self::assertSame(404, $response->getStatusCode());
         $this->assertAuthorizationRequestIsMade();
@@ -780,7 +785,7 @@ class SourcesControllerTest extends WebTestCase
             new Response(200, [], $userId)
         );
 
-        $response = $this->makeAuthorizedSourceRequest(
+        $response = $this->applicationClient->makeAuthorizedSourceRequest(
             'POST',
             'prepare',
             $source->getId(),
@@ -904,11 +909,7 @@ class SourcesControllerTest extends WebTestCase
             new Response(200, [], $userId)
         );
 
-        $response = $this->makeAuthorizedSourceRequest(
-            'GET',
-            'read',
-            $runSource->getId()
-        );
+        $response = $this->applicationClient->makeAuthorizedSourceRequest('GET', 'read', $runSource->getId());
 
         self::assertSame($expectedResponse->getStatusCode(), $response->getStatusCode());
         self::assertSame($expectedResponse->headers->get('content-type'), $response->headers->get('content-type'));
@@ -933,7 +934,12 @@ class SourcesControllerTest extends WebTestCase
             new Response(200, [], $userId)
         );
 
-        $response = $this->makeAuthorizedSourceRequest('POST', 'add_file', $source->getId(), $requestData);
+        $response = $this->applicationClient->makeAuthorizedSourceRequest(
+            'POST',
+            'add_file',
+            $source->getId(),
+            $requestData
+        );
 
         self::assertSame(400, $response->getStatusCode());
         $this->assertAuthorizationRequestIsMade();
@@ -1084,7 +1090,12 @@ class SourcesControllerTest extends WebTestCase
             new Response(200, [], $userId)
         );
 
-        $response = $this->makeAuthorizedSourceRequest('POST', 'add_file', $source->getId(), $requestData);
+        $response = $this->applicationClient->makeAuthorizedSourceRequest(
+            'POST',
+            'add_file',
+            $source->getId(),
+            $requestData
+        );
 
         self::assertSame(200, $response->getStatusCode());
         $this->assertAuthorizationRequestIsMade();
@@ -1145,69 +1156,5 @@ class SourcesControllerTest extends WebTestCase
         $expectedAuthorizationHeader = AuthorizationProperties::DEFAULT_VALUE_PREFIX . self::AUTHORIZATION_TOKEN;
 
         self::assertSame($expectedAuthorizationHeader, $authorizationHeader);
-    }
-
-    /**
-     * @return array<string, string>
-     */
-    private function createAuthorizationHeader(): array
-    {
-        $authHeaderName = AuthorizationProperties::DEFAULT_HEADER_NAME;
-        $authHeaderValue = AuthorizationProperties::DEFAULT_VALUE_PREFIX . self::AUTHORIZATION_TOKEN;
-
-        return [
-            $authHeaderName => $authHeaderValue,
-        ];
-    }
-
-    /**
-     * @param array<string, string> $headers
-     *
-     * @return array<string, string>
-     */
-    private function createRequestServerPropertiesFromHeaders(array $headers): array
-    {
-        $server = [];
-        foreach ($headers as $key => $value) {
-            $server['HTTP_' . $key] = $value;
-        }
-
-        return $server;
-    }
-
-    /**
-     * @param array<string, string> $parameters
-     */
-    private function makeAuthorizedSourceRequest(
-        string $method,
-        string $routeName,
-        string $sourceId,
-        array $parameters = []
-    ): SymfonyResponse {
-        return $this->makeAuthorizedRequest($method, new Route($routeName, ['sourceId' => $sourceId]), $parameters);
-    }
-
-    /**
-     * @param array<string, string> $parameters
-     */
-    private function makeAuthorizedRequest(string $method, Route $route, array $parameters = []): SymfonyResponse
-    {
-        return $this->makeRequest($method, $route, $this->createAuthorizationHeader(), $parameters);
-    }
-
-    /**
-     * @param array<string, string> $headers
-     * @param array<string, string> $parameters
-     */
-    private function makeRequest(string $method, Route $route, array $headers, array $parameters): SymfonyResponse
-    {
-        $this->client->request(
-            method: $method,
-            uri: $this->router->generate($route->name, $route->parameters),
-            parameters: $parameters,
-            server: $this->createRequestServerPropertiesFromHeaders($headers)
-        );
-
-        return $this->client->getResponse();
     }
 }

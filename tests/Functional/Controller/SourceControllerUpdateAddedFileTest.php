@@ -28,6 +28,7 @@ use App\Tests\Model\UserId;
 use App\Tests\Services\EntityRemover;
 use App\Tests\Services\FileStoreFixtureCreator;
 use App\Tests\Services\FixtureLoader;
+use App\Tests\Services\ApplicationClient;
 use App\Validator\YamlFileConstraint;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
@@ -73,6 +74,9 @@ class SourceControllerUpdateAddedFileTest extends WebTestCase
     private RouterInterface $router;
     private FileStoreFixtureCreator $fixtureCreator;
     private FixtureLoader $fixtureLoader;
+
+    private ApplicationClient $applicationClient;
+
     private string $expectedFilePath;
 
     protected function setUp(): void
@@ -121,6 +125,11 @@ class SourceControllerUpdateAddedFileTest extends WebTestCase
         \assert(is_string($fileStoreBasePath));
         $this->expectedFilePath = $fileStoreBasePath . '/' . self::EXPECTED_FILE_RELATIVE_PATH;
 
+        $applicationClient = self::getContainer()->get(ApplicationClient::class);
+        \assert($applicationClient instanceof ApplicationClient);
+        $this->applicationClient = $applicationClient;
+        $applicationClient->setClient($this->client);
+
         $entityRemover = self::getContainer()->get(EntityRemover::class);
         if ($entityRemover instanceof EntityRemover) {
             $entityRemover->removeAll();
@@ -150,7 +159,12 @@ class SourceControllerUpdateAddedFileTest extends WebTestCase
             new Response(200, [], self::USER_ID),
         );
 
-        $response = $this->makeAuthorizedSourceRequest('POST', 'add_file', $source->getId(), self::CREATE_DATA);
+        $response = $this->applicationClient->makeAuthorizedSourceRequest(
+            'POST',
+            'add_file',
+            $source->getId(),
+            self::CREATE_DATA
+        );
 
         self::assertSame(200, $response->getStatusCode());
         self::assertSame(self::CREATE_DATA['content'], file_get_contents($this->expectedFilePath));
@@ -173,7 +187,12 @@ class SourceControllerUpdateAddedFileTest extends WebTestCase
             new Response(200, [], self::USER_ID)
         );
 
-        $response = $this->makeAuthorizedSourceRequest('POST', 'add_file', $source->getId(), self::UPDATE_DATA);
+        $response = $this->applicationClient->makeAuthorizedSourceRequest(
+            'POST',
+            'add_file',
+            $source->getId(),
+            self::UPDATE_DATA
+        );
 
         self::assertSame(200, $response->getStatusCode());
         self::assertSame(self::UPDATE_DATA['content'], file_get_contents($this->expectedFilePath));
@@ -195,69 +214,5 @@ class SourceControllerUpdateAddedFileTest extends WebTestCase
 //        self::assertIsString($requestContent);
 //
 //        self::assertSame($requestContent, file_get_contents($expectedFilePath));
-    }
-
-    /**
-     * @return array<string, string>
-     */
-    private function createAuthorizationHeader(): array
-    {
-        $authHeaderName = AuthorizationProperties::DEFAULT_HEADER_NAME;
-        $authHeaderValue = AuthorizationProperties::DEFAULT_VALUE_PREFIX . self::AUTHORIZATION_TOKEN;
-
-        return [
-            $authHeaderName => $authHeaderValue,
-        ];
-    }
-
-    /**
-     * @param array<string, string> $headers
-     *
-     * @return array<string, string>
-     */
-    private function createRequestServerPropertiesFromHeaders(array $headers): array
-    {
-        $server = [];
-        foreach ($headers as $key => $value) {
-            $server['HTTP_' . $key] = $value;
-        }
-
-        return $server;
-    }
-
-    /**
-     * @param array<string, string> $parameters
-     */
-    private function makeAuthorizedSourceRequest(
-        string $method,
-        string $routeName,
-        string $sourceId,
-        array $parameters = []
-    ): SymfonyResponse {
-        return $this->makeAuthorizedRequest($method, new Route($routeName, ['sourceId' => $sourceId]), $parameters);
-    }
-
-    /**
-     * @param array<string, string> $parameters
-     */
-    private function makeAuthorizedRequest(string $method, Route $route, array $parameters = []): SymfonyResponse
-    {
-        return $this->makeRequest($method, $route, $this->createAuthorizationHeader(), $parameters);
-    }
-
-    /**
-     * @param array<string, string> $headers
-     * @param array<string, string> $parameters
-     */
-    private function makeRequest(string $method, Route $route, array $headers, array $parameters): SymfonyResponse
-    {
-        $this->client->request(
-            method: $method,
-            uri: $this->router->generate($route->name, $route->parameters),
-            parameters: $parameters,
-            server: $this->createRequestServerPropertiesFromHeaders($headers)
-        );
-
-        return $this->client->getResponse();
     }
 }
