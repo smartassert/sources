@@ -21,6 +21,20 @@ class Filename implements \Stringable
         return $this->value;
     }
 
+    public function getExtension(): string
+    {
+        return substr($this->value, ((int) strrpos($this->value, '.')) + 1);
+    }
+
+    public function getName(): string
+    {
+        $lastDotPosition = strrpos($this->value, '.');
+
+        return false === $lastDotPosition
+            ? $this->value
+            : substr($this->value, 0, $lastDotPosition);
+    }
+
     public function isValid(): bool
     {
         return
