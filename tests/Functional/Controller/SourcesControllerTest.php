@@ -27,7 +27,6 @@ use App\Tests\Services\EntityRemover;
 use App\Tests\Services\FileStoreFixtureCreator;
 use App\Tests\Services\FixtureLoader;
 use App\Validator\FilenameConstraint;
-use App\Validator\YamlFileConstraint;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Middleware;
 use Psr\Http\Message\RequestInterface;
@@ -968,7 +967,7 @@ class SourcesControllerTest extends AbstractSourceControllerTest
                         'payload' => [
                             'name' => [
                                 'value' => '',
-                                'message' => YamlFileConstraint::MESSAGE_NAME_INVALID,
+                                'message' => FilenameConstraint::MESSAGE_NAME_INVALID,
                             ],
                         ],
                     ],
@@ -985,7 +984,7 @@ class SourcesControllerTest extends AbstractSourceControllerTest
                         'payload' => [
                             'name' => [
                                 'value' => '',
-                                'message' => YamlFileConstraint::MESSAGE_NAME_INVALID,
+                                'message' => FilenameConstraint::MESSAGE_NAME_INVALID,
                             ],
                         ],
                     ],
@@ -1002,7 +1001,7 @@ class SourcesControllerTest extends AbstractSourceControllerTest
                         'payload' => [
                             'name' => [
                                 'value' => '',
-                                'message' => YamlFileConstraint::MESSAGE_NAME_INVALID,
+                                'message' => FilenameConstraint::MESSAGE_NAME_INVALID,
                             ],
                         ],
                     ],

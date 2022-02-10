@@ -154,7 +154,7 @@ class SourceController
             $source,
             $user,
             function (FileSource $source) use ($request, $fileStoreManager) {
-                if (($response = $this->validateRequest($request, 'file.')) instanceof JsonResponse) {
+                if (($response = $this->validateRequest($request, ['filename.', 'file.'])) instanceof JsonResponse) {
                     return $response;
                 }
 
@@ -182,7 +182,7 @@ class SourceController
             $source,
             $user,
             function (FileSource $source) use ($request, $fileStoreManager) {
-                if (($response = $this->validateRequest($request, 'filename.')) instanceof JsonResponse) {
+                if (($response = $this->validateRequest($request, ['filename.'])) instanceof JsonResponse) {
                     return $response;
                 }
 
@@ -210,14 +210,17 @@ class SourceController
         return $action($source);
     }
 
-    private function validateRequest(object $request, string $propertyNamePrefixToRemove = ''): ?JsonResponse
+    /**
+     * @param string[] $propertyNamePrefixesToRemove
+     */
+    private function validateRequest(object $request, array $propertyNamePrefixesToRemove = []): ?JsonResponse
     {
         $errors = $this->validator->validate($request);
         if (0 !== count($errors)) {
             return $this->responseFactory->createErrorResponse(
                 $this->invalidRequestResponseFactory->createFromConstraintViolations(
                     $errors,
-                    $propertyNamePrefixToRemove
+                    $propertyNamePrefixesToRemove
                 ),
                 400
             );

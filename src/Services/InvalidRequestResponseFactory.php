@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use _PHPStan_70b6e53dc\Symfony\Component\String\UnicodeString;
 use App\ResponseBody\InvalidField;
 use App\ResponseBody\InvalidRequestResponse;
+use Symfony\Component\String\UnicodeString;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
 
 class InvalidRequestResponseFactory
@@ -16,9 +16,12 @@ class InvalidRequestResponseFactory
     ) {
     }
 
+    /**
+     * @param string[] $propertyNamePrefixesToRemove
+     */
     public function createFromConstraintViolations(
         ConstraintViolationListInterface $errors,
-        string $propertyNamePrefixToRemove = ''
+        array $propertyNamePrefixesToRemove = []
     ): InvalidRequestResponse {
         $invalidFields = [];
 
@@ -27,7 +30,7 @@ class InvalidRequestResponseFactory
             $invalidValue = is_scalar($invalidValue) ? (string) $invalidValue : '';
 
             $requestField = $this->stringCaseConverter->convertCamelCaseToKebabCase($error->getPropertyPath());
-            $requestField = (string) (new UnicodeString($requestField))->trimPrefix($propertyNamePrefixToRemove);
+            $requestField = (string) (new UnicodeString($requestField))->trimPrefix($propertyNamePrefixesToRemove);
 
             $invalidFields[] = new InvalidField($requestField, $invalidValue, (string) $error->getMessage());
         }
