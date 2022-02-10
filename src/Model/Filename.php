@@ -34,12 +34,4 @@ class Filename implements \Stringable
             ? $this->value
             : substr($this->value, 0, $lastDotPosition);
     }
-
-    public function isValid(): bool
-    {
-        return
-            '' !== trim($this->value)
-            && !str_contains($this->value, '\\')
-            && !str_contains($this->value, chr(0));
-    }
 }

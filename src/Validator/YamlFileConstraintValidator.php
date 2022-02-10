@@ -30,20 +30,7 @@ class YamlFileConstraintValidator extends ConstraintValidator
         }
 
         if (!$value instanceof YamlFile) {
-            throw new UnexpectedValueException($value, 'string');
-        }
-
-        $filename = $value->name;
-
-        if (
-            !$value->name->isValid()
-            || '' === $filename->getName()
-            || !in_array($filename->getExtension(), YamlFile::EXTENSIONS)
-        ) {
-            $this->context->buildViolation($constraint::MESSAGE_NAME_INVALID)
-                ->atPath('name')
-                ->addViolation()
-            ;
+            throw new UnexpectedValueException($value, YamlFile::class);
         }
 
         if ('' === $value->content) {
