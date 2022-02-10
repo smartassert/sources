@@ -9,13 +9,10 @@ use App\Entity\FileSource;
 use App\Services\FileStoreManager;
 use App\Services\Source\Store;
 use App\Tests\Services\EntityRemover;
-use App\Tests\Services\ApplicationClient;
-use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\Psr7\Response;
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use webignition\ObjectReflector\ObjectReflector;
 
-class SourceControllerAddFileTest extends WebTestCase
+class SourceControllerAddFileTest extends AbstractSourceControllerTest
 {
     private const USER_ID = '01FVHKTM3V53JVCW1HPN1125NF';
     private const SOURCE_ID = '01FVHM0XGXGAD463JTW05CN2TF';
@@ -35,29 +32,15 @@ class SourceControllerAddFileTest extends WebTestCase
         'content' => self::CONTENT . ' updated',
     ];
 
-    private MockHandler $mockHandler;
-    private ApplicationClient $applicationClient;
-
     private string $expectedFilePath;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $client = static::createClient();
-
-        $mockHandler = self::getContainer()->get(MockHandler::class);
-        \assert($mockHandler instanceof MockHandler);
-        $this->mockHandler = $mockHandler;
-
         $fileStoreBasePath = self::getContainer()->getParameter('file_store_base_path');
         \assert(is_string($fileStoreBasePath));
         $this->expectedFilePath = $fileStoreBasePath . '/' . self::EXPECTED_FILE_RELATIVE_PATH;
-
-        $applicationClient = self::getContainer()->get(ApplicationClient::class);
-        \assert($applicationClient instanceof ApplicationClient);
-        $this->applicationClient = $applicationClient;
-        $applicationClient->setClient($client);
 
         $entityRemover = self::getContainer()->get(EntityRemover::class);
         if ($entityRemover instanceof EntityRemover) {

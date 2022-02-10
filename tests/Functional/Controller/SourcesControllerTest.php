@@ -25,42 +25,31 @@ use App\Tests\Model\UserId;
 use App\Tests\Services\EntityRemover;
 use App\Tests\Services\FileStoreFixtureCreator;
 use App\Tests\Services\FixtureLoader;
-use App\Tests\Services\ApplicationClient;
 use App\Validator\YamlFileConstraint;
-use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Middleware;
 use GuzzleHttp\Psr7\Response;
 use Psr\Http\Message\RequestInterface;
 use SmartAssert\UsersClient\Routes;
 use SmartAssert\UsersSecurityBundle\Security\AuthorizationProperties;
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 use webignition\HttpHistoryContainer\Container as HttpHistoryContainer;
 
-class SourcesControllerTest extends WebTestCase
+class SourcesControllerTest extends AbstractSourceControllerTest
 {
     private const AUTHORIZATION_TOKEN = 'authorization-token';
 
-    private MockHandler $mockHandler;
     private HttpHistoryContainer $httpHistoryContainer;
     private SourceRepository $sourceRepository;
     private RunSourceRepository $runSourceRepository;
     private Store $store;
     private FileStoreFixtureCreator $fixtureCreator;
     private FixtureLoader $fixtureLoader;
-    private ApplicationClient $applicationClient;
 
     protected function setUp(): void
     {
         parent::setUp();
-
-        $client = static::createClient();
-
-        $mockHandler = self::getContainer()->get(MockHandler::class);
-        \assert($mockHandler instanceof MockHandler);
-        $this->mockHandler = $mockHandler;
 
         $httpHistoryContainer = self::getContainer()->get(HttpHistoryContainer::class);
         \assert($httpHistoryContainer instanceof HttpHistoryContainer);
@@ -89,12 +78,6 @@ class SourcesControllerTest extends WebTestCase
         $fixtureLoader = self::getContainer()->get(FixtureLoader::class);
         \assert($fixtureLoader instanceof FixtureLoader);
         $this->fixtureLoader = $fixtureLoader;
-
-        $applicationClient = self::getContainer()->get(ApplicationClient::class);
-        \assert($applicationClient instanceof ApplicationClient);
-        $applicationClient->setClient($client);
-
-        $this->applicationClient = $applicationClient;
 
         $entityRemover = self::getContainer()->get(EntityRemover::class);
         if ($entityRemover instanceof EntityRemover) {
