@@ -60,7 +60,11 @@ class SourceControllerTest extends AbstractSourceControllerTest
         $userId = UserId::create();
         $this->setUserServiceAuthorizedResponse($userId);
 
-        $response = $this->applicationClient->makeAuthorizedRequest('POST', new Route('create'), $requestParameters);
+        $response = $this->applicationClient->makeAuthorizedRequest(
+            'POST',
+            new Route('source_create'),
+            $requestParameters
+        );
 
         self::assertSame(400, $response->getStatusCode());
         self::assertInstanceOf(JsonResponse::class, $response);
@@ -122,7 +126,11 @@ class SourceControllerTest extends AbstractSourceControllerTest
     {
         $this->setUserServiceAuthorizedResponse($userId);
 
-        $response = $this->applicationClient->makeAuthorizedRequest('POST', new Route('create'), $requestParameters);
+        $response = $this->applicationClient->makeAuthorizedRequest(
+            'POST',
+            new Route('source_create'),
+            $requestParameters
+        );
 
         self::assertSame(200, $response->getStatusCode());
         $this->authorizationRequestAsserter->assertAuthorizationRequestIsMade();
@@ -210,7 +218,7 @@ class SourceControllerTest extends AbstractSourceControllerTest
 
         $this->setUserServiceAuthorizedResponse($userId);
 
-        $response = $this->applicationClient->makeAuthorizedRequest('GET', new Route('list'));
+        $response = $this->applicationClient->makeAuthorizedRequest('GET', new Route('source_list'));
 
         self::assertSame(200, $response->getStatusCode());
         $this->authorizationRequestAsserter->assertAuthorizationRequestIsMade();

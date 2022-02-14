@@ -76,23 +76,23 @@ class InvalidSourceRequestTest extends AbstractSourceControllerTest
         return [
             'get source' => [
                 'method' => 'GET',
-                'route' => new Route('get', $sourceRouteParameters),
+                'route' => new Route('user_source_get', $sourceRouteParameters),
             ],
             'update source' => [
                 'method' => 'PUT',
-                'route' => new Route('update', $sourceRouteParameters),
+                'route' => new Route('user_source_update', $sourceRouteParameters),
             ],
             'delete source' => [
                 'method' => 'DELETE',
-                'route' => new Route('delete', $sourceRouteParameters),
+                'route' => new Route('user_source_delete', $sourceRouteParameters),
             ],
             'prepare source' => [
                 'method' => 'POST',
-                'route' => new Route('prepare', $sourceRouteParameters),
+                'route' => new Route('user_source_prepare', $sourceRouteParameters),
             ],
             'add file' => [
                 'method' => 'POST',
-                'route' => new Route('add_file', array_merge(
+                'route' => new Route('file_source_file_add', array_merge(
                     $sourceRouteParameters,
                     [
                         'filename' => 'filename.yaml',
@@ -101,7 +101,7 @@ class InvalidSourceRequestTest extends AbstractSourceControllerTest
             ],
             'remove file' => [
                 'method' => 'POST',
-                'route' => new Route('remove_file', array_merge(
+                'route' => new Route('file_source_file_remove', array_merge(
                     $sourceRouteParameters,
                     [
                         'filename' => 'filename.yaml',
