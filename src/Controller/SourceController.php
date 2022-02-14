@@ -19,7 +19,7 @@ class SourceController
     /**
      * @throws InvalidRequestException
      */
-    #[Route('/', name: 'create', methods: ['POST'])]
+    #[Route('/', name: 'source_create', methods: ['POST'])]
     public function create(
         RequestValidator $requestValidator,
         UserInterface $user,
@@ -31,7 +31,7 @@ class SourceController
         return new JsonResponse($factory->createFromSourceRequest($user, $request));
     }
 
-    #[Route('/list', name: 'list', methods: ['GET'])]
+    #[Route('/list', name: 'source_list', methods: ['GET'])]
     public function list(UserInterface $user, SourceRepository $repository): JsonResponse
     {
         return new JsonResponse($repository->findByUserAndType($user, [Type::FILE, Type::GIT]));

@@ -80,7 +80,7 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
 
         $this->setUserServiceAuthorizedResponse($userId);
 
-        $response = $this->applicationClient->makeAuthorizedSourceRequest('GET', 'get', $source->getId());
+        $response = $this->applicationClient->makeAuthorizedSourceRequest('GET', 'user_source_get', $source->getId());
 
         self::assertSame(200, $response->getStatusCode());
         $this->authorizationRequestAsserter->assertAuthorizationRequestIsMade();
@@ -178,7 +178,7 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
 
         $response = $this->applicationClient->makeAuthorizedSourceRequest(
             'PUT',
-            'update',
+            'user_source_update',
             $source->getId(),
             $requestData
         );
@@ -296,7 +296,7 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
 
         $this->setUserServiceAuthorizedResponse($userId);
 
-        $response = $this->applicationClient->makeAuthorizedSourceRequest('DELETE', 'delete', $source->getId());
+        $response = $this->applicationClient->makeAuthorizedSourceRequest('DELETE', 'user_source_delete', $source->getId());
 
         self::assertSame(200, $response->getStatusCode());
         $this->authorizationRequestAsserter->assertAuthorizationRequestIsMade();
@@ -343,7 +343,7 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
 
         $this->setUserServiceAuthorizedResponse($userId);
 
-        $response = $this->applicationClient->makeAuthorizedSourceRequest('POST', 'prepare', $source->getId());
+        $response = $this->applicationClient->makeAuthorizedSourceRequest('POST', 'user_source_prepare', $source->getId());
 
         self::assertSame(404, $response->getStatusCode());
         $this->authorizationRequestAsserter->assertAuthorizationRequestIsMade();
@@ -367,7 +367,7 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
 
         $response = $this->applicationClient->makeAuthorizedSourceRequest(
             'POST',
-            'prepare',
+            'user_source_prepare',
             $source->getId(),
             $requestParameters
         );
@@ -487,7 +487,7 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
 
         $this->setUserServiceAuthorizedResponse($userId);
 
-        $response = $this->applicationClient->makeAuthorizedSourceRequest('GET', 'read', $runSource->getId());
+        $response = $this->applicationClient->makeAuthorizedSourceRequest('GET', 'user_source_read', $runSource->getId());
 
         self::assertSame($expectedResponse->getStatusCode(), $response->getStatusCode());
         self::assertSame($expectedResponse->headers->get('content-type'), $response->headers->get('content-type'));

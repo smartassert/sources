@@ -80,7 +80,7 @@ class FileSourceFileControllerTest extends AbstractSourceControllerTest
 
         $response = $this->applicationClient->makeAuthorizedRequest(
             'POST',
-            new Route('add_file', [
+            new Route('file_source_file_add', [
                 'sourceId' => self::SOURCE_ID,
                 'filename' => $filename,
             ]),
@@ -164,7 +164,7 @@ class FileSourceFileControllerTest extends AbstractSourceControllerTest
 
         $response = $this->applicationClient->makeAuthorizedRequest(
             'POST',
-            new Route('add_file', [
+            new Route('file_source_file_add', [
                 'sourceId' => self::SOURCE_ID,
                 'filename' => self::FILENAME,
             ]),
@@ -188,7 +188,7 @@ class FileSourceFileControllerTest extends AbstractSourceControllerTest
 
         $response = $this->applicationClient->makeAuthorizedRequest(
             'POST',
-            new Route('add_file', [
+            new Route('file_source_file_add', [
                 'sourceId' => self::SOURCE_ID,
                 'filename' => self::FILENAME,
             ]),
@@ -213,7 +213,7 @@ class FileSourceFileControllerTest extends AbstractSourceControllerTest
 
         $response = $this->applicationClient->makeAuthorizedRequest(
             'DELETE',
-            new Route('remove_file', [
+            new Route('file_source_file_remove', [
                 'sourceId' => self::SOURCE_ID,
                 'filename' => $filename,
             ])
@@ -261,7 +261,7 @@ class FileSourceFileControllerTest extends AbstractSourceControllerTest
 
         $response = $this->applicationClient->makeAuthorizedRequest(
             'DELETE',
-            new Route('remove_file', [
+            new Route('file_source_file_remove', [
                 'sourceId' => self::SOURCE_ID,
                 'filename' => self::FILENAME,
             ])

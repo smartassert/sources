@@ -34,7 +34,7 @@ class FileSourceFileController
     /**
      * @throws InvalidRequestException
      */
-    #[Route(self::ROUTE_SOURCE_FILE, name: 'add_file', methods: ['POST'])]
+    #[Route(self::ROUTE_SOURCE_FILE, name: 'file_source_file_add', methods: ['POST'])]
     public function add(FileSource $source, AddYamlFileRequest $request): Response
     {
         $this->userSourceAccessChecker->denyAccessUnlessGranted($source);
@@ -54,7 +54,7 @@ class FileSourceFileController
     /**
      * @throws InvalidRequestException
      */
-    #[Route(self::ROUTE_SOURCE_FILE, name: 'remove_file', methods: ['DELETE'])]
+    #[Route(self::ROUTE_SOURCE_FILE, name: 'file_source_file_remove', methods: ['DELETE'])]
     public function remove(FileSource $source, RemoveYamlFileRequest $request): Response
     {
         $this->userSourceAccessChecker->denyAccessUnlessGranted($source);

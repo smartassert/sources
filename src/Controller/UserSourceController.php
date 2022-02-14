@@ -32,7 +32,7 @@ class UserSourceController
     ) {
     }
 
-    #[Route(SourceRoutes::ROUTE_SOURCE, name: 'get', methods: ['GET'])]
+    #[Route(SourceRoutes::ROUTE_SOURCE, name: 'user_source_get', methods: ['GET'])]
     public function get(SourceInterface $source): Response
     {
         $this->userSourceAccessChecker->denyAccessUnlessGranted($source);
@@ -43,7 +43,7 @@ class UserSourceController
     /**
      * @throws InvalidRequestException
      */
-    #[Route(SourceRoutes::ROUTE_SOURCE, name: 'update', methods: ['PUT'])]
+    #[Route(SourceRoutes::ROUTE_SOURCE, name: 'user_source_update', methods: ['PUT'])]
     public function update(
         RequestValidator $requestValidator,
         Mutator $mutator,
@@ -56,7 +56,7 @@ class UserSourceController
         return new JsonResponse($mutator->update($source, $request));
     }
 
-    #[Route(SourceRoutes::ROUTE_SOURCE, name: 'delete', methods: ['DELETE'])]
+    #[Route(SourceRoutes::ROUTE_SOURCE, name: 'user_source_delete', methods: ['DELETE'])]
     public function delete(SourceInterface $source, Store $store): Response
     {
         $this->userSourceAccessChecker->denyAccessUnlessGranted($source);
@@ -66,7 +66,7 @@ class UserSourceController
         return new JsonResponse();
     }
 
-    #[Route(SourceRoutes::ROUTE_SOURCE . '/prepare', name: 'prepare', methods: ['POST'])]
+    #[Route(SourceRoutes::ROUTE_SOURCE . '/prepare', name: 'user_source_prepare', methods: ['POST'])]
     public function prepare(
         Request $request,
         OriginSource $source,
@@ -81,7 +81,7 @@ class UserSourceController
         return new JsonResponse($runSource, 202);
     }
 
-    #[Route(SourceRoutes::ROUTE_SOURCE . '/read', name: 'read', methods: ['GET'])]
+    #[Route(SourceRoutes::ROUTE_SOURCE . '/read', name: 'user_source_read', methods: ['GET'])]
     public function read(
         RunSource $source,
         RunSourceSerializer $runSourceSerializer,
