@@ -5,18 +5,16 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use App\Entity\FileSource;
-use App\Exception\File\RemoveException;
-use App\Exception\File\WriteException;
+use App\Exception\File\FileExceptionInterface;
 use App\Exception\InvalidRequestException;
 use App\Request\AddYamlFileRequest;
 use App\Request\RemoveYamlFileRequest;
-use App\ResponseBody\FileExceptionResponse;
 use App\Security\UserSourceAccessChecker;
 use App\Services\FileStoreManager;
 use App\Services\RequestValidator;
-use App\Services\ResponseFactory;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 class FileSourceFileController
 {
@@ -27,12 +25,13 @@ class FileSourceFileController
         private UserSourceAccessChecker $userSourceAccessChecker,
         private RequestValidator $requestValidator,
         private FileStoreManager $fileStoreManager,
-        private ResponseFactory $responseFactory,
     ) {
     }
 
     /**
+     * @throws AccessDeniedException
      * @throws InvalidRequestException
+     * @throws FileExceptionInterface
      */
     #[Route(self::ROUTE_SOURCE_FILE, name: 'file_source_file_add', methods: ['POST'])]
     public function add(FileSource $source, AddYamlFileRequest $request): Response
@@ -42,29 +41,22 @@ class FileSourceFileController
 
         $yamlFile = $request->getYamlFile();
 
-        try {
-            $this->fileStoreManager->write($source . '/' . $yamlFile->name, $yamlFile->content);
-        } catch (WriteException $exception) {
-            return $this->responseFactory->createErrorResponse(new FileExceptionResponse($exception), 500);
-        }
+        $this->fileStoreManager->write($source . '/' . $yamlFile->name, $yamlFile->content);
 
         return new Response();
     }
 
     /**
+     * @throws AccessDeniedException
      * @throws InvalidRequestException
+     * @throws FileExceptionInterface
      */
     #[Route(self::ROUTE_SOURCE_FILE, name: 'file_source_file_remove', methods: ['DELETE'])]
     public function remove(FileSource $source, RemoveYamlFileRequest $request): Response
     {
         $this->userSourceAccessChecker->denyAccessUnlessGranted($source);
         $this->requestValidator->validate($request, ['filename.']);
-
-        try {
-            $this->fileStoreManager->removeFile($source . '/' . $request->getFilename());
-        } catch (RemoveException $exception) {
-            return $this->responseFactory->createErrorResponse(new FileExceptionResponse($exception), 500);
-        }
+        $this->fileStoreManager->removeFile($source . '/' . $request->getFilename());
 
         return new Response();
     }

@@ -15,6 +15,9 @@ class UserSourceAccessChecker
     ) {
     }
 
+    /**
+     * @throws AccessDeniedException
+     */
     public function denyAccessUnlessGranted(SourceInterface $source): void
     {
         $attribute = SourceAccessVoter::ACCESS;

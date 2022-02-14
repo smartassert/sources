@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace App\EventListener;
 
+use App\Exception\File\FileExceptionInterface;
 use App\Exception\HasHttpErrorCodeInterface;
 use App\Exception\InvalidRequestException;
+use App\ResponseBody\FileExceptionResponse;
 use App\Services\InvalidRequestResponseFactory;
 use App\Services\ResponseFactory;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -45,6 +47,10 @@ class KernelExceptionEventSubscriber implements EventSubscriberInterface
             $response = $this->handleInvalidRequest($throwable);
         }
 
+        if ($throwable instanceof FileExceptionInterface) {
+            $response = $this->handleFilesystemException($throwable);
+        }
+
         if ($response instanceof Response) {
             $event->setResponse($response);
             $event->stopPropagation();
@@ -65,5 +71,10 @@ class KernelExceptionEventSubscriber implements EventSubscriberInterface
             ),
             $throwable->getErrorCode()
         );
+    }
+
+    private function handleFilesystemException(FileExceptionInterface $throwable): Response
+    {
+        return $this->responseFactory->createErrorResponse(new FileExceptionResponse($throwable), 500);
     }
 }
