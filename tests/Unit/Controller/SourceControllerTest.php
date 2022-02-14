@@ -9,7 +9,7 @@ use App\Entity\FileSource;
 use App\Entity\RunSource;
 use App\Message\Prepare;
 use App\Security\UserSourceAccessChecker;
-use App\Services\InvalidRequestResponseFactory;
+use App\Services\RequestValidator;
 use App\Services\ResponseFactory;
 use App\Services\RunSourceFactory;
 use App\Tests\Model\UserId;
@@ -17,7 +17,6 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\MessageBusInterface;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class SourceControllerTest extends WebTestCase
 {
@@ -62,9 +61,8 @@ class SourceControllerTest extends WebTestCase
 
         (new SourceController(
             \Mockery::mock(ResponseFactory::class),
-            \Mockery::mock(ValidatorInterface::class),
-            \Mockery::mock(InvalidRequestResponseFactory::class),
             $userSourceAccessChecker,
+            \Mockery::mock(RequestValidator::class),
         ))
             ->prepare($request, $fileSource, $messageBus, $runSourceFactory)
         ;

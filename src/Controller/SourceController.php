@@ -12,6 +12,7 @@ use App\Enum\Source\Type;
 use App\Exception\File\ReadException;
 use App\Exception\File\RemoveException;
 use App\Exception\File\WriteException;
+use App\Exception\InvalidRequestException;
 use App\Message\Prepare;
 use App\Repository\SourceRepository;
 use App\Request\AddYamlFileRequest;
@@ -20,7 +21,7 @@ use App\Request\SourceRequestInterface;
 use App\ResponseBody\FileExceptionResponse;
 use App\Security\UserSourceAccessChecker;
 use App\Services\FileStoreManager;
-use App\Services\InvalidRequestResponseFactory;
+use App\Services\RequestValidator;
 use App\Services\ResponseFactory;
 use App\Services\RunSourceFactory;
 use App\Services\RunSourceSerializer;
@@ -33,7 +34,6 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\User\UserInterface;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class SourceController
 {
@@ -45,18 +45,18 @@ class SourceController
 
     public function __construct(
         private ResponseFactory $responseFactory,
-        private ValidatorInterface $validator,
-        private InvalidRequestResponseFactory $invalidRequestResponseFactory,
         private UserSourceAccessChecker $userSourceAccessChecker,
+        private RequestValidator $requestValidator,
     ) {
     }
 
+    /**
+     * @throws InvalidRequestException
+     */
     #[Route('/', name: 'create', methods: ['POST'])]
     public function create(UserInterface $user, Factory $factory, SourceRequestInterface $request): JsonResponse
     {
-        if (($response = $this->validateRequest($request)) instanceof JsonResponse) {
-            return $response;
-        }
+        $this->requestValidator->validate($request);
 
         return new JsonResponse($factory->createFromSourceRequest($user, $request));
     }
@@ -69,14 +69,14 @@ class SourceController
         return new JsonResponse($source);
     }
 
+    /**
+     * @throws InvalidRequestException
+     */
     #[Route(self::ROUTE_SOURCE, name: 'update', methods: ['PUT'])]
     public function update(OriginSource $source, Mutator $mutator, SourceRequestInterface $request): Response
     {
         $this->userSourceAccessChecker->denyAccessUnlessGranted($source);
-
-        if (($response = $this->validateRequest($request)) instanceof JsonResponse) {
-            return $response;
-        }
+        $this->requestValidator->validate($request);
 
         return new JsonResponse($mutator->update($source, $request));
     }
@@ -130,6 +130,9 @@ class SourceController
         }
     }
 
+    /**
+     * @throws InvalidRequestException
+     */
     #[Route(self::ROUTE_SOURCE_FILE, name: 'add_file', methods: ['POST'])]
     public function addFile(
         FileSource $source,
@@ -137,10 +140,7 @@ class SourceController
         FileStoreManager $fileStoreManager,
     ): Response {
         $this->userSourceAccessChecker->denyAccessUnlessGranted($source);
-
-        if (($response = $this->validateRequest($request, ['filename.', 'file.'])) instanceof JsonResponse) {
-            return $response;
-        }
+        $this->requestValidator->validate($request, ['filename.', 'file.']);
 
         $yamlFile = $request->getYamlFile();
 
@@ -153,6 +153,9 @@ class SourceController
         return new Response();
     }
 
+    /**
+     * @throws InvalidRequestException
+     */
     #[Route(self::ROUTE_SOURCE_FILE, name: 'remove_file', methods: ['DELETE'])]
     public function removeFile(
         FileSource $source,
@@ -160,10 +163,7 @@ class SourceController
         FileStoreManager $fileStoreManager,
     ): Response {
         $this->userSourceAccessChecker->denyAccessUnlessGranted($source);
-
-        if (($response = $this->validateRequest($request, ['filename.'])) instanceof JsonResponse) {
-            return $response;
-        }
+        $this->requestValidator->validate($request, ['filename.']);
 
         try {
             $fileStoreManager->removeFile($source . '/' . $request->getFilename());
@@ -172,24 +172,5 @@ class SourceController
         }
 
         return new Response();
-    }
-
-    /**
-     * @param string[] $propertyNamePrefixesToRemove
-     */
-    private function validateRequest(object $request, array $propertyNamePrefixesToRemove = []): ?JsonResponse
-    {
-        $errors = $this->validator->validate($request);
-        if (0 !== count($errors)) {
-            return $this->responseFactory->createErrorResponse(
-                $this->invalidRequestResponseFactory->createFromConstraintViolations(
-                    $errors,
-                    $propertyNamePrefixesToRemove
-                ),
-                400
-            );
-        }
-
-        return null;
     }
 }

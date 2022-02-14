@@ -5,12 +5,21 @@ declare(strict_types=1);
 namespace App\EventListener;
 
 use App\Exception\HasHttpErrorCodeInterface;
+use App\Exception\InvalidRequestException;
+use App\Services\InvalidRequestResponseFactory;
+use App\Services\ResponseFactory;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 
 class KernelExceptionEventSubscriber implements EventSubscriberInterface
 {
+    public function __construct(
+        private ResponseFactory $responseFactory,
+        private InvalidRequestResponseFactory $invalidRequestResponseFactory,
+    ) {
+    }
+
     /**
      * @return array<class-string, array<mixed>>
      */
@@ -26,10 +35,35 @@ class KernelExceptionEventSubscriber implements EventSubscriberInterface
     public function onKernelException(ExceptionEvent $event): void
     {
         $throwable = $event->getThrowable();
+        $response = null;
 
         if ($throwable instanceof HasHttpErrorCodeInterface) {
-            $event->setResponse(new Response(null, $throwable->getErrorCode()));
+            $response = $this->handleHttpErrorException($throwable);
+        }
+
+        if ($throwable instanceof InvalidRequestException) {
+            $response = $this->handleInvalidRequest($throwable);
+        }
+
+        if ($response instanceof Response) {
+            $event->setResponse($response);
             $event->stopPropagation();
         }
+    }
+
+    private function handleHttpErrorException(HasHttpErrorCodeInterface $throwable): Response
+    {
+        return new Response(null, $throwable->getErrorCode());
+    }
+
+    private function handleInvalidRequest(InvalidRequestException $throwable): Response
+    {
+        return $this->responseFactory->createErrorResponse(
+            $this->invalidRequestResponseFactory->createFromConstraintViolations(
+                $throwable->getViolations(),
+                $throwable->getPropertyNamePrefixesToRemove()
+            ),
+            $throwable->getErrorCode()
+        );
     }
 }
