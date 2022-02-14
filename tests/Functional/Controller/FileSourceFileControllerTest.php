@@ -4,68 +4,13 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\Controller;
 
-use App\Entity\AbstractSource;
-use App\Entity\FileSource;
 use App\Services\FileStoreManager;
-use App\Services\Source\Store;
 use App\Tests\Model\Route;
-use App\Tests\Services\AuthorizationRequestAsserter;
-use App\Tests\Services\EntityRemover;
 use App\Validator\YamlFilenameConstraint;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use webignition\ObjectReflector\ObjectReflector;
 
-class FileSourceFileControllerTest extends AbstractSourceControllerTest
+class FileSourceFileControllerTest extends AbstractFileSourceFilesTest
 {
-    private const USER_ID = '01FVHKTM3V53JVCW1HPN1125NF';
-    private const SOURCE_ID = '01FVHM0XGXGAD463JTW05CN2TF';
-    private const SOURCE_RELATIVE_PATH = self::USER_ID . '/' . self::SOURCE_ID;
-    private const EXPECTED_FILE_RELATIVE_PATH = self::SOURCE_RELATIVE_PATH . '/' . self::FILENAME;
-
-    private const FILENAME = 'filename.yaml';
-    private const CONTENT = '- list item';
-
-    private const CREATE_DATA = [
-        'content' => self::CONTENT,
-    ];
-
-    private const UPDATE_DATA = [
-        'content' => self::CONTENT . ' updated',
-    ];
-
-    private AuthorizationRequestAsserter $authorizationRequestAsserter;
-    private string $expectedFilePath;
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        $authorizationRequestAsserter = self::getContainer()->get(AuthorizationRequestAsserter::class);
-        \assert($authorizationRequestAsserter instanceof AuthorizationRequestAsserter);
-        $this->authorizationRequestAsserter = $authorizationRequestAsserter;
-
-        $fileStoreBasePath = self::getContainer()->getParameter('file_store_base_path');
-        \assert(is_string($fileStoreBasePath));
-        $this->expectedFilePath = $fileStoreBasePath . '/' . self::EXPECTED_FILE_RELATIVE_PATH;
-
-        $entityRemover = self::getContainer()->get(EntityRemover::class);
-        if ($entityRemover instanceof EntityRemover) {
-            $entityRemover->removeAll();
-        }
-
-        $source = new FileSource(self::USER_ID, 'file source label');
-        ObjectReflector::setProperty(
-            $source,
-            AbstractSource::class,
-            'id',
-            self::SOURCE_ID
-        );
-
-        $store = self::getContainer()->get(Store::class);
-        \assert($store instanceof Store);
-        $store->add($source);
-    }
-
     /**
      * @dataProvider addFileInvalidRequestDataProvider
      *

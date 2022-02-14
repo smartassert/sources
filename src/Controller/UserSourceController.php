@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use App\Entity\FileSource;
 use App\Entity\OriginSourceInterface as OriginSource;
 use App\Entity\RunSource;
 use App\Entity\SourceInterface;
@@ -12,6 +13,7 @@ use App\Exception\InvalidRequestException;
 use App\Message\Prepare;
 use App\Request\SourceRequestInterface;
 use App\Security\UserSourceAccessChecker;
+use App\Services\FileStoreManager;
 use App\Services\RequestValidator;
 use App\Services\RunSourceFactory;
 use App\Services\RunSourceSerializer;
@@ -61,13 +63,18 @@ class UserSourceController
 
     /**
      * @throws AccessDeniedException
+     * @throws FileExceptionInterface
      */
     #[Route(SourceRoutes::ROUTE_SOURCE, name: 'user_source_delete', methods: ['DELETE'])]
-    public function delete(SourceInterface $source, Store $store): Response
+    public function delete(SourceInterface $source, Store $store, FileStoreManager $fileStoreManager): Response
     {
         $this->userSourceAccessChecker->denyAccessUnlessGranted($source);
 
         $store->remove($source);
+
+        if ($source instanceof FileSource) {
+            $fileStoreManager->remove((string) $source);
+        }
 
         return new JsonResponse();
     }
