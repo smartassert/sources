@@ -16,6 +16,7 @@ use App\Repository\SourceRepository;
 use App\Request\FileSourceRequest;
 use App\Request\GitSourceRequest;
 use App\Request\SourceRequestInterface;
+use App\Services\FileStoreManager;
 use App\Services\RunSourceSerializer;
 use App\Services\Source\Store;
 use App\Tests\Model\UserId;
@@ -334,6 +335,45 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
                 'expectedRepositoryCount' => 1,
             ],
         ];
+    }
+
+    public function testDeleteRunSourceDeletesRunSourceFiles(): void
+    {
+        $userId = UserId::create();
+        $fileSource = new FileSource($userId, 'file source label');
+        $runSource = new RunSource($fileSource);
+
+        $this->store->add($fileSource);
+        $this->store->add($runSource);
+
+        $fileStoreManager = self::getContainer()->get(FileStoreManager::class);
+        \assert($fileStoreManager instanceof FileStoreManager);
+        $fileStoreManager->write($fileSource . '/file.yaml', '- file content');
+
+        $runSourceSerializer = self::getContainer()->get(RunSourceSerializer::class);
+        \assert($runSourceSerializer instanceof RunSourceSerializer);
+        $runSourceSerializer->write($runSource);
+
+        $fileStoreBasePath = self::getContainer()->getParameter('file_store_base_path');
+        \assert(is_string($fileStoreBasePath));
+
+        $expectedRunSourceAbsolutePath = $fileStoreBasePath . '/' . $runSource;
+        $expectedSerializedRunSourcePath = $expectedRunSourceAbsolutePath . '/source.yaml';
+
+        self::assertDirectoryExists($expectedRunSourceAbsolutePath);
+        self::assertFileExists($expectedSerializedRunSourcePath);
+
+        $this->setUserServiceAuthorizedResponse($userId);
+
+        $response = $this->applicationClient->makeAuthorizedSourceRequest(
+            'DELETE',
+            'user_source_delete',
+            $runSource->getId()
+        );
+
+        self::assertSame(200, $response->getStatusCode());
+        self::assertDirectoryDoesNotExist($expectedRunSourceAbsolutePath);
+        self::assertFileDoesNotExist($expectedSerializedRunSourcePath);
     }
 
     public function testPrepareRunSource(): void
