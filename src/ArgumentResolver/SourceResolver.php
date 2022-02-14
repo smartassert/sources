@@ -13,8 +13,8 @@ class SourceResolver extends AbstractSourceResolver
         return SourceInterface::class === $type;
     }
 
-    protected function doYield(?SourceInterface $source): ?SourceInterface
+    protected function getExpectedInstanceClassName(): string
     {
-        return $source;
+        return SourceInterface::class;
     }
 }

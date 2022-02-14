@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\ArgumentResolver;
 
 use App\Entity\OriginSourceInterface;
-use App\Entity\SourceInterface;
 
 class OriginSourceResolver extends AbstractSourceResolver
 {
@@ -14,8 +13,8 @@ class OriginSourceResolver extends AbstractSourceResolver
         return OriginSourceInterface::class === $type;
     }
 
-    protected function doYield(?SourceInterface $source): ?OriginSourceInterface
+    protected function getExpectedInstanceClassName(): string
     {
-        return $source instanceof OriginSourceInterface ? $source : null;
+        return OriginSourceInterface::class;
     }
 }
