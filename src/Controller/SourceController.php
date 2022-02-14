@@ -69,7 +69,7 @@ class SourceController
     }
 
     #[Route(self::ROUTE_SOURCE, name: 'get', methods: ['GET'])]
-    public function get(?SourceInterface $source): Response
+    public function get(SourceInterface $source): Response
     {
         return $this->doUserSourceAction($source, function (SourceInterface $source) {
             return new JsonResponse($source);
@@ -77,7 +77,7 @@ class SourceController
     }
 
     #[Route(self::ROUTE_SOURCE, name: 'update', methods: ['PUT'])]
-    public function update(?OriginSource $source, Mutator $mutator, SourceRequestInterface $request): Response
+    public function update(OriginSource $source, Mutator $mutator, SourceRequestInterface $request): Response
     {
         return $this->doUserSourceAction($source, function (OriginSource $source) use ($request, $mutator) {
             if (($response = $this->validateRequest($request)) instanceof JsonResponse) {
@@ -89,7 +89,7 @@ class SourceController
     }
 
     #[Route(self::ROUTE_SOURCE, name: 'delete', methods: ['DELETE'])]
-    public function delete(?SourceInterface $source, Store $store): Response
+    public function delete(SourceInterface $source, Store $store): Response
     {
         return $this->doUserSourceAction($source, function (SourceInterface $source) use ($store) {
             $store->remove($source);
@@ -107,7 +107,7 @@ class SourceController
     #[Route(self::ROUTE_SOURCE . '/prepare', name: 'prepare', methods: ['POST'])]
     public function prepare(
         Request $request,
-        ?OriginSource $source,
+        OriginSource $source,
         MessageBusInterface $messageBus,
         RunSourceFactory $runSourceFactory,
     ): Response {
@@ -123,7 +123,7 @@ class SourceController
     }
 
     #[Route(self::ROUTE_SOURCE . '/read', name: 'read', methods: ['GET'])]
-    public function read(?RunSource $source, RunSourceSerializer $runSourceSerializer): Response
+    public function read(RunSource $source, RunSourceSerializer $runSourceSerializer): Response
     {
         return $this->doUserSourceAction($source, function (RunSource $source) use ($runSourceSerializer) {
             try {
@@ -142,7 +142,7 @@ class SourceController
 
     #[Route(self::ROUTE_SOURCE_FILE, name: 'add_file', methods: ['POST'])]
     public function addFile(
-        ?FileSource $source,
+        FileSource $source,
         AddYamlFileRequest $request,
         FileStoreManager $fileStoreManager,
     ): Response {
@@ -168,7 +168,7 @@ class SourceController
 
     #[Route(self::ROUTE_SOURCE_FILE, name: 'remove_file', methods: ['DELETE'])]
     public function removeFile(
-        ?FileSource $source,
+        FileSource $source,
         RemoveYamlFileRequest $request,
         FileStoreManager $fileStoreManager,
     ): Response {
@@ -190,12 +190,8 @@ class SourceController
         );
     }
 
-    private function doUserSourceAction(?SourceInterface $source, callable $action): Response
+    private function doUserSourceAction(SourceInterface $source, callable $action): Response
     {
-        if (null === $source) {
-            return new JsonResponse(null, 404);
-        }
-
         if ($this->user->getUserIdentifier() !== $source->getUserId()) {
             return new JsonResponse(null, 401);
         }

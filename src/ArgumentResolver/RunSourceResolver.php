@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\ArgumentResolver;
 
 use App\Entity\RunSource;
-use App\Entity\SourceInterface;
 
 class RunSourceResolver extends AbstractSourceResolver
 {
@@ -14,8 +13,8 @@ class RunSourceResolver extends AbstractSourceResolver
         return RunSource::class === $type;
     }
 
-    protected function doYield(?SourceInterface $source): ?RunSource
+    protected function getExpectedInstanceClassName(): string
     {
-        return $source instanceof RunSource ? $source : null;
+        return RunSource::class;
     }
 }

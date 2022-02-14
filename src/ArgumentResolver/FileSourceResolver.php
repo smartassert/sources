@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\ArgumentResolver;
 
 use App\Entity\FileSource;
-use App\Entity\SourceInterface;
 
 class FileSourceResolver extends AbstractSourceResolver
 {
@@ -14,8 +13,8 @@ class FileSourceResolver extends AbstractSourceResolver
         return FileSource::class === $type;
     }
 
-    protected function doYield(?SourceInterface $source): ?FileSource
+    protected function getExpectedInstanceClassName(): string
     {
-        return $source instanceof FileSource ? $source : null;
+        return FileSource::class;
     }
 }
