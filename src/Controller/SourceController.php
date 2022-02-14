@@ -16,18 +16,17 @@ use Symfony\Component\Security\Core\User\UserInterface;
 
 class SourceController
 {
-    public function __construct(
-        private RequestValidator $requestValidator,
-    ) {
-    }
-
     /**
      * @throws InvalidRequestException
      */
     #[Route('/', name: 'create', methods: ['POST'])]
-    public function create(UserInterface $user, Factory $factory, SourceRequestInterface $request): JsonResponse
-    {
-        $this->requestValidator->validate($request);
+    public function create(
+        RequestValidator $requestValidator,
+        UserInterface $user,
+        Factory $factory,
+        SourceRequestInterface $request
+    ): JsonResponse {
+        $requestValidator->validate($request);
 
         return new JsonResponse($factory->createFromSourceRequest($user, $request));
     }

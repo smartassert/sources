@@ -39,9 +39,7 @@ class UserSourceController
     private const ROUTE_SOURCE_FILE = self::ROUTE_SOURCE . '/' . self::ROUTE_FILENAME_PATTERN;
 
     public function __construct(
-        private ResponseFactory $responseFactory,
         private UserSourceAccessChecker $userSourceAccessChecker,
-        private RequestValidator $requestValidator,
     ) {
     }
 
@@ -57,10 +55,14 @@ class UserSourceController
      * @throws InvalidRequestException
      */
     #[Route(self::ROUTE_SOURCE, name: 'update', methods: ['PUT'])]
-    public function update(OriginSource $source, Mutator $mutator, SourceRequestInterface $request): Response
-    {
+    public function update(
+        RequestValidator $requestValidator,
+        Mutator $mutator,
+        OriginSource $source,
+        SourceRequestInterface $request,
+    ): Response {
         $this->userSourceAccessChecker->denyAccessUnlessGranted($source);
-        $this->requestValidator->validate($request);
+        $requestValidator->validate($request);
 
         return new JsonResponse($mutator->update($source, $request));
     }
@@ -91,8 +93,11 @@ class UserSourceController
     }
 
     #[Route(self::ROUTE_SOURCE . '/read', name: 'read', methods: ['GET'])]
-    public function read(RunSource $source, RunSourceSerializer $runSourceSerializer): Response
-    {
+    public function read(
+        RunSource $source,
+        RunSourceSerializer $runSourceSerializer,
+        ResponseFactory $responseFactory,
+    ): Response {
         $this->userSourceAccessChecker->denyAccessUnlessGranted($source);
 
         try {
@@ -104,7 +109,7 @@ class UserSourceController
                 ]
             );
         } catch (ReadException $exception) {
-            return $this->responseFactory->createErrorResponse(new FileExceptionResponse($exception), 500);
+            return $responseFactory->createErrorResponse(new FileExceptionResponse($exception), 500);
         }
     }
 
@@ -115,17 +120,19 @@ class UserSourceController
     public function addFile(
         FileSource $source,
         AddYamlFileRequest $request,
+        RequestValidator $requestValidator,
         FileStoreManager $fileStoreManager,
+        ResponseFactory $responseFactory,
     ): Response {
         $this->userSourceAccessChecker->denyAccessUnlessGranted($source);
-        $this->requestValidator->validate($request, ['filename.', 'file.']);
+        $requestValidator->validate($request, ['filename.', 'file.']);
 
         $yamlFile = $request->getYamlFile();
 
         try {
             $fileStoreManager->write($source . '/' . $yamlFile->name, $yamlFile->content);
         } catch (WriteException $exception) {
-            return $this->responseFactory->createErrorResponse(new FileExceptionResponse($exception), 500);
+            return $responseFactory->createErrorResponse(new FileExceptionResponse($exception), 500);
         }
 
         return new Response();
@@ -138,15 +145,17 @@ class UserSourceController
     public function removeFile(
         FileSource $source,
         RemoveYamlFileRequest $request,
+        RequestValidator $requestValidator,
         FileStoreManager $fileStoreManager,
+        ResponseFactory $responseFactory,
     ): Response {
         $this->userSourceAccessChecker->denyAccessUnlessGranted($source);
-        $this->requestValidator->validate($request, ['filename.']);
+        $requestValidator->validate($request, ['filename.']);
 
         try {
             $fileStoreManager->removeFile($source . '/' . $request->getFilename());
         } catch (RemoveException $exception) {
-            return $this->responseFactory->createErrorResponse(new FileExceptionResponse($exception), 500);
+            return $responseFactory->createErrorResponse(new FileExceptionResponse($exception), 500);
         }
 
         return new Response();
