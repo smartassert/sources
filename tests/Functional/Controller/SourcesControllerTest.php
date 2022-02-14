@@ -182,7 +182,7 @@ class SourcesControllerTest extends AbstractSourceControllerTest
 
         $response = $this->applicationClient->makeAuthorizedRequest($method, $routeWithSourceId);
 
-        self::assertSame(401, $response->getStatusCode());
+        self::assertSame(403, $response->getStatusCode());
     }
 
     /**
