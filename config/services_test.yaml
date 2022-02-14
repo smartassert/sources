@@ -48,3 +48,8 @@ services:
 
     App\Tests\Services\ApplicationClient:
         public: true
+
+    App\Tests\Services\AuthorizationRequestAsserter:
+        public: true
+        arguments:
+            $usersSecurityBundleBaseUrl: '%users_security_bundle_base_url%'

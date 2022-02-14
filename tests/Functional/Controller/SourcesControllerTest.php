@@ -22,39 +22,26 @@ use App\Services\RunSourceSerializer;
 use App\Services\Source\Store;
 use App\Tests\Model\Route;
 use App\Tests\Model\UserId;
-use App\Tests\Services\ApplicationClient;
+use App\Tests\Services\AuthorizationRequestAsserter;
 use App\Tests\Services\EntityRemover;
 use App\Tests\Services\FileStoreFixtureCreator;
 use App\Tests\Services\FixtureLoader;
 use App\Validator\YamlFilenameConstraint;
-use GuzzleHttp\HandlerStack;
-use GuzzleHttp\Middleware;
-use Psr\Http\Message\RequestInterface;
-use SmartAssert\UsersClient\Routes;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
-use webignition\HttpHistoryContainer\Container as HttpHistoryContainer;
 
 class SourcesControllerTest extends AbstractSourceControllerTest
 {
-    private HttpHistoryContainer $httpHistoryContainer;
     private SourceRepository $sourceRepository;
     private RunSourceRepository $runSourceRepository;
     private Store $store;
     private FileStoreFixtureCreator $fixtureCreator;
     private FixtureLoader $fixtureLoader;
+    private AuthorizationRequestAsserter $authorizationRequestAsserter;
 
     protected function setUp(): void
     {
         parent::setUp();
-
-        $httpHistoryContainer = self::getContainer()->get(HttpHistoryContainer::class);
-        \assert($httpHistoryContainer instanceof HttpHistoryContainer);
-        $this->httpHistoryContainer = $httpHistoryContainer;
-
-        $handlerStack = self::getContainer()->get(HandlerStack::class);
-        \assert($handlerStack instanceof HandlerStack);
-        $handlerStack->push(Middleware::history($this->httpHistoryContainer), 'history');
 
         $store = self::getContainer()->get(Store::class);
         \assert($store instanceof Store);
@@ -76,6 +63,10 @@ class SourcesControllerTest extends AbstractSourceControllerTest
         \assert($fixtureLoader instanceof FixtureLoader);
         $this->fixtureLoader = $fixtureLoader;
 
+        $authorizationRequestAsserter = self::getContainer()->get(AuthorizationRequestAsserter::class);
+        \assert($authorizationRequestAsserter instanceof AuthorizationRequestAsserter);
+        $this->authorizationRequestAsserter = $authorizationRequestAsserter;
+
         $entityRemover = self::getContainer()->get(EntityRemover::class);
         if ($entityRemover instanceof EntityRemover) {
             $entityRemover->removeAll();
@@ -92,7 +83,7 @@ class SourcesControllerTest extends AbstractSourceControllerTest
         $response = $this->applicationClient->makeAuthorizedRequest($method, $route);
 
         self::assertSame(401, $response->getStatusCode());
-        $this->assertAuthorizationRequestIsMade();
+        $this->authorizationRequestAsserter->assertAuthorizationRequestIsMade();
     }
 
     /**
@@ -306,7 +297,7 @@ class SourcesControllerTest extends AbstractSourceControllerTest
         $response = $this->applicationClient->makeAuthorizedRequest('POST', new Route('create'), $requestParameters);
 
         self::assertSame(200, $response->getStatusCode());
-        $this->assertAuthorizationRequestIsMade();
+        $this->authorizationRequestAsserter->assertAuthorizationRequestIsMade();
 
         $sources = $this->sourceRepository->findAll();
         self::assertIsArray($sources);
@@ -391,7 +382,7 @@ class SourcesControllerTest extends AbstractSourceControllerTest
         $response = $this->applicationClient->makeAuthorizedSourceRequest('GET', 'get', $source->getId());
 
         self::assertSame(200, $response->getStatusCode());
-        $this->assertAuthorizationRequestIsMade();
+        $this->authorizationRequestAsserter->assertAuthorizationRequestIsMade();
         self::assertInstanceOf(JsonResponse::class, $response);
 
         $responseData = json_decode((string) $response->getContent(), true);
@@ -492,7 +483,7 @@ class SourcesControllerTest extends AbstractSourceControllerTest
         );
 
         self::assertSame($expectedResponseStatusCode, $response->getStatusCode());
-        $this->assertAuthorizationRequestIsMade();
+        $this->authorizationRequestAsserter->assertAuthorizationRequestIsMade();
         self::assertInstanceOf(JsonResponse::class, $response);
 
         $responseData = json_decode((string) $response->getContent(), true);
@@ -607,7 +598,7 @@ class SourcesControllerTest extends AbstractSourceControllerTest
         $response = $this->applicationClient->makeAuthorizedSourceRequest('DELETE', 'delete', $source->getId());
 
         self::assertSame(200, $response->getStatusCode());
-        $this->assertAuthorizationRequestIsMade();
+        $this->authorizationRequestAsserter->assertAuthorizationRequestIsMade();
         self::assertInstanceOf(JsonResponse::class, $response);
         self::assertSame($expectedRepositoryCount, $this->sourceRepository->count([]));
     }
@@ -657,7 +648,7 @@ class SourcesControllerTest extends AbstractSourceControllerTest
         $response = $this->applicationClient->makeAuthorizedRequest('GET', new Route('list'));
 
         self::assertSame(200, $response->getStatusCode());
-        $this->assertAuthorizationRequestIsMade();
+        $this->authorizationRequestAsserter->assertAuthorizationRequestIsMade();
         self::assertInstanceOf(JsonResponse::class, $response);
 
         $responseData = json_decode((string) $response->getContent(), true);
@@ -762,7 +753,7 @@ class SourcesControllerTest extends AbstractSourceControllerTest
         $response = $this->applicationClient->makeAuthorizedSourceRequest('POST', 'prepare', $source->getId());
 
         self::assertSame(404, $response->getStatusCode());
-        $this->assertAuthorizationRequestIsMade();
+        $this->authorizationRequestAsserter->assertAuthorizationRequestIsMade();
     }
 
     /**
@@ -789,7 +780,7 @@ class SourcesControllerTest extends AbstractSourceControllerTest
         );
 
         self::assertSame(202, $response->getStatusCode());
-        $this->assertAuthorizationRequestIsMade();
+        $this->authorizationRequestAsserter->assertAuthorizationRequestIsMade();
         self::assertInstanceOf(JsonResponse::class, $response);
 
         $responseData = json_decode((string) $response->getContent(), true);
@@ -938,7 +929,7 @@ class SourcesControllerTest extends AbstractSourceControllerTest
         );
 
         self::assertSame(400, $response->getStatusCode());
-        $this->assertAuthorizationRequestIsMade();
+        $this->authorizationRequestAsserter->assertAuthorizationRequestIsMade();
         self::assertInstanceOf(JsonResponse::class, $response);
 
         $responseData = json_decode((string) $response->getContent(), true);
@@ -1040,7 +1031,7 @@ class SourcesControllerTest extends AbstractSourceControllerTest
         );
 
         self::assertSame(400, $response->getStatusCode());
-        $this->assertAuthorizationRequestIsMade();
+        $this->authorizationRequestAsserter->assertAuthorizationRequestIsMade();
         self::assertInstanceOf(JsonResponse::class, $response);
 
         $responseData = json_decode((string) $response->getContent(), true);
@@ -1079,23 +1070,6 @@ class SourcesControllerTest extends AbstractSourceControllerTest
                 'expectedResponseData' => $expectedInvalidFilenameResponseData,
             ],
         ];
-    }
-
-    private function assertAuthorizationRequestIsMade(): void
-    {
-        $request = $this->httpHistoryContainer->getTransactions()->getRequests()->getLast();
-        \assert($request instanceof RequestInterface);
-
-        $usersServiceBaseUrl = self::getContainer()->getParameter('users_security_bundle_base_url');
-        \assert(is_string($usersServiceBaseUrl));
-
-        $expectedUrl = $usersServiceBaseUrl . Routes::DEFAULT_VERIFY_API_TOKEN_PATH;
-
-        self::assertSame($expectedUrl, (string) $request->getUri());
-        self::assertSame(
-            ApplicationClient::AUTH_HEADER_VALUE,
-            $request->getHeaderLine(ApplicationClient::AUTH_HEADER_KEY)
-        );
     }
 
     /**
