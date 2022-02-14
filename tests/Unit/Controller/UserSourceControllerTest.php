@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\Controller;
 
-use App\Controller\SourceController;
+use App\Controller\UserSourceController;
 use App\Entity\FileSource;
 use App\Entity\RunSource;
 use App\Message\Prepare;
@@ -18,7 +18,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\MessageBusInterface;
 
-class SourceControllerTest extends WebTestCase
+class UserSourceControllerTest extends WebTestCase
 {
     public function testPrepareSuccessDispatchesPrepareMessage(): void
     {
@@ -59,7 +59,7 @@ class SourceControllerTest extends WebTestCase
             ->with($fileSource)
         ;
 
-        (new SourceController(
+        (new UserSourceController(
             \Mockery::mock(ResponseFactory::class),
             $userSourceAccessChecker,
             \Mockery::mock(RequestValidator::class),
