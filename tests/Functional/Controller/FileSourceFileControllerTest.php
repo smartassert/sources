@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\Controller;
 
-use App\Services\FileStoreManager;
 use App\Tests\Model\Route;
 use App\Validator\YamlFilenameConstraint;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -100,10 +99,7 @@ class FileSourceFileControllerTest extends AbstractFileSourceFilesTest
 
     public function testAddFileSuccess(): void
     {
-        $fileStoreManager = self::getContainer()->get(FileStoreManager::class);
-        \assert($fileStoreManager instanceof FileStoreManager);
-        $fileStoreManager->remove(self::SOURCE_RELATIVE_PATH);
-        self::assertDirectoryDoesNotExist(self::SOURCE_RELATIVE_PATH);
+        self::assertFalse($this->filesystemOperator->directoryExists(self::SOURCE_RELATIVE_PATH));
 
         $this->setUserServiceAuthorizedResponse(self::USER_ID);
 
@@ -117,17 +113,17 @@ class FileSourceFileControllerTest extends AbstractFileSourceFilesTest
         );
 
         self::assertSame(200, $response->getStatusCode());
-        self::assertFileExists($this->expectedFilePath);
-        self::assertSame(self::CREATE_DATA['content'], file_get_contents($this->expectedFilePath));
+        self::assertTrue($this->filesystemOperator->directoryExists(self::SOURCE_RELATIVE_PATH));
+        self::assertTrue($this->filesystemOperator->fileExists(self::EXPECTED_FILE_RELATIVE_PATH));
+        self::assertSame(
+            self::CREATE_DATA['content'],
+            $this->filesystemOperator->read(self::EXPECTED_FILE_RELATIVE_PATH)
+        );
     }
 
-    /**
-     * @depends testAddFileSuccess
-     */
     public function testUpdateAddedFileSuccess(): void
     {
-        self::assertFileExists($this->expectedFilePath);
-        self::assertSame(self::CREATE_DATA['content'], file_get_contents($this->expectedFilePath));
+        $this->filesystemOperator->write(self::EXPECTED_FILE_RELATIVE_PATH, self::CREATE_DATA['content']);
 
         $this->setUserServiceAuthorizedResponse(self::USER_ID);
 
@@ -141,8 +137,12 @@ class FileSourceFileControllerTest extends AbstractFileSourceFilesTest
         );
 
         self::assertSame(200, $response->getStatusCode());
-        self::assertFileExists($this->expectedFilePath);
-        self::assertSame(self::UPDATE_DATA['content'], file_get_contents($this->expectedFilePath));
+        self::assertTrue($this->filesystemOperator->directoryExists(self::SOURCE_RELATIVE_PATH));
+        self::assertTrue($this->filesystemOperator->fileExists(self::EXPECTED_FILE_RELATIVE_PATH));
+        self::assertSame(
+            self::UPDATE_DATA['content'],
+            $this->filesystemOperator->read(self::EXPECTED_FILE_RELATIVE_PATH)
+        );
     }
 
     /**
@@ -195,12 +195,9 @@ class FileSourceFileControllerTest extends AbstractFileSourceFilesTest
         ];
     }
 
-    /**
-     * @depends testUpdateAddedFileSuccess
-     */
-    public function testRemoveFile(): void
+    public function testRemoveFileSuccess(): void
     {
-        self::assertFileExists($this->expectedFilePath);
+        $this->filesystemOperator->write(self::EXPECTED_FILE_RELATIVE_PATH, self::CREATE_DATA['content']);
 
         $this->setUserServiceAuthorizedResponse(self::USER_ID);
 
@@ -213,7 +210,7 @@ class FileSourceFileControllerTest extends AbstractFileSourceFilesTest
         );
 
         self::assertSame(200, $response->getStatusCode());
-        self::assertFileDoesNotExist($this->expectedFilePath);
+        self::assertFalse($this->filesystemOperator->fileExists(self::EXPECTED_FILE_RELATIVE_PATH));
     }
 
     /**

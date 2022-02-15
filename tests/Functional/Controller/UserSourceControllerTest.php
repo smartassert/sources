@@ -16,7 +16,6 @@ use App\Repository\SourceRepository;
 use App\Request\FileSourceRequest;
 use App\Request\GitSourceRequest;
 use App\Request\SourceRequestInterface;
-use App\Services\FileStoreManager;
 use App\Services\RunSourceSerializer;
 use App\Services\Source\Store;
 use App\Tests\Model\UserId;
@@ -24,6 +23,7 @@ use App\Tests\Services\AuthorizationRequestAsserter;
 use App\Tests\Services\EntityRemover;
 use App\Tests\Services\FileStoreFixtureCreator;
 use App\Tests\Services\FixtureLoader;
+use League\Flysystem\FilesystemOperator;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
@@ -35,6 +35,7 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
     private FileStoreFixtureCreator $fixtureCreator;
     private FixtureLoader $fixtureLoader;
     private AuthorizationRequestAsserter $authorizationRequestAsserter;
+    private FilesystemOperator $filesystemOperator;
 
     protected function setUp(): void
     {
@@ -63,6 +64,10 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
         $authorizationRequestAsserter = self::getContainer()->get(AuthorizationRequestAsserter::class);
         \assert($authorizationRequestAsserter instanceof AuthorizationRequestAsserter);
         $this->authorizationRequestAsserter = $authorizationRequestAsserter;
+
+        $filesystemOperator = self::getContainer()->get('default.storage');
+        \assert($filesystemOperator instanceof FilesystemOperator);
+        $this->filesystemOperator = $filesystemOperator;
 
         $entityRemover = self::getContainer()->get(EntityRemover::class);
         if ($entityRemover instanceof EntityRemover) {
@@ -346,22 +351,13 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
         $this->store->add($fileSource);
         $this->store->add($runSource);
 
-        $fileStoreManager = self::getContainer()->get(FileStoreManager::class);
-        \assert($fileStoreManager instanceof FileStoreManager);
-        $fileStoreManager->write($fileSource . '/file.yaml', '- file content');
+        $serializedRunSourcePath = $runSource . '/' . RunSourceSerializer::SERIALIZED_FILENAME;
 
-        $runSourceSerializer = self::getContainer()->get(RunSourceSerializer::class);
-        \assert($runSourceSerializer instanceof RunSourceSerializer);
-        $runSourceSerializer->write($runSource);
+        $this->filesystemOperator->write($fileSource . '/file.yaml', '- file content');
+        $this->filesystemOperator->write($serializedRunSourcePath, '- serialized content');
 
-        $fileStoreBasePath = self::getContainer()->getParameter('file_store_base_path');
-        \assert(is_string($fileStoreBasePath));
-
-        $expectedRunSourceAbsolutePath = $fileStoreBasePath . '/' . $runSource;
-        $expectedSerializedRunSourcePath = $expectedRunSourceAbsolutePath . '/source.yaml';
-
-        self::assertDirectoryExists($expectedRunSourceAbsolutePath);
-        self::assertFileExists($expectedSerializedRunSourcePath);
+        self::assertTrue($this->filesystemOperator->directoryExists((string) $runSource));
+        self::assertTrue($this->filesystemOperator->fileExists($serializedRunSourcePath));
 
         $this->setUserServiceAuthorizedResponse($userId);
 
@@ -372,8 +368,39 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
         );
 
         self::assertSame(200, $response->getStatusCode());
-        self::assertDirectoryDoesNotExist($expectedRunSourceAbsolutePath);
-        self::assertFileDoesNotExist($expectedSerializedRunSourcePath);
+        self::assertFalse($this->filesystemOperator->directoryExists((string) $runSource));
+        self::assertFalse($this->filesystemOperator->fileExists($serializedRunSourcePath));
+    }
+
+    public function testDeleteFileSourceDeletesFileSourceFiles(): void
+    {
+        $userId = UserId::create();
+        $fileSource = new FileSource($userId, 'file source label');
+        $filename = 'file.yaml';
+
+        $this->store->add($fileSource);
+
+        $sourceRelativePath = (string) $fileSource;
+        $fileRelativePath = $sourceRelativePath . '/' . $filename;
+
+        $this->filesystemOperator->write($fileRelativePath, '- content');
+
+        self::assertTrue($this->filesystemOperator->directoryExists($sourceRelativePath));
+        self::assertTrue($this->filesystemOperator->fileExists($fileRelativePath));
+
+        $this->setUserServiceAuthorizedResponse($userId);
+
+        $response = $this->applicationClient->makeAuthorizedSourceRequest(
+            'DELETE',
+            'user_source_delete',
+            $fileSource->getId()
+        );
+
+        self::assertSame(200, $response->getStatusCode());
+        self::assertSame(0, $this->sourceRepository->count([]));
+
+        self::assertFalse($this->filesystemOperator->directoryExists($sourceRelativePath));
+        self::assertFalse($this->filesystemOperator->fileExists($fileRelativePath));
     }
 
     public function testPrepareRunSource(): void

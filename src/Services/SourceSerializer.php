@@ -11,7 +11,6 @@ use App\Exception\SourceRead\SourceReadExceptionInterface;
 use App\Model\FilePathIdentifier;
 use League\Flysystem\FilesystemException;
 use League\Flysystem\PathNormalizer;
-use Symfony\Component\String\UnicodeString;
 use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Parser as YamlParser;
 
@@ -41,12 +40,11 @@ class SourceSerializer
 
         $documents = [];
         foreach ($sourceFiles as $sourceFile) {
-            $content = $this->readYamlFile($sourceFile);
-            $relativeSourcePath = (string) (new UnicodeString($sourceFile))->trimPrefix($sourceDirectory . '/');
+            $content = $this->readYamlFile($sourceDirectory . '/' . $sourceFile);
 
             $documents[] = sprintf(
                 self::DOCUMENT_TEMPLATE,
-                new FilePathIdentifier($relativeSourcePath, md5($content))
+                new FilePathIdentifier($sourceFile, md5($content))
             );
             $documents[] = sprintf(self::DOCUMENT_TEMPLATE, trim($content));
         }

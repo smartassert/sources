@@ -13,6 +13,7 @@ use App\Services\UserGitRepositoryPreparer;
 use App\Tests\Model\UserId;
 use App\Tests\Services\FileStoreFixtureCreator;
 use App\Tests\Services\FixtureLoader;
+use League\Flysystem\FilesystemOperator;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use webignition\ObjectReflector\ObjectReflector;
 
@@ -21,7 +22,7 @@ class RunSourceSerializerTest extends WebTestCase
     private RunSourceSerializer $runSourceSerializer;
     private FileStoreFixtureCreator $fixtureCreator;
     private FixtureLoader $fixtureLoader;
-    private string $fileStoreBasePath;
+    private FilesystemOperator $filesystemOperator;
 
     protected function setUp(): void
     {
@@ -39,9 +40,9 @@ class RunSourceSerializerTest extends WebTestCase
         \assert($fixtureLoader instanceof FixtureLoader);
         $this->fixtureLoader = $fixtureLoader;
 
-        $fileStoreBasePath = self::getContainer()->getParameter('file_store_base_path');
-        \assert(is_string($fileStoreBasePath));
-        $this->fileStoreBasePath = $fileStoreBasePath;
+        $filesystemOperator = self::getContainer()->get('default.storage');
+        \assert($filesystemOperator instanceof FilesystemOperator);
+        $this->filesystemOperator = $filesystemOperator;
     }
 
     public function testPrepareForFileSource(): void
@@ -52,17 +53,12 @@ class RunSourceSerializerTest extends WebTestCase
         $runSource = new RunSource($fileSource);
         $this->runSourceSerializer->write($runSource);
 
-        $targetAbsolutePath = sprintf(
-            '%s/%s/%s',
-            $this->fileStoreBasePath,
-            $runSource,
-            RunSourceSerializer::SERIALIZED_FILENAME
-        );
+        $serializedRunSourcePath = $runSource . '/' . RunSourceSerializer::SERIALIZED_FILENAME;
 
-        self::assertFileExists($targetAbsolutePath);
+        self::assertTrue($this->filesystemOperator->fileExists($serializedRunSourcePath));
         self::assertSame(
             $this->fixtureLoader->load('/RunSource/source_yml_yaml_entire.yaml'),
-            file_get_contents($targetAbsolutePath)
+            $this->filesystemOperator->read($serializedRunSourcePath)
         );
     }
 
@@ -83,24 +79,22 @@ class RunSourceSerializerTest extends WebTestCase
             $gitRepositoryPreparer
         );
 
-        $this->fixtureCreator->copySetTo('/Source/yml_yaml_valid', (string) $userGitRepository);
+        $userGitRepositoryPath = (string) $userGitRepository;
+
+        $this->fixtureCreator->copySetTo('/Source/yml_yaml_valid', $userGitRepositoryPath);
+        self::assertTrue($this->filesystemOperator->directoryExists($userGitRepositoryPath));
 
         $this->runSourceSerializer->write($runSource);
 
-        $targetAbsolutePath = sprintf(
-            '%s/%s/%s',
-            $this->fileStoreBasePath,
-            $runSource,
-            RunSourceSerializer::SERIALIZED_FILENAME
-        );
+        $serializedRunSourcePath = $runSource . '/' . RunSourceSerializer::SERIALIZED_FILENAME;
 
-        self::assertFileExists($targetAbsolutePath);
+        self::assertTrue($this->filesystemOperator->fileExists($serializedRunSourcePath));
         self::assertSame(
             $this->fixtureLoader->load($expectedSerializedFixturePath),
-            file_get_contents($targetAbsolutePath)
+            $this->filesystemOperator->read($serializedRunSourcePath)
         );
 
-        self::assertDirectoryDoesNotExist($this->fileStoreBasePath . '/' . $userGitRepository);
+        self::assertFalse($this->filesystemOperator->directoryExists($userGitRepositoryPath));
     }
 
     /**

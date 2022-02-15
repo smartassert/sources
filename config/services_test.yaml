@@ -29,7 +29,6 @@ services:
     App\Tests\Services\FileStoreFixtureCreator:
         public: true
         arguments:
-            $fileStoreBasePath: '%file_store_base_path%'
             $fixturesBasePath: '%fixtures_base_path%'
 
     App\Tests\Services\FixtureLoader:
@@ -53,3 +52,6 @@ services:
         public: true
         arguments:
             $usersSecurityBundleBaseUrl: '%users_security_bundle_base_url%'
+
+    App\Tests\Services\DirectoryLister:
+        public: true

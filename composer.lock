@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "3fa4b7273e97ab484563752f885a77cb",
+    "content-hash": "0108124aaaaf1b2657ad661a4a97d6b9",
     "packages": [
         {
             "name": "doctrine/annotations",
@@ -1663,6 +1663,55 @@
                 "source": "https://github.com/thephpleague/flysystem-bundle/tree/2.2.0"
             },
             "time": "2022-01-13T22:04:41+00:00"
+        },
+        {
+            "name": "league/flysystem-memory",
+            "version": "3.0.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/thephpleague/flysystem-memory.git",
+                "reference": "d8b5e7e4862537642bd47a1d30497a362fd813a3"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/thephpleague/flysystem-memory/zipball/d8b5e7e4862537642bd47a1d30497a362fd813a3",
+                "reference": "d8b5e7e4862537642bd47a1d30497a362fd813a3",
+                "shasum": ""
+            },
+            "require": {
+                "ext-fileinfo": "*",
+                "league/flysystem": "^2.0.0 || ^3.0.0",
+                "php": "^8.0.2"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "League\\Flysystem\\InMemory\\": ""
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Frank de Jonge",
+                    "email": "info@frankdejonge.nl"
+                }
+            ],
+            "description": "In-memory filesystem adapter for Flysystem.",
+            "keywords": [
+                "Flysystem",
+                "file",
+                "files",
+                "filesystem",
+                "memory"
+            ],
+            "support": {
+                "issues": "https://github.com/thephpleague/flysystem-memory/issues",
+                "source": "https://github.com/thephpleague/flysystem-memory/tree/3.0.2"
+            },
+            "time": "2022-01-15T22:42:13+00:00"
         },
         {
             "name": "league/mime-type-detection",
