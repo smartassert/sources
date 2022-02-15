@@ -4,12 +4,45 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\Controller;
 
+use App\Entity\FileSource;
+use App\Services\Source\Store;
 use App\Tests\Model\Route;
+use App\Tests\Model\UserId;
+use App\Tests\Services\AuthorizationRequestAsserter;
 use App\Validator\YamlFilenameConstraint;
+use League\Flysystem\FilesystemOperator;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
-class FileSourceFileControllerTest extends AbstractFileSourceFilesTest
+class FileSourceFileControllerTest extends AbstractSourceControllerTest
 {
+    private AuthorizationRequestAsserter $authorizationRequestAsserter;
+    private FilesystemOperator $filesystemOperator;
+
+    private string $userId;
+    private FileSource $fileSource;
+    private string $sourceRelativePath;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $authorizationRequestAsserter = self::getContainer()->get(AuthorizationRequestAsserter::class);
+        \assert($authorizationRequestAsserter instanceof AuthorizationRequestAsserter);
+        $this->authorizationRequestAsserter = $authorizationRequestAsserter;
+
+        $filesystemOperator = self::getContainer()->get('default.storage');
+        \assert($filesystemOperator instanceof FilesystemOperator);
+        $this->filesystemOperator = $filesystemOperator;
+
+        $this->userId = UserId::create();
+        $this->fileSource = new FileSource($this->userId, 'file source label');
+        $this->sourceRelativePath = (string) $this->fileSource;
+
+        $store = self::getContainer()->get(Store::class);
+        \assert($store instanceof Store);
+        $store->add($this->fileSource);
+    }
+
     /**
      * @dataProvider addFileInvalidRequestDataProvider
      *
@@ -20,12 +53,12 @@ class FileSourceFileControllerTest extends AbstractFileSourceFilesTest
         string $content,
         array $expectedResponseData
     ): void {
-        $this->setUserServiceAuthorizedResponse(self::USER_ID);
+        $this->setUserServiceAuthorizedResponse($this->userId);
 
         $response = $this->applicationClient->makeAuthorizedRequest(
             'POST',
             new Route('file_source_file_add', [
-                'sourceId' => self::SOURCE_ID,
+                'sourceId' => $this->fileSource->getId(),
                 'filename' => $filename,
             ]),
             [
@@ -99,50 +132,58 @@ class FileSourceFileControllerTest extends AbstractFileSourceFilesTest
 
     public function testAddFileSuccess(): void
     {
-        self::assertFalse($this->filesystemOperator->directoryExists(self::SOURCE_RELATIVE_PATH));
+        $filename = 'filename.yaml';
+        $content = '- file content';
+        $fileRelativePath = $this->sourceRelativePath . '/' . $filename;
 
-        $this->setUserServiceAuthorizedResponse(self::USER_ID);
+        self::assertFalse($this->filesystemOperator->directoryExists($this->sourceRelativePath));
+        self::assertFalse($this->filesystemOperator->fileExists($fileRelativePath));
+
+        $this->setUserServiceAuthorizedResponse($this->userId);
 
         $response = $this->applicationClient->makeAuthorizedRequest(
             'POST',
             new Route('file_source_file_add', [
-                'sourceId' => self::SOURCE_ID,
-                'filename' => self::FILENAME,
+                'sourceId' => $this->fileSource->getId(),
+                'filename' => $filename,
             ]),
-            self::CREATE_DATA
+            [
+                'content' => $content,
+            ]
         );
 
         self::assertSame(200, $response->getStatusCode());
-        self::assertTrue($this->filesystemOperator->directoryExists(self::SOURCE_RELATIVE_PATH));
-        self::assertTrue($this->filesystemOperator->fileExists(self::EXPECTED_FILE_RELATIVE_PATH));
-        self::assertSame(
-            self::CREATE_DATA['content'],
-            $this->filesystemOperator->read(self::EXPECTED_FILE_RELATIVE_PATH)
-        );
+        self::assertTrue($this->filesystemOperator->directoryExists($this->sourceRelativePath));
+        self::assertTrue($this->filesystemOperator->fileExists($fileRelativePath));
+        self::assertSame($content, $this->filesystemOperator->read($fileRelativePath));
     }
 
-    public function testUpdateAddedFileSuccess(): void
+    public function testUpdateFileSuccess(): void
     {
-        $this->filesystemOperator->write(self::EXPECTED_FILE_RELATIVE_PATH, self::CREATE_DATA['content']);
+        $filename = 'filename.yaml';
+        $initialContent = '- initial content';
+        $updatedContent = '- updated content';
+        $fileRelativePath = $this->sourceRelativePath . '/' . $filename;
 
-        $this->setUserServiceAuthorizedResponse(self::USER_ID);
+        $this->filesystemOperator->write($fileRelativePath, $initialContent);
+
+        $this->setUserServiceAuthorizedResponse($this->userId);
 
         $response = $this->applicationClient->makeAuthorizedRequest(
             'POST',
             new Route('file_source_file_add', [
-                'sourceId' => self::SOURCE_ID,
-                'filename' => self::FILENAME,
+                'sourceId' => $this->fileSource->getId(),
+                'filename' => $filename,
             ]),
-            self::UPDATE_DATA
+            [
+                'content' => $updatedContent,
+            ]
         );
 
         self::assertSame(200, $response->getStatusCode());
-        self::assertTrue($this->filesystemOperator->directoryExists(self::SOURCE_RELATIVE_PATH));
-        self::assertTrue($this->filesystemOperator->fileExists(self::EXPECTED_FILE_RELATIVE_PATH));
-        self::assertSame(
-            self::UPDATE_DATA['content'],
-            $this->filesystemOperator->read(self::EXPECTED_FILE_RELATIVE_PATH)
-        );
+        self::assertTrue($this->filesystemOperator->directoryExists($this->sourceRelativePath));
+        self::assertTrue($this->filesystemOperator->fileExists($fileRelativePath));
+        self::assertSame($updatedContent, $this->filesystemOperator->read($fileRelativePath));
     }
 
     /**
@@ -154,12 +195,12 @@ class FileSourceFileControllerTest extends AbstractFileSourceFilesTest
         string $filename,
         array $expectedResponseData
     ): void {
-        $this->setUserServiceAuthorizedResponse(self::USER_ID);
+        $this->setUserServiceAuthorizedResponse($this->userId);
 
         $response = $this->applicationClient->makeAuthorizedRequest(
             'DELETE',
             new Route('file_source_file_remove', [
-                'sourceId' => self::SOURCE_ID,
+                'sourceId' => $this->fileSource->getId(),
                 'filename' => $filename,
             ])
         );
@@ -197,20 +238,24 @@ class FileSourceFileControllerTest extends AbstractFileSourceFilesTest
 
     public function testRemoveFileSuccess(): void
     {
-        $this->filesystemOperator->write(self::EXPECTED_FILE_RELATIVE_PATH, self::CREATE_DATA['content']);
+        $filename = 'filename.yaml';
+        $content = '- file content';
+        $fileRelativePath = $this->sourceRelativePath . '/' . $filename;
 
-        $this->setUserServiceAuthorizedResponse(self::USER_ID);
+        $this->filesystemOperator->write($fileRelativePath, $content);
+
+        $this->setUserServiceAuthorizedResponse($this->userId);
 
         $response = $this->applicationClient->makeAuthorizedRequest(
             'DELETE',
             new Route('file_source_file_remove', [
-                'sourceId' => self::SOURCE_ID,
-                'filename' => self::FILENAME,
+                'sourceId' => $this->fileSource->getId(),
+                'filename' => $filename,
             ])
         );
 
         self::assertSame(200, $response->getStatusCode());
-        self::assertFalse($this->filesystemOperator->fileExists(self::EXPECTED_FILE_RELATIVE_PATH));
+        self::assertFalse($this->filesystemOperator->fileExists($fileRelativePath));
     }
 
     /**
