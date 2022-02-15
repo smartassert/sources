@@ -72,7 +72,7 @@ class UserSourceController
 
         $store->remove($source);
 
-        if ($source instanceof FileSource) {
+        if ($source instanceof FileSource || $source instanceof RunSource) {
             $fileStoreManager->remove((string) $source);
         }
 
