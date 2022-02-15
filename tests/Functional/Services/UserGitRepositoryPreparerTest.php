@@ -7,18 +7,20 @@ namespace App\Tests\Functional\Services;
 use App\Entity\GitSource;
 use App\Exception\GitActionException;
 use App\Exception\ProcessExecutorException;
+use App\Exception\UserGitRepositoryException;
 use App\Exception\UserGitRepositoryException as RepositoryException;
 use App\Model\ProcessOutput;
+use App\Services\FileStoreManager;
 use App\Services\GitRepositoryCheckoutHandler;
 use App\Services\GitRepositoryCloner;
 use App\Services\UserGitRepositoryPreparer;
 use App\Tests\Model\UserId;
 use App\Tests\Services\EntityRemover;
 use App\Tests\Services\FileStoreFixtureCreator;
+use League\Flysystem\FilesystemOperator;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Process\Exception\RuntimeException as SymfonyProcessRuntimeException;
-use Symfony\Component\String\UnicodeString;
 use webignition\ObjectReflector\ObjectReflector;
 
 class UserGitRepositoryPreparerTest extends WebTestCase
@@ -30,9 +32,9 @@ class UserGitRepositoryPreparerTest extends WebTestCase
 
     private UserGitRepositoryPreparer $userGitRepositoryPreparer;
     private FileStoreFixtureCreator $fixtureCreator;
-    private string $fileStoreBasePath;
+    private FilesystemOperator $filesystemOperator;
+    private FileStoreManager $fileStoreManager;
     private GitSource $gitSource;
-    private string $repositoryPath = '';
 
     protected function setUp(): void
     {
@@ -46,9 +48,13 @@ class UserGitRepositoryPreparerTest extends WebTestCase
         \assert($fixtureCreator instanceof FileStoreFixtureCreator);
         $this->fixtureCreator = $fixtureCreator;
 
-        $fileStoreBasePath = self::getContainer()->getParameter('file_store_base_path');
-        \assert(is_string($fileStoreBasePath));
-        $this->fileStoreBasePath = $fileStoreBasePath;
+        $filesystemOperator = self::getContainer()->get('default.storage');
+        \assert($filesystemOperator instanceof FilesystemOperator);
+        $this->filesystemOperator = $filesystemOperator;
+
+        $fileStoreManager = self::getContainer()->get(FileStoreManager::class);
+        \assert($fileStoreManager instanceof FileStoreManager);
+        $this->fileStoreManager = $fileStoreManager;
 
         $entityRemover = self::getContainer()->get(EntityRemover::class);
         if ($entityRemover instanceof EntityRemover) {
@@ -76,19 +82,21 @@ class UserGitRepositoryPreparerTest extends WebTestCase
 
         $assertionCount = self::getCount();
 
+        $userGitRepositoryException = null;
+
         try {
             $this->userGitRepositoryPreparer->prepare($this->gitSource, self::REF);
             self::fail(GitActionException::class . ' not thrown');
         } catch (RepositoryException $userGitRepositoryException) {
             $assertions($cloneProcessOutcome, $checkoutProcessOutcome, $userGitRepositoryException);
         }
+
         self::assertGreaterThan($assertionCount, self::getCount());
+        self::assertInstanceOf(UserGitRepositoryException::class, $userGitRepositoryException);
 
-        self::assertNotSame('', $this->repositoryPath);
+        $userGitRepository = $userGitRepositoryException->getUserGitRepository();
 
-        $fileStoreUserPath = substr($this->repositoryPath, 0, (int) strrpos($this->repositoryPath, '/'));
-        self::assertDirectoryDoesNotExist($this->repositoryPath);
-        self::assertDirectoryExists($fileStoreUserPath);
+        self::assertFalse($this->filesystemOperator->directoryExists((string) $userGitRepository));
     }
 
     /**
@@ -187,14 +195,16 @@ class UserGitRepositoryPreparerTest extends WebTestCase
             $fixtureSetIdentifier
         );
 
-        $runSource = $this->userGitRepositoryPreparer->prepare($this->gitSource, self::REF);
+        $userGitRepository = $this->userGitRepositoryPreparer->prepare($this->gitSource, self::REF);
+        self::assertSame($this->gitSource, $userGitRepository->getSource());
 
-        self::assertDirectoryExists($this->repositoryPath);
+        $userGitRepositoryPath = (string) $userGitRepository;
 
-        $sourceAbsolutePath = $this->fixtureCreator->getFixturePath($fixtureSetIdentifier);
-        $targetAbsolutePath = $this->fileStoreBasePath . '/' . $runSource;
-
-        self::assertSame(scandir($sourceAbsolutePath), scandir($targetAbsolutePath));
+        self::assertTrue($this->filesystemOperator->directoryExists($userGitRepositoryPath));
+        self::assertSame(
+            $this->fixtureCreator->listFixtureSetFiles($fixtureSetIdentifier),
+            $this->fileStoreManager->list($userGitRepositoryPath)
+        );
     }
 
     private function setGitRepositoryClonerOutcome(ProcessOutput|\Exception $outcome): void
@@ -226,7 +236,7 @@ class UserGitRepositoryPreparerTest extends WebTestCase
             ->shouldReceive('clone')
             ->withArgs(function (string $repositoryUrl, string $localPath): bool {
                 TestCase::assertSame(self::REPOSITORY_URL, $repositoryUrl);
-                $this->repositoryPath = $localPath;
+                TestCase::assertNotSame('', $localPath);
 
                 return true;
             })
@@ -250,7 +260,6 @@ class UserGitRepositoryPreparerTest extends WebTestCase
         $expectation = $mock
             ->shouldReceive('checkout')
             ->withArgs(function (string $passedPath, string $passedRef) {
-                TestCase::assertSame($this->repositoryPath, $passedPath);
                 TestCase::assertSame(self::REF, $passedRef);
 
                 return true;
@@ -260,13 +269,14 @@ class UserGitRepositoryPreparerTest extends WebTestCase
         if ($outcome instanceof ProcessOutput) {
             $expectation->andReturnUsing(
                 function (string $repositoryPath) use ($outcome, $fixtureSetIdentifier): ProcessOutput {
-                    if (is_string($fixtureSetIdentifier)) {
-                        $repositoryRelativePath = (string) (new UnicodeString($repositoryPath))
-                            ->trimPrefix($this->fileStoreBasePath . '/')
-                        ;
+                    if (
+                        $outcome instanceof ProcessOutput
+                        && $outcome->isSuccessful()
+                        && is_string($fixtureSetIdentifier)
+                    ) {
                         $this->fixtureCreator->copySetTo(
                             $fixtureSetIdentifier,
-                            $repositoryRelativePath
+                            $this->getRepositoryRelativePath($repositoryPath)
                         );
                     }
 
@@ -278,5 +288,13 @@ class UserGitRepositoryPreparerTest extends WebTestCase
         }
 
         return $mock;
+    }
+
+    private function getRepositoryRelativePath(string $path): string
+    {
+        $pathParts = explode('/', $path);
+        $relativePathParts = array_slice($pathParts, -2);
+
+        return implode('/', $relativePathParts);
     }
 }

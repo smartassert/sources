@@ -10,6 +10,7 @@ use App\Repository\SourceRepository;
 use App\Services\Source\Store;
 use App\Tests\Services\AuthorizationRequestAsserter;
 use App\Tests\Services\EntityRemover;
+use League\Flysystem\FilesystemOperator;
 use webignition\ObjectReflector\ObjectReflector;
 
 abstract class AbstractFileSourceFilesTest extends AbstractSourceControllerTest
@@ -32,8 +33,7 @@ abstract class AbstractFileSourceFilesTest extends AbstractSourceControllerTest
 
     protected SourceRepository $sourceRepository;
     protected AuthorizationRequestAsserter $authorizationRequestAsserter;
-    protected string $expectedFileStorePath;
-    protected string $expectedFilePath;
+    protected FilesystemOperator $filesystemOperator;
 
     protected function setUp(): void
     {
@@ -47,10 +47,9 @@ abstract class AbstractFileSourceFilesTest extends AbstractSourceControllerTest
         \assert($authorizationRequestAsserter instanceof AuthorizationRequestAsserter);
         $this->authorizationRequestAsserter = $authorizationRequestAsserter;
 
-        $fileStoreBasePath = self::getContainer()->getParameter('file_store_base_path');
-        \assert(is_string($fileStoreBasePath));
-        $this->expectedFileStorePath = $fileStoreBasePath . '/' . self::SOURCE_RELATIVE_PATH;
-        $this->expectedFilePath = $fileStoreBasePath . '/' . self::EXPECTED_FILE_RELATIVE_PATH;
+        $filesystemOperator = self::getContainer()->get('default.storage');
+        \assert($filesystemOperator instanceof FilesystemOperator);
+        $this->filesystemOperator = $filesystemOperator;
 
         $entityRemover = self::getContainer()->get(EntityRemover::class);
         if ($entityRemover instanceof EntityRemover) {
