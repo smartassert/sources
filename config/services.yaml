@@ -60,7 +60,8 @@ services:
     League\Flysystem\PathNormalizer:
         class: League\Flysystem\WhitespacePathNormalizer
 
-    League\Flysystem\Filesystem:
+    League\Flysystem\FilesystemOperator:
+        class: League\Flysystem\Filesystem
 
     App\Services\PathFactory:
         arguments:

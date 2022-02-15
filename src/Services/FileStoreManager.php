@@ -8,14 +8,14 @@ use App\Exception\File\CreateException;
 use App\Exception\File\ReadException;
 use App\Exception\File\RemoveException;
 use App\Exception\File\WriteException;
-use League\Flysystem\Filesystem;
 use League\Flysystem\FilesystemException;
+use League\Flysystem\FilesystemOperator;
 use League\Flysystem\StorageAttributes;
 
 class FileStoreManager
 {
     public function __construct(
-        private Filesystem $filesystem,
+        private FilesystemOperator $filesystem,
     ) {
     }
 
