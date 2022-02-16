@@ -8,11 +8,11 @@ use App\Entity\FileSource;
 use App\Entity\GitSource;
 use App\Entity\RunSource;
 use App\Model\UserGitRepository;
+use App\Services\FileStoreManager;
 use App\Services\RunSourceSerializer;
 use App\Services\UserGitRepositoryPreparer;
 use App\Tests\Model\UserId;
 use App\Tests\Services\FileStoreFixtureCreator;
-use App\Tests\Services\FixtureLoader;
 use League\Flysystem\FilesystemOperator;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use webignition\ObjectReflector\ObjectReflector;
@@ -21,8 +21,8 @@ class RunSourceSerializerTest extends WebTestCase
 {
     private RunSourceSerializer $runSourceSerializer;
     private FileStoreFixtureCreator $fixtureCreator;
-    private FixtureLoader $fixtureLoader;
     private FilesystemOperator $filesystemOperator;
+    private FileStoreManager $fixtureFileStore;
 
     protected function setUp(): void
     {
@@ -36,19 +36,23 @@ class RunSourceSerializerTest extends WebTestCase
         \assert($fixtureCreator instanceof FileStoreFixtureCreator);
         $this->fixtureCreator = $fixtureCreator;
 
-        $fixtureLoader = self::getContainer()->get(FixtureLoader::class);
-        \assert($fixtureLoader instanceof FixtureLoader);
-        $this->fixtureLoader = $fixtureLoader;
-
         $filesystemOperator = self::getContainer()->get('default.storage');
         \assert($filesystemOperator instanceof FilesystemOperator);
         $this->filesystemOperator = $filesystemOperator;
+
+        $fixtureFileStore = self::getContainer()->get('app.tests.services.file_store_manager.fixtures');
+        \assert($fixtureFileStore instanceof FileStoreManager);
+        $this->fixtureFileStore = $fixtureFileStore;
     }
 
     public function testPrepareForFileSource(): void
     {
         $fileSource = new FileSource(UserId::create(), 'file source label');
-        $this->fixtureCreator->copySetTo('/Source/yml_yaml_valid', (string) $fileSource);
+        $this->fixtureCreator->copySetTo(
+            'Source/yml_yaml_valid',
+            $this->filesystemOperator,
+            (string) $fileSource
+        );
 
         $runSource = new RunSource($fileSource);
         $this->runSourceSerializer->write($runSource);
@@ -57,7 +61,7 @@ class RunSourceSerializerTest extends WebTestCase
 
         self::assertTrue($this->filesystemOperator->fileExists($serializedRunSourcePath));
         self::assertSame(
-            $this->fixtureLoader->load('/RunSource/source_yml_yaml_entire.yaml'),
+            trim($this->fixtureFileStore->read('RunSource/source_yml_yaml_entire.yaml')),
             $this->filesystemOperator->read($serializedRunSourcePath)
         );
     }
@@ -81,7 +85,11 @@ class RunSourceSerializerTest extends WebTestCase
 
         $userGitRepositoryPath = (string) $userGitRepository;
 
-        $this->fixtureCreator->copySetTo('/Source/yml_yaml_valid', $userGitRepositoryPath);
+        $this->fixtureCreator->copySetTo(
+            'Source/yml_yaml_valid',
+            $this->filesystemOperator,
+            $userGitRepositoryPath
+        );
         self::assertTrue($this->filesystemOperator->directoryExists($userGitRepositoryPath));
 
         $this->runSourceSerializer->write($runSource);
@@ -90,7 +98,7 @@ class RunSourceSerializerTest extends WebTestCase
 
         self::assertTrue($this->filesystemOperator->fileExists($serializedRunSourcePath));
         self::assertSame(
-            $this->fixtureLoader->load($expectedSerializedFixturePath),
+            trim($this->fixtureFileStore->read($expectedSerializedFixturePath)),
             $this->filesystemOperator->read($serializedRunSourcePath)
         );
 
@@ -146,13 +154,13 @@ class RunSourceSerializerTest extends WebTestCase
         $fileSource = new FileSource(UserId::create(), 'file source label');
         $runSource = new RunSource($fileSource);
         $this->fixtureCreator->copyTo(
-            '/RunSource/source_yml_yaml_entire.yaml',
+            'RunSource/source_yml_yaml_entire.yaml',
+            $this->filesystemOperator,
             $runSource . '/' . RunSourceSerializer::SERIALIZED_FILENAME
         );
 
-        $fixturePath = $this->fixtureCreator->getFixturePath('/RunSource/source_yml_yaml_entire.yaml');
-        $expected = trim((string) file_get_contents($fixturePath));
+        $expected = $this->filesystemOperator->read($runSource . '/' . RunSourceSerializer::SERIALIZED_FILENAME);
 
-        self::assertSame($expected, $this->runSourceSerializer->read($runSource));
+        self::assertSame(trim($expected), $this->runSourceSerializer->read($runSource));
     }
 }
