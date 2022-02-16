@@ -76,3 +76,30 @@ services:
         class: League\Flysystem\Local\LocalFilesystemAdapter
         arguments:
             $location: '%git_repository_store_directory%'
+
+    #todo: remove in #437
+    App\Services\FileStoreManager:
+        $filesystem: '@default.storage'
+
+    app.services.file_store_manager.file_source:
+        class: App\Services\FileStoreManager
+        public: true
+        arguments:
+            $filesystem: '@file_source.storage'
+
+    app.services.file_store_manager.run_source:
+        class: App\Services\FileStoreManager
+        public: true
+        arguments:
+            $filesystem: '@run_source.storage'
+
+    app.services.file_store_manager.git_repository:
+        class: App\Services\FileStoreManager
+        public: true
+        arguments:
+            $filesystem: '@git_repository.storage'
+
+    app.services.path_factory.git_repository:
+        class: App\Services\PathFactory
+        arguments:
+            $basePath: '%git_repository_store_directory%'

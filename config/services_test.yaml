@@ -38,6 +38,8 @@ services:
 
     App\Services\FileStoreManager:
         public: true
+        arguments:
+            $filesystem: '@default.storage'
 
     App\Services\GitRepositoryCheckoutHandler:
         public: true
@@ -55,3 +57,9 @@ services:
 
     App\Tests\Services\DirectoryLister:
         public: true
+
+    app.services.path_factory.git_repository:
+        public: true
+        class: App\Services\PathFactory
+        arguments:
+            $basePath: '%git_repository_store_directory%'
