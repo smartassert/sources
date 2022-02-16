@@ -7,6 +7,9 @@ parameters:
     users_security_bundle_firewall_pattern: '^/'
     users_security_bundle_access_control_pattern: '^/'
     file_store_base_path: '%env(resolve:FILE_STORE_BASE_PATH)%'
+    file_source_store_directory: '%env(resolve:FILE_SOURCE_STORE_DIRECTORY)%'
+    run_source_store_directory: '%env(resolve:RUN_SOURCE_STORE_DIRECTORY)%'
+    git_repository_store_directory: '%env(resolve:GIT_REPOSITORY_STORE_DIRECTORY)%'
 
 services:
     # default configuration for services in *this* file
@@ -58,3 +61,18 @@ services:
     App\Services\PathFactory:
         arguments:
             $basePath: '%file_store_base_path%'
+
+    filesystem.adapter.file_source_store:
+        class: League\Flysystem\Local\LocalFilesystemAdapter
+        arguments:
+            $location: '%file_source_store_directory%'
+
+    filesystem.adapter.run_source_store:
+        class: League\Flysystem\Local\LocalFilesystemAdapter
+        arguments:
+            $location: '%run_source_store_directory%'
+
+    filesystem.adapter.git_repository_store:
+        class: League\Flysystem\Local\LocalFilesystemAdapter
+        arguments:
+            $location: '%git_repository_store_directory%'

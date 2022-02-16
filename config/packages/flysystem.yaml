@@ -5,3 +5,18 @@ flysystem:
             adapter: 'local'
             options:
                 directory: '%kernel.project_dir%/var/storage/default'
+
+        file_source.storage:
+            adapter: 'local'
+            options:
+                directory: '%file_source_store_directory%'
+
+        run_source.storage:
+            adapter: 'local'
+            options:
+                directory: '%run_source_store_directory%'
+
+        git_repository.storage:
+            adapter: 'local'
+            options:
+                directory: '%git_repository_store_directory%'
