@@ -15,7 +15,7 @@ use League\Flysystem\StorageAttributes;
 class FileStoreManager
 {
     public function __construct(
-        private FilesystemOperator $defaultStorage,
+        private FilesystemOperator $filesystem,
     ) {
     }
 
@@ -25,7 +25,7 @@ class FileStoreManager
     public function create(string $relativePath): void
     {
         try {
-            $this->defaultStorage->createDirectory($relativePath);
+            $this->filesystem->createDirectory($relativePath);
         } catch (FilesystemException $filesystemException) {
             throw new CreateException($relativePath, $filesystemException);
         }
@@ -37,7 +37,7 @@ class FileStoreManager
     public function remove(string $relativePath): void
     {
         try {
-            $this->defaultStorage->deleteDirectory($relativePath);
+            $this->filesystem->deleteDirectory($relativePath);
         } catch (FilesystemException $filesystemException) {
             throw new RemoveException($relativePath, $filesystemException);
         }
@@ -52,7 +52,7 @@ class FileStoreManager
      */
     public function list(string $relativePath, array $extensions = []): array
     {
-        $directoryListing = $this->defaultStorage
+        $directoryListing = $this->filesystem
             ->listContents($relativePath, true)
             ->filter(function (StorageAttributes $item) {
                 return !$item->isDir();
@@ -91,7 +91,7 @@ class FileStoreManager
     public function write(string $fileRelativePath, string $content): void
     {
         try {
-            $this->defaultStorage->write($fileRelativePath, $content);
+            $this->filesystem->write($fileRelativePath, $content);
         } catch (FilesystemException $e) {
             throw new WriteException($fileRelativePath, $e);
         }
@@ -103,7 +103,7 @@ class FileStoreManager
     public function read(string $fileRelativePath): string
     {
         try {
-            return $this->defaultStorage->read($fileRelativePath);
+            return $this->filesystem->read($fileRelativePath);
         } catch (FilesystemException $e) {
             throw new ReadException($fileRelativePath, $e);
         }
@@ -115,7 +115,7 @@ class FileStoreManager
     public function removeFile(string $fileRelativePath): void
     {
         try {
-            $this->defaultStorage->delete($fileRelativePath);
+            $this->filesystem->delete($fileRelativePath);
         } catch (FilesystemException $e) {
             throw new RemoveException($fileRelativePath, $e);
         }
