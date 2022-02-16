@@ -2,3 +2,12 @@ flysystem:
     storages:
         default.storage:
             adapter: 'memory'
+
+        file_source.storage:
+            adapter: 'memory'
+
+        run_source.storage:
+            adapter: 'memory'
+
+        git_repository.storage:
+            adapter: 'memory'
