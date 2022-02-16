@@ -4,57 +4,33 @@ declare(strict_types=1);
 
 namespace App\Tests\Services;
 
+use App\Services\FileStoreManager;
 use League\Flysystem\FilesystemOperator;
 
 class FileStoreFixtureCreator
 {
     public function __construct(
-        private FilesystemOperator $defaultStorage,
-        private DirectoryLister $directoryLister,
-        private string $fixturesBasePath,
+        private FileStoreManager $fixturesFileStore,
     ) {
     }
 
-    public function copySetTo(string $originRelativePath, string $targetRelativeDirectory): void
-    {
-        $originDirectoryIterator = new \RecursiveDirectoryIterator($this->fixturesBasePath . $originRelativePath);
-        $originFiles = $this->directoryLister->list($originDirectoryIterator);
+    public function copySetTo(
+        string $originRelativePath,
+        FilesystemOperator $storage,
+        string $targetRelativeDirectory
+    ): void {
+        $originFiles = $this->fixturesFileStore->list($originRelativePath);
 
-        foreach ($originFiles as $relativePath => $file) {
-            $this->copyFilesystemFileToFileStore(
-                $file->getPathname(),
-                $targetRelativeDirectory . '/' . $relativePath
-            );
+        foreach ($originFiles as $fileRelativePath) {
+            $originPath = $originRelativePath . '/' . $fileRelativePath;
+            $targetPath = $targetRelativeDirectory . '/' . $fileRelativePath;
+
+            $storage->write($targetPath, $this->fixturesFileStore->read($originPath));
         }
     }
 
-    public function copyTo(string $originRelativePath, string $targetRelativePath): void
+    public function copyTo(string $originRelativePath, FilesystemOperator $storage, string $targetRelativePath): void
     {
-        $this->copyFilesystemFileToFileStore(
-            $this->getFixturePath($originRelativePath),
-            $targetRelativePath
-        );
-    }
-
-    /**
-     * @return string[]
-     */
-    public function listFixtureSetFiles(string $relativePath): array
-    {
-        $absolutePath = $this->getFixturePath($relativePath);
-        $paths = array_keys($this->directoryLister->list(new \RecursiveDirectoryIterator($absolutePath)));
-        sort($paths);
-
-        return $paths;
-    }
-
-    public function getFixturePath(string $relativePath): string
-    {
-        return $this->fixturesBasePath . $relativePath;
-    }
-
-    private function copyFilesystemFileToFileStore(string $sourceAbsolutePath, string $targetRelativePath): void
-    {
-        $this->defaultStorage->write($targetRelativePath, (string) file_get_contents($sourceAbsolutePath));
+        $storage->write($targetRelativePath, $this->fixturesFileStore->read($originRelativePath));
     }
 }

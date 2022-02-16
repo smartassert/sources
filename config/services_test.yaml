@@ -29,12 +29,7 @@ services:
     App\Tests\Services\FileStoreFixtureCreator:
         public: true
         arguments:
-            $fixturesBasePath: '%fixtures_base_path%'
-
-    App\Tests\Services\FixtureLoader:
-        public: true
-        arguments:
-            $fixturesBasePath: '%fixtures_base_path%'
+            $fixturesFileStore: '@app.tests.services.file_store_manager.fixtures'
 
     App\Services\FileStoreManager:
         public: true
@@ -57,6 +52,12 @@ services:
 
     App\Tests\Services\DirectoryLister:
         public: true
+
+    app.tests.services.file_store_manager.fixtures:
+        class: App\Services\FileStoreManager
+        public: true
+        arguments:
+            $filesystem: '@test_fixtures.storage'
 
     app.services.path_factory.git_repository:
         public: true

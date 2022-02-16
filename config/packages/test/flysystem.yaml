@@ -11,3 +11,8 @@ flysystem:
 
         git_repository.storage:
             adapter: 'memory'
+
+        test_fixtures.storage:
+            adapter: 'local'
+            options:
+                directory: '%fixtures_base_path%'

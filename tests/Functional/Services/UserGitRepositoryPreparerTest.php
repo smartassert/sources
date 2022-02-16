@@ -35,6 +35,7 @@ class UserGitRepositoryPreparerTest extends WebTestCase
     private FilesystemOperator $filesystemOperator;
     private FileStoreManager $fileStoreManager;
     private GitSource $gitSource;
+    private FileStoreManager $fixtureFileStore;
 
     protected function setUp(): void
     {
@@ -55,6 +56,10 @@ class UserGitRepositoryPreparerTest extends WebTestCase
         $fileStoreManager = self::getContainer()->get(FileStoreManager::class);
         \assert($fileStoreManager instanceof FileStoreManager);
         $this->fileStoreManager = $fileStoreManager;
+
+        $fixtureFileStore = self::getContainer()->get('app.tests.services.file_store_manager.fixtures');
+        \assert($fixtureFileStore instanceof FileStoreManager);
+        $this->fixtureFileStore = $fixtureFileStore;
 
         $entityRemover = self::getContainer()->get(EntityRemover::class);
         if ($entityRemover instanceof EntityRemover) {
@@ -187,7 +192,7 @@ class UserGitRepositoryPreparerTest extends WebTestCase
 
     public function testPrepareSuccess(): void
     {
-        $fixtureSetIdentifier = '/Source/txt';
+        $fixtureSetIdentifier = 'Source/txt';
 
         $this->setGitRepositoryClonerOutcome(new ProcessOutput(0, 'clone success output', ''));
         $this->setGitRepositoryCheckoutHandlerOutcome(
@@ -202,7 +207,7 @@ class UserGitRepositoryPreparerTest extends WebTestCase
 
         self::assertTrue($this->filesystemOperator->directoryExists($userGitRepositoryPath));
         self::assertSame(
-            $this->fixtureCreator->listFixtureSetFiles($fixtureSetIdentifier),
+            $this->fixtureFileStore->list($fixtureSetIdentifier),
             $this->fileStoreManager->list($userGitRepositoryPath)
         );
     }
@@ -276,6 +281,7 @@ class UserGitRepositoryPreparerTest extends WebTestCase
                     ) {
                         $this->fixtureCreator->copySetTo(
                             $fixtureSetIdentifier,
+                            $this->filesystemOperator,
                             $this->getRepositoryRelativePath($repositoryPath)
                         );
                     }

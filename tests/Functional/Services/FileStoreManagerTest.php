@@ -60,7 +60,11 @@ class FileStoreManagerTest extends WebTestCase
     ): void {
         $this->fileStoreManager->remove($relativePath);
 
-        $this->fixtureCreator->copySetTo('/Source/' . $fixtureSet, $relativePath);
+        $this->fixtureCreator->copySetTo(
+            'Source/' . $fixtureSet,
+            $this->filesystemOperator,
+            $relativePath
+        );
 
         $files = $this->fileStoreManager->list($relativePath, $extensions);
 
