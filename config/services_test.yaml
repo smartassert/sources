@@ -29,7 +29,7 @@ services:
     App\Tests\Services\FileStoreFixtureCreator:
         public: true
         arguments:
-            $fixturesFileStore: '@app.tests.services.file_store_manager.fixtures'
+            $fixtureFileStore: '@app.tests.services.file_store_manager.fixtures'
 
     App\Services\GitRepositoryCheckoutHandler:
         public: true

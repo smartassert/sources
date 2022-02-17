@@ -69,19 +69,19 @@ class UserSourceController
     public function delete(
         SourceInterface $source,
         Store $store,
-        FileStoreManager $fileSourceStore,
-        FileStoreManager $runSourceStore,
+        FileStoreManager $fileSourceFileStore,
+        FileStoreManager $runSourceFileStore,
     ): Response {
         $this->userSourceAccessChecker->denyAccessUnlessGranted($source);
 
         $store->remove($source);
 
         if ($source instanceof FileSource) {
-            $fileSourceStore->remove((string) $source);
+            $fileSourceFileStore->remove((string) $source);
         }
 
         if ($source instanceof RunSource) {
-            $runSourceStore->remove((string) $source);
+            $runSourceFileStore->remove((string) $source);
         }
 
         return new JsonResponse();
