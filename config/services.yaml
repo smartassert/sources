@@ -6,7 +6,6 @@
 parameters:
     users_security_bundle_firewall_pattern: '^/'
     users_security_bundle_access_control_pattern: '^/'
-    file_store_base_path: '%env(resolve:FILE_STORE_BASE_PATH)%'
     file_source_store_directory: '%env(resolve:FILE_SOURCE_STORE_DIRECTORY)%'
     run_source_store_directory: '%env(resolve:RUN_SOURCE_STORE_DIRECTORY)%'
     git_repository_store_directory: '%env(resolve:GIT_REPOSITORY_STORE_DIRECTORY)%'
@@ -62,10 +61,6 @@ services:
     League\Flysystem\PathNormalizer:
         class: League\Flysystem\WhitespacePathNormalizer
 
-    App\Services\PathFactory:
-        arguments:
-            $basePath: '%file_store_base_path%'
-
     filesystem.adapter.file_source_store:
         class: League\Flysystem\Local\LocalFilesystemAdapter
         arguments:
@@ -102,7 +97,14 @@ services:
         arguments:
             $filesystem: '@git_repository.storage'
 
+    App\Services\PathFactory:
+        autowire: false
+
     app.services.path_factory.git_repository:
         class: App\Services\PathFactory
         arguments:
             $basePath: '%git_repository_store_directory%'
+
+    App\Services\UserGitRepositoryPreparer:
+        arguments:
+            $pathFactory: '@app.services.path_factory.git_repository'
