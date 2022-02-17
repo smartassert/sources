@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Entity\GitSource;
-use App\Exception\File\CreateException;
 use App\Exception\File\RemoveException;
 use App\Exception\GitActionException;
 use App\Exception\UserGitRepositoryException;
@@ -40,7 +39,6 @@ class UserGitRepositoryPreparer
     }
 
     /**
-     * @throws CreateException
      * @throws GitActionException
      * @throws RemoveException
      */
@@ -49,7 +47,6 @@ class UserGitRepositoryPreparer
         $gitRepositoryRelativePath = (string) $gitRepository;
 
         $this->gitRepositoryFileStore->remove($gitRepositoryRelativePath);
-        $this->gitRepositoryFileStore->create($gitRepositoryRelativePath);
 
         $gitRepositoryAbsolutePath = $this->pathFactory->createAbsolutePath($gitRepositoryRelativePath);
 

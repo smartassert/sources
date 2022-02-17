@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use App\Exception\File\CreateException;
 use App\Exception\File\ReadException;
 use App\Exception\File\RemoveException;
 use App\Exception\File\WriteException;
@@ -17,18 +16,6 @@ class FileStoreManager
     public function __construct(
         private FilesystemOperator $filesystem,
     ) {
-    }
-
-    /**
-     * @throws CreateException
-     */
-    public function create(string $relativePath): void
-    {
-        try {
-            $this->filesystem->createDirectory($relativePath);
-        } catch (FilesystemException $filesystemException) {
-            throw new CreateException($relativePath, $filesystemException);
-        }
     }
 
     /**

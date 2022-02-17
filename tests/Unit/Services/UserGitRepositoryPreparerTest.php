@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Tests\Unit\Services;
 
 use App\Entity\GitSource;
-use App\Exception\File\CreateException;
 use App\Exception\File\RemoveException;
 use App\Exception\UserGitRepositoryException;
 use App\Services\FileStoreManager;
@@ -13,7 +12,6 @@ use App\Services\GitRepositoryCheckoutHandler;
 use App\Services\GitRepositoryCloner;
 use App\Services\PathFactory;
 use App\Services\UserGitRepositoryPreparer;
-use League\Flysystem\UnableToCreateDirectory;
 use League\Flysystem\UnableToDeleteDirectory;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
@@ -51,7 +49,6 @@ class UserGitRepositoryPreparerTest extends WebTestCase
         $unableToDeleteDirectoryException = UnableToDeleteDirectory::atLocation('/path/to/remove');
 
         $removeException = new RemoveException('/path/to/remove', $unableToDeleteDirectoryException);
-        $createException = new CreateException('/path/to/create', UnableToCreateDirectory::atLocation('/path'));
 
         $fileStoreManagerThrowingRemoveException = \Mockery::mock(FileStoreManager::class);
         $fileStoreManagerThrowingRemoveException
@@ -59,24 +56,10 @@ class UserGitRepositoryPreparerTest extends WebTestCase
             ->andThrow($removeException)
         ;
 
-        $fileStoreManagerThrowingCreateException = \Mockery::mock(FileStoreManager::class);
-        $fileStoreManagerThrowingCreateException
-            ->shouldReceive('remove')
-            ->andReturn('/absolute/removed/path')
-        ;
-        $fileStoreManagerThrowingCreateException
-            ->shouldReceive('create')
-            ->andThrow($createException)
-        ;
-
         return [
             'remove throws exception' => [
                 'fileStoreManager' => $fileStoreManagerThrowingRemoveException,
                 'expectedPrevious' => $removeException,
-            ],
-            'create throws exception' => [
-                'fileStoreManager' => $fileStoreManagerThrowingCreateException,
-                'expectedPrevious' => $createException,
             ],
         ];
     }

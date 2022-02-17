@@ -25,7 +25,7 @@ class FileStoreManagerTest extends WebTestCase
     }
 
     /**
-     * @dataProvider createRemoveSuccessDataProvider
+     * @dataProvider removeSuccessDataProvider
      */
     public function testCreateRemoveSuccess(string $storageServiceId, string $storeServiceId): void
     {
@@ -38,7 +38,7 @@ class FileStoreManagerTest extends WebTestCase
         $relativePath = UserId::create();
         self::assertFalse($storage->directoryExists($relativePath));
 
-        $store->create($relativePath);
+        $storage->createDirectory($relativePath);
         self::assertTrue($storage->directoryExists($relativePath));
 
         $store->remove($relativePath);
@@ -48,7 +48,7 @@ class FileStoreManagerTest extends WebTestCase
     /**
      * @return array<mixed>
      */
-    public function createRemoveSuccessDataProvider(): array
+    public function removeSuccessDataProvider(): array
     {
         return [
             'file source store' => [
