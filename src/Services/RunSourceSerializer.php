@@ -19,8 +19,10 @@ class RunSourceSerializer
 
     public function __construct(
         private UserGitRepositoryPreparer $gitRepositoryPreparer,
-        private FileStoreManager $fileStoreManager,
         private SourceSerializer $sourceSerializer,
+        private FileStoreManager $fileSourceStore,
+        private FileStoreManager $gitRepositoryStore,
+        private FileStoreManager $runSourceStore,
     ) {
     }
 
@@ -35,17 +37,21 @@ class RunSourceSerializer
         $serializedSourcePath = $target . '/' . self::SERIALIZED_FILENAME;
 
         if ($source instanceof FileSource) {
-            $content = $this->sourceSerializer->serialize((string) $source);
-            $this->fileStoreManager->write($serializedSourcePath, $content);
+            $content = $this->sourceSerializer->serialize($this->fileSourceStore, (string) $source);
+            $this->runSourceStore->write($serializedSourcePath, $content);
         }
 
         if ($source instanceof GitSource) {
             $gitRepository = $this->gitRepositoryPreparer->prepare($source, $target->getParameters()['ref'] ?? null);
-            $content = $this->sourceSerializer->serialize((string) $gitRepository, $source->getPath());
-            $this->fileStoreManager->write($serializedSourcePath, $content);
+            $content = $this->sourceSerializer->serialize(
+                $this->gitRepositoryStore,
+                (string) $gitRepository,
+                $source->getPath()
+            );
+            $this->runSourceStore->write($serializedSourcePath, $content);
 
             try {
-                $this->fileStoreManager->remove((string) $gitRepository);
+                $this->gitRepositoryStore->remove((string) $gitRepository);
             } catch (RemoveException) {
             }
         }
@@ -56,6 +62,6 @@ class RunSourceSerializer
      */
     public function read(RunSource $runSource): string
     {
-        return trim($this->fileStoreManager->read($runSource . '/' . self::SERIALIZED_FILENAME));
+        return trim($this->runSourceStore->read($runSource . '/' . self::SERIALIZED_FILENAME));
     }
 }

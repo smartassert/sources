@@ -13,37 +13,57 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 class FileStoreManagerTest extends WebTestCase
 {
-    private FileStoreManager $fileStoreManager;
     private FileStoreFixtureCreator $fixtureCreator;
-    private FilesystemOperator $filesystemOperator;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $fileStoreManager = self::getContainer()->get(FileStoreManager::class);
-        \assert($fileStoreManager instanceof FileStoreManager);
-        $this->fileStoreManager = $fileStoreManager;
-
         $fixtureCreator = self::getContainer()->get(FileStoreFixtureCreator::class);
         \assert($fixtureCreator instanceof FileStoreFixtureCreator);
         $this->fixtureCreator = $fixtureCreator;
-
-        $filesystemOperator = self::getContainer()->get('default.storage');
-        \assert($filesystemOperator instanceof FilesystemOperator);
-        $this->filesystemOperator = $filesystemOperator;
     }
 
-    public function testCreateRemoveSuccess(): void
+    /**
+     * @dataProvider createRemoveSuccessDataProvider
+     */
+    public function testCreateRemoveSuccess(string $storageServiceId, string $storeServiceId): void
     {
+        $storage = self::getContainer()->get($storageServiceId);
+        self::assertInstanceOf(FilesystemOperator::class, $storage);
+
+        $store = self::getContainer()->get($storeServiceId);
+        self::assertInstanceOf(FileStoreManager::class, $store);
+
         $relativePath = UserId::create();
-        self::assertFalse($this->filesystemOperator->directoryExists($relativePath));
+        self::assertFalse($storage->directoryExists($relativePath));
 
-        $this->fileStoreManager->create($relativePath);
-        self::assertTrue($this->filesystemOperator->directoryExists($relativePath));
+        $store->create($relativePath);
+        self::assertTrue($storage->directoryExists($relativePath));
 
-        $this->fileStoreManager->remove($relativePath);
-        self::assertFalse($this->filesystemOperator->directoryExists($relativePath));
+        $store->remove($relativePath);
+        self::assertFalse($storage->directoryExists($relativePath));
+    }
+
+    /**
+     * @return array<mixed>
+     */
+    public function createRemoveSuccessDataProvider(): array
+    {
+        return [
+            'file source store' => [
+                'storageServiceId' => 'file_source.storage',
+                'storeServiceId' => 'app.services.file_store_manager.file_source',
+            ],
+            'git repository store' => [
+                'storageServiceId' => 'git_repository.storage',
+                'storeServiceId' => 'app.services.file_store_manager.git_repository',
+            ],
+            'run source store' => [
+                'storageServiceId' => 'run_source.storage',
+                'storeServiceId' => 'app.services.file_store_manager.run_source',
+            ],
+        ];
     }
 
     /**
@@ -58,15 +78,17 @@ class FileStoreManagerTest extends WebTestCase
         array $extensions,
         array $expectedRelativePathNames
     ): void {
-        $this->fileStoreManager->remove($relativePath);
+        $storage = self::getContainer()->get('file_source.storage');
+        self::assertInstanceOf(FilesystemOperator::class, $storage);
 
-        $this->fixtureCreator->copySetTo(
-            'Source/' . $fixtureSet,
-            $this->filesystemOperator,
-            $relativePath
-        );
+        $store = self::getContainer()->get('app.services.file_store_manager.file_source');
+        self::assertInstanceOf(FileStoreManager::class, $store);
 
-        $files = $this->fileStoreManager->list($relativePath, $extensions);
+        $store->remove($relativePath);
+
+        $this->fixtureCreator->copySetTo('Source/' . $fixtureSet, $storage, $relativePath);
+
+        $files = $store->list($relativePath, $extensions);
 
         self::assertCount(count($expectedRelativePathNames), $files);
         self::assertSame($expectedRelativePathNames, $files);
@@ -142,10 +164,16 @@ class FileStoreManagerTest extends WebTestCase
      */
     public function testWrite(string $fileRelativePath, string $content): void
     {
-        $this->fileStoreManager->write($fileRelativePath, $content);
+        $storage = self::getContainer()->get('file_source.storage');
+        self::assertInstanceOf(FilesystemOperator::class, $storage);
 
-        self::assertTrue($this->filesystemOperator->fileExists($fileRelativePath));
-        self::assertSame($content, $this->filesystemOperator->read($fileRelativePath));
+        $store = self::getContainer()->get('app.services.file_store_manager.file_source');
+        self::assertInstanceOf(FileStoreManager::class, $store);
+
+        $store->write($fileRelativePath, $content);
+
+        self::assertTrue($storage->fileExists($fileRelativePath));
+        self::assertSame($content, $store->read($fileRelativePath));
     }
 
     /**
@@ -167,12 +195,15 @@ class FileStoreManagerTest extends WebTestCase
 
     public function testReadSuccess(): void
     {
+        $store = self::getContainer()->get('app.services.file_store_manager.file_source');
+        self::assertInstanceOf(FileStoreManager::class, $store);
+
         $fileSource = new FileSource(UserId::create(), 'file source label');
         $fileRelativePath = $fileSource . '/' . 'file.txt';
         $content = 'file content';
 
-        $this->filesystemOperator->write($fileRelativePath, $content);
+        $store->write($fileRelativePath, $content);
 
-        self::assertSame($content, $this->fileStoreManager->read($fileRelativePath));
+        self::assertSame($content, $store->read($fileRelativePath));
     }
 }
