@@ -56,3 +56,6 @@ services:
         class: App\Services\PathFactory
         arguments:
             $basePath: '%git_repository_store_directory%'
+
+    App\Services\GitRepositoryStore:
+        public: true
