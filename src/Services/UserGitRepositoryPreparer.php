@@ -15,7 +15,7 @@ use Symfony\Component\String\UnicodeString;
 class UserGitRepositoryPreparer
 {
     public function __construct(
-        private FileStoreManager $gitRepositoryFileStore,
+        private FileStoreInterface $gitRepositoryFileStore,
         private GitRepositoryCloner $gitRepositoryCloner,
         private GitRepositoryCheckoutHandler $gitRepositoryCheckoutHandler,
         private PathFactory $pathFactory,

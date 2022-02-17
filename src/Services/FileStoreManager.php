@@ -11,7 +11,7 @@ use League\Flysystem\FilesystemException;
 use League\Flysystem\FilesystemOperator;
 use League\Flysystem\StorageAttributes;
 
-class FileStoreManager
+class FileStoreManager implements FileStoreInterface
 {
     public function __construct(
         private FilesystemOperator $filesystem,

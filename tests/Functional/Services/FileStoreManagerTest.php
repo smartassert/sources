@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Functional\Services;
 
 use App\Entity\FileSource;
-use App\Services\FileStoreManager;
+use App\Services\FileStoreInterface;
 use App\Tests\Model\UserId;
 use App\Tests\Services\FileStoreFixtureCreator;
 use League\Flysystem\FilesystemOperator;
@@ -33,7 +33,7 @@ class FileStoreManagerTest extends WebTestCase
         self::assertInstanceOf(FilesystemOperator::class, $storage);
 
         $store = self::getContainer()->get($storeServiceId);
-        self::assertInstanceOf(FileStoreManager::class, $store);
+        self::assertInstanceOf(FileStoreInterface::class, $store);
 
         $relativePath = UserId::create();
         self::assertFalse($storage->directoryExists($relativePath));
@@ -82,7 +82,7 @@ class FileStoreManagerTest extends WebTestCase
         self::assertInstanceOf(FilesystemOperator::class, $storage);
 
         $store = self::getContainer()->get('app.services.file_store_manager.file_source');
-        self::assertInstanceOf(FileStoreManager::class, $store);
+        self::assertInstanceOf(FileStoreInterface::class, $store);
 
         $store->remove($relativePath);
 
@@ -168,7 +168,7 @@ class FileStoreManagerTest extends WebTestCase
         self::assertInstanceOf(FilesystemOperator::class, $storage);
 
         $store = self::getContainer()->get('app.services.file_store_manager.file_source');
-        self::assertInstanceOf(FileStoreManager::class, $store);
+        self::assertInstanceOf(FileStoreInterface::class, $store);
 
         $store->write($fileRelativePath, $content);
 
@@ -196,7 +196,7 @@ class FileStoreManagerTest extends WebTestCase
     public function testReadSuccess(): void
     {
         $store = self::getContainer()->get('app.services.file_store_manager.file_source');
-        self::assertInstanceOf(FileStoreManager::class, $store);
+        self::assertInstanceOf(FileStoreInterface::class, $store);
 
         $fileSource = new FileSource(UserId::create(), 'file source label');
         $fileRelativePath = $fileSource . '/' . 'file.txt';

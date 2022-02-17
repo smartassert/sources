@@ -8,7 +8,7 @@ use App\Entity\FileSource;
 use App\Entity\GitSource;
 use App\Entity\RunSource;
 use App\Model\UserGitRepository;
-use App\Services\FileStoreManager;
+use App\Services\FileStoreInterface;
 use App\Services\RunSourceSerializer;
 use App\Services\UserGitRepositoryPreparer;
 use App\Tests\Model\UserId;
@@ -24,7 +24,7 @@ class RunSourceSerializerTest extends WebTestCase
     private FilesystemOperator $fileSourceStorage;
     private FilesystemOperator $gitRepositoryStorage;
     private FilesystemOperator $runSourceStorage;
-    private FileStoreManager $fixtureFileStore;
+    private FileStoreInterface $fixtureFileStore;
 
     protected function setUp(): void
     {
@@ -51,7 +51,7 @@ class RunSourceSerializerTest extends WebTestCase
         $this->runSourceStorage = $runSourceStorage;
 
         $fixtureFileStore = self::getContainer()->get('app.tests.services.file_store_manager.fixtures');
-        \assert($fixtureFileStore instanceof FileStoreManager);
+        \assert($fixtureFileStore instanceof FileStoreInterface);
         $this->fixtureFileStore = $fixtureFileStore;
     }
 

@@ -20,9 +20,9 @@ class RunSourceSerializer
     public function __construct(
         private UserGitRepositoryPreparer $gitRepositoryPreparer,
         private SourceSerializer $sourceSerializer,
-        private FileStoreManager $fileSourceFileStore,
-        private FileStoreManager $gitRepositoryFileStore,
-        private FileStoreManager $runSourceFileStore,
+        private FileStoreInterface $fileSourceFileStore,
+        private FileStoreInterface $gitRepositoryFileStore,
+        private FileStoreInterface $runSourceFileStore,
     ) {
     }
 

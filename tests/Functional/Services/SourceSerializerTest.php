@@ -6,7 +6,7 @@ namespace App\Tests\Functional\Services;
 
 use App\Entity\FileSource;
 use App\Entity\RunSource;
-use App\Services\FileStoreManager;
+use App\Services\FileStoreInterface;
 use App\Services\SourceSerializer;
 use App\Tests\Model\UserId;
 use App\Tests\Services\FileStoreFixtureCreator;
@@ -18,8 +18,8 @@ class SourceSerializerTest extends WebTestCase
     private SourceSerializer $sourceSerializer;
     private FileStoreFixtureCreator $fixtureCreator;
     private FilesystemOperator $fileSourceStorage;
-    private FileStoreManager $fileSourceFileStore;
-    private FileStoreManager $fixtureFileStore;
+    private FileStoreInterface $fileSourceFileStore;
+    private FileStoreInterface $fixtureFileStore;
 
     protected function setUp(): void
     {
@@ -38,11 +38,11 @@ class SourceSerializerTest extends WebTestCase
         $this->fileSourceStorage = $fileSourceStorage;
 
         $fileSourceFileStore = self::getContainer()->get('app.services.file_store_manager.file_source');
-        \assert($fileSourceFileStore instanceof FileStoreManager);
+        \assert($fileSourceFileStore instanceof FileStoreInterface);
         $this->fileSourceFileStore = $fileSourceFileStore;
 
         $fixtureFileStore = self::getContainer()->get('app.tests.services.file_store_manager.fixtures');
-        \assert($fixtureFileStore instanceof FileStoreManager);
+        \assert($fixtureFileStore instanceof FileStoreInterface);
         $this->fixtureFileStore = $fixtureFileStore;
     }
 

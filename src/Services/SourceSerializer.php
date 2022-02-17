@@ -28,7 +28,7 @@ class SourceSerializer
      * @throws SourceReadExceptionInterface
      */
     public function serialize(
-        FileStoreManager $sourceFileStore,
+        FileStoreInterface $sourceFileStore,
         string $sourceRelativePath,
         ?string $path = null
     ): string {
@@ -57,7 +57,7 @@ class SourceSerializer
     /**
      * @throws SourceReadExceptionInterface
      */
-    private function readYamlFile(FileStoreManager $sourceFileStore, string $path): string
+    private function readYamlFile(FileStoreInterface $sourceFileStore, string $path): string
     {
         try {
             $content = $sourceFileStore->read($path);
