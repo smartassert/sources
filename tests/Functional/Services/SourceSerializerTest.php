@@ -18,7 +18,7 @@ class SourceSerializerTest extends WebTestCase
     private SourceSerializer $sourceSerializer;
     private FileStoreFixtureCreator $fixtureCreator;
     private FilesystemOperator $fileSourceStorage;
-    private FileStoreManager $fileSourceStore;
+    private FileStoreManager $fileSourceFileStore;
     private FileStoreManager $fixtureFileStore;
 
     protected function setUp(): void
@@ -37,9 +37,9 @@ class SourceSerializerTest extends WebTestCase
         \assert($fileSourceStorage instanceof FilesystemOperator);
         $this->fileSourceStorage = $fileSourceStorage;
 
-        $fileSourceStore = self::getContainer()->get('app.services.file_store_manager.file_source');
-        \assert($fileSourceStore instanceof FileStoreManager);
-        $this->fileSourceStore = $fileSourceStore;
+        $fileSourceFileStore = self::getContainer()->get('app.services.file_store_manager.file_source');
+        \assert($fileSourceFileStore instanceof FileStoreManager);
+        $this->fileSourceFileStore = $fileSourceFileStore;
 
         $fixtureFileStore = self::getContainer()->get('app.tests.services.file_store_manager.fixtures');
         \assert($fixtureFileStore instanceof FileStoreManager);
@@ -63,7 +63,7 @@ class SourceSerializerTest extends WebTestCase
             (string) $source
         );
 
-        $content = $this->sourceSerializer->serialize($this->fileSourceStore, (string) $source, $path);
+        $content = $this->sourceSerializer->serialize($this->fileSourceFileStore, (string) $source, $path);
         $expected = trim($this->fixtureFileStore->read($expectedContentFixture));
 
         self::assertSame($expected, $content);

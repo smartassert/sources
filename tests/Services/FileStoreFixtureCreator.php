@@ -10,7 +10,7 @@ use League\Flysystem\FilesystemOperator;
 class FileStoreFixtureCreator
 {
     public function __construct(
-        private FileStoreManager $fixturesFileStore,
+        private FileStoreManager $fixtureFileStore,
     ) {
     }
 
@@ -19,18 +19,18 @@ class FileStoreFixtureCreator
         FilesystemOperator $storage,
         string $targetRelativeDirectory
     ): void {
-        $originFiles = $this->fixturesFileStore->list($originRelativePath);
+        $originFiles = $this->fixtureFileStore->list($originRelativePath);
 
         foreach ($originFiles as $fileRelativePath) {
             $originPath = $originRelativePath . '/' . $fileRelativePath;
             $targetPath = $targetRelativeDirectory . '/' . $fileRelativePath;
 
-            $storage->write($targetPath, $this->fixturesFileStore->read($originPath));
+            $storage->write($targetPath, $this->fixtureFileStore->read($originPath));
         }
     }
 
     public function copyTo(string $originRelativePath, FilesystemOperator $storage, string $targetRelativePath): void
     {
-        $storage->write($targetRelativePath, $this->fixturesFileStore->read($originRelativePath));
+        $storage->write($targetRelativePath, $this->fixtureFileStore->read($originRelativePath));
     }
 }

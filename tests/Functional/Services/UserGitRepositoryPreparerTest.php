@@ -33,7 +33,7 @@ class UserGitRepositoryPreparerTest extends WebTestCase
     private UserGitRepositoryPreparer $userGitRepositoryPreparer;
     private FileStoreFixtureCreator $fixtureCreator;
     private FilesystemOperator $gitRepositoryStorage;
-    private FileStoreManager $gitRepositoryStore;
+    private FileStoreManager $gitRepositoryFileStore;
     private GitSource $gitSource;
     private FileStoreManager $fixtureFileStore;
 
@@ -53,9 +53,9 @@ class UserGitRepositoryPreparerTest extends WebTestCase
         \assert($gitRepositoryStorage instanceof FilesystemOperator);
         $this->gitRepositoryStorage = $gitRepositoryStorage;
 
-        $gitRepositoryStore = self::getContainer()->get('app.services.file_store_manager.git_repository');
-        \assert($gitRepositoryStore instanceof FileStoreManager);
-        $this->gitRepositoryStore = $gitRepositoryStore;
+        $gitRepositoryFileStore = self::getContainer()->get('app.services.file_store_manager.git_repository');
+        \assert($gitRepositoryFileStore instanceof FileStoreManager);
+        $this->gitRepositoryFileStore = $gitRepositoryFileStore;
 
         $fixtureFileStore = self::getContainer()->get('app.tests.services.file_store_manager.fixtures');
         \assert($fixtureFileStore instanceof FileStoreManager);
@@ -208,7 +208,7 @@ class UserGitRepositoryPreparerTest extends WebTestCase
         self::assertTrue($this->gitRepositoryStorage->directoryExists($userGitRepositoryPath));
         self::assertSame(
             $this->fixtureFileStore->list($fixtureSetIdentifier),
-            $this->gitRepositoryStore->list($userGitRepositoryPath)
+            $this->gitRepositoryFileStore->list($userGitRepositoryPath)
         );
     }
 

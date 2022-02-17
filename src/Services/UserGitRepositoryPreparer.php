@@ -16,7 +16,7 @@ use Symfony\Component\String\UnicodeString;
 class UserGitRepositoryPreparer
 {
     public function __construct(
-        private FileStoreManager $gitRepositoryStore,
+        private FileStoreManager $gitRepositoryFileStore,
         private GitRepositoryCloner $gitRepositoryCloner,
         private GitRepositoryCheckoutHandler $gitRepositoryCheckoutHandler,
         private PathFactory $pathFactory,
@@ -48,8 +48,8 @@ class UserGitRepositoryPreparer
     {
         $gitRepositoryRelativePath = (string) $gitRepository;
 
-        $this->gitRepositoryStore->remove($gitRepositoryRelativePath);
-        $this->gitRepositoryStore->create($gitRepositoryRelativePath);
+        $this->gitRepositoryFileStore->remove($gitRepositoryRelativePath);
+        $this->gitRepositoryFileStore->create($gitRepositoryRelativePath);
 
         $gitRepositoryAbsolutePath = $this->pathFactory->createAbsolutePath($gitRepositoryRelativePath);
 
@@ -77,7 +77,7 @@ class UserGitRepositoryPreparer
             }
 
             if ($gitActionException instanceof GitActionException) {
-                $this->gitRepositoryStore->remove($gitRepositoryRelativePath);
+                $this->gitRepositoryFileStore->remove($gitRepositoryRelativePath);
 
                 throw $gitActionException;
             }
