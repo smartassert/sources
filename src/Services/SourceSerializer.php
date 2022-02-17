@@ -19,7 +19,6 @@ class SourceSerializer
     private const DOCUMENT_TEMPLATE = '---' . "\n" . '%s' . "\n" . '...';
 
     public function __construct(
-        private FileStoreManager $fileStoreManager,
         private YamlParser $yamlParser,
         private PathNormalizer $pathNormalizer,
     ) {
@@ -28,19 +27,22 @@ class SourceSerializer
     /**
      * @throws SourceReadExceptionInterface
      */
-    public function serialize(string $sourceRelativePath, ?string $path = null): string
-    {
+    public function serialize(
+        FileStoreManager $sourceFileStore,
+        string $sourceRelativePath,
+        ?string $path = null
+    ): string {
         $sourceDirectory = $this->pathNormalizer->normalizePath($sourceRelativePath . '/' . $path);
         $sourceFiles = [];
 
         try {
-            $sourceFiles = $this->fileStoreManager->list($sourceDirectory, ['yml', 'yaml']);
+            $sourceFiles = $sourceFileStore->list($sourceDirectory, ['yml', 'yaml']);
         } catch (FilesystemException) {
         }
 
         $documents = [];
         foreach ($sourceFiles as $sourceFile) {
-            $content = $this->readYamlFile($sourceDirectory . '/' . $sourceFile);
+            $content = $this->readYamlFile($sourceFileStore, $sourceDirectory . '/' . $sourceFile);
 
             $documents[] = sprintf(
                 self::DOCUMENT_TEMPLATE,
@@ -55,10 +57,10 @@ class SourceSerializer
     /**
      * @throws SourceReadExceptionInterface
      */
-    private function readYamlFile(string $path): string
+    private function readYamlFile(FileStoreManager $sourceFileStore, string $path): string
     {
         try {
-            $content = $this->fileStoreManager->read($path);
+            $content = $sourceFileStore->read($path);
         } catch (ReadException) {
             throw new ReadFileException($path);
         }

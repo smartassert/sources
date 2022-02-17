@@ -34,7 +34,8 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
     private Store $store;
     private FileStoreFixtureCreator $fixtureCreator;
     private AuthorizationRequestAsserter $authorizationRequestAsserter;
-    private FilesystemOperator $filesystemOperator;
+    private FilesystemOperator $runSourceStorage;
+    private FilesystemOperator $fileSourceStorage;
     private FileStoreManager $fixtureFileStore;
 
     protected function setUp(): void
@@ -61,9 +62,13 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
         \assert($authorizationRequestAsserter instanceof AuthorizationRequestAsserter);
         $this->authorizationRequestAsserter = $authorizationRequestAsserter;
 
-        $filesystemOperator = self::getContainer()->get('default.storage');
-        \assert($filesystemOperator instanceof FilesystemOperator);
-        $this->filesystemOperator = $filesystemOperator;
+        $runSourceStorage = self::getContainer()->get('run_source.storage');
+        \assert($runSourceStorage instanceof FilesystemOperator);
+        $this->runSourceStorage = $runSourceStorage;
+
+        $fileSourceStorage = self::getContainer()->get('file_source.storage');
+        \assert($fileSourceStorage instanceof FilesystemOperator);
+        $this->fileSourceStorage = $fileSourceStorage;
 
         $fixtureFileStore = self::getContainer()->get('app.tests.services.file_store_manager.fixtures');
         \assert($fixtureFileStore instanceof FileStoreManager);
@@ -353,11 +358,10 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
 
         $serializedRunSourcePath = $runSource . '/' . RunSourceSerializer::SERIALIZED_FILENAME;
 
-        $this->filesystemOperator->write($fileSource . '/file.yaml', '- file content');
-        $this->filesystemOperator->write($serializedRunSourcePath, '- serialized content');
+        $this->runSourceStorage->write($serializedRunSourcePath, '- serialized content');
 
-        self::assertTrue($this->filesystemOperator->directoryExists((string) $runSource));
-        self::assertTrue($this->filesystemOperator->fileExists($serializedRunSourcePath));
+        self::assertTrue($this->runSourceStorage->directoryExists((string) $runSource));
+        self::assertTrue($this->runSourceStorage->fileExists($serializedRunSourcePath));
 
         $this->setUserServiceAuthorizedResponse($userId);
 
@@ -368,8 +372,8 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
         );
 
         self::assertSame(200, $response->getStatusCode());
-        self::assertFalse($this->filesystemOperator->directoryExists((string) $runSource));
-        self::assertFalse($this->filesystemOperator->fileExists($serializedRunSourcePath));
+        self::assertFalse($this->runSourceStorage->directoryExists((string) $runSource));
+        self::assertFalse($this->runSourceStorage->fileExists($serializedRunSourcePath));
     }
 
     public function testDeleteFileSourceDeletesFileSourceFiles(): void
@@ -383,10 +387,10 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
         $sourceRelativePath = (string) $fileSource;
         $fileRelativePath = $sourceRelativePath . '/' . $filename;
 
-        $this->filesystemOperator->write($fileRelativePath, '- content');
+        $this->fileSourceStorage->write($fileRelativePath, '- content');
 
-        self::assertTrue($this->filesystemOperator->directoryExists($sourceRelativePath));
-        self::assertTrue($this->filesystemOperator->fileExists($fileRelativePath));
+        self::assertTrue($this->fileSourceStorage->directoryExists($sourceRelativePath));
+        self::assertTrue($this->fileSourceStorage->fileExists($fileRelativePath));
 
         $this->setUserServiceAuthorizedResponse($userId);
 
@@ -399,8 +403,8 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
         self::assertSame(200, $response->getStatusCode());
         self::assertSame(0, $this->sourceRepository->count([]));
 
-        self::assertFalse($this->filesystemOperator->directoryExists($sourceRelativePath));
-        self::assertFalse($this->filesystemOperator->fileExists($fileRelativePath));
+        self::assertFalse($this->fileSourceStorage->directoryExists($sourceRelativePath));
+        self::assertFalse($this->fileSourceStorage->fileExists($fileRelativePath));
     }
 
     public function testPrepareRunSource(): void
@@ -557,7 +561,7 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
 
         $this->fixtureCreator->copyTo(
             $serializedRunSourceFixturePath,
-            $this->filesystemOperator,
+            $this->runSourceStorage,
             $runSource . '/' . RunSourceSerializer::SERIALIZED_FILENAME
         );
 

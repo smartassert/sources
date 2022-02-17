@@ -31,15 +31,7 @@ services:
         arguments:
             $fixturesFileStore: '@app.tests.services.file_store_manager.fixtures'
 
-    App\Services\FileStoreManager:
-        public: true
-        arguments:
-            $filesystem: '@default.storage'
-
     App\Services\GitRepositoryCheckoutHandler:
-        public: true
-
-    App\Services\UserGitRepositoryPreparer:
         public: true
 
     App\Tests\Services\ApplicationClient:

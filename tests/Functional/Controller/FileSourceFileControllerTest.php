@@ -16,7 +16,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 class FileSourceFileControllerTest extends AbstractSourceControllerTest
 {
     private AuthorizationRequestAsserter $authorizationRequestAsserter;
-    private FilesystemOperator $filesystemOperator;
+    private FilesystemOperator $fileSourceStorage;
 
     private string $userId;
     private FileSource $fileSource;
@@ -30,9 +30,9 @@ class FileSourceFileControllerTest extends AbstractSourceControllerTest
         \assert($authorizationRequestAsserter instanceof AuthorizationRequestAsserter);
         $this->authorizationRequestAsserter = $authorizationRequestAsserter;
 
-        $filesystemOperator = self::getContainer()->get('default.storage');
-        \assert($filesystemOperator instanceof FilesystemOperator);
-        $this->filesystemOperator = $filesystemOperator;
+        $fileSourceStorage = self::getContainer()->get('file_source.storage');
+        \assert($fileSourceStorage instanceof FilesystemOperator);
+        $this->fileSourceStorage = $fileSourceStorage;
 
         $this->userId = UserId::create();
         $this->fileSource = new FileSource($this->userId, 'file source label');
@@ -136,8 +136,8 @@ class FileSourceFileControllerTest extends AbstractSourceControllerTest
         $content = '- file content';
         $fileRelativePath = $this->sourceRelativePath . '/' . $filename;
 
-        self::assertFalse($this->filesystemOperator->directoryExists($this->sourceRelativePath));
-        self::assertFalse($this->filesystemOperator->fileExists($fileRelativePath));
+        self::assertFalse($this->fileSourceStorage->directoryExists($this->sourceRelativePath));
+        self::assertFalse($this->fileSourceStorage->fileExists($fileRelativePath));
 
         $this->setUserServiceAuthorizedResponse($this->userId);
 
@@ -153,9 +153,9 @@ class FileSourceFileControllerTest extends AbstractSourceControllerTest
         );
 
         self::assertSame(200, $response->getStatusCode());
-        self::assertTrue($this->filesystemOperator->directoryExists($this->sourceRelativePath));
-        self::assertTrue($this->filesystemOperator->fileExists($fileRelativePath));
-        self::assertSame($content, $this->filesystemOperator->read($fileRelativePath));
+        self::assertTrue($this->fileSourceStorage->directoryExists($this->sourceRelativePath));
+        self::assertTrue($this->fileSourceStorage->fileExists($fileRelativePath));
+        self::assertSame($content, $this->fileSourceStorage->read($fileRelativePath));
     }
 
     public function testUpdateFileSuccess(): void
@@ -165,7 +165,7 @@ class FileSourceFileControllerTest extends AbstractSourceControllerTest
         $updatedContent = '- updated content';
         $fileRelativePath = $this->sourceRelativePath . '/' . $filename;
 
-        $this->filesystemOperator->write($fileRelativePath, $initialContent);
+        $this->fileSourceStorage->write($fileRelativePath, $initialContent);
 
         $this->setUserServiceAuthorizedResponse($this->userId);
 
@@ -181,9 +181,9 @@ class FileSourceFileControllerTest extends AbstractSourceControllerTest
         );
 
         self::assertSame(200, $response->getStatusCode());
-        self::assertTrue($this->filesystemOperator->directoryExists($this->sourceRelativePath));
-        self::assertTrue($this->filesystemOperator->fileExists($fileRelativePath));
-        self::assertSame($updatedContent, $this->filesystemOperator->read($fileRelativePath));
+        self::assertTrue($this->fileSourceStorage->directoryExists($this->sourceRelativePath));
+        self::assertTrue($this->fileSourceStorage->fileExists($fileRelativePath));
+        self::assertSame($updatedContent, $this->fileSourceStorage->read($fileRelativePath));
     }
 
     /**
@@ -242,7 +242,7 @@ class FileSourceFileControllerTest extends AbstractSourceControllerTest
         $content = '- file content';
         $fileRelativePath = $this->sourceRelativePath . '/' . $filename;
 
-        $this->filesystemOperator->write($fileRelativePath, $content);
+        $this->fileSourceStorage->write($fileRelativePath, $content);
 
         $this->setUserServiceAuthorizedResponse($this->userId);
 
@@ -255,7 +255,7 @@ class FileSourceFileControllerTest extends AbstractSourceControllerTest
         );
 
         self::assertSame(200, $response->getStatusCode());
-        self::assertFalse($this->filesystemOperator->fileExists($fileRelativePath));
+        self::assertFalse($this->fileSourceStorage->fileExists($fileRelativePath));
     }
 
     /**

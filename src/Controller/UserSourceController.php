@@ -66,14 +66,22 @@ class UserSourceController
      * @throws FileExceptionInterface
      */
     #[Route(SourceRoutes::ROUTE_SOURCE, name: 'user_source_delete', methods: ['DELETE'])]
-    public function delete(SourceInterface $source, Store $store, FileStoreManager $fileStoreManager): Response
-    {
+    public function delete(
+        SourceInterface $source,
+        Store $store,
+        FileStoreManager $fileSourceStore,
+        FileStoreManager $runSourceStore,
+    ): Response {
         $this->userSourceAccessChecker->denyAccessUnlessGranted($source);
 
         $store->remove($source);
 
-        if ($source instanceof FileSource || $source instanceof RunSource) {
-            $fileStoreManager->remove((string) $source);
+        if ($source instanceof FileSource) {
+            $fileSourceStore->remove((string) $source);
+        }
+
+        if ($source instanceof RunSource) {
+            $runSourceStore->remove((string) $source);
         }
 
         return new JsonResponse();
