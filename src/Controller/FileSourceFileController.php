@@ -10,7 +10,7 @@ use App\Exception\InvalidRequestException;
 use App\Request\AddYamlFileRequest;
 use App\Request\RemoveYamlFileRequest;
 use App\Security\UserSourceAccessChecker;
-use App\Services\FileStoreManager;
+use App\Services\FileStoreInterface;
 use App\Services\RequestValidator;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -24,7 +24,7 @@ class FileSourceFileController
     public function __construct(
         private UserSourceAccessChecker $userSourceAccessChecker,
         private RequestValidator $requestValidator,
-        private FileStoreManager $fileSourceFileStore,
+        private FileStoreInterface $fileSourceFileStore,
     ) {
     }
 

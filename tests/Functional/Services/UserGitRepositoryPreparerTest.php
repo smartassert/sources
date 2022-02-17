@@ -10,7 +10,7 @@ use App\Exception\ProcessExecutorException;
 use App\Exception\UserGitRepositoryException;
 use App\Exception\UserGitRepositoryException as RepositoryException;
 use App\Model\ProcessOutput;
-use App\Services\FileStoreManager;
+use App\Services\FileStoreInterface;
 use App\Services\GitRepositoryCheckoutHandler;
 use App\Services\GitRepositoryCloner;
 use App\Services\UserGitRepositoryPreparer;
@@ -33,9 +33,9 @@ class UserGitRepositoryPreparerTest extends WebTestCase
     private UserGitRepositoryPreparer $userGitRepositoryPreparer;
     private FileStoreFixtureCreator $fixtureCreator;
     private FilesystemOperator $gitRepositoryStorage;
-    private FileStoreManager $gitRepositoryFileStore;
+    private FileStoreInterface $gitRepositoryFileStore;
     private GitSource $gitSource;
-    private FileStoreManager $fixtureFileStore;
+    private FileStoreInterface $fixtureFileStore;
 
     protected function setUp(): void
     {
@@ -54,11 +54,11 @@ class UserGitRepositoryPreparerTest extends WebTestCase
         $this->gitRepositoryStorage = $gitRepositoryStorage;
 
         $gitRepositoryFileStore = self::getContainer()->get('app.services.file_store_manager.git_repository');
-        \assert($gitRepositoryFileStore instanceof FileStoreManager);
+        \assert($gitRepositoryFileStore instanceof FileStoreInterface);
         $this->gitRepositoryFileStore = $gitRepositoryFileStore;
 
         $fixtureFileStore = self::getContainer()->get('app.tests.services.file_store_manager.fixtures');
-        \assert($fixtureFileStore instanceof FileStoreManager);
+        \assert($fixtureFileStore instanceof FileStoreInterface);
         $this->fixtureFileStore = $fixtureFileStore;
 
         $entityRemover = self::getContainer()->get(EntityRemover::class);

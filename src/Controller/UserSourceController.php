@@ -13,7 +13,7 @@ use App\Exception\InvalidRequestException;
 use App\Message\Prepare;
 use App\Request\SourceRequestInterface;
 use App\Security\UserSourceAccessChecker;
-use App\Services\FileStoreManager;
+use App\Services\FileStoreInterface;
 use App\Services\RequestValidator;
 use App\Services\RunSourceFactory;
 use App\Services\RunSourceSerializer;
@@ -69,8 +69,8 @@ class UserSourceController
     public function delete(
         SourceInterface $source,
         Store $store,
-        FileStoreManager $fileSourceFileStore,
-        FileStoreManager $runSourceFileStore,
+        FileStoreInterface $fileSourceFileStore,
+        FileStoreInterface $runSourceFileStore,
     ): Response {
         $this->userSourceAccessChecker->denyAccessUnlessGranted($source);
 

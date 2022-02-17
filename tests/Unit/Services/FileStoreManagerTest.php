@@ -7,6 +7,7 @@ namespace App\Tests\Unit\Services;
 use App\Exception\File\ReadException;
 use App\Exception\File\RemoveException;
 use App\Exception\File\WriteException;
+use App\Services\FileStoreInterface;
 use App\Services\FileStoreManager;
 use League\Flysystem\Filesystem;
 use League\Flysystem\UnableToDeleteDirectory;
@@ -27,7 +28,7 @@ class FileStoreManagerTest extends TestCase
      * @dataProvider throwsRemoveExceptionDataProvider
      */
     public function testRemoveThrowsException(
-        FileStoreManager $fileStoreManager,
+        FileStoreInterface $fileStoreManager,
         string $relativePath,
         \Exception $expected
     ): void {

@@ -16,7 +16,7 @@ use App\Repository\SourceRepository;
 use App\Request\FileSourceRequest;
 use App\Request\GitSourceRequest;
 use App\Request\SourceRequestInterface;
-use App\Services\FileStoreManager;
+use App\Services\FileStoreInterface;
 use App\Services\RunSourceSerializer;
 use App\Services\Source\Store;
 use App\Tests\Model\UserId;
@@ -36,7 +36,7 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
     private AuthorizationRequestAsserter $authorizationRequestAsserter;
     private FilesystemOperator $runSourceStorage;
     private FilesystemOperator $fileSourceStorage;
-    private FileStoreManager $fixtureFileStore;
+    private FileStoreInterface $fixtureFileStore;
 
     protected function setUp(): void
     {
@@ -71,7 +71,7 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
         $this->fileSourceStorage = $fileSourceStorage;
 
         $fixtureFileStore = self::getContainer()->get('app.tests.services.file_store_manager.fixtures');
-        \assert($fixtureFileStore instanceof FileStoreManager);
+        \assert($fixtureFileStore instanceof FileStoreInterface);
         $this->fixtureFileStore = $fixtureFileStore;
 
         $entityRemover = self::getContainer()->get(EntityRemover::class);

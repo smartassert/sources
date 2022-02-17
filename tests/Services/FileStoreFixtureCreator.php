@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace App\Tests\Services;
 
-use App\Services\FileStoreManager;
+use App\Services\FileStoreInterface;
 use League\Flysystem\FilesystemOperator;
 
 class FileStoreFixtureCreator
 {
     public function __construct(
-        private FileStoreManager $fixtureFileStore,
+        private FileStoreInterface $fixtureFileStore,
     ) {
     }
 

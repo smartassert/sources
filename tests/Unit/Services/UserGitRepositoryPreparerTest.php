@@ -7,7 +7,7 @@ namespace App\Tests\Unit\Services;
 use App\Entity\GitSource;
 use App\Exception\File\RemoveException;
 use App\Exception\UserGitRepositoryException;
-use App\Services\FileStoreManager;
+use App\Services\FileStoreInterface;
 use App\Services\GitRepositoryCheckoutHandler;
 use App\Services\GitRepositoryCloner;
 use App\Services\PathFactory;
@@ -21,7 +21,7 @@ class UserGitRepositoryPreparerTest extends WebTestCase
      * @dataProvider prepareFileStoreManagerThrowsExceptionDataProvider
      */
     public function testPrepareFileStoreManagerThrowsException(
-        FileStoreManager $fileStoreManager,
+        FileStoreInterface $fileStoreManager,
         \Exception $expectedPrevious
     ): void {
         $preparer = new UserGitRepositoryPreparer(
@@ -50,7 +50,7 @@ class UserGitRepositoryPreparerTest extends WebTestCase
 
         $removeException = new RemoveException('/path/to/remove', $unableToDeleteDirectoryException);
 
-        $fileStoreManagerThrowingRemoveException = \Mockery::mock(FileStoreManager::class);
+        $fileStoreManagerThrowingRemoveException = \Mockery::mock(FileStoreInterface::class);
         $fileStoreManagerThrowingRemoveException
             ->shouldReceive('remove')
             ->andThrow($removeException)
