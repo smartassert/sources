@@ -13,6 +13,11 @@ use Symfony\Component\Validator\Exception\UnexpectedValueException;
 
 class YamlFilenameConstraintValidator extends ConstraintValidator
 {
+    public function __construct(
+        private readonly FilenameValidator $filenameValidator,
+    ) {
+    }
+
     public function validate(mixed $value, Constraint $constraint): void
     {
         if (!$constraint instanceof YamlFilenameConstraint) {
@@ -27,12 +32,15 @@ class YamlFilenameConstraintValidator extends ConstraintValidator
             throw new UnexpectedValueException($value, Filename::class);
         }
 
-        $filename = $value->getValue();
+        if (false === $this->filenameValidator->isValid($value->getValue())) {
+            $this->context->buildViolation($constraint::MESSAGE_NAME_INVALID)
+                ->atPath('name')
+                ->addViolation()
+            ;
+        }
+
         if (
-            '' === $filename
-            || str_contains($filename, '\\')
-            || str_contains($filename, chr(0))
-            || '' === $value->getName()
+            '' === $value->getName()
             || !in_array($value->getExtension(), YamlFile::EXTENSIONS)
         ) {
             $this->context->buildViolation($constraint::MESSAGE_NAME_INVALID)

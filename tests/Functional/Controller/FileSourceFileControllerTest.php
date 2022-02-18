@@ -88,12 +88,17 @@ class FileSourceFileControllerTest extends AbstractSourceControllerTest
                 'expectedResponseData' => $expectedInvalidFilenameResponseData,
             ],
             'name contains backslash characters, content non-empty' => [
-                'filename' => 'one two \\ three.yaml',
+                'filename' => 'one-two-\\-three.yaml',
                 'content' => 'non-empty value',
                 'expectedResponseData' => $expectedInvalidFilenameResponseData,
             ],
             'name contains null byte characters, content non-empty' => [
-                'filename' => 'one ' . chr(0) . ' two three' . chr(0) . '.yaml',
+                'filename' => 'one-' . chr(0) . '-two-three' . chr(0) . '.yaml',
+                'content' => 'non-empty value',
+                'expectedResponseData' => $expectedInvalidFilenameResponseData,
+            ],
+            'name contains space characters, content non-empty' => [
+                'filename' => 'one two three.yaml',
                 'content' => 'non-empty value',
                 'expectedResponseData' => $expectedInvalidFilenameResponseData,
             ],
