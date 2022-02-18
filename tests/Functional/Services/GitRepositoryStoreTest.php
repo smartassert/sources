@@ -17,7 +17,6 @@ use App\Services\FileStoreManager;
 use App\Services\GitRepositoryCheckoutHandler;
 use App\Services\GitRepositoryCloner;
 use App\Services\GitRepositoryStore;
-use App\Services\PathFactory;
 use App\Services\UserGitRepositoryFactory;
 use App\Tests\Model\UserId;
 use App\Tests\Services\EntityRemover;
@@ -77,9 +76,9 @@ class GitRepositoryStoreTest extends WebTestCase
         $this->source = new GitSource(UserId::create(), self::REPOSITORY_URL, self::PATH);
         $this->gitRepository = new UserGitRepository($this->source);
 
-        $gitRepositoryPathFactory = self::getContainer()->get('app.services.path_factory.git_repository');
-        \assert($gitRepositoryPathFactory instanceof PathFactory);
-        $this->gitRepositoryAbsolutePath = $gitRepositoryPathFactory->createAbsolutePath((string) $this->gitRepository);
+        $gitRepositoryBasePath = self::getContainer()->getParameter('git_repository_store_directory');
+        \assert(is_string($gitRepositoryBasePath));
+        $this->gitRepositoryAbsolutePath = $gitRepositoryBasePath . '/' . $this->gitRepository;
 
         $this->setGitRepositoryStoreUserGitRepositoryFactory();
     }
