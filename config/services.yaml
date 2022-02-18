@@ -97,9 +97,6 @@ services:
         arguments:
             $filesystem: '@git_repository.storage'
 
-    App\Services\PathFactory:
-        autowire: false
-
     App\Services\GitRepositoryStore:
         arguments:
             $gitRepositoryBasePath: '%git_repository_store_directory%'
