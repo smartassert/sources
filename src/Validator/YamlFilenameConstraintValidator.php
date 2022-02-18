@@ -33,17 +33,21 @@ class YamlFilenameConstraintValidator extends ConstraintValidator
         }
 
         if (false === $this->filenameValidator->isValid($value->getValue())) {
-            $this->context->buildViolation($constraint::MESSAGE_NAME_INVALID)
+            $this->context->buildViolation($constraint::MESSAGE_FILENAME_INVALID)
                 ->atPath('name')
                 ->addViolation()
             ;
         }
 
-        if (
-            '' === $value->getName()
-            || !in_array($value->getExtension(), YamlFile::EXTENSIONS)
-        ) {
-            $this->context->buildViolation($constraint::MESSAGE_NAME_INVALID)
+        if ('' === $value->getName()) {
+            $this->context->buildViolation($constraint::MESSAGE_NAME_EMPTY)
+                ->atPath('name')
+                ->addViolation()
+            ;
+        }
+
+        if (!in_array($value->getExtension(), YamlFile::EXTENSIONS)) {
+            $this->context->buildViolation($constraint::MESSAGE_EXTENSION_INVALID)
                 ->atPath('name')
                 ->addViolation()
             ;

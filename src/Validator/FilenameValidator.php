@@ -6,6 +6,9 @@ namespace App\Validator;
 
 class FilenameValidator
 {
+    public const MESSAGE_INVALID =
+        'File name must be non-empty and contain no space, backslash or null byte characters.';
+
     public function isValid(string $filename): bool
     {
         return !(
