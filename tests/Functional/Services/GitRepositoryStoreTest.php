@@ -5,20 +5,26 @@ declare(strict_types=1);
 namespace App\Tests\Functional\Services;
 
 use App\Entity\GitSource;
+use App\Exception\File\RemoveException;
 use App\Exception\GitActionException;
+use App\Exception\GitRepositoryException;
 use App\Exception\GitRepositoryException as RepositoryException;
 use App\Exception\ProcessExecutorException;
 use App\Model\ProcessOutput;
 use App\Model\UserGitRepository;
+use App\Services\FileStoreInterface;
 use App\Services\FileStoreManager;
 use App\Services\GitRepositoryCheckoutHandler;
 use App\Services\GitRepositoryCloner;
 use App\Services\GitRepositoryStore;
 use App\Services\PathFactory;
+use App\Services\UserGitRepositoryFactory;
 use App\Tests\Model\UserId;
 use App\Tests\Services\EntityRemover;
 use App\Tests\Services\FileStoreFixtureCreator;
+use League\Flysystem\FilesystemException;
 use League\Flysystem\FilesystemOperator;
+use League\Flysystem\UnableToDeleteDirectory;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Process\Exception\RuntimeException as SymfonyProcessRuntimeException;
@@ -33,6 +39,7 @@ class GitRepositoryStoreTest extends WebTestCase
 
     private GitRepositoryStore $gitRepositoryStore;
     private FileStoreFixtureCreator $fixtureCreator;
+    private GitSource $source;
     private UserGitRepository $gitRepository;
     private FilesystemOperator $gitRepositoryStorage;
     private FileStoreManager $gitRepositoryFileStore;
@@ -68,21 +75,49 @@ class GitRepositoryStoreTest extends WebTestCase
             $entityRemover->removeAll();
         }
 
-        $this->gitRepository = new UserGitRepository(
-            new GitSource(UserId::create(), self::REPOSITORY_URL, self::PATH)
-        );
+        $this->source = new GitSource(UserId::create(), self::REPOSITORY_URL, self::PATH);
+        $this->gitRepository = new UserGitRepository($this->source);
 
         $gitRepositoryPathFactory = self::getContainer()->get('app.services.path_factory.git_repository');
         \assert($gitRepositoryPathFactory instanceof PathFactory);
         $this->gitRepositoryAbsolutePath = $gitRepositoryPathFactory->createAbsolutePath((string) $this->gitRepository);
+
+        $this->setGitRepositoryStoreUserGitRepositoryFactory();
+    }
+
+    public function testInitializeUnableToRemoveExistingFileStore(): void
+    {
+        $unableToDeleteDirectoryException = UnableToDeleteDirectory::atLocation((string) $this->gitRepository);
+
+        $removeException = new RemoveException(
+            (string) $this->gitRepository,
+            $unableToDeleteDirectoryException
+        );
+
+        $gitRepositoryFileStore = \Mockery::mock(FileStoreInterface::class);
+        $gitRepositoryFileStore
+            ->shouldReceive('remove')
+            ->with((string) $this->gitRepository)
+            ->andThrow($removeException);
+
+        ObjectReflector::setProperty(
+            $this->gitRepositoryStore,
+            GitRepositoryStore::class,
+            'gitRepositoryFileStore',
+            $gitRepositoryFileStore
+        );
+
+        $this->expectExceptionObject(new GitRepositoryException($removeException));
+
+        $this->gitRepositoryStore->initialize($this->source, 'ref value goes right here');
     }
 
     /**
-     * @dataProvider createThrowsExceptionDataProvider
+     * @dataProvider initializeThrowsGitActionExceptionDataProvider
      *
      * @param callable(\Exception|ProcessOutput, null|\Exception|ProcessOutput, RepositoryException): void $assertions
      */
-    public function testCreateThrowsException(
+    public function testInitializeThrowsGitActionException(
         ProcessOutput|\Exception $cloneProcessOutcome,
         null|ProcessOutput|\Exception $checkoutProcessOutcome,
         callable $assertions
@@ -97,7 +132,7 @@ class GitRepositoryStoreTest extends WebTestCase
         $userGitRepositoryException = null;
 
         try {
-            $this->gitRepositoryStore->create($this->gitRepository, $this->gitRepositoryAbsolutePath, self::REF);
+            $this->gitRepositoryStore->initialize($this->source, self::REF);
             self::fail(RepositoryException::class . ' not thrown');
         } catch (RepositoryException $userGitRepositoryException) {
             $assertions($cloneProcessOutcome, $checkoutProcessOutcome, $userGitRepositoryException);
@@ -111,7 +146,7 @@ class GitRepositoryStoreTest extends WebTestCase
     /**
      * @return array<mixed>
      */
-    public function createThrowsExceptionDataProvider(): array
+    public function initializeThrowsGitActionExceptionDataProvider(): array
     {
         return [
             'clone process throws exception' => [
@@ -204,7 +239,7 @@ class GitRepositoryStoreTest extends WebTestCase
             $fixtureSetIdentifier
         );
 
-        $this->gitRepositoryStore->create($this->gitRepository, $this->gitRepositoryAbsolutePath, self::REF);
+        $this->gitRepositoryStore->initialize($this->source, self::REF);
 
         $userGitRepositoryPath = (string) $this->gitRepository;
 
@@ -306,5 +341,21 @@ class GitRepositoryStoreTest extends WebTestCase
         $relativePathParts = array_slice($pathParts, -2);
 
         return implode('/', $relativePathParts);
+    }
+
+    private function setGitRepositoryStoreUserGitRepositoryFactory(): void
+    {
+        $factory = \Mockery::mock(UserGitRepositoryFactory::class);
+        $factory
+            ->shouldReceive('create')
+            ->with($this->source)
+            ->andReturn($this->gitRepository);
+
+        ObjectReflector::setProperty(
+            $this->gitRepositoryStore,
+            GitRepositoryStore::class,
+            'gitRepositoryFactory',
+            $factory
+        );
     }
 }

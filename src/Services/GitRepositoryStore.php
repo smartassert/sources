@@ -18,35 +18,34 @@ class GitRepositoryStore
         private PathFactory $gitRepositoryPathFactory,
         private GitRepositoryCloner $cloner,
         private GitRepositoryCheckoutHandler $checkoutHandler,
+        private UserGitRepositoryFactory $gitRepositoryFactory,
     ) {
-    }
-
-    public function initialize(GitSource $source): UserGitRepository
-    {
-        $gitRepository = new UserGitRepository($source);
-        $relativePath = (string) $gitRepository;
-        $this->gitRepositoryFileStore->remove($relativePath);
-
-        return $gitRepository->withAbsolutePath(
-            $this->gitRepositoryPathFactory->createAbsolutePath($relativePath)
-        );
     }
 
     /**
      * @throws GitRepositoryException
      */
-    public function create(
-        UserGitRepository $gitRepository,
-        string $gitRepositoryAbsolutePath,
-        ?string $ref
-    ): void {
-        $gitRepositoryUrl = $this->createRepositoryUrl($gitRepository->getSource());
+    public function initialize(GitSource $source, ?string $ref): UserGitRepository
+    {
+        $gitRepository = $this->gitRepositoryFactory->create($source);
+        $relativePath = (string) $gitRepository;
 
         try {
-            $this->doCreate($gitRepositoryUrl, $gitRepositoryAbsolutePath, $ref);
+            $this->gitRepositoryFileStore->remove($relativePath);
         } catch (\Throwable $throwable) {
             throw new GitRepositoryException($throwable);
         }
+
+        $absolutePath = $this->gitRepositoryPathFactory->createAbsolutePath($relativePath);
+        $gitRepositoryUrl = $this->createRepositoryUrl($gitRepository->getSource());
+
+        try {
+            $this->doCreate($gitRepositoryUrl, $absolutePath, $ref);
+        } catch (\Throwable $throwable) {
+            throw new GitRepositoryException($throwable);
+        }
+
+        return $gitRepository;
     }
 
     /**
