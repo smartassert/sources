@@ -18,7 +18,7 @@ class UserGitRepositoryPreparer
         private FileStoreInterface $gitRepositoryFileStore,
         private GitRepositoryCloner $gitRepositoryCloner,
         private GitRepositoryCheckoutHandler $gitRepositoryCheckoutHandler,
-        private PathFactory $pathFactory,
+        private PathFactory $gitRepositoryPathFactory,
     ) {
     }
 
@@ -48,7 +48,7 @@ class UserGitRepositoryPreparer
 
         $this->gitRepositoryFileStore->remove($gitRepositoryRelativePath);
 
-        $gitRepositoryAbsolutePath = $this->pathFactory->createAbsolutePath($gitRepositoryRelativePath);
+        $gitRepositoryAbsolutePath = $this->gitRepositoryPathFactory->createAbsolutePath($gitRepositoryRelativePath);
 
         $gitActionException = null;
         $cloneOutput = null;

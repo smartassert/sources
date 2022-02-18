@@ -51,11 +51,5 @@ services:
         arguments:
             $filesystem: '@test_fixtures.storage'
 
-    app.services.path_factory.git_repository:
-        public: true
-        class: App\Services\PathFactory
-        arguments:
-            $basePath: '%git_repository_store_directory%'
-
     App\Services\GitRepositoryStore:
         public: true
