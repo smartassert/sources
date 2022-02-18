@@ -19,6 +19,7 @@ services:
             $fileSourceFileStore: '@app.services.file_store_manager.file_source'
             $gitRepositoryFileStore: '@app.services.file_store_manager.git_repository'
             $runSourceFileStore: '@app.services.file_store_manager.run_source'
+            $gitRepositoryPathFactory: '@app.services.path_factory.git_repository'
 
     # makes classes in src/ available to be used as services
     # this creates a service per class whose id is the fully-qualified class name
@@ -104,7 +105,3 @@ services:
         class: App\Services\PathFactory
         arguments:
             $basePath: '%git_repository_store_directory%'
-
-    App\Services\UserGitRepositoryPreparer:
-        arguments:
-            $pathFactory: '@app.services.path_factory.git_repository'

@@ -10,26 +10,26 @@ use App\Entity\RunSource;
 use App\Exception\File\ReadException;
 use App\Exception\File\RemoveException;
 use App\Exception\File\WriteException;
+use App\Exception\GitRepositoryException;
 use App\Exception\SourceRead\SourceReadExceptionInterface;
-use App\Exception\UserGitRepositoryException;
 
 class RunSourceSerializer
 {
     public const SERIALIZED_FILENAME = 'source.yaml';
 
     public function __construct(
-        private UserGitRepositoryPreparer $gitRepositoryPreparer,
         private SourceSerializer $sourceSerializer,
         private FileStoreInterface $fileSourceFileStore,
         private FileStoreInterface $gitRepositoryFileStore,
         private FileStoreInterface $runSourceFileStore,
+        private GitRepositoryStore $gitRepositoryStore,
     ) {
     }
 
     /**
      * @throws WriteException
      * @throws SourceReadExceptionInterface
-     * @throws UserGitRepositoryException
+     * @throws GitRepositoryException
      */
     public function write(RunSource $target): void
     {
@@ -42,7 +42,7 @@ class RunSourceSerializer
         }
 
         if ($source instanceof GitSource) {
-            $gitRepository = $this->gitRepositoryPreparer->prepare($source, $target->getParameters()['ref'] ?? null);
+            $gitRepository = $this->gitRepositoryStore->initialize($source, $target->getParameters()['ref'] ?? null);
             $content = $this->sourceSerializer->serialize(
                 $this->gitRepositoryFileStore,
                 (string) $gitRepository,

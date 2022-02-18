@@ -5,6 +5,9 @@ services:
     _defaults:
         autowire: true
         autoconfigure: true
+        bind:
+            $gitRepositoryFileStore: '@app.services.file_store_manager.git_repository'
+            $gitRepositoryPathFactory: '@app.services.path_factory.git_repository'
 
     webignition\HttpHistoryContainer\Container:
         public: true
@@ -51,8 +54,5 @@ services:
         arguments:
             $filesystem: '@test_fixtures.storage'
 
-    app.services.path_factory.git_repository:
+    App\Services\GitRepositoryStore:
         public: true
-        class: App\Services\PathFactory
-        arguments:
-            $basePath: '%git_repository_store_directory%'
