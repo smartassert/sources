@@ -22,7 +22,6 @@ use App\Services\UserGitRepositoryFactory;
 use App\Tests\Model\UserId;
 use App\Tests\Services\EntityRemover;
 use App\Tests\Services\FileStoreFixtureCreator;
-use League\Flysystem\FilesystemException;
 use League\Flysystem\FilesystemOperator;
 use League\Flysystem\UnableToDeleteDirectory;
 use PHPUnit\Framework\TestCase;
@@ -98,7 +97,8 @@ class GitRepositoryStoreTest extends WebTestCase
         $gitRepositoryFileStore
             ->shouldReceive('remove')
             ->with((string) $this->gitRepository)
-            ->andThrow($removeException);
+            ->andThrow($removeException)
+        ;
 
         ObjectReflector::setProperty(
             $this->gitRepositoryStore,
@@ -349,7 +349,8 @@ class GitRepositoryStoreTest extends WebTestCase
         $factory
             ->shouldReceive('create')
             ->with($this->source)
-            ->andReturn($this->gitRepository);
+            ->andReturn($this->gitRepository)
+        ;
 
         ObjectReflector::setProperty(
             $this->gitRepositoryStore,

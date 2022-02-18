@@ -129,7 +129,8 @@ class RunSourceSerializerTest extends WebTestCase
         $gitSourceEntireGitRepositoryStore
             ->shouldReceive('initialize')
             ->with($gitSourceEntire, $gitRef)
-            ->andReturn($gitSourceEntireRepository);
+            ->andReturn($gitSourceEntireRepository)
+        ;
 
         $gitSourcePartial = new GitSource(UserId::create(), 'http://example.com/repository.git', '/directory');
         $gitSourcePartialRepository = new UserGitRepository($gitSourcePartial);
