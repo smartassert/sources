@@ -7,11 +7,11 @@ namespace App\Services;
 use App\Entity\FileSource;
 use App\Entity\GitSource;
 use App\Entity\RunSource;
-use App\Exception\File\ReadException;
-use App\Exception\File\RemoveException;
-use App\Exception\File\WriteException;
 use App\Exception\GitRepositoryException;
 use App\Exception\SourceRead\SourceReadExceptionInterface;
+use App\Exception\Storage\ReadException;
+use App\Exception\Storage\RemoveException;
+use App\Exception\Storage\WriteException;
 
 class RunSourceSerializer
 {

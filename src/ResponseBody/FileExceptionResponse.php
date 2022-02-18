@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace App\ResponseBody;
 
-use App\Exception\File\FileExceptionInterface;
+use App\Exception\Storage\StorageExceptionInterface;
 
 class FileExceptionResponse implements ErrorInterface
 {
     public function __construct(
-        private FileExceptionInterface $exception
+        private StorageExceptionInterface $exception
     ) {
     }
 

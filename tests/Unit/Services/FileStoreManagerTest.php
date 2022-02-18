@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\Services;
 
-use App\Exception\File\ReadException;
-use App\Exception\File\RemoveException;
-use App\Exception\File\WriteException;
+use App\Exception\Storage\ReadException;
+use App\Exception\Storage\RemoveException;
+use App\Exception\Storage\WriteException;
 use App\Services\FileStoreInterface;
 use App\Services\FileStoreManager;
 use League\Flysystem\Filesystem;
