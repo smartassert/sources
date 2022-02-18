@@ -5,6 +5,9 @@ services:
     _defaults:
         autowire: true
         autoconfigure: true
+        bind:
+            $gitRepositoryFileStore: '@app.services.file_store_manager.git_repository'
+            $gitRepositoryPathFactory: '@app.services.path_factory.git_repository'
 
     webignition\HttpHistoryContainer\Container:
         public: true

@@ -11,10 +11,10 @@ class UserGitRepository implements UserFileLocatorInterface
     use UserSourceFileLocatorTrait;
 
     private string $id;
+    private ?string $absolutePath = null;
 
-    public function __construct(
-        private GitSource $source
-    ) {
+    public function __construct(private GitSource $source)
+    {
         $this->id = EntityId::create();
     }
 
@@ -31,5 +31,18 @@ class UserGitRepository implements UserFileLocatorInterface
     public function getSource(): GitSource
     {
         return $this->source;
+    }
+
+    public function getAbsolutePath(): ?string
+    {
+        return $this->absolutePath;
+    }
+
+    public function withAbsolutePath(string $absolutePath): self
+    {
+        $new = clone $this;
+        $new->absolutePath = $absolutePath;
+
+        return $new;
     }
 }

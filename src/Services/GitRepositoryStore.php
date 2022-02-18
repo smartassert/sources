@@ -14,9 +14,22 @@ use Symfony\Component\String\UnicodeString;
 class GitRepositoryStore
 {
     public function __construct(
+        private FileStoreInterface $gitRepositoryFileStore,
+        private PathFactory $gitRepositoryPathFactory,
         private GitRepositoryCloner $cloner,
         private GitRepositoryCheckoutHandler $checkoutHandler,
     ) {
+    }
+
+    public function initialize(GitSource $source): UserGitRepository
+    {
+        $gitRepository = new UserGitRepository($source);
+        $relativePath = (string) $gitRepository;
+        $this->gitRepositoryFileStore->remove($relativePath);
+
+        return $gitRepository->withAbsolutePath(
+            $this->gitRepositoryPathFactory->createAbsolutePath($relativePath)
+        );
     }
 
     /**
