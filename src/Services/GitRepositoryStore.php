@@ -14,10 +14,10 @@ class GitRepositoryStore
 {
     public function __construct(
         private FileStoreInterface $gitRepositoryFileStore,
-        private PathFactory $gitRepositoryPathFactory,
         private GitRepositoryCloner $cloner,
         private GitRepositoryCheckoutHandler $checkoutHandler,
         private UserGitRepositoryFactory $gitRepositoryFactory,
+        private string $gitRepositoryBasePath,
     ) {
     }
 
@@ -28,8 +28,8 @@ class GitRepositoryStore
     {
         $gitRepository = $this->gitRepositoryFactory->create($source);
         $relativePath = (string) $gitRepository;
+        $absolutePath = $this->gitRepositoryBasePath . '/' . $relativePath;
 
-        $absolutePath = $this->gitRepositoryPathFactory->createAbsolutePath($relativePath);
         $gitRepositoryUrl = $this->createRepositoryUrl($gitRepository->getSource());
 
         try {
