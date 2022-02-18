@@ -9,8 +9,8 @@ use App\Entity\GitSource;
 use App\Entity\RunSource;
 use App\Model\UserGitRepository;
 use App\Services\FileStoreInterface;
+use App\Services\GitRepositoryStore;
 use App\Services\RunSourceSerializer;
-use App\Services\UserGitRepositoryPreparer;
 use App\Tests\Model\UserId;
 use App\Tests\Services\FileStoreFixtureCreator;
 use League\Flysystem\FilesystemOperator;
@@ -84,14 +84,14 @@ class RunSourceSerializerTest extends WebTestCase
         RunSource $runSource,
         UserGitRepository $userGitRepository,
         string $fixtureSetIdentifier,
-        UserGitRepositoryPreparer $gitRepositoryPreparer,
+        GitRepositoryStore $gitRepositoryStore,
         string $expectedSerializedFixturePath,
     ): void {
         ObjectReflector::setProperty(
             $this->runSourceSerializer,
             $this->runSourceSerializer::class,
-            'gitRepositoryPreparer',
-            $gitRepositoryPreparer
+            'gitRepositoryStore',
+            $gitRepositoryStore
         );
 
         $userGitRepositoryPath = (string) $userGitRepository;
@@ -125,19 +125,18 @@ class RunSourceSerializerTest extends WebTestCase
         $gitSourceEntire = new GitSource(UserId::create(), 'http://example.com/repository.git');
         $gitSourceEntireRepository = new UserGitRepository($gitSourceEntire);
 
-        $gitSourceEntireRepositoryPreparer = \Mockery::mock(UserGitRepositoryPreparer::class);
-        $gitSourceEntireRepositoryPreparer
-            ->shouldReceive('prepare')
+        $gitSourceEntireGitRepositoryStore = \Mockery::mock(GitRepositoryStore::class);
+        $gitSourceEntireGitRepositoryStore
+            ->shouldReceive('initialize')
             ->with($gitSourceEntire, $gitRef)
-            ->andReturn($gitSourceEntireRepository)
-        ;
+            ->andReturn($gitSourceEntireRepository);
 
         $gitSourcePartial = new GitSource(UserId::create(), 'http://example.com/repository.git', '/directory');
         $gitSourcePartialRepository = new UserGitRepository($gitSourcePartial);
 
-        $gitSourcePartialRepositoryPreparer = \Mockery::mock(UserGitRepositoryPreparer::class);
-        $gitSourcePartialRepositoryPreparer
-            ->shouldReceive('prepare')
+        $gitSourcePartialGitRepositoryStore = \Mockery::mock(GitRepositoryStore::class);
+        $gitSourcePartialGitRepositoryStore
+            ->shouldReceive('initialize')
             ->with($gitSourcePartial, $gitRef)
             ->andReturn($gitSourcePartialRepository)
         ;
@@ -147,14 +146,14 @@ class RunSourceSerializerTest extends WebTestCase
                 'runSource' => new RunSource($gitSourceEntire, ['ref' => $gitRef]),
                 'userGitRepository' => $gitSourceEntireRepository,
                 'fixtureSetIdentifier' => 'yml_yaml_valid',
-                'gitRepositoryPreparer' => $gitSourceEntireRepositoryPreparer,
+                'gitRepositoryPreparer' => $gitSourceEntireGitRepositoryStore,
                 'expectedSerializedFixturePath' => '/RunSource/source_yml_yaml_entire.yaml',
             ],
             'git source, partial' => [
                 'runSource' => new RunSource($gitSourcePartial, ['ref' => $gitRef]),
                 'userGitRepository' => $gitSourcePartialRepository,
                 'fixtureSetIdentifier' => 'yml_yaml_valid',
-                'gitRepositoryPreparer' => $gitSourcePartialRepositoryPreparer,
+                'gitRepositoryPreparer' => $gitSourcePartialGitRepositoryStore,
                 'expectedSerializedFixturePath' => '/RunSource/source_yml_yaml_partial.yaml',
             ],
         ];
