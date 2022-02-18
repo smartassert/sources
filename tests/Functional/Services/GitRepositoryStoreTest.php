@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace App\Tests\Functional\Services;
 
 use App\Entity\GitSource;
-use App\Exception\File\RemoveException;
 use App\Exception\GitActionException;
 use App\Exception\GitRepositoryException;
 use App\Exception\GitRepositoryException as RepositoryException;
 use App\Exception\ProcessExecutorException;
+use App\Exception\Storage\RemoveException;
 use App\Model\ProcessOutput;
 use App\Model\UserGitRepository;
 use App\Services\FileStoreInterface;

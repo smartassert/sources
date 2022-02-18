@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace App\Exception\File;
+namespace App\Exception\Storage;
 
 use League\Flysystem\FilesystemException;
 
-interface FileExceptionInterface extends \Throwable
+interface StorageExceptionInterface extends \Throwable
 {
     public function getPath(): string;
 

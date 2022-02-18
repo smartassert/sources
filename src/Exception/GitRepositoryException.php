@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Exception;
 
-use App\Exception\File\RemoveException;
+use App\Exception\Storage\RemoveException;
 
 class GitRepositoryException extends \Exception
 {

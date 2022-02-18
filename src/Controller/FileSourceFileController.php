@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use App\Entity\FileSource;
-use App\Exception\File\FileExceptionInterface;
 use App\Exception\InvalidRequestException;
+use App\Exception\Storage\StorageExceptionInterface;
 use App\Request\AddYamlFileRequest;
 use App\Request\RemoveYamlFileRequest;
 use App\Security\UserSourceAccessChecker;
@@ -31,7 +31,7 @@ class FileSourceFileController
     /**
      * @throws AccessDeniedException
      * @throws InvalidRequestException
-     * @throws FileExceptionInterface
+     * @throws StorageExceptionInterface
      */
     #[Route(self::ROUTE_SOURCE_FILE, name: 'file_source_file_add', methods: ['POST'])]
     public function add(FileSource $source, AddYamlFileRequest $request): Response
@@ -49,7 +49,7 @@ class FileSourceFileController
     /**
      * @throws AccessDeniedException
      * @throws InvalidRequestException
-     * @throws FileExceptionInterface
+     * @throws StorageExceptionInterface
      */
     #[Route(self::ROUTE_SOURCE_FILE, name: 'file_source_file_remove', methods: ['DELETE'])]
     public function remove(FileSource $source, RemoveYamlFileRequest $request): Response

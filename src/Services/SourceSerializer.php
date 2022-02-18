@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use App\Exception\File\ReadException;
 use App\Exception\SourceRead\InvalidYamlException;
 use App\Exception\SourceRead\ReadFileException;
 use App\Exception\SourceRead\SourceReadExceptionInterface;
+use App\Exception\Storage\ReadException;
 use App\Model\FilePathIdentifier;
 use League\Flysystem\FilesystemException;
 use League\Flysystem\PathNormalizer;

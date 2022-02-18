@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace App\Exception\File;
+namespace App\Exception\Storage;
 
 use League\Flysystem\FilesystemException;
 
-abstract class AbstractFileException extends \Exception implements FileExceptionInterface
+abstract class AbstractStorageException extends \Exception implements StorageExceptionInterface
 {
     public function __construct(
         private string $action,

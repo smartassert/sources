@@ -6,10 +6,10 @@ namespace App\MessageHandler;
 
 use App\Entity\RunSource;
 use App\Enum\RunSource\State;
-use App\Exception\File\WriteException;
 use App\Exception\GitRepositoryException;
 use App\Exception\MessageHandler\PrepareException;
 use App\Exception\SourceRead\SourceReadExceptionInterface;
+use App\Exception\Storage\WriteException;
 use App\Message\Prepare;
 use App\Repository\SourceRepository;
 use App\Services\RunSourceSerializer;

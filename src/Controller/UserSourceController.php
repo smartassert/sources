@@ -8,8 +8,8 @@ use App\Entity\FileSource;
 use App\Entity\OriginSourceInterface as OriginSource;
 use App\Entity\RunSource;
 use App\Entity\SourceInterface;
-use App\Exception\File\FileExceptionInterface;
 use App\Exception\InvalidRequestException;
+use App\Exception\Storage\StorageExceptionInterface;
 use App\Message\Prepare;
 use App\Request\SourceRequestInterface;
 use App\Security\UserSourceAccessChecker;
@@ -63,7 +63,7 @@ class UserSourceController
 
     /**
      * @throws AccessDeniedException
-     * @throws FileExceptionInterface
+     * @throws StorageExceptionInterface
      */
     #[Route(SourceRoutes::ROUTE_SOURCE, name: 'user_source_delete', methods: ['DELETE'])]
     public function delete(
@@ -107,7 +107,7 @@ class UserSourceController
 
     /**
      * @throws AccessDeniedException
-     * @throws FileExceptionInterface
+     * @throws StorageExceptionInterface
      */
     #[Route(SourceRoutes::ROUTE_SOURCE . '/read', name: 'user_source_read', methods: ['GET'])]
     public function read(RunSource $source, RunSourceSerializer $runSourceSerializer): Response
