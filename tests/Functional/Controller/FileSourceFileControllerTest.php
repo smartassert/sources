@@ -79,23 +79,34 @@ class FileSourceFileControllerTest extends AbstractSourceControllerTest
      */
     public function addFileInvalidRequestDataProvider(): array
     {
-        $expectedInvalidFilenameResponseData = $this->createExpectedInvalidFilenameResponseData();
-
         return [
             'name empty with .yaml extension, content non-empty' => [
                 'filename' => '.yaml',
                 'content' => 'non-empty value',
-                'expectedResponseData' => $expectedInvalidFilenameResponseData,
+                'expectedResponseData' => $this->createExpectedInvalidFilenameResponseData(
+                    YamlFilenameConstraint::MESSAGE_NAME_EMPTY
+                ),
             ],
             'name contains backslash characters, content non-empty' => [
-                'filename' => 'one two \\ three.yaml',
+                'filename' => 'one-two-\\-three.yaml',
                 'content' => 'non-empty value',
-                'expectedResponseData' => $expectedInvalidFilenameResponseData,
+                'expectedResponseData' => $this->createExpectedInvalidFilenameResponseData(
+                    YamlFilenameConstraint::MESSAGE_FILENAME_INVALID
+                ),
             ],
             'name contains null byte characters, content non-empty' => [
-                'filename' => 'one ' . chr(0) . ' two three' . chr(0) . '.yaml',
+                'filename' => 'one-' . chr(0) . '-two-three' . chr(0) . '.yaml',
                 'content' => 'non-empty value',
-                'expectedResponseData' => $expectedInvalidFilenameResponseData,
+                'expectedResponseData' => $this->createExpectedInvalidFilenameResponseData(
+                    YamlFilenameConstraint::MESSAGE_FILENAME_INVALID
+                ),
+            ],
+            'name contains space characters, content non-empty' => [
+                'filename' => 'one two three.yaml',
+                'content' => 'non-empty value',
+                'expectedResponseData' => $this->createExpectedInvalidFilenameResponseData(
+                    YamlFilenameConstraint::MESSAGE_FILENAME_INVALID
+                ),
             ],
             'name valid, content empty' => [
                 'filename' => 'filename.yaml',
@@ -218,20 +229,30 @@ class FileSourceFileControllerTest extends AbstractSourceControllerTest
      */
     public function removeFileInvalidRequestDataProvider(): array
     {
-        $expectedInvalidFilenameResponseData = $this->createExpectedInvalidFilenameResponseData();
-
         return [
             'name empty with .yaml extension' => [
                 'filename' => '.yaml',
-                'expectedResponseData' => $expectedInvalidFilenameResponseData,
+                'expectedResponseData' => $this->createExpectedInvalidFilenameResponseData(
+                    YamlFilenameConstraint::MESSAGE_NAME_EMPTY
+                ),
             ],
             'name contains backslash characters' => [
-                'filename' => 'one two \\ three.yaml',
-                'expectedResponseData' => $expectedInvalidFilenameResponseData,
+                'filename' => 'one-two-\\-three.yaml',
+                'expectedResponseData' => $this->createExpectedInvalidFilenameResponseData(
+                    YamlFilenameConstraint::MESSAGE_FILENAME_INVALID
+                ),
             ],
             'name contains null byte characters' => [
-                'filename' => 'one ' . chr(0) . ' two three' . chr(0) . '.yaml',
-                'expectedResponseData' => $expectedInvalidFilenameResponseData,
+                'filename' => 'one-' . chr(0) . '-two-three' . chr(0) . '.yaml',
+                'expectedResponseData' => $this->createExpectedInvalidFilenameResponseData(
+                    YamlFilenameConstraint::MESSAGE_FILENAME_INVALID
+                ),
+            ],
+            'name contains space characters' => [
+                'filename' => 'one two three.yaml',
+                'expectedResponseData' => $this->createExpectedInvalidFilenameResponseData(
+                    YamlFilenameConstraint::MESSAGE_FILENAME_INVALID
+                ),
             ],
         ];
     }
@@ -261,7 +282,7 @@ class FileSourceFileControllerTest extends AbstractSourceControllerTest
     /**
      * @return array<mixed>
      */
-    private function createExpectedInvalidFilenameResponseData(): array
+    private function createExpectedInvalidFilenameResponseData(string $message): array
     {
         return [
             'error' => [
@@ -269,7 +290,7 @@ class FileSourceFileControllerTest extends AbstractSourceControllerTest
                 'payload' => [
                     'name' => [
                         'value' => '',
-                        'message' => YamlFilenameConstraint::MESSAGE_NAME_INVALID,
+                        'message' => $message,
                     ],
                 ],
             ],
