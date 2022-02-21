@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "8d0c3cf20eb0e1ba40912219a51eb56e",
+    "content-hash": "6c259c5007a433bd7038388fc268b175",
     "packages": [
         {
             "name": "async-aws/core",
@@ -1643,20 +1643,19 @@
         },
         {
             "name": "league/flysystem",
-            "version": "3.0.3",
+            "version": "3.0.8",
             "source": {
                 "type": "git",
                 "url": "https://github.com/thephpleague/flysystem.git",
-                "reference": "9f8b4260031bfef5497477da53dd57b2aaff0e06"
+                "reference": "30f2c7069b2625da5b126ac66cbea7618a3db8b6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/thephpleague/flysystem/zipball/9f8b4260031bfef5497477da53dd57b2aaff0e06",
-                "reference": "9f8b4260031bfef5497477da53dd57b2aaff0e06",
+                "url": "https://api.github.com/repos/thephpleague/flysystem/zipball/30f2c7069b2625da5b126ac66cbea7618a3db8b6",
+                "reference": "30f2c7069b2625da5b126ac66cbea7618a3db8b6",
                 "shasum": ""
             },
             "require": {
-                "ext-json": "*",
                 "league/mime-type-detection": "^1.0.0",
                 "php": "^8.0.2"
             },
@@ -1675,10 +1674,11 @@
                 "ext-zip": "*",
                 "friendsofphp/php-cs-fixer": "^3.5",
                 "google/cloud-storage": "^1.23",
+                "microsoft/azure-storage-blob": "^1.1",
                 "phpseclib/phpseclib": "^2.0",
                 "phpstan/phpstan": "^0.12.26",
                 "phpunit/phpunit": "^9.5.11",
-                "sabre/dav": "^4.1"
+                "sabre/dav": "^4.3.1"
             },
             "type": "library",
             "autoload": {
@@ -1712,7 +1712,7 @@
             ],
             "support": {
                 "issues": "https://github.com/thephpleague/flysystem/issues",
-                "source": "https://github.com/thephpleague/flysystem/tree/3.0.3"
+                "source": "https://github.com/thephpleague/flysystem/tree/3.0.8"
             },
             "funding": [
                 {
@@ -1728,7 +1728,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2022-01-31T19:41:04+00:00"
+            "time": "2022-02-16T18:51:54+00:00"
         },
         {
             "name": "league/flysystem-async-aws-s3",
