@@ -17,18 +17,6 @@ class FileStoreManager implements FileStoreInterface
     }
 
     /**
-     * @throws RemoveException
-     */
-    public function remove(string $relativePath): void
-    {
-        try {
-            $this->filesystem->deleteDirectory($relativePath);
-        } catch (FilesystemException $filesystemException) {
-            throw new RemoveException($relativePath, $filesystemException);
-        }
-    }
-
-    /**
      * @throws WriteException
      */
     public function write(string $fileRelativePath, string $content): void

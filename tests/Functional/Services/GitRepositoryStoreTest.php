@@ -9,11 +9,9 @@ use App\Exception\GitActionException;
 use App\Exception\GitRepositoryException;
 use App\Exception\GitRepositoryException as RepositoryException;
 use App\Exception\ProcessExecutorException;
-use App\Exception\Storage\RemoveException;
 use App\Model\ProcessOutput;
 use App\Model\UserGitRepository;
 use App\Services\FileLister;
-use App\Services\FileStoreInterface;
 use App\Services\GitRepositoryCheckoutHandler;
 use App\Services\GitRepositoryCloner;
 use App\Services\GitRepositoryStore;
@@ -22,6 +20,7 @@ use App\Tests\Model\UserId;
 use App\Tests\Services\EntityRemover;
 use App\Tests\Services\FileStoreFixtureCreator;
 use League\Flysystem\FilesystemOperator;
+use League\Flysystem\FilesystemWriter;
 use League\Flysystem\UnableToDeleteDirectory;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -87,26 +86,21 @@ class GitRepositoryStoreTest extends WebTestCase
     {
         $unableToDeleteDirectoryException = UnableToDeleteDirectory::atLocation((string) $this->gitRepository);
 
-        $removeException = new RemoveException(
-            (string) $this->gitRepository,
-            $unableToDeleteDirectoryException
-        );
-
-        $gitRepositoryFileStore = \Mockery::mock(FileStoreInterface::class);
-        $gitRepositoryFileStore
-            ->shouldReceive('remove')
+        $gitRepositoryStorage = \Mockery::mock(FilesystemWriter::class);
+        $gitRepositoryStorage
+            ->shouldReceive('deleteDirectory')
             ->with((string) $this->gitRepository)
-            ->andThrow($removeException)
+            ->andThrow($unableToDeleteDirectoryException)
         ;
 
         ObjectReflector::setProperty(
             $this->gitRepositoryStore,
             GitRepositoryStore::class,
-            'gitRepositoryFileStore',
-            $gitRepositoryFileStore
+            'gitRepositoryStorage',
+            $gitRepositoryStorage
         );
 
-        $this->expectExceptionObject(new GitRepositoryException($removeException));
+        $this->expectExceptionObject(new GitRepositoryException($unableToDeleteDirectoryException));
 
         $this->gitRepositoryStore->initialize($this->source, 'ref value goes right here');
     }
