@@ -23,6 +23,7 @@ class RunSourceSerializer
         private FileStoreInterface $gitRepositoryFileStore,
         private FileStoreInterface $runSourceFileStore,
         private GitRepositoryStore $gitRepositoryStore,
+        private SerializableSourceLister $sourceLister,
     ) {
     }
 
@@ -36,24 +37,32 @@ class RunSourceSerializer
         $source = $target->getParent();
         $serializedSourcePath = $target . '/' . self::SERIALIZED_FILENAME;
 
+        $content = null;
+
         if ($source instanceof FileSource) {
-            $content = $this->sourceSerializer->serialize($this->fileSourceFileStore, (string) $source);
-            $this->runSourceFileStore->write($serializedSourcePath, $content);
+            $files = $this->sourceLister->list($this->fileSourceFileStore, (string) $source);
+            $content = $this->sourceSerializer->serialize($files);
         }
 
         if ($source instanceof GitSource) {
             $gitRepository = $this->gitRepositoryStore->initialize($source, $target->getParameters()['ref'] ?? null);
-            $content = $this->sourceSerializer->serialize(
-                $this->gitRepositoryFileStore,
-                (string) $gitRepository,
-                $source->getPath()
+
+            $sourcePath = rtrim(
+                sprintf('%s/%s', $gitRepository, ltrim($source->getPath(), '/')),
+                '/'
             );
-            $this->runSourceFileStore->write($serializedSourcePath, $content);
+
+            $files = $this->sourceLister->list($this->gitRepositoryFileStore, $sourcePath);
+            $content = $this->sourceSerializer->serialize($files);
 
             try {
                 $this->gitRepositoryFileStore->remove((string) $gitRepository);
             } catch (RemoveException) {
             }
+        }
+
+        if (is_string($content)) {
+            $this->runSourceFileStore->write($serializedSourcePath, $content);
         }
     }
 
