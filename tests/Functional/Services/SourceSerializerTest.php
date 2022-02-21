@@ -18,7 +18,6 @@ class SourceSerializerTest extends WebTestCase
     private SourceSerializer $sourceSerializer;
     private FileStoreFixtureCreator $fixtureCreator;
     private FilesystemOperator $fileSourceStorage;
-    private FileStoreInterface $fileSourceFileStore;
     private FileStoreInterface $fixtureFileStore;
     private SerializableSourceLister $sourceLister;
 
@@ -37,10 +36,6 @@ class SourceSerializerTest extends WebTestCase
         $fileSourceStorage = self::getContainer()->get('file_source.storage');
         \assert($fileSourceStorage instanceof FilesystemOperator);
         $this->fileSourceStorage = $fileSourceStorage;
-
-        $fileSourceFileStore = self::getContainer()->get('app.services.file_store_manager.file_source');
-        \assert($fileSourceFileStore instanceof FileStoreInterface);
-        $this->fileSourceFileStore = $fileSourceFileStore;
 
         $fixtureFileStore = self::getContainer()->get('app.tests.services.file_store_manager.fixtures');
         \assert($fixtureFileStore instanceof FileStoreInterface);
@@ -69,7 +64,7 @@ class SourceSerializerTest extends WebTestCase
 
         $sourceFiles = $this->sourceLister->list($this->fileSourceStorage, $source . '/' . $path);
 
-        $content = $this->sourceSerializer->serialize($this->fileSourceFileStore, $sourceFiles);
+        $content = $this->sourceSerializer->serialize($this->fileSourceStorage, $sourceFiles);
         $expected = trim($this->fixtureFileStore->read($expectedContentFixture));
 
         self::assertSame($expected, $content);

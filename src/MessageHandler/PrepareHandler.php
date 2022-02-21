@@ -6,10 +6,7 @@ namespace App\MessageHandler;
 
 use App\Entity\RunSource;
 use App\Enum\RunSource\State;
-use App\Exception\GitRepositoryException;
 use App\Exception\MessageHandler\PrepareException;
-use App\Exception\SourceRead\SourceReadExceptionInterface;
-use App\Exception\Storage\WriteException;
 use App\Message\Prepare;
 use App\Repository\SourceRepository;
 use App\Services\RunSourceSerializer;
@@ -45,7 +42,7 @@ class PrepareHandler
 
         try {
             $this->runSourceSerializer->write($runSource);
-        } catch (WriteException | SourceReadExceptionInterface | GitRepositoryException $e) {
+        } catch (\Throwable $e) {
             $runSource->setState(State::PREPARING_HALTED);
             $this->sourceStore->add($runSource);
 
