@@ -8,7 +8,6 @@ use App\Entity\FileSource;
 use App\Entity\GitSource;
 use App\Entity\RunSource;
 use App\Exception\GitRepositoryException;
-use App\Exception\Storage\WriteException;
 use League\Flysystem\FilesystemException;
 use League\Flysystem\FilesystemOperator;
 use League\Flysystem\FilesystemReader;
@@ -20,7 +19,6 @@ class RunSourceSerializer
 
     public function __construct(
         private SourceSerializer $sourceSerializer,
-        private FileStoreInterface $runSourceFileStore,
         private GitRepositoryStore $gitRepositoryStore,
         private SerializableSourceLister $sourceLister,
         private FilesystemReader $fileSourceStorage,
@@ -30,7 +28,6 @@ class RunSourceSerializer
     }
 
     /**
-     * @throws WriteException
      * @throws ParseException
      * @throws FilesystemException
      * @throws GitRepositoryException
@@ -65,7 +62,7 @@ class RunSourceSerializer
         }
 
         if (is_string($content)) {
-            $this->runSourceFileStore->write($serializedSourcePath, $content);
+            $this->runSourceStorage->write($serializedSourcePath, $content);
         }
     }
 
