@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Exception\Storage\RemoveException;
-use App\Exception\Storage\WriteException;
 use League\Flysystem\FilesystemException;
 use League\Flysystem\FilesystemOperator;
 
@@ -14,18 +13,6 @@ class FileStoreManager implements FileStoreInterface
     public function __construct(
         private FilesystemOperator $filesystem,
     ) {
-    }
-
-    /**
-     * @throws WriteException
-     */
-    public function write(string $fileRelativePath, string $content): void
-    {
-        try {
-            $this->filesystem->write($fileRelativePath, $content);
-        } catch (FilesystemException $e) {
-            throw new WriteException($fileRelativePath, $e);
-        }
     }
 
     /**
