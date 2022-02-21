@@ -254,7 +254,6 @@ class FileSourceFileControllerTest extends AbstractSourceControllerTest
                     YamlFilenameConstraint::MESSAGE_FILENAME_INVALID
                 ),
             ],
-
         ];
     }
 

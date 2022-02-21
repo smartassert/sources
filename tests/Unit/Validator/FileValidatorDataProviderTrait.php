@@ -4,12 +4,11 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\Validator;
 
-use App\Model\Filename;
-use App\Validator\FilenameValidator;
-use PHPUnit\Framework\TestCase;
-
 trait FileValidatorDataProviderTrait
 {
+    /**
+     * @return array<mixed>
+     */
     public function invalidSinglePartFilePath(): array
     {
         return [
@@ -32,6 +31,9 @@ trait FileValidatorDataProviderTrait
         ];
     }
 
+    /**
+     * @return array<mixed>
+     */
     public function validSinglePartFilePath(): array
     {
         return [
@@ -42,6 +44,9 @@ trait FileValidatorDataProviderTrait
         ];
     }
 
+    /**
+     * @return array<mixed>
+     */
     public function invalidMultiplePartFilePath(): array
     {
         return [
@@ -60,6 +65,9 @@ trait FileValidatorDataProviderTrait
         ];
     }
 
+    /**
+     * @return array<mixed>
+     */
     public function validMultiplePartFilePath(): array
     {
         return [
