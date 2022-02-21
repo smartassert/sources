@@ -50,3 +50,6 @@ services:
         public: true
         arguments:
             $filesystem: '@test_fixtures.storage'
+
+    App\Services\FileLister:
+        public: true
