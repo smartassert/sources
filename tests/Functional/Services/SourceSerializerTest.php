@@ -69,7 +69,7 @@ class SourceSerializerTest extends WebTestCase
 
         $sourceFiles = $this->sourceLister->list($this->fileSourceFileStore, $source . '/' . $path);
 
-        $content = $this->sourceSerializer->serialize($sourceFiles);
+        $content = $this->sourceSerializer->serialize($this->fileSourceFileStore, $sourceFiles);
         $expected = trim($this->fixtureFileStore->read($expectedContentFixture));
 
         self::assertSame($expected, $content);

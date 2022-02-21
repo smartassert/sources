@@ -7,24 +7,24 @@ namespace App\Model;
 use Traversable;
 
 /**
- * @implements \IteratorAggregate<int|string, SourceFile>
+ * @implements \IteratorAggregate<int|string, string>
  */
 class SourceFileCollection implements \IteratorAggregate
 {
     /**
-     * @param SourceFile[] $files
+     * @param string[] $paths
      */
     public function __construct(
-        private array $files,
+        private array $paths,
         public readonly string $pathPrefix,
     ) {
     }
 
     /**
-     * @return Traversable<int|string, SourceFile>
+     * @return Traversable<int|string, string>
      */
     public function getIterator(): Traversable
     {
-        return new \ArrayIterator($this->files);
+        return new \ArrayIterator($this->paths);
     }
 }

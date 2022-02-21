@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Tests\Functional\Services;
 
 use App\Entity\FileSource;
-use App\Model\SourceFile;
 use App\Model\SourceFileCollection;
 use App\Services\FileStoreInterface;
 use App\Services\SerializableSourceLister;
@@ -60,8 +59,7 @@ class SerializableSourceListerTest extends WebTestCase
         self::assertCount(count($expectedSourceFilePaths), $collection);
 
         foreach ($collection as $sourceFileIndex => $sourceFile) {
-            self::assertInstanceOf(SourceFile::class, $sourceFile);
-            self::assertSame($this->fileSourceStore, $sourceFile->fileStore);
+            self::assertIsString($sourceFile);
 
             $expectedSourceFilePath = str_replace(
                 '{{ fileSourcePath }}',
@@ -69,7 +67,7 @@ class SerializableSourceListerTest extends WebTestCase
                 $expectedSourceFilePaths[$sourceFileIndex]
             );
 
-            self::assertSame($expectedSourceFilePath, $sourceFile->path);
+            self::assertSame($expectedSourceFilePath, $sourceFile);
         }
     }
 
