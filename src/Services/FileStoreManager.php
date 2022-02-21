@@ -9,7 +9,6 @@ use App\Exception\Storage\RemoveException;
 use App\Exception\Storage\WriteException;
 use League\Flysystem\FilesystemException;
 use League\Flysystem\FilesystemOperator;
-use League\Flysystem\StorageAttributes;
 
 class FileStoreManager implements FileStoreInterface
 {
@@ -28,48 +27,6 @@ class FileStoreManager implements FileStoreInterface
         } catch (FilesystemException $filesystemException) {
             throw new RemoveException($relativePath, $filesystemException);
         }
-    }
-
-    /**
-     * @param string[] $extensions
-     *
-     * @throws FilesystemException
-     *
-     * @return string[]
-     */
-    public function list(string $relativePath, array $extensions = []): array
-    {
-        $directoryListing = $this->filesystem
-            ->listContents($relativePath, true)
-            ->filter(function (StorageAttributes $item) {
-                return !$item->isDir();
-            })
-            ->filter(function (StorageAttributes $item) use ($extensions) {
-                if (0 === count($extensions)) {
-                    return true;
-                }
-
-                $path = $item->path();
-                foreach ($extensions as $extension) {
-                    if (str_ends_with($path, '.' . $extension)) {
-                        return true;
-                    }
-                }
-
-                return false;
-            })
-            ->sortByPath()
-            ->map(function (StorageAttributes $item) use ($relativePath) {
-                $itemPath = $item->path();
-                if (str_starts_with($itemPath, $relativePath)) {
-                    $itemPath = substr($itemPath, strlen($relativePath) + 1);
-                }
-
-                return $itemPath;
-            })
-        ;
-
-        return $directoryListing->toArray();
     }
 
     /**
