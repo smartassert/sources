@@ -62,27 +62,6 @@ services:
     League\Flysystem\PathNormalizer:
         class: League\Flysystem\WhitespacePathNormalizer
 
-    App\Services\FileStoreManager:
-        autowire: false
-
-    app.services.file_store_manager.file_source:
-        class: App\Services\FileStoreManager
-        public: true
-        arguments:
-            $filesystem: '@file_source.storage'
-
-    app.services.file_store_manager.run_source:
-        class: App\Services\FileStoreManager
-        public: true
-        arguments:
-            $filesystem: '@run_source.storage'
-
-    app.services.file_store_manager.git_repository:
-        class: App\Services\FileStoreManager
-        public: true
-        arguments:
-            $filesystem: '@git_repository.storage'
-
     App\Services\GitRepositoryStore:
         arguments:
             $gitRepositoryBasePath: '%git_repository_store_directory%'
