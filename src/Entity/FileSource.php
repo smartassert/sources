@@ -5,12 +5,17 @@ declare(strict_types=1);
 namespace App\Entity;
 
 use App\Enum\Source\Type;
+use App\Model\SerializableSourceInterface;
 use App\Model\UserFileLocatorInterface;
 use App\Model\UserSourceFileLocatorTrait;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity]
-class FileSource extends AbstractSource implements OriginSourceInterface, UserFileLocatorInterface, \JsonSerializable
+class FileSource extends AbstractSource implements
+    OriginSourceInterface,
+    UserFileLocatorInterface,
+    SerializableSourceInterface,
+    \JsonSerializable
 {
     use UserSourceFileLocatorTrait;
 
