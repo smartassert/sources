@@ -12,6 +12,8 @@ use App\Request\RemoveYamlFileRequest;
 use App\Security\UserSourceAccessChecker;
 use App\Services\FileStoreInterface;
 use App\Services\RequestValidator;
+use League\Flysystem\FilesystemException;
+use League\Flysystem\FilesystemWriter;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
@@ -25,13 +27,14 @@ class FileSourceFileController
         private UserSourceAccessChecker $userSourceAccessChecker,
         private RequestValidator $requestValidator,
         private FileStoreInterface $fileSourceFileStore,
+        private FilesystemWriter $fileSourceStorage,
     ) {
     }
 
     /**
      * @throws AccessDeniedException
      * @throws InvalidRequestException
-     * @throws StorageExceptionInterface
+     * @throws FilesystemException
      */
     #[Route(self::ROUTE_SOURCE_FILE, name: 'file_source_file_add', methods: ['POST'])]
     public function add(FileSource $source, AddYamlFileRequest $request): Response
@@ -41,7 +44,7 @@ class FileSourceFileController
 
         $yamlFile = $request->getYamlFile();
 
-        $this->fileSourceFileStore->write($source . '/' . $yamlFile->name, $yamlFile->content);
+        $this->fileSourceStorage->write($source . '/' . $yamlFile->name, $yamlFile->content);
 
         return new Response();
     }
