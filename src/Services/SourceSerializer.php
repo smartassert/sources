@@ -4,12 +4,10 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use App\Exception\SourceRead\InvalidYamlException;
-use App\Exception\SourceRead\ReadFileException;
-use App\Exception\SourceRead\SourceReadExceptionInterface;
-use App\Exception\Storage\ReadException;
 use App\Model\FilePathIdentifier;
 use App\Model\SourceFileCollection;
+use League\Flysystem\FilesystemException;
+use League\Flysystem\FilesystemReader;
 use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Parser as YamlParser;
 
@@ -23,18 +21,19 @@ class SourceSerializer
     }
 
     /**
-     * @throws SourceReadExceptionInterface
+     * @throws ParseException
+     * @throws FilesystemException
      */
-    public function serialize(SourceFileCollection $files): string
+    public function serialize(FilesystemReader $reader, SourceFileCollection $files): string
     {
         $documents = [];
 
         foreach ($files as $file) {
-            $content = $this->readYamlFile($file->fileStore, $file->path);
+            $content = $this->readYamlFile($reader, $file);
 
             $documents[] = sprintf(
                 self::DOCUMENT_TEMPLATE,
-                new FilePathIdentifier($this->removePathPrefix($files->pathPrefix, $file->path), md5($content))
+                new FilePathIdentifier($this->removePathPrefix($files->pathPrefix, $file), md5($content))
             );
             $documents[] = sprintf(self::DOCUMENT_TEMPLATE, trim($content));
         }
@@ -43,21 +42,13 @@ class SourceSerializer
     }
 
     /**
-     * @throws SourceReadExceptionInterface
+     * @throws ParseException
+     * @throws FilesystemException
      */
-    private function readYamlFile(FileStoreInterface $sourceFileStore, string $path): string
+    private function readYamlFile(FilesystemReader $reader, string $path): string
     {
-        try {
-            $content = $sourceFileStore->read($path);
-        } catch (ReadException) {
-            throw new ReadFileException($path);
-        }
-
-        try {
-            $this->yamlParser->parse($content);
-        } catch (ParseException $parseException) {
-            throw new InvalidYamlException($path, $parseException);
-        }
+        $content = $reader->read($path);
+        $this->yamlParser->parse($content);
 
         return $content;
     }

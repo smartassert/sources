@@ -10,9 +10,6 @@ use App\Entity\RunSource;
 use App\Enum\RunSource\State;
 use App\Exception\GitRepositoryException;
 use App\Exception\MessageHandler\PrepareException;
-use App\Exception\SourceRead\InvalidYamlException;
-use App\Exception\SourceRead\ReadFileException;
-use App\Exception\Storage\WriteException;
 use App\Message\Prepare;
 use App\MessageHandler\PrepareHandler;
 use App\Model\EntityId;
@@ -22,8 +19,10 @@ use App\Services\Source\Store;
 use App\Tests\Model\UserId;
 use App\Tests\Services\EntityRemover;
 use Doctrine\ORM\EntityManagerInterface;
+use League\Flysystem\UnableToReadFile;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Symfony\Component\Yaml\Exception\ParseException;
 use webignition\ObjectReflector\ObjectReflector;
 
 class PrepareHandlerTest extends WebTestCase
@@ -260,14 +259,11 @@ class PrepareHandlerTest extends WebTestCase
     public function invokeRunSourceSerializerThrowsExceptionDataProvider(): array
     {
         return [
-            WriteException::class => [
-                'runSourceSerializerException' => \Mockery::mock(WriteException::class),
+            UnableToReadFile::class => [
+                'runSourceSerializerException' => UnableToReadFile::fromLocation('/path/to/file'),
             ],
-            ReadFileException::class => [
-                'runSourceSerializerException' => \Mockery::mock(ReadFileException::class),
-            ],
-            InvalidYamlException::class => [
-                'runSourceSerializerException' => \Mockery::mock(InvalidYamlException::class),
+            ParseException::class => [
+                'runSourceSerializerException' => new ParseException('invalid'),
             ],
             GitRepositoryException::class => [
                 'runSourceSerializerException' => \Mockery::mock(GitRepositoryException::class),

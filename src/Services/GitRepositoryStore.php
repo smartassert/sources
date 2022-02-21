@@ -8,12 +8,13 @@ use App\Entity\GitSource;
 use App\Exception\GitActionException;
 use App\Exception\GitRepositoryException;
 use App\Model\UserGitRepository;
+use League\Flysystem\FilesystemWriter;
 use Symfony\Component\String\UnicodeString;
 
 class GitRepositoryStore
 {
     public function __construct(
-        private FileStoreInterface $gitRepositoryFileStore,
+        private FilesystemWriter $gitRepositoryWriter,
         private GitRepositoryCloner $cloner,
         private GitRepositoryCheckoutHandler $checkoutHandler,
         private UserGitRepositoryFactory $gitRepositoryFactory,
@@ -33,7 +34,7 @@ class GitRepositoryStore
         $gitRepositoryUrl = $this->createRepositoryUrl($gitRepository->getSource());
 
         try {
-            $this->gitRepositoryFileStore->remove($relativePath);
+            $this->gitRepositoryWriter->deleteDirectory($relativePath);
 
             $cloneOutput = $this->cloner->clone($gitRepositoryUrl, $absolutePath);
             if (false === $cloneOutput->isSuccessful()) {

@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Tests\Functional\Services;
 
 use App\Entity\FileSource;
-use App\Services\FileStoreInterface;
 use App\Services\SerializableSourceLister;
 use App\Services\SourceSerializer;
 use App\Tests\Model\UserId;
@@ -18,9 +17,8 @@ class SourceSerializerTest extends WebTestCase
     private SourceSerializer $sourceSerializer;
     private FileStoreFixtureCreator $fixtureCreator;
     private FilesystemOperator $fileSourceStorage;
-    private FileStoreInterface $fileSourceFileStore;
-    private FileStoreInterface $fixtureFileStore;
     private SerializableSourceLister $sourceLister;
+    private FilesystemOperator $fixtureStorage;
 
     protected function setUp(): void
     {
@@ -38,17 +36,13 @@ class SourceSerializerTest extends WebTestCase
         \assert($fileSourceStorage instanceof FilesystemOperator);
         $this->fileSourceStorage = $fileSourceStorage;
 
-        $fileSourceFileStore = self::getContainer()->get('app.services.file_store_manager.file_source');
-        \assert($fileSourceFileStore instanceof FileStoreInterface);
-        $this->fileSourceFileStore = $fileSourceFileStore;
-
-        $fixtureFileStore = self::getContainer()->get('app.tests.services.file_store_manager.fixtures');
-        \assert($fixtureFileStore instanceof FileStoreInterface);
-        $this->fixtureFileStore = $fixtureFileStore;
-
         $sourceLister = self::getContainer()->get(SerializableSourceLister::class);
         \assert($sourceLister instanceof SerializableSourceLister);
         $this->sourceLister = $sourceLister;
+
+        $fixtureStorage = self::getContainer()->get('test_fixtures.storage');
+        \assert($fixtureStorage instanceof FilesystemOperator);
+        $this->fixtureStorage = $fixtureStorage;
     }
 
     /**
@@ -67,10 +61,10 @@ class SourceSerializerTest extends WebTestCase
             (string) $source
         );
 
-        $sourceFiles = $this->sourceLister->list($this->fileSourceFileStore, $source . '/' . $path);
+        $sourceFiles = $this->sourceLister->list($this->fileSourceStorage, $source . '/' . $path);
 
-        $content = $this->sourceSerializer->serialize($sourceFiles);
-        $expected = trim($this->fixtureFileStore->read($expectedContentFixture));
+        $content = $this->sourceSerializer->serialize($this->fileSourceStorage, $sourceFiles);
+        $expected = trim($this->fixtureStorage->read($expectedContentFixture));
 
         self::assertSame($expected, $content);
     }

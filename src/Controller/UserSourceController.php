@@ -9,16 +9,16 @@ use App\Entity\OriginSourceInterface as OriginSource;
 use App\Entity\RunSource;
 use App\Entity\SourceInterface;
 use App\Exception\InvalidRequestException;
-use App\Exception\Storage\StorageExceptionInterface;
 use App\Message\Prepare;
 use App\Request\SourceRequestInterface;
 use App\Security\UserSourceAccessChecker;
-use App\Services\FileStoreInterface;
 use App\Services\RequestValidator;
 use App\Services\RunSourceFactory;
 use App\Services\RunSourceSerializer;
 use App\Services\Source\Mutator;
 use App\Services\Source\Store;
+use League\Flysystem\FilesystemException;
+use League\Flysystem\FilesystemWriter;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -63,25 +63,25 @@ class UserSourceController
 
     /**
      * @throws AccessDeniedException
-     * @throws StorageExceptionInterface
+     * @throws FilesystemException
      */
     #[Route(SourceRoutes::ROUTE_SOURCE, name: 'user_source_delete', methods: ['DELETE'])]
     public function delete(
         SourceInterface $source,
         Store $store,
-        FileStoreInterface $fileSourceFileStore,
-        FileStoreInterface $runSourceFileStore,
+        FilesystemWriter $fileSourceWriter,
+        FilesystemWriter $runSourceWriter,
     ): Response {
         $this->userSourceAccessChecker->denyAccessUnlessGranted($source);
 
         $store->remove($source);
 
         if ($source instanceof FileSource) {
-            $fileSourceFileStore->remove((string) $source);
+            $fileSourceWriter->deleteDirectory((string) $source);
         }
 
         if ($source instanceof RunSource) {
-            $runSourceFileStore->remove((string) $source);
+            $runSourceWriter->deleteDirectory((string) $source);
         }
 
         return new JsonResponse();
@@ -107,7 +107,7 @@ class UserSourceController
 
     /**
      * @throws AccessDeniedException
-     * @throws StorageExceptionInterface
+     * @throws FilesystemException
      */
     #[Route(SourceRoutes::ROUTE_SOURCE . '/read', name: 'user_source_read', methods: ['GET'])]
     public function read(RunSource $source, RunSourceSerializer $runSourceSerializer): Response

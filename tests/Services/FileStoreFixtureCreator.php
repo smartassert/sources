@@ -4,13 +4,15 @@ declare(strict_types=1);
 
 namespace App\Tests\Services;
 
-use App\Services\FileStoreInterface;
+use App\Services\FileLister;
 use League\Flysystem\FilesystemOperator;
+use League\Flysystem\FilesystemReader;
 
 class FileStoreFixtureCreator
 {
     public function __construct(
-        private FileStoreInterface $fixtureFileStore,
+        private FileLister $fileLister,
+        private FilesystemReader $fixturesReader,
     ) {
     }
 
@@ -19,18 +21,19 @@ class FileStoreFixtureCreator
         FilesystemOperator $storage,
         string $targetRelativeDirectory
     ): void {
-        $originFiles = $this->fixtureFileStore->list($originRelativePath);
+        $originFiles = $this->fileLister->list($this->fixturesReader, $originRelativePath);
 
         foreach ($originFiles as $fileRelativePath) {
-            $originPath = $originRelativePath . '/' . $fileRelativePath;
-            $targetPath = $targetRelativeDirectory . '/' . $fileRelativePath;
-
-            $storage->write($targetPath, $this->fixtureFileStore->read($originPath));
+            $this->copyTo(
+                $originRelativePath . '/' . $fileRelativePath,
+                $storage,
+                $targetRelativeDirectory . '/' . $fileRelativePath
+            );
         }
     }
 
     public function copyTo(string $originRelativePath, FilesystemOperator $storage, string $targetRelativePath): void
     {
-        $storage->write($targetRelativePath, $this->fixtureFileStore->read($originRelativePath));
+        $storage->write($targetRelativePath, $this->fixturesReader->read($originRelativePath));
     }
 }

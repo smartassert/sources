@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Exception;
 
-use App\Exception\Storage\RemoveException;
+use League\Flysystem\UnableToDeleteDirectory;
 
 class GitRepositoryException extends \Exception
 {
@@ -19,7 +19,7 @@ class GitRepositoryException extends \Exception
         $message = 'Unknown';
         $code = self::CODE_UNKNOWN;
 
-        if ($previous instanceof RemoveException) {
+        if ($previous instanceof UnableToDeleteDirectory) {
             $message = $previous->getMessage();
             $code = self::CODE_DIRECTORY_REMOVAL_FAILED;
         }
