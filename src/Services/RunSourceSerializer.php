@@ -9,9 +9,10 @@ use App\Entity\GitSource;
 use App\Entity\RunSource;
 use App\Exception\GitRepositoryException;
 use App\Exception\SourceRead\SourceReadExceptionInterface;
-use App\Exception\Storage\ReadException;
 use App\Exception\Storage\RemoveException;
 use App\Exception\Storage\WriteException;
+use League\Flysystem\FilesystemException;
+use League\Flysystem\FilesystemOperator;
 use League\Flysystem\FilesystemReader;
 
 class RunSourceSerializer
@@ -27,6 +28,7 @@ class RunSourceSerializer
         private SerializableSourceLister $sourceLister,
         private FilesystemReader $fileSourceStorage,
         private FilesystemReader $gitRepositoryStorage,
+        private FilesystemOperator $runSourceStorage,
     ) {
     }
 
@@ -70,10 +72,10 @@ class RunSourceSerializer
     }
 
     /**
-     * @throws ReadException
+     * @throws FilesystemException
      */
     public function read(RunSource $runSource): string
     {
-        return trim($this->runSourceFileStore->read($runSource . '/' . self::SERIALIZED_FILENAME));
+        return trim($this->runSourceStorage->read($runSource . '/' . self::SERIALIZED_FILENAME));
     }
 }

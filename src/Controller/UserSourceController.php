@@ -19,6 +19,7 @@ use App\Services\RunSourceFactory;
 use App\Services\RunSourceSerializer;
 use App\Services\Source\Mutator;
 use App\Services\Source\Store;
+use League\Flysystem\FilesystemException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -107,7 +108,7 @@ class UserSourceController
 
     /**
      * @throws AccessDeniedException
-     * @throws StorageExceptionInterface
+     * @throws FilesystemException
      */
     #[Route(SourceRoutes::ROUTE_SOURCE . '/read', name: 'user_source_read', methods: ['GET'])]
     public function read(RunSource $source, RunSourceSerializer $runSourceSerializer): Response
