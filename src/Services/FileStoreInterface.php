@@ -7,7 +7,6 @@ namespace App\Services;
 use App\Exception\Storage\ReadException;
 use App\Exception\Storage\RemoveException;
 use App\Exception\Storage\WriteException;
-use League\Flysystem\FilesystemException;
 
 interface FileStoreInterface
 {
@@ -15,15 +14,6 @@ interface FileStoreInterface
      * @throws RemoveException
      */
     public function remove(string $relativePath): void;
-
-    /**
-     * @param string[] $extensions
-     *
-     * @throws FilesystemException
-     *
-     * @return string[]
-     */
-    public function list(string $relativePath, array $extensions = []): array;
 
     /**
      * @throws WriteException

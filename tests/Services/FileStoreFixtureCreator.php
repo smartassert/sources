@@ -4,12 +4,16 @@ declare(strict_types=1);
 
 namespace App\Tests\Services;
 
+use App\Services\FileLister;
 use App\Services\FileStoreInterface;
 use League\Flysystem\FilesystemOperator;
+use League\Flysystem\FilesystemReader;
 
 class FileStoreFixtureCreator
 {
     public function __construct(
+        private FileLister $fileLister,
+        private FilesystemReader $fixturesReader,
         private FileStoreInterface $fixtureFileStore,
     ) {
     }
@@ -19,7 +23,7 @@ class FileStoreFixtureCreator
         FilesystemOperator $storage,
         string $targetRelativeDirectory
     ): void {
-        $originFiles = $this->fixtureFileStore->list($originRelativePath);
+        $originFiles = $this->fileLister->list($this->fixturesReader, $originRelativePath);
 
         foreach ($originFiles as $fileRelativePath) {
             $originPath = $originRelativePath . '/' . $fileRelativePath;

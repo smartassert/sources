@@ -12,8 +12,8 @@ use App\Exception\ProcessExecutorException;
 use App\Exception\Storage\RemoveException;
 use App\Model\ProcessOutput;
 use App\Model\UserGitRepository;
+use App\Services\FileLister;
 use App\Services\FileStoreInterface;
-use App\Services\FileStoreManager;
 use App\Services\GitRepositoryCheckoutHandler;
 use App\Services\GitRepositoryCloner;
 use App\Services\GitRepositoryStore;
@@ -40,8 +40,8 @@ class GitRepositoryStoreTest extends WebTestCase
     private GitSource $source;
     private UserGitRepository $gitRepository;
     private FilesystemOperator $gitRepositoryStorage;
-    private FileStoreManager $gitRepositoryFileStore;
-    private FileStoreManager $fixturesFileStore;
+    private FilesystemOperator $fixturesStorage;
+    private FileLister $fileLister;
     private string $gitRepositoryAbsolutePath;
 
     protected function setUp(): void
@@ -60,13 +60,13 @@ class GitRepositoryStoreTest extends WebTestCase
         \assert($gitRepositoryStorage instanceof FilesystemOperator);
         $this->gitRepositoryStorage = $gitRepositoryStorage;
 
-        $gitRepositoryFileStoreManager = self::getContainer()->get('app.services.file_store_manager.git_repository');
-        \assert($gitRepositoryFileStoreManager instanceof FileStoreManager);
-        $this->gitRepositoryFileStore = $gitRepositoryFileStoreManager;
+        $fixturesStorage = self::getContainer()->get('test_fixtures.storage');
+        \assert($fixturesStorage instanceof FilesystemOperator);
+        $this->fixturesStorage = $fixturesStorage;
 
-        $fixturesFileStoreManager = self::getContainer()->get('app.tests.services.file_store_manager.fixtures');
-        \assert($fixturesFileStoreManager instanceof FileStoreManager);
-        $this->fixturesFileStore = $fixturesFileStoreManager;
+        $fileLister = self::getContainer()->get(FileLister::class);
+        \assert($fileLister instanceof FileLister);
+        $this->fileLister = $fileLister;
 
         $entityRemover = self::getContainer()->get(EntityRemover::class);
         if ($entityRemover instanceof EntityRemover) {
@@ -244,8 +244,8 @@ class GitRepositoryStoreTest extends WebTestCase
 
         self::assertTrue($this->gitRepositoryStorage->directoryExists($userGitRepositoryPath));
         self::assertSame(
-            $this->fixturesFileStore->list($fixtureSetIdentifier),
-            $this->gitRepositoryFileStore->list($userGitRepositoryPath)
+            $this->fileLister->list($this->fixturesStorage, $fixtureSetIdentifier),
+            $this->fileLister->list($this->gitRepositoryStorage, $userGitRepositoryPath)
         );
     }
 
