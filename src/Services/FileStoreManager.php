@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use App\Exception\Storage\ReadException;
 use App\Exception\Storage\RemoveException;
 use App\Exception\Storage\WriteException;
 use League\Flysystem\FilesystemException;
@@ -38,18 +37,6 @@ class FileStoreManager implements FileStoreInterface
             $this->filesystem->write($fileRelativePath, $content);
         } catch (FilesystemException $e) {
             throw new WriteException($fileRelativePath, $e);
-        }
-    }
-
-    /**
-     * @throws ReadException
-     */
-    public function read(string $fileRelativePath): string
-    {
-        try {
-            return $this->filesystem->read($fileRelativePath);
-        } catch (FilesystemException $e) {
-            throw new ReadException($fileRelativePath, $e);
         }
     }
 
