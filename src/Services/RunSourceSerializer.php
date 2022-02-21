@@ -41,7 +41,7 @@ class RunSourceSerializer
 
         if ($source instanceof FileSource) {
             $files = $this->sourceLister->list($this->fileSourceFileStore, (string) $source);
-            $content = $this->sourceSerializer->serialize($files);
+            $content = $this->sourceSerializer->serialize($this->fileSourceFileStore, $files);
         }
 
         if ($source instanceof GitSource) {
@@ -53,7 +53,7 @@ class RunSourceSerializer
             );
 
             $files = $this->sourceLister->list($this->gitRepositoryFileStore, $sourcePath);
-            $content = $this->sourceSerializer->serialize($files);
+            $content = $this->sourceSerializer->serialize($this->gitRepositoryFileStore, $files);
 
             try {
                 $this->gitRepositoryFileStore->remove((string) $gitRepository);

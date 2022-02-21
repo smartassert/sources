@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use App\Model\SourceFile;
 use App\Model\SourceFileCollection;
 use League\Flysystem\FilesystemException;
 use League\Flysystem\PathNormalizer;
@@ -26,10 +25,7 @@ class SerializableSourceLister
             $sourceFilePaths = $sourceFileStore->list($path, ['yml', 'yaml']);
 
             foreach ($sourceFilePaths as $sourceFilePath) {
-                $sourceFiles[] = new SourceFile(
-                    $sourceFileStore,
-                    $this->pathNormalizer->normalizePath($path . '/' . $sourceFilePath)
-                );
+                $sourceFiles[] = $this->pathNormalizer->normalizePath($path . '/' . $sourceFilePath);
             }
         } catch (FilesystemException) {
         }

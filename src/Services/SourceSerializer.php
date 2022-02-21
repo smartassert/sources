@@ -25,16 +25,16 @@ class SourceSerializer
     /**
      * @throws SourceReadExceptionInterface
      */
-    public function serialize(SourceFileCollection $files): string
+    public function serialize(FileStoreInterface $store, SourceFileCollection $files): string
     {
         $documents = [];
 
         foreach ($files as $file) {
-            $content = $this->readYamlFile($file->fileStore, $file->path);
+            $content = $this->readYamlFile($store, $file);
 
             $documents[] = sprintf(
                 self::DOCUMENT_TEMPLATE,
-                new FilePathIdentifier($this->removePathPrefix($files->pathPrefix, $file->path), md5($content))
+                new FilePathIdentifier($this->removePathPrefix($files->pathPrefix, $file), md5($content))
             );
             $documents[] = sprintf(self::DOCUMENT_TEMPLATE, trim($content));
         }
