@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Tests\Functional\Services;
 
 use App\Entity\FileSource;
-use App\Entity\RunSource;
 use App\Services\FileStoreInterface;
+use App\Services\SerializableSourceLister;
 use App\Services\SourceSerializer;
 use App\Tests\Model\UserId;
 use App\Tests\Services\FileStoreFixtureCreator;
@@ -20,6 +20,7 @@ class SourceSerializerTest extends WebTestCase
     private FilesystemOperator $fileSourceStorage;
     private FileStoreInterface $fileSourceFileStore;
     private FileStoreInterface $fixtureFileStore;
+    private SerializableSourceLister $sourceLister;
 
     protected function setUp(): void
     {
@@ -44,6 +45,10 @@ class SourceSerializerTest extends WebTestCase
         $fixtureFileStore = self::getContainer()->get('app.tests.services.file_store_manager.fixtures');
         \assert($fixtureFileStore instanceof FileStoreInterface);
         $this->fixtureFileStore = $fixtureFileStore;
+
+        $sourceLister = self::getContainer()->get(SerializableSourceLister::class);
+        \assert($sourceLister instanceof SerializableSourceLister);
+        $this->sourceLister = $sourceLister;
     }
 
     /**
@@ -54,8 +59,7 @@ class SourceSerializerTest extends WebTestCase
         ?string $path,
         string $expectedContentFixture
     ): void {
-        $fileSource = new FileSource(UserId::create(), 'file source label');
-        $source = new RunSource($fileSource);
+        $source = new FileSource(UserId::create(), 'file source label');
 
         $this->fixtureCreator->copySetTo(
             'Source/' . $fixtureSetIdentifier,
@@ -63,7 +67,9 @@ class SourceSerializerTest extends WebTestCase
             (string) $source
         );
 
-        $content = $this->sourceSerializer->serialize($this->fileSourceFileStore, (string) $source, $path);
+        $sourceFiles = $this->sourceLister->list($this->fileSourceFileStore, $source . '/' . $path);
+
+        $content = $this->sourceSerializer->serialize($sourceFiles);
         $expected = trim($this->fixtureFileStore->read($expectedContentFixture));
 
         self::assertSame($expected, $content);

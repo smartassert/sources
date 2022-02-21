@@ -9,8 +9,7 @@ use App\Exception\SourceRead\ReadFileException;
 use App\Exception\SourceRead\SourceReadExceptionInterface;
 use App\Exception\Storage\ReadException;
 use App\Model\FilePathIdentifier;
-use League\Flysystem\FilesystemException;
-use League\Flysystem\PathNormalizer;
+use App\Model\SourceFileCollection;
 use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Parser as YamlParser;
 
@@ -20,33 +19,22 @@ class SourceSerializer
 
     public function __construct(
         private YamlParser $yamlParser,
-        private PathNormalizer $pathNormalizer,
     ) {
     }
 
     /**
      * @throws SourceReadExceptionInterface
      */
-    public function serialize(
-        FileStoreInterface $sourceFileStore,
-        string $sourceRelativePath,
-        ?string $path = null
-    ): string {
-        $sourceDirectory = $this->pathNormalizer->normalizePath($sourceRelativePath . '/' . $path);
-        $sourceFiles = [];
-
-        try {
-            $sourceFiles = $sourceFileStore->list($sourceDirectory, ['yml', 'yaml']);
-        } catch (FilesystemException) {
-        }
-
+    public function serialize(SourceFileCollection $files): string
+    {
         $documents = [];
-        foreach ($sourceFiles as $sourceFile) {
-            $content = $this->readYamlFile($sourceFileStore, $sourceDirectory . '/' . $sourceFile);
+
+        foreach ($files as $file) {
+            $content = $this->readYamlFile($file->fileStore, $file->path);
 
             $documents[] = sprintf(
                 self::DOCUMENT_TEMPLATE,
-                new FilePathIdentifier($sourceFile, md5($content))
+                new FilePathIdentifier($this->removePathPrefix($files->pathPrefix, $file->path), md5($content))
             );
             $documents[] = sprintf(self::DOCUMENT_TEMPLATE, trim($content));
         }
@@ -72,5 +60,12 @@ class SourceSerializer
         }
 
         return $content;
+    }
+
+    private function removePathPrefix(string $prefix, string $path): string
+    {
+        return str_starts_with($path, $prefix)
+            ? substr($path, strlen($prefix))
+            : $path;
     }
 }
