@@ -12,48 +12,6 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 class FileStoreManagerTest extends WebTestCase
 {
     /**
-     * @dataProvider removeSuccessDataProvider
-     */
-    public function testCreateRemoveSuccess(string $storageServiceId, string $storeServiceId): void
-    {
-        $storage = self::getContainer()->get($storageServiceId);
-        self::assertInstanceOf(FilesystemOperator::class, $storage);
-
-        $store = self::getContainer()->get($storeServiceId);
-        self::assertInstanceOf(FileStoreInterface::class, $store);
-
-        $relativePath = UserId::create();
-        self::assertFalse($storage->directoryExists($relativePath));
-
-        $storage->createDirectory($relativePath);
-        self::assertTrue($storage->directoryExists($relativePath));
-
-        $store->remove($relativePath);
-        self::assertFalse($storage->directoryExists($relativePath));
-    }
-
-    /**
-     * @return array<mixed>
-     */
-    public function removeSuccessDataProvider(): array
-    {
-        return [
-            'file source store' => [
-                'storageServiceId' => 'file_source.storage',
-                'storeServiceId' => 'app.services.file_store_manager.file_source',
-            ],
-            'git repository store' => [
-                'storageServiceId' => 'git_repository.storage',
-                'storeServiceId' => 'app.services.file_store_manager.git_repository',
-            ],
-            'run source store' => [
-                'storageServiceId' => 'run_source.storage',
-                'storeServiceId' => 'app.services.file_store_manager.run_source',
-            ],
-        ];
-    }
-
-    /**
      * @dataProvider writeDataProvider
      */
     public function testWrite(string $fileRelativePath, string $content): void

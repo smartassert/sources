@@ -10,11 +10,6 @@ use App\Exception\Storage\WriteException;
 interface FileStoreInterface
 {
     /**
-     * @throws RemoveException
-     */
-    public function remove(string $relativePath): void;
-
-    /**
      * @throws WriteException
      */
     public function write(string $fileRelativePath, string $content): void;
