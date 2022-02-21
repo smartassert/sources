@@ -11,6 +11,7 @@
         "doctrine/doctrine-migrations-bundle": "^3.2",
         "doctrine/orm": "^2.11",
         "league/flysystem": "^3.0",
+        "league/flysystem-async-aws-s3": "^3.0",
         "league/flysystem-bundle": "^2.2",
         "league/flysystem-memory": "^3.0",
         "psr/http-client": "^1.0",

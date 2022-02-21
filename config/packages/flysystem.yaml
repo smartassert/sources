@@ -2,14 +2,16 @@
 flysystem:
     storages:
         file_source.storage:
-            adapter: 'local'
+            adapter: 'asyncaws'
             options:
-                directory: '%file_source_store_directory%'
+                client: 'digitalocean_spaces_client'
+                bucket: '%env(DIGITALOCEAN_SPACES_FILE_SOURCE_BUCKET)%'
 
         run_source.storage:
-            adapter: 'local'
+            adapter: 'asyncaws'
             options:
-                directory: '%run_source_store_directory%'
+                client: 'digitalocean_spaces_client'
+                bucket: '%env(DIGITALOCEAN_SPACES_RUN_SOURCE_BUCKET)%'
 
         git_repository.storage:
             adapter: 'local'

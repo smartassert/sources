@@ -1,4 +1,10 @@
 {
+    "async-aws/core": {
+        "version": "1.13.0"
+    },
+    "async-aws/s3": {
+        "version": "1.10.0"
+    },
     "doctrine/annotations": {
         "version": "1.13",
         "recipe": {
@@ -99,6 +105,9 @@
     },
     "league/flysystem": {
         "version": "3.0.3"
+    },
+    "league/flysystem-async-aws-s3": {
+        "version": "3.0.8"
     },
     "league/flysystem-bundle": {
         "version": "2.2",
@@ -376,6 +385,12 @@
             "src/Controller/.gitignore",
             "src/Kernel.php"
         ]
+    },
+    "symfony/http-client": {
+        "version": "v6.0.3"
+    },
+    "symfony/http-client-contracts": {
+        "version": "v3.0.0"
     },
     "symfony/http-foundation": {
         "version": "v6.0.1"
