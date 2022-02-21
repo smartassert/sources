@@ -6,7 +6,7 @@ namespace App\ResponseBody;
 
 use App\Exception\Storage\StorageExceptionInterface;
 
-class FileExceptionResponse implements ErrorInterface
+class StorageExceptionResponse implements ErrorInterface
 {
     public function __construct(
         private StorageExceptionInterface $exception
