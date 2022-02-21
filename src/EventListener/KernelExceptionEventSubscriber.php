@@ -6,9 +6,7 @@ namespace App\EventListener;
 
 use App\Exception\HasHttpErrorCodeInterface;
 use App\Exception\InvalidRequestException;
-use App\Exception\Storage\StorageExceptionInterface;
 use App\ResponseBody\FilesystemExceptionResponse;
-use App\ResponseBody\StorageExceptionResponse;
 use App\Services\InvalidRequestResponseFactory;
 use App\Services\ResponseFactory;
 use League\Flysystem\FilesystemException;
@@ -49,10 +47,6 @@ class KernelExceptionEventSubscriber implements EventSubscriberInterface
             $response = $this->handleInvalidRequest($throwable);
         }
 
-        if ($throwable instanceof StorageExceptionInterface) {
-            $response = $this->handleStorageException($throwable);
-        }
-
         if ($throwable instanceof FilesystemException) {
             $response = $this->handleFilesystemException($throwable);
         }
@@ -77,11 +71,6 @@ class KernelExceptionEventSubscriber implements EventSubscriberInterface
             ),
             $throwable->getErrorCode()
         );
-    }
-
-    private function handleStorageException(StorageExceptionInterface $throwable): Response
-    {
-        return $this->responseFactory->createErrorResponse(new StorageExceptionResponse($throwable), 500);
     }
 
     private function handleFilesystemException(FilesystemException $throwable): Response
