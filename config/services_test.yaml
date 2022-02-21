@@ -44,9 +44,3 @@ services:
 
     App\Tests\Services\DirectoryLister:
         public: true
-
-    app.tests.services.file_store_manager.fixtures:
-        class: App\Services\FileStoreManager
-        public: true
-        arguments:
-            $filesystem: '@test_fixtures.storage'
