@@ -86,8 +86,8 @@ class GitRepositoryStoreTest extends WebTestCase
     {
         $unableToDeleteDirectoryException = UnableToDeleteDirectory::atLocation((string) $this->gitRepository);
 
-        $gitRepositoryStorage = \Mockery::mock(FilesystemWriter::class);
-        $gitRepositoryStorage
+        $gitRepositoryWriter = \Mockery::mock(FilesystemWriter::class);
+        $gitRepositoryWriter
             ->shouldReceive('deleteDirectory')
             ->with((string) $this->gitRepository)
             ->andThrow($unableToDeleteDirectoryException)
@@ -96,8 +96,8 @@ class GitRepositoryStoreTest extends WebTestCase
         ObjectReflector::setProperty(
             $this->gitRepositoryStore,
             GitRepositoryStore::class,
-            'gitRepositoryStorage',
-            $gitRepositoryStorage
+            'gitRepositoryWriter',
+            $gitRepositoryWriter
         );
 
         $this->expectExceptionObject(new GitRepositoryException($unableToDeleteDirectoryException));
