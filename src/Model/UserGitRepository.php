@@ -12,9 +12,8 @@ class UserGitRepository implements UserFileLocatorInterface
 
     private string $id;
 
-    public function __construct(
-        private GitSource $source
-    ) {
+    public function __construct(private GitSource $source)
+    {
         $this->id = EntityId::create();
     }
 

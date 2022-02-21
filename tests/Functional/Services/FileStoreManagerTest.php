@@ -5,45 +5,65 @@ declare(strict_types=1);
 namespace App\Tests\Functional\Services;
 
 use App\Entity\FileSource;
-use App\Services\FileStoreManager;
+use App\Services\FileStoreInterface;
 use App\Tests\Model\UserId;
 use App\Tests\Services\FileStoreFixtureCreator;
+use League\Flysystem\FilesystemOperator;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 class FileStoreManagerTest extends WebTestCase
 {
-    private FileStoreManager $fileStoreManager;
     private FileStoreFixtureCreator $fixtureCreator;
-    private string $fileStoreBasePath;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $fileStoreManager = self::getContainer()->get(FileStoreManager::class);
-        \assert($fileStoreManager instanceof FileStoreManager);
-        $this->fileStoreManager = $fileStoreManager;
-
         $fixtureCreator = self::getContainer()->get(FileStoreFixtureCreator::class);
         \assert($fixtureCreator instanceof FileStoreFixtureCreator);
         $this->fixtureCreator = $fixtureCreator;
-
-        $fileStoreBasePath = self::getContainer()->getParameter('file_store_base_path');
-        \assert(is_string($fileStoreBasePath));
-        $this->fileStoreBasePath = $fileStoreBasePath;
     }
 
-    public function testCreateRemoveSuccess(): void
+    /**
+     * @dataProvider removeSuccessDataProvider
+     */
+    public function testCreateRemoveSuccess(string $storageServiceId, string $storeServiceId): void
     {
+        $storage = self::getContainer()->get($storageServiceId);
+        self::assertInstanceOf(FilesystemOperator::class, $storage);
+
+        $store = self::getContainer()->get($storeServiceId);
+        self::assertInstanceOf(FileStoreInterface::class, $store);
+
         $relativePath = UserId::create();
-        $absolutePath = $this->fileStoreBasePath . '/' . $relativePath;
-        self::assertDirectoryDoesNotExist($absolutePath);
+        self::assertFalse($storage->directoryExists($relativePath));
 
-        $this->fileStoreManager->create($relativePath);
-        self::assertDirectoryExists($absolutePath);
+        $storage->createDirectory($relativePath);
+        self::assertTrue($storage->directoryExists($relativePath));
 
-        $this->fileStoreManager->remove($relativePath);
-        self::assertDirectoryDoesNotExist($absolutePath);
+        $store->remove($relativePath);
+        self::assertFalse($storage->directoryExists($relativePath));
+    }
+
+    /**
+     * @return array<mixed>
+     */
+    public function removeSuccessDataProvider(): array
+    {
+        return [
+            'file source store' => [
+                'storageServiceId' => 'file_source.storage',
+                'storeServiceId' => 'app.services.file_store_manager.file_source',
+            ],
+            'git repository store' => [
+                'storageServiceId' => 'git_repository.storage',
+                'storeServiceId' => 'app.services.file_store_manager.git_repository',
+            ],
+            'run source store' => [
+                'storageServiceId' => 'run_source.storage',
+                'storeServiceId' => 'app.services.file_store_manager.run_source',
+            ],
+        ];
     }
 
     /**
@@ -58,11 +78,17 @@ class FileStoreManagerTest extends WebTestCase
         array $extensions,
         array $expectedRelativePathNames
     ): void {
-        $this->fileStoreManager->remove($relativePath);
+        $storage = self::getContainer()->get('file_source.storage');
+        self::assertInstanceOf(FilesystemOperator::class, $storage);
 
-        $this->fixtureCreator->copySetTo('/Source/' . $fixtureSet, $relativePath);
+        $store = self::getContainer()->get('app.services.file_store_manager.file_source');
+        self::assertInstanceOf(FileStoreInterface::class, $store);
 
-        $files = $this->fileStoreManager->list($relativePath, $extensions);
+        $store->remove($relativePath);
+
+        $this->fixtureCreator->copySetTo('Source/' . $fixtureSet, $storage, $relativePath);
+
+        $files = $store->list($relativePath, $extensions);
 
         self::assertCount(count($expectedRelativePathNames), $files);
         self::assertSame($expectedRelativePathNames, $files);
@@ -81,9 +107,9 @@ class FileStoreManagerTest extends WebTestCase
                 'relativePath' => $basePath,
                 'extensions' => [],
                 'expectedRelativePathNames' => [
-                    $basePath . '/directory/file3.txt',
-                    $basePath . '/file1.txt',
-                    $basePath . '/file2.txt',
+                    'directory/file3.txt',
+                    'file1.txt',
+                    'file2.txt',
                 ],
             ],
             'source: txt, extensions=[txt]' => [
@@ -91,9 +117,9 @@ class FileStoreManagerTest extends WebTestCase
                 'relativePath' => $basePath,
                 'extensions' => ['txt'],
                 'expected' => [
-                    $basePath . '/directory/file3.txt',
-                    $basePath . '/file1.txt',
-                    $basePath . '/file2.txt',
+                    'directory/file3.txt',
+                    'file1.txt',
+                    'file2.txt',
                 ],
             ],
             'source: txt, extensions=[yml, yaml]' => [
@@ -107,9 +133,9 @@ class FileStoreManagerTest extends WebTestCase
                 'relativePath' => $basePath,
                 'extensions' => [],
                 'expected' => [
-                    $basePath . '/directory/file3.yml',
-                    $basePath . '/file1.yaml',
-                    $basePath . '/file2.yml',
+                    'directory/file3.yml',
+                    'file1.yaml',
+                    'file2.yml',
                 ],
             ],
             'source: yml_yaml, extensions=[yml]' => [
@@ -117,8 +143,8 @@ class FileStoreManagerTest extends WebTestCase
                 'relativePath' => $basePath,
                 'extensions' => ['yml'],
                 'expected' => [
-                    $basePath . '/directory/file3.yml',
-                    $basePath . '/file2.yml',
+                    'directory/file3.yml',
+                    'file2.yml',
                 ],
             ],
             'source: mixed, extensions=[yaml]' => [
@@ -126,8 +152,8 @@ class FileStoreManagerTest extends WebTestCase
                 'relativePath' => $basePath,
                 'extensions' => ['yaml'],
                 'expected' => [
-                    $basePath . '/directory/file3.yaml',
-                    $basePath . '/file1.yaml',
+                    'directory/file3.yaml',
+                    'file1.yaml',
                 ],
             ],
         ];
@@ -138,14 +164,16 @@ class FileStoreManagerTest extends WebTestCase
      */
     public function testWrite(string $fileRelativePath, string $content): void
     {
-        $this->fileStoreManager->write($fileRelativePath, $content);
+        $storage = self::getContainer()->get('file_source.storage');
+        self::assertInstanceOf(FilesystemOperator::class, $storage);
 
-        $expectedAbsolutePath = $this->fileStoreBasePath . '/' . $fileRelativePath;
+        $store = self::getContainer()->get('app.services.file_store_manager.file_source');
+        self::assertInstanceOf(FileStoreInterface::class, $store);
 
-        self::assertFileExists($expectedAbsolutePath);
-        self::assertSame($content, file_get_contents($expectedAbsolutePath));
+        $store->write($fileRelativePath, $content);
 
-        unlink($expectedAbsolutePath);
+        self::assertTrue($storage->fileExists($fileRelativePath));
+        self::assertSame($content, $store->read($fileRelativePath));
     }
 
     /**
@@ -167,11 +195,15 @@ class FileStoreManagerTest extends WebTestCase
 
     public function testReadSuccess(): void
     {
+        $store = self::getContainer()->get('app.services.file_store_manager.file_source');
+        self::assertInstanceOf(FileStoreInterface::class, $store);
+
         $fileSource = new FileSource(UserId::create(), 'file source label');
-        $this->fixtureCreator->copySetTo('/Source/txt', (string) $fileSource);
+        $fileRelativePath = $fileSource . '/' . 'file.txt';
+        $content = 'file content';
 
-        $fileRelativePath = $fileSource . '/file1.txt';
+        $store->write($fileRelativePath, $content);
 
-        self::assertSame('File One' . "\n", $this->fileStoreManager->read($fileRelativePath));
+        self::assertSame($content, $store->read($fileRelativePath));
     }
 }

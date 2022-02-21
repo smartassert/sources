@@ -7,47 +7,62 @@ namespace App\Services;
 use App\Entity\FileSource;
 use App\Entity\GitSource;
 use App\Entity\RunSource;
-use App\Exception\File\ReadException;
-use App\Exception\File\RemoveException;
-use App\Exception\File\WriteException;
+use App\Exception\GitRepositoryException;
 use App\Exception\SourceRead\SourceReadExceptionInterface;
-use App\Exception\UserGitRepositoryException;
+use App\Exception\Storage\ReadException;
+use App\Exception\Storage\RemoveException;
+use App\Exception\Storage\WriteException;
 
 class RunSourceSerializer
 {
     public const SERIALIZED_FILENAME = 'source.yaml';
 
     public function __construct(
-        private UserGitRepositoryPreparer $gitRepositoryPreparer,
-        private FileStoreManager $fileStoreManager,
         private SourceSerializer $sourceSerializer,
+        private FileStoreInterface $fileSourceFileStore,
+        private FileStoreInterface $gitRepositoryFileStore,
+        private FileStoreInterface $runSourceFileStore,
+        private GitRepositoryStore $gitRepositoryStore,
+        private SerializableSourceLister $sourceLister,
     ) {
     }
 
     /**
      * @throws WriteException
      * @throws SourceReadExceptionInterface
-     * @throws UserGitRepositoryException
+     * @throws GitRepositoryException
      */
     public function write(RunSource $target): void
     {
         $source = $target->getParent();
         $serializedSourcePath = $target . '/' . self::SERIALIZED_FILENAME;
 
+        $content = null;
+
         if ($source instanceof FileSource) {
-            $content = $this->sourceSerializer->serialize((string) $source);
-            $this->fileStoreManager->write($serializedSourcePath, $content);
+            $files = $this->sourceLister->list($this->fileSourceFileStore, (string) $source);
+            $content = $this->sourceSerializer->serialize($files);
         }
 
         if ($source instanceof GitSource) {
-            $gitRepository = $this->gitRepositoryPreparer->prepare($source, $target->getParameters()['ref'] ?? null);
-            $content = $this->sourceSerializer->serialize((string) $gitRepository, $source->getPath());
-            $this->fileStoreManager->write($serializedSourcePath, $content);
+            $gitRepository = $this->gitRepositoryStore->initialize($source, $target->getParameters()['ref'] ?? null);
+
+            $sourcePath = rtrim(
+                sprintf('%s/%s', $gitRepository, ltrim($source->getPath(), '/')),
+                '/'
+            );
+
+            $files = $this->sourceLister->list($this->gitRepositoryFileStore, $sourcePath);
+            $content = $this->sourceSerializer->serialize($files);
 
             try {
-                $this->fileStoreManager->remove((string) $gitRepository);
+                $this->gitRepositoryFileStore->remove((string) $gitRepository);
             } catch (RemoveException) {
             }
+        }
+
+        if (is_string($content)) {
+            $this->runSourceFileStore->write($serializedSourcePath, $content);
         }
     }
 
@@ -56,6 +71,6 @@ class RunSourceSerializer
      */
     public function read(RunSource $runSource): string
     {
-        return trim($this->fileStoreManager->read($runSource . '/' . self::SERIALIZED_FILENAME));
+        return trim($this->runSourceFileStore->read($runSource . '/' . self::SERIALIZED_FILENAME));
     }
 }

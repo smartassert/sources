@@ -4,13 +4,45 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\Controller;
 
-use App\Services\FileStoreManager;
+use App\Entity\FileSource;
+use App\Services\Source\Store;
 use App\Tests\Model\Route;
+use App\Tests\Model\UserId;
+use App\Tests\Services\AuthorizationRequestAsserter;
 use App\Validator\YamlFilenameConstraint;
+use League\Flysystem\FilesystemOperator;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
-class FileSourceFileControllerTest extends AbstractFileSourceFilesTest
+class FileSourceFileControllerTest extends AbstractSourceControllerTest
 {
+    private AuthorizationRequestAsserter $authorizationRequestAsserter;
+    private FilesystemOperator $fileSourceStorage;
+
+    private string $userId;
+    private FileSource $fileSource;
+    private string $sourceRelativePath;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $authorizationRequestAsserter = self::getContainer()->get(AuthorizationRequestAsserter::class);
+        \assert($authorizationRequestAsserter instanceof AuthorizationRequestAsserter);
+        $this->authorizationRequestAsserter = $authorizationRequestAsserter;
+
+        $fileSourceStorage = self::getContainer()->get('file_source.storage');
+        \assert($fileSourceStorage instanceof FilesystemOperator);
+        $this->fileSourceStorage = $fileSourceStorage;
+
+        $this->userId = UserId::create();
+        $this->fileSource = new FileSource($this->userId, 'file source label');
+        $this->sourceRelativePath = (string) $this->fileSource;
+
+        $store = self::getContainer()->get(Store::class);
+        \assert($store instanceof Store);
+        $store->add($this->fileSource);
+    }
+
     /**
      * @dataProvider addFileInvalidRequestDataProvider
      *
@@ -21,12 +53,12 @@ class FileSourceFileControllerTest extends AbstractFileSourceFilesTest
         string $content,
         array $expectedResponseData
     ): void {
-        $this->setUserServiceAuthorizedResponse(self::USER_ID);
+        $this->setUserServiceAuthorizedResponse($this->userId);
 
         $response = $this->applicationClient->makeAuthorizedRequest(
             'POST',
             new Route('file_source_file_add', [
-                'sourceId' => self::SOURCE_ID,
+                'sourceId' => $this->fileSource->getId(),
                 'filename' => $filename,
             ]),
             [
@@ -47,23 +79,34 @@ class FileSourceFileControllerTest extends AbstractFileSourceFilesTest
      */
     public function addFileInvalidRequestDataProvider(): array
     {
-        $expectedInvalidFilenameResponseData = $this->createExpectedInvalidFilenameResponseData();
-
         return [
             'name empty with .yaml extension, content non-empty' => [
                 'filename' => '.yaml',
                 'content' => 'non-empty value',
-                'expectedResponseData' => $expectedInvalidFilenameResponseData,
+                'expectedResponseData' => $this->createExpectedInvalidFilenameResponseData(
+                    YamlFilenameConstraint::MESSAGE_NAME_EMPTY
+                ),
             ],
             'name contains backslash characters, content non-empty' => [
-                'filename' => 'one two \\ three.yaml',
+                'filename' => 'one-two-\\-three.yaml',
                 'content' => 'non-empty value',
-                'expectedResponseData' => $expectedInvalidFilenameResponseData,
+                'expectedResponseData' => $this->createExpectedInvalidFilenameResponseData(
+                    YamlFilenameConstraint::MESSAGE_FILENAME_INVALID
+                ),
             ],
             'name contains null byte characters, content non-empty' => [
-                'filename' => 'one ' . chr(0) . ' two three' . chr(0) . '.yaml',
+                'filename' => 'one-' . chr(0) . '-two-three' . chr(0) . '.yaml',
                 'content' => 'non-empty value',
-                'expectedResponseData' => $expectedInvalidFilenameResponseData,
+                'expectedResponseData' => $this->createExpectedInvalidFilenameResponseData(
+                    YamlFilenameConstraint::MESSAGE_FILENAME_INVALID
+                ),
+            ],
+            'name contains space characters, content non-empty' => [
+                'filename' => 'one two three.yaml',
+                'content' => 'non-empty value',
+                'expectedResponseData' => $this->createExpectedInvalidFilenameResponseData(
+                    YamlFilenameConstraint::MESSAGE_FILENAME_INVALID
+                ),
             ],
             'name valid, content empty' => [
                 'filename' => 'filename.yaml',
@@ -100,49 +143,58 @@ class FileSourceFileControllerTest extends AbstractFileSourceFilesTest
 
     public function testAddFileSuccess(): void
     {
-        $fileStoreManager = self::getContainer()->get(FileStoreManager::class);
-        \assert($fileStoreManager instanceof FileStoreManager);
-        $fileStoreManager->remove(self::SOURCE_RELATIVE_PATH);
-        self::assertDirectoryDoesNotExist(self::SOURCE_RELATIVE_PATH);
+        $filename = 'filename.yaml';
+        $content = '- file content';
+        $fileRelativePath = $this->sourceRelativePath . '/' . $filename;
 
-        $this->setUserServiceAuthorizedResponse(self::USER_ID);
+        self::assertFalse($this->fileSourceStorage->directoryExists($this->sourceRelativePath));
+        self::assertFalse($this->fileSourceStorage->fileExists($fileRelativePath));
+
+        $this->setUserServiceAuthorizedResponse($this->userId);
 
         $response = $this->applicationClient->makeAuthorizedRequest(
             'POST',
             new Route('file_source_file_add', [
-                'sourceId' => self::SOURCE_ID,
-                'filename' => self::FILENAME,
+                'sourceId' => $this->fileSource->getId(),
+                'filename' => $filename,
             ]),
-            self::CREATE_DATA
+            [
+                'content' => $content,
+            ]
         );
 
         self::assertSame(200, $response->getStatusCode());
-        self::assertFileExists($this->expectedFilePath);
-        self::assertSame(self::CREATE_DATA['content'], file_get_contents($this->expectedFilePath));
+        self::assertTrue($this->fileSourceStorage->directoryExists($this->sourceRelativePath));
+        self::assertTrue($this->fileSourceStorage->fileExists($fileRelativePath));
+        self::assertSame($content, $this->fileSourceStorage->read($fileRelativePath));
     }
 
-    /**
-     * @depends testAddFileSuccess
-     */
-    public function testUpdateAddedFileSuccess(): void
+    public function testUpdateFileSuccess(): void
     {
-        self::assertFileExists($this->expectedFilePath);
-        self::assertSame(self::CREATE_DATA['content'], file_get_contents($this->expectedFilePath));
+        $filename = 'filename.yaml';
+        $initialContent = '- initial content';
+        $updatedContent = '- updated content';
+        $fileRelativePath = $this->sourceRelativePath . '/' . $filename;
 
-        $this->setUserServiceAuthorizedResponse(self::USER_ID);
+        $this->fileSourceStorage->write($fileRelativePath, $initialContent);
+
+        $this->setUserServiceAuthorizedResponse($this->userId);
 
         $response = $this->applicationClient->makeAuthorizedRequest(
             'POST',
             new Route('file_source_file_add', [
-                'sourceId' => self::SOURCE_ID,
-                'filename' => self::FILENAME,
+                'sourceId' => $this->fileSource->getId(),
+                'filename' => $filename,
             ]),
-            self::UPDATE_DATA
+            [
+                'content' => $updatedContent,
+            ]
         );
 
         self::assertSame(200, $response->getStatusCode());
-        self::assertFileExists($this->expectedFilePath);
-        self::assertSame(self::UPDATE_DATA['content'], file_get_contents($this->expectedFilePath));
+        self::assertTrue($this->fileSourceStorage->directoryExists($this->sourceRelativePath));
+        self::assertTrue($this->fileSourceStorage->fileExists($fileRelativePath));
+        self::assertSame($updatedContent, $this->fileSourceStorage->read($fileRelativePath));
     }
 
     /**
@@ -154,12 +206,12 @@ class FileSourceFileControllerTest extends AbstractFileSourceFilesTest
         string $filename,
         array $expectedResponseData
     ): void {
-        $this->setUserServiceAuthorizedResponse(self::USER_ID);
+        $this->setUserServiceAuthorizedResponse($this->userId);
 
         $response = $this->applicationClient->makeAuthorizedRequest(
             'DELETE',
             new Route('file_source_file_remove', [
-                'sourceId' => self::SOURCE_ID,
+                'sourceId' => $this->fileSource->getId(),
                 'filename' => $filename,
             ])
         );
@@ -177,49 +229,60 @@ class FileSourceFileControllerTest extends AbstractFileSourceFilesTest
      */
     public function removeFileInvalidRequestDataProvider(): array
     {
-        $expectedInvalidFilenameResponseData = $this->createExpectedInvalidFilenameResponseData();
-
         return [
             'name empty with .yaml extension' => [
                 'filename' => '.yaml',
-                'expectedResponseData' => $expectedInvalidFilenameResponseData,
+                'expectedResponseData' => $this->createExpectedInvalidFilenameResponseData(
+                    YamlFilenameConstraint::MESSAGE_NAME_EMPTY
+                ),
             ],
             'name contains backslash characters' => [
-                'filename' => 'one two \\ three.yaml',
-                'expectedResponseData' => $expectedInvalidFilenameResponseData,
+                'filename' => 'one-two-\\-three.yaml',
+                'expectedResponseData' => $this->createExpectedInvalidFilenameResponseData(
+                    YamlFilenameConstraint::MESSAGE_FILENAME_INVALID
+                ),
             ],
             'name contains null byte characters' => [
-                'filename' => 'one ' . chr(0) . ' two three' . chr(0) . '.yaml',
-                'expectedResponseData' => $expectedInvalidFilenameResponseData,
+                'filename' => 'one-' . chr(0) . '-two-three' . chr(0) . '.yaml',
+                'expectedResponseData' => $this->createExpectedInvalidFilenameResponseData(
+                    YamlFilenameConstraint::MESSAGE_FILENAME_INVALID
+                ),
+            ],
+            'name contains space characters' => [
+                'filename' => 'one two three.yaml',
+                'expectedResponseData' => $this->createExpectedInvalidFilenameResponseData(
+                    YamlFilenameConstraint::MESSAGE_FILENAME_INVALID
+                ),
             ],
         ];
     }
 
-    /**
-     * @depends testUpdateAddedFileSuccess
-     */
-    public function testRemoveFile(): void
+    public function testRemoveFileSuccess(): void
     {
-        self::assertFileExists($this->expectedFilePath);
+        $filename = 'filename.yaml';
+        $content = '- file content';
+        $fileRelativePath = $this->sourceRelativePath . '/' . $filename;
 
-        $this->setUserServiceAuthorizedResponse(self::USER_ID);
+        $this->fileSourceStorage->write($fileRelativePath, $content);
+
+        $this->setUserServiceAuthorizedResponse($this->userId);
 
         $response = $this->applicationClient->makeAuthorizedRequest(
             'DELETE',
             new Route('file_source_file_remove', [
-                'sourceId' => self::SOURCE_ID,
-                'filename' => self::FILENAME,
+                'sourceId' => $this->fileSource->getId(),
+                'filename' => $filename,
             ])
         );
 
         self::assertSame(200, $response->getStatusCode());
-        self::assertFileDoesNotExist($this->expectedFilePath);
+        self::assertFalse($this->fileSourceStorage->fileExists($fileRelativePath));
     }
 
     /**
      * @return array<mixed>
      */
-    private function createExpectedInvalidFilenameResponseData(): array
+    private function createExpectedInvalidFilenameResponseData(string $message): array
     {
         return [
             'error' => [
@@ -227,7 +290,7 @@ class FileSourceFileControllerTest extends AbstractFileSourceFilesTest
                 'payload' => [
                     'name' => [
                         'value' => '',
-                        'message' => YamlFilenameConstraint::MESSAGE_NAME_INVALID,
+                        'message' => $message,
                     ],
                 ],
             ],

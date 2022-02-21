@@ -8,12 +8,12 @@ use App\Entity\FileSource;
 use App\Entity\OriginSourceInterface as OriginSource;
 use App\Entity\RunSource;
 use App\Entity\SourceInterface;
-use App\Exception\File\FileExceptionInterface;
 use App\Exception\InvalidRequestException;
+use App\Exception\Storage\StorageExceptionInterface;
 use App\Message\Prepare;
 use App\Request\SourceRequestInterface;
 use App\Security\UserSourceAccessChecker;
-use App\Services\FileStoreManager;
+use App\Services\FileStoreInterface;
 use App\Services\RequestValidator;
 use App\Services\RunSourceFactory;
 use App\Services\RunSourceSerializer;
@@ -63,17 +63,25 @@ class UserSourceController
 
     /**
      * @throws AccessDeniedException
-     * @throws FileExceptionInterface
+     * @throws StorageExceptionInterface
      */
     #[Route(SourceRoutes::ROUTE_SOURCE, name: 'user_source_delete', methods: ['DELETE'])]
-    public function delete(SourceInterface $source, Store $store, FileStoreManager $fileStoreManager): Response
-    {
+    public function delete(
+        SourceInterface $source,
+        Store $store,
+        FileStoreInterface $fileSourceFileStore,
+        FileStoreInterface $runSourceFileStore,
+    ): Response {
         $this->userSourceAccessChecker->denyAccessUnlessGranted($source);
 
         $store->remove($source);
 
-        if ($source instanceof FileSource || $source instanceof RunSource) {
-            $fileStoreManager->remove((string) $source);
+        if ($source instanceof FileSource) {
+            $fileSourceFileStore->remove((string) $source);
+        }
+
+        if ($source instanceof RunSource) {
+            $runSourceFileStore->remove((string) $source);
         }
 
         return new JsonResponse();
@@ -99,7 +107,7 @@ class UserSourceController
 
     /**
      * @throws AccessDeniedException
-     * @throws FileExceptionInterface
+     * @throws StorageExceptionInterface
      */
     #[Route(SourceRoutes::ROUTE_SOURCE . '/read', name: 'user_source_read', methods: ['GET'])]
     public function read(RunSource $source, RunSourceSerializer $runSourceSerializer): Response

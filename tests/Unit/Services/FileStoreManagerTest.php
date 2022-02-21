@@ -4,13 +4,12 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\Services;
 
-use App\Exception\File\CreateException;
-use App\Exception\File\ReadException;
-use App\Exception\File\RemoveException;
-use App\Exception\File\WriteException;
+use App\Exception\Storage\ReadException;
+use App\Exception\Storage\RemoveException;
+use App\Exception\Storage\WriteException;
+use App\Services\FileStoreInterface;
 use App\Services\FileStoreManager;
 use League\Flysystem\Filesystem;
-use League\Flysystem\UnableToCreateDirectory;
 use League\Flysystem\UnableToDeleteDirectory;
 use League\Flysystem\UnableToReadFile;
 use League\Flysystem\UnableToWriteFile;
@@ -26,52 +25,16 @@ class FileStoreManagerTest extends TestCase
     private const PATH = self::BASE_PATH . '/' . self::FILE_LOCATOR_PATH;
 
     /**
-     * @dataProvider throwsCreateExceptionDataProvider
-     */
-    public function testCreateThrowsException(
-        FileStoreManager $fileStoreManager,
-        string $relativePath,
-        \Exception $expected
-    ): void {
-        $this->expectExceptionObject($expected);
-
-        $fileStoreManager->create($relativePath);
-    }
-
-    /**
      * @dataProvider throwsRemoveExceptionDataProvider
      */
     public function testRemoveThrowsException(
-        FileStoreManager $fileStoreManager,
+        FileStoreInterface $fileStoreManager,
         string $relativePath,
         \Exception $expected
     ): void {
         $this->expectExceptionObject($expected);
 
         $fileStoreManager->remove($relativePath);
-    }
-
-    /**
-     * @return array<mixed>
-     */
-    public function throwsCreateExceptionDataProvider(): array
-    {
-        $cannotCreateException = UnableToCreateDirectory::atLocation(self::PATH);
-
-        $mockFilesystem = (\Mockery::mock(Filesystem::class));
-        $mockFilesystem
-            ->shouldReceive('createDirectory')
-            ->with(self::FILE_LOCATOR_PATH)
-            ->andThrow($cannotCreateException)
-        ;
-
-        return [
-            CreateException::class => [
-                'fileStoreManager' => new FileStoreManager($mockFilesystem),
-                'relativePath' => self::FILE_LOCATOR_PATH,
-                'expected' => new CreateException(self::FILE_LOCATOR_PATH, $cannotCreateException),
-            ],
-        ];
     }
 
     /**

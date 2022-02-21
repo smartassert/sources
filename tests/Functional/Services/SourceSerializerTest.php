@@ -5,18 +5,22 @@ declare(strict_types=1);
 namespace App\Tests\Functional\Services;
 
 use App\Entity\FileSource;
-use App\Entity\RunSource;
+use App\Services\FileStoreInterface;
+use App\Services\SerializableSourceLister;
 use App\Services\SourceSerializer;
 use App\Tests\Model\UserId;
 use App\Tests\Services\FileStoreFixtureCreator;
-use App\Tests\Services\FixtureLoader;
+use League\Flysystem\FilesystemOperator;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 class SourceSerializerTest extends WebTestCase
 {
     private SourceSerializer $sourceSerializer;
     private FileStoreFixtureCreator $fixtureCreator;
-    private FixtureLoader $fixtureLoader;
+    private FilesystemOperator $fileSourceStorage;
+    private FileStoreInterface $fileSourceFileStore;
+    private FileStoreInterface $fixtureFileStore;
+    private SerializableSourceLister $sourceLister;
 
     protected function setUp(): void
     {
@@ -30,24 +34,45 @@ class SourceSerializerTest extends WebTestCase
         \assert($fixtureCreator instanceof FileStoreFixtureCreator);
         $this->fixtureCreator = $fixtureCreator;
 
-        $fixtureLoader = self::getContainer()->get(FixtureLoader::class);
-        \assert($fixtureLoader instanceof FixtureLoader);
-        $this->fixtureLoader = $fixtureLoader;
+        $fileSourceStorage = self::getContainer()->get('file_source.storage');
+        \assert($fileSourceStorage instanceof FilesystemOperator);
+        $this->fileSourceStorage = $fileSourceStorage;
+
+        $fileSourceFileStore = self::getContainer()->get('app.services.file_store_manager.file_source');
+        \assert($fileSourceFileStore instanceof FileStoreInterface);
+        $this->fileSourceFileStore = $fileSourceFileStore;
+
+        $fixtureFileStore = self::getContainer()->get('app.tests.services.file_store_manager.fixtures');
+        \assert($fixtureFileStore instanceof FileStoreInterface);
+        $this->fixtureFileStore = $fixtureFileStore;
+
+        $sourceLister = self::getContainer()->get(SerializableSourceLister::class);
+        \assert($sourceLister instanceof SerializableSourceLister);
+        $this->sourceLister = $sourceLister;
     }
 
     /**
      * @dataProvider serializeSuccessDataProvider
      */
-    public function testSerializeSuccess(string $fixtureSetIdentifier, ?string $path, callable $expectedCreator): void
-    {
-        $fileSource = new FileSource(UserId::create(), 'file source label');
-        $source = new RunSource($fileSource);
+    public function testSerializeSuccess(
+        string $fixtureSetIdentifier,
+        ?string $path,
+        string $expectedContentFixture
+    ): void {
+        $source = new FileSource(UserId::create(), 'file source label');
 
-        $this->fixtureCreator->copySetTo('/Source/' . $fixtureSetIdentifier, (string) $source);
+        $this->fixtureCreator->copySetTo(
+            'Source/' . $fixtureSetIdentifier,
+            $this->fileSourceStorage,
+            (string) $source
+        );
 
-        $content = $this->sourceSerializer->serialize((string) $source, $path);
+        $sourceFiles = $this->sourceLister->list($this->fileSourceFileStore, $source . '/' . $path);
 
-        self::assertSame($expectedCreator($this->fixtureLoader), $content);
+        $content = $this->sourceSerializer->serialize($sourceFiles);
+        $expected = trim($this->fixtureFileStore->read($expectedContentFixture));
+
+        self::assertSame($expected, $content);
     }
 
     /**
@@ -59,23 +84,17 @@ class SourceSerializerTest extends WebTestCase
             'yml_yaml_valid, entire' => [
                 'fixtureSetIdentifier' => 'yml_yaml_valid',
                 'path' => null,
-                'expectedCreator' => function (FixtureLoader $fixtureLoader): string {
-                    return $fixtureLoader->load('/RunSource/source_yml_yaml_entire.yaml');
-                },
+                'expectedContentFixture' => 'RunSource/source_yml_yaml_entire.yaml',
             ],
             'yml_yaml_valid, sub-directory without leading slash' => [
                 'fixtureSetIdentifier' => 'yml_yaml_valid',
                 'path' => 'directory',
-                'expectedCreator' => function (FixtureLoader $fixtureLoader): string {
-                    return $fixtureLoader->load('/RunSource/source_yml_yaml_partial.yaml');
-                },
+                'expectedContentFixture' => 'RunSource/source_yml_yaml_partial.yaml',
             ],
             'yml_yaml_valid, sub-directory with leading slash' => [
                 'fixtureSetIdentifier' => 'yml_yaml_valid',
                 'path' => '/directory',
-                'expectedCreator' => function (FixtureLoader $fixtureLoader): string {
-                    return $fixtureLoader->load('/RunSource/source_yml_yaml_partial.yaml');
-                },
+                'expectedContentFixture' => 'RunSource/source_yml_yaml_partial.yaml',
             ],
         ];
     }

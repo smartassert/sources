@@ -29,21 +29,9 @@ services:
     App\Tests\Services\FileStoreFixtureCreator:
         public: true
         arguments:
-            $fileStoreBasePath: '%file_store_base_path%'
-            $fixturesBasePath: '%fixtures_base_path%'
-
-    App\Tests\Services\FixtureLoader:
-        public: true
-        arguments:
-            $fixturesBasePath: '%fixtures_base_path%'
-
-    App\Services\FileStoreManager:
-        public: true
+            $fixtureFileStore: '@app.tests.services.file_store_manager.fixtures'
 
     App\Services\GitRepositoryCheckoutHandler:
-        public: true
-
-    App\Services\UserGitRepositoryPreparer:
         public: true
 
     App\Tests\Services\ApplicationClient:
@@ -53,3 +41,12 @@ services:
         public: true
         arguments:
             $usersSecurityBundleBaseUrl: '%users_security_bundle_base_url%'
+
+    App\Tests\Services\DirectoryLister:
+        public: true
+
+    app.tests.services.file_store_manager.fixtures:
+        class: App\Services\FileStoreManager
+        public: true
+        arguments:
+            $filesystem: '@test_fixtures.storage'

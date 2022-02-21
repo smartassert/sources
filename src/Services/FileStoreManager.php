@@ -4,31 +4,18 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use App\Exception\File\CreateException;
-use App\Exception\File\ReadException;
-use App\Exception\File\RemoveException;
-use App\Exception\File\WriteException;
-use League\Flysystem\Filesystem;
+use App\Exception\Storage\ReadException;
+use App\Exception\Storage\RemoveException;
+use App\Exception\Storage\WriteException;
 use League\Flysystem\FilesystemException;
+use League\Flysystem\FilesystemOperator;
 use League\Flysystem\StorageAttributes;
 
-class FileStoreManager
+class FileStoreManager implements FileStoreInterface
 {
     public function __construct(
-        private Filesystem $filesystem,
+        private FilesystemOperator $filesystem,
     ) {
-    }
-
-    /**
-     * @throws CreateException
-     */
-    public function create(string $relativePath): void
-    {
-        try {
-            $this->filesystem->createDirectory($relativePath);
-        } catch (FilesystemException $filesystemException) {
-            throw new CreateException($relativePath, $filesystemException);
-        }
     }
 
     /**
@@ -72,8 +59,13 @@ class FileStoreManager
                 return false;
             })
             ->sortByPath()
-            ->map(function (StorageAttributes $item) {
-                return $item->path();
+            ->map(function (StorageAttributes $item) use ($relativePath) {
+                $itemPath = $item->path();
+                if (str_starts_with($itemPath, $relativePath)) {
+                    $itemPath = substr($itemPath, strlen($relativePath) + 1);
+                }
+
+                return $itemPath;
             })
         ;
 

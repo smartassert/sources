@@ -1,0 +1,19 @@
+# Read the documentation at https://github.com/thephpleague/flysystem-bundle/blob/master/docs/1-getting-started.md
+flysystem:
+    storages:
+        file_source.storage:
+            adapter: 'asyncaws'
+            options:
+                client: 'digitalocean_spaces_client'
+                bucket: '%env(DIGITALOCEAN_SPACES_FILE_SOURCE_BUCKET)%'
+
+        run_source.storage:
+            adapter: 'asyncaws'
+            options:
+                client: 'digitalocean_spaces_client'
+                bucket: '%env(DIGITALOCEAN_SPACES_RUN_SOURCE_BUCKET)%'
+
+        git_repository.storage:
+            adapter: 'local'
+            options:
+                directory: '%git_repository_store_directory%'

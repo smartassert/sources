@@ -4,29 +4,33 @@ declare(strict_types=1);
 
 namespace App\Tests\Services;
 
-use Symfony\Component\Filesystem\Filesystem;
+use App\Services\FileStoreInterface;
+use League\Flysystem\FilesystemOperator;
 
 class FileStoreFixtureCreator
 {
     public function __construct(
-        private Filesystem $filesystem,
-        private string $fileStoreBasePath,
-        private string $fixturesBasePath,
+        private FileStoreInterface $fixtureFileStore,
     ) {
     }
 
-    public function copySetTo(string $origin, string $target): void
-    {
-        $this->filesystem->mirror($this->getFixturePath($origin), sprintf('%s/%s', $this->fileStoreBasePath, $target));
+    public function copySetTo(
+        string $originRelativePath,
+        FilesystemOperator $storage,
+        string $targetRelativeDirectory
+    ): void {
+        $originFiles = $this->fixtureFileStore->list($originRelativePath);
+
+        foreach ($originFiles as $fileRelativePath) {
+            $originPath = $originRelativePath . '/' . $fileRelativePath;
+            $targetPath = $targetRelativeDirectory . '/' . $fileRelativePath;
+
+            $storage->write($targetPath, $this->fixtureFileStore->read($originPath));
+        }
     }
 
-    public function copyTo(string $origin, string $target): void
+    public function copyTo(string $originRelativePath, FilesystemOperator $storage, string $targetRelativePath): void
     {
-        $this->filesystem->copy($this->getFixturePath($origin), sprintf('%s/%s', $this->fileStoreBasePath, $target));
-    }
-
-    public function getFixturePath(string $relativePath): string
-    {
-        return $this->fixturesBasePath . $relativePath;
+        $storage->write($targetRelativePath, $this->fixtureFileStore->read($originRelativePath));
     }
 }

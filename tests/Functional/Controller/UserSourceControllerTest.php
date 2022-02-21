@@ -16,14 +16,14 @@ use App\Repository\SourceRepository;
 use App\Request\FileSourceRequest;
 use App\Request\GitSourceRequest;
 use App\Request\SourceRequestInterface;
-use App\Services\FileStoreManager;
+use App\Services\FileStoreInterface;
 use App\Services\RunSourceSerializer;
 use App\Services\Source\Store;
 use App\Tests\Model\UserId;
 use App\Tests\Services\AuthorizationRequestAsserter;
 use App\Tests\Services\EntityRemover;
 use App\Tests\Services\FileStoreFixtureCreator;
-use App\Tests\Services\FixtureLoader;
+use League\Flysystem\FilesystemOperator;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
@@ -33,8 +33,10 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
     private RunSourceRepository $runSourceRepository;
     private Store $store;
     private FileStoreFixtureCreator $fixtureCreator;
-    private FixtureLoader $fixtureLoader;
     private AuthorizationRequestAsserter $authorizationRequestAsserter;
+    private FilesystemOperator $runSourceStorage;
+    private FilesystemOperator $fileSourceStorage;
+    private FileStoreInterface $fixtureFileStore;
 
     protected function setUp(): void
     {
@@ -56,13 +58,21 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
         \assert($fixtureCreator instanceof FileStoreFixtureCreator);
         $this->fixtureCreator = $fixtureCreator;
 
-        $fixtureLoader = self::getContainer()->get(FixtureLoader::class);
-        \assert($fixtureLoader instanceof FixtureLoader);
-        $this->fixtureLoader = $fixtureLoader;
-
         $authorizationRequestAsserter = self::getContainer()->get(AuthorizationRequestAsserter::class);
         \assert($authorizationRequestAsserter instanceof AuthorizationRequestAsserter);
         $this->authorizationRequestAsserter = $authorizationRequestAsserter;
+
+        $runSourceStorage = self::getContainer()->get('run_source.storage');
+        \assert($runSourceStorage instanceof FilesystemOperator);
+        $this->runSourceStorage = $runSourceStorage;
+
+        $fileSourceStorage = self::getContainer()->get('file_source.storage');
+        \assert($fileSourceStorage instanceof FilesystemOperator);
+        $this->fileSourceStorage = $fileSourceStorage;
+
+        $fixtureFileStore = self::getContainer()->get('app.tests.services.file_store_manager.fixtures');
+        \assert($fixtureFileStore instanceof FileStoreInterface);
+        $this->fixtureFileStore = $fixtureFileStore;
 
         $entityRemover = self::getContainer()->get(EntityRemover::class);
         if ($entityRemover instanceof EntityRemover) {
@@ -346,22 +356,12 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
         $this->store->add($fileSource);
         $this->store->add($runSource);
 
-        $fileStoreManager = self::getContainer()->get(FileStoreManager::class);
-        \assert($fileStoreManager instanceof FileStoreManager);
-        $fileStoreManager->write($fileSource . '/file.yaml', '- file content');
+        $serializedRunSourcePath = $runSource . '/' . RunSourceSerializer::SERIALIZED_FILENAME;
 
-        $runSourceSerializer = self::getContainer()->get(RunSourceSerializer::class);
-        \assert($runSourceSerializer instanceof RunSourceSerializer);
-        $runSourceSerializer->write($runSource);
+        $this->runSourceStorage->write($serializedRunSourcePath, '- serialized content');
 
-        $fileStoreBasePath = self::getContainer()->getParameter('file_store_base_path');
-        \assert(is_string($fileStoreBasePath));
-
-        $expectedRunSourceAbsolutePath = $fileStoreBasePath . '/' . $runSource;
-        $expectedSerializedRunSourcePath = $expectedRunSourceAbsolutePath . '/source.yaml';
-
-        self::assertDirectoryExists($expectedRunSourceAbsolutePath);
-        self::assertFileExists($expectedSerializedRunSourcePath);
+        self::assertTrue($this->runSourceStorage->directoryExists((string) $runSource));
+        self::assertTrue($this->runSourceStorage->fileExists($serializedRunSourcePath));
 
         $this->setUserServiceAuthorizedResponse($userId);
 
@@ -372,8 +372,39 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
         );
 
         self::assertSame(200, $response->getStatusCode());
-        self::assertDirectoryDoesNotExist($expectedRunSourceAbsolutePath);
-        self::assertFileDoesNotExist($expectedSerializedRunSourcePath);
+        self::assertFalse($this->runSourceStorage->directoryExists((string) $runSource));
+        self::assertFalse($this->runSourceStorage->fileExists($serializedRunSourcePath));
+    }
+
+    public function testDeleteFileSourceDeletesFileSourceFiles(): void
+    {
+        $userId = UserId::create();
+        $fileSource = new FileSource($userId, 'file source label');
+        $filename = 'file.yaml';
+
+        $this->store->add($fileSource);
+
+        $sourceRelativePath = (string) $fileSource;
+        $fileRelativePath = $sourceRelativePath . '/' . $filename;
+
+        $this->fileSourceStorage->write($fileRelativePath, '- content');
+
+        self::assertTrue($this->fileSourceStorage->directoryExists($sourceRelativePath));
+        self::assertTrue($this->fileSourceStorage->fileExists($fileRelativePath));
+
+        $this->setUserServiceAuthorizedResponse($userId);
+
+        $response = $this->applicationClient->makeAuthorizedSourceRequest(
+            'DELETE',
+            'user_source_delete',
+            $fileSource->getId()
+        );
+
+        self::assertSame(200, $response->getStatusCode());
+        self::assertSame(0, $this->sourceRepository->count([]));
+
+        self::assertFalse($this->fileSourceStorage->directoryExists($sourceRelativePath));
+        self::assertFalse($this->fileSourceStorage->fileExists($fileRelativePath));
     }
 
     public function testPrepareRunSource(): void
@@ -512,10 +543,10 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
 
     public function testReadSuccess(): void
     {
-        $serializedRunSourceFixturePath = '/RunSource/source_yml_yaml_entire.yaml';
+        $serializedRunSourceFixturePath = 'RunSource/source_yml_yaml_entire.yaml';
 
         $expectedResponse = new SymfonyResponse(
-            $this->fixtureLoader->load($serializedRunSourceFixturePath),
+            trim($this->fixtureFileStore->read($serializedRunSourceFixturePath)),
             200,
             [
                 'content-type' => 'text/x-yaml; charset=utf-8',
@@ -530,6 +561,7 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
 
         $this->fixtureCreator->copyTo(
             $serializedRunSourceFixturePath,
+            $this->runSourceStorage,
             $runSource . '/' . RunSourceSerializer::SERIALIZED_FILENAME
         );
 

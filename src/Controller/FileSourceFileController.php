@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use App\Entity\FileSource;
-use App\Exception\File\FileExceptionInterface;
 use App\Exception\InvalidRequestException;
+use App\Exception\Storage\StorageExceptionInterface;
 use App\Request\AddYamlFileRequest;
 use App\Request\RemoveYamlFileRequest;
 use App\Security\UserSourceAccessChecker;
-use App\Services\FileStoreManager;
+use App\Services\FileStoreInterface;
 use App\Services\RequestValidator;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -24,14 +24,14 @@ class FileSourceFileController
     public function __construct(
         private UserSourceAccessChecker $userSourceAccessChecker,
         private RequestValidator $requestValidator,
-        private FileStoreManager $fileStoreManager,
+        private FileStoreInterface $fileSourceFileStore,
     ) {
     }
 
     /**
      * @throws AccessDeniedException
      * @throws InvalidRequestException
-     * @throws FileExceptionInterface
+     * @throws StorageExceptionInterface
      */
     #[Route(self::ROUTE_SOURCE_FILE, name: 'file_source_file_add', methods: ['POST'])]
     public function add(FileSource $source, AddYamlFileRequest $request): Response
@@ -41,7 +41,7 @@ class FileSourceFileController
 
         $yamlFile = $request->getYamlFile();
 
-        $this->fileStoreManager->write($source . '/' . $yamlFile->name, $yamlFile->content);
+        $this->fileSourceFileStore->write($source . '/' . $yamlFile->name, $yamlFile->content);
 
         return new Response();
     }
@@ -49,14 +49,14 @@ class FileSourceFileController
     /**
      * @throws AccessDeniedException
      * @throws InvalidRequestException
-     * @throws FileExceptionInterface
+     * @throws StorageExceptionInterface
      */
     #[Route(self::ROUTE_SOURCE_FILE, name: 'file_source_file_remove', methods: ['DELETE'])]
     public function remove(FileSource $source, RemoveYamlFileRequest $request): Response
     {
         $this->userSourceAccessChecker->denyAccessUnlessGranted($source);
         $this->requestValidator->validate($request, ['filename.']);
-        $this->fileStoreManager->removeFile($source . '/' . $request->getFilename());
+        $this->fileSourceFileStore->removeFile($source . '/' . $request->getFilename());
 
         return new Response();
     }

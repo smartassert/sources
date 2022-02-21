@@ -8,11 +8,11 @@ use App\Entity\FileSource;
 use App\Entity\GitSource;
 use App\Entity\RunSource;
 use App\Enum\RunSource\State;
-use App\Exception\File\WriteException;
+use App\Exception\GitRepositoryException;
 use App\Exception\MessageHandler\PrepareException;
 use App\Exception\SourceRead\InvalidYamlException;
 use App\Exception\SourceRead\ReadFileException;
-use App\Exception\UserGitRepositoryException;
+use App\Exception\Storage\WriteException;
 use App\Message\Prepare;
 use App\MessageHandler\PrepareHandler;
 use App\Model\EntityId;
@@ -157,7 +157,7 @@ class PrepareHandlerTest extends WebTestCase
      */
     public function testInvokeDoesPrepare(
         array $entities,
-        RunSourceSerializer $runSourcePreparer,
+        RunSourceSerializer $runSourceSerializer,
         Prepare $message,
     ): void {
         foreach ($entities as $entity) {
@@ -169,7 +169,7 @@ class PrepareHandlerTest extends WebTestCase
             $this->handler,
             $this->handler::class,
             'runSourceSerializer',
-            $runSourcePreparer
+            $runSourceSerializer
         );
 
         $source = $this->sourceRepository->find($message->getSourceId());
@@ -199,7 +199,7 @@ class PrepareHandlerTest extends WebTestCase
                     $fileSource,
                     $fileRunSource,
                 ],
-                'runSourceSerializer' => $this->createRunSourcePreparer($fileRunSource),
+                'runSourceSerializer' => $this->createRunSourceSerializer($fileRunSource),
                 'message' => Prepare::createFromRunSource($fileRunSource),
             ],
             'run source is parent of git source, state is "requested"' => [
@@ -207,7 +207,7 @@ class PrepareHandlerTest extends WebTestCase
                     $gitSource,
                     $gitRunSource,
                 ],
-                'runSourceSerializer' => $this->createRunSourcePreparer($gitRunSource),
+                'runSourceSerializer' => $this->createRunSourceSerializer($gitRunSource),
                 'message' => Prepare::createFromRunSource($gitRunSource),
             ],
             'run source is parent of file source, state is "preparing/halted"' => [
@@ -215,28 +215,28 @@ class PrepareHandlerTest extends WebTestCase
                     $fileSource,
                     $fileRunSourceStatePreparingHalted,
                 ],
-                'runSourceSerializer' => $this->createRunSourcePreparer($fileRunSourceStatePreparingHalted),
+                'runSourceSerializer' => $this->createRunSourceSerializer($fileRunSourceStatePreparingHalted),
                 'message' => Prepare::createFromRunSource($fileRunSourceStatePreparingHalted),
             ],
         ];
     }
 
     /**
-     * @dataProvider invokeRunSourcePreparerThrowsExceptionDataProvider
+     * @dataProvider invokeRunSourceSerializerThrowsExceptionDataProvider
      */
-    public function testInvokeRunSourcePreparerThrowsException(\Exception $runSourcePreparerException): void
+    public function testInvokeRunSourceSerializerThrowsException(\Exception $runSourceSerializerException): void
     {
         $fileRunSource = new RunSource(new FileSource(UserId::create(), 'file source label'));
         $this->entityManager->persist($fileRunSource);
         $this->entityManager->flush();
 
-        $runSourcePreparer = $this->createRunSourcePreparer($fileRunSource, $runSourcePreparerException);
+        $runSourceSerializer = $this->createRunSourceSerializer($fileRunSource, $runSourceSerializerException);
 
         ObjectReflector::setProperty(
             $this->handler,
             $this->handler::class,
             'runSourceSerializer',
-            $runSourcePreparer
+            $runSourceSerializer
         );
 
         $message = Prepare::createFromRunSource($fileRunSource);
@@ -249,7 +249,7 @@ class PrepareHandlerTest extends WebTestCase
             $this->handler->__invoke($message);
             self::fail('Prepare exception not thrown');
         } catch (PrepareException $prepareException) {
-            self::assertSame($runSourcePreparerException, $prepareException->getHandlerException());
+            self::assertSame($runSourceSerializerException, $prepareException->getHandlerException());
             self::assertSame(State::PREPARING_HALTED, $source->getState());
         }
     }
@@ -257,25 +257,25 @@ class PrepareHandlerTest extends WebTestCase
     /**
      * @return array<mixed>
      */
-    public function invokeRunSourcePreparerThrowsExceptionDataProvider(): array
+    public function invokeRunSourceSerializerThrowsExceptionDataProvider(): array
     {
         return [
             WriteException::class => [
-                'runSourcePreparerException' => \Mockery::mock(WriteException::class),
+                'runSourceSerializerException' => \Mockery::mock(WriteException::class),
             ],
             ReadFileException::class => [
-                'runSourcePreparerException' => \Mockery::mock(ReadFileException::class),
+                'runSourceSerializerException' => \Mockery::mock(ReadFileException::class),
             ],
             InvalidYamlException::class => [
-                'runSourcePreparerException' => \Mockery::mock(InvalidYamlException::class),
+                'runSourceSerializerException' => \Mockery::mock(InvalidYamlException::class),
             ],
-            UserGitRepositoryException::class => [
-                'runSourcePreparerException' => \Mockery::mock(UserGitRepositoryException::class),
+            GitRepositoryException::class => [
+                'runSourceSerializerException' => \Mockery::mock(GitRepositoryException::class),
             ],
         ];
     }
 
-    private function createRunSourcePreparer(RunSource $runSource, ?\Exception $exception = null): RunSourceSerializer
+    private function createRunSourceSerializer(RunSource $runSource, ?\Exception $exception = null): RunSourceSerializer
     {
         $runSourceSerializer = \Mockery::mock(RunSourceSerializer::class);
         $expectation = $runSourceSerializer
