@@ -12,6 +12,7 @@ use App\Exception\SourceRead\SourceReadExceptionInterface;
 use App\Exception\Storage\ReadException;
 use App\Exception\Storage\RemoveException;
 use App\Exception\Storage\WriteException;
+use League\Flysystem\FilesystemReader;
 
 class RunSourceSerializer
 {
@@ -24,6 +25,8 @@ class RunSourceSerializer
         private FileStoreInterface $runSourceFileStore,
         private GitRepositoryStore $gitRepositoryStore,
         private SerializableSourceLister $sourceLister,
+        private FilesystemReader $fileSourceStorage,
+        private FilesystemReader $gitRepositoryStorage,
     ) {
     }
 
@@ -40,7 +43,7 @@ class RunSourceSerializer
         $content = null;
 
         if ($source instanceof FileSource) {
-            $files = $this->sourceLister->list($this->fileSourceFileStore, (string) $source);
+            $files = $this->sourceLister->list($this->fileSourceStorage, (string) $source);
             $content = $this->sourceSerializer->serialize($this->fileSourceFileStore, $files);
         }
 
@@ -52,7 +55,7 @@ class RunSourceSerializer
                 '/'
             );
 
-            $files = $this->sourceLister->list($this->gitRepositoryFileStore, $sourcePath);
+            $files = $this->sourceLister->list($this->gitRepositoryStorage, $sourcePath);
             $content = $this->sourceSerializer->serialize($this->gitRepositoryFileStore, $files);
 
             try {

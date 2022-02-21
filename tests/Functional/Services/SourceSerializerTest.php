@@ -67,7 +67,7 @@ class SourceSerializerTest extends WebTestCase
             (string) $source
         );
 
-        $sourceFiles = $this->sourceLister->list($this->fileSourceFileStore, $source . '/' . $path);
+        $sourceFiles = $this->sourceLister->list($this->fileSourceStorage, $source . '/' . $path);
 
         $content = $this->sourceSerializer->serialize($this->fileSourceFileStore, $sourceFiles);
         $expected = trim($this->fixtureFileStore->read($expectedContentFixture));

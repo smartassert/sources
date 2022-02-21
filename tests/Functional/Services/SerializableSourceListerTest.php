@@ -6,7 +6,6 @@ namespace App\Tests\Functional\Services;
 
 use App\Entity\FileSource;
 use App\Model\SourceFileCollection;
-use App\Services\FileStoreInterface;
 use App\Services\SerializableSourceLister;
 use App\Tests\Model\UserId;
 use App\Tests\Services\FileStoreFixtureCreator;
@@ -16,7 +15,7 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 class SerializableSourceListerTest extends WebTestCase
 {
     private SerializableSourceLister $sourceLister;
-    private FileStoreInterface $fileSourceStore;
+    private FilesystemOperator $fileSourceStorage;
     private string $fileSourcePath;
 
     protected function setUp(): void
@@ -27,12 +26,9 @@ class SerializableSourceListerTest extends WebTestCase
         \assert($runSourceSerializer instanceof SerializableSourceLister);
         $this->sourceLister = $runSourceSerializer;
 
-        $filesourceStore = self::getContainer()->get('app.services.file_store_manager.file_source');
-        \assert($filesourceStore instanceof FileStoreInterface);
-        $this->fileSourceStore = $filesourceStore;
-
         $fileSourceStorage = self::getContainer()->get('file_source.storage');
         \assert($fileSourceStorage instanceof FilesystemOperator);
+        $this->fileSourceStorage = $fileSourceStorage;
 
         $fileSource = new FileSource(UserId::create(), 'file source label');
         $this->fileSourcePath = (string) $fileSource;
@@ -53,7 +49,7 @@ class SerializableSourceListerTest extends WebTestCase
     {
         $path = str_replace('{{ fileSourcePath }}', $this->fileSourcePath, $path);
 
-        $collection = $this->sourceLister->list($this->fileSourceStore, $path);
+        $collection = $this->sourceLister->list($this->fileSourceStorage, $path);
 
         self::assertInstanceOf(SourceFileCollection::class, $collection);
         self::assertCount(count($expectedSourceFilePaths), $collection);
