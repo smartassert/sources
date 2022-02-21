@@ -69,19 +69,19 @@ class UserSourceController
     public function delete(
         SourceInterface $source,
         Store $store,
-        FilesystemWriter $fileSourceStorage,
-        FilesystemWriter $runSourceStorage,
+        FilesystemWriter $fileSourceWriter,
+        FilesystemWriter $runSourceWriter,
     ): Response {
         $this->userSourceAccessChecker->denyAccessUnlessGranted($source);
 
         $store->remove($source);
 
         if ($source instanceof FileSource) {
-            $fileSourceStorage->deleteDirectory((string) $source);
+            $fileSourceWriter->deleteDirectory((string) $source);
         }
 
         if ($source instanceof RunSource) {
-            $runSourceStorage->deleteDirectory((string) $source);
+            $runSourceWriter->deleteDirectory((string) $source);
         }
 
         return new JsonResponse();

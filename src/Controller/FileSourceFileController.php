@@ -24,7 +24,7 @@ class FileSourceFileController
     public function __construct(
         private UserSourceAccessChecker $userSourceAccessChecker,
         private RequestValidator $requestValidator,
-        private FilesystemWriter $fileSourceStorage,
+        private FilesystemWriter $fileSourceWriter,
     ) {
     }
 
@@ -41,7 +41,7 @@ class FileSourceFileController
 
         $yamlFile = $request->getYamlFile();
 
-        $this->fileSourceStorage->write($source . '/' . $yamlFile->name, $yamlFile->content);
+        $this->fileSourceWriter->write($source . '/' . $yamlFile->name, $yamlFile->content);
 
         return new Response();
     }
@@ -56,7 +56,7 @@ class FileSourceFileController
     {
         $this->userSourceAccessChecker->denyAccessUnlessGranted($source);
         $this->requestValidator->validate($request, ['filename.']);
-        $this->fileSourceStorage->delete($source . '/' . $request->getFilename());
+        $this->fileSourceWriter->delete($source . '/' . $request->getFilename());
 
         return new Response();
     }

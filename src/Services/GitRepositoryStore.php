@@ -14,7 +14,7 @@ use Symfony\Component\String\UnicodeString;
 class GitRepositoryStore
 {
     public function __construct(
-        private FilesystemWriter $gitRepositoryStorage,
+        private FilesystemWriter $gitRepositoryWriter,
         private GitRepositoryCloner $cloner,
         private GitRepositoryCheckoutHandler $checkoutHandler,
         private UserGitRepositoryFactory $gitRepositoryFactory,
@@ -34,7 +34,7 @@ class GitRepositoryStore
         $gitRepositoryUrl = $this->createRepositoryUrl($gitRepository->getSource());
 
         try {
-            $this->gitRepositoryStorage->deleteDirectory($relativePath);
+            $this->gitRepositoryWriter->deleteDirectory($relativePath);
 
             $cloneOutput = $this->cloner->clone($gitRepositoryUrl, $absolutePath);
             if (false === $cloneOutput->isSuccessful()) {
