@@ -10,7 +10,6 @@ use App\Entity\RunSource;
 use App\Enum\RunSource\State;
 use App\Exception\GitRepositoryException;
 use App\Exception\MessageHandler\PrepareException;
-use App\Exception\SourceRead\ReadFileException;
 use App\Message\Prepare;
 use App\MessageHandler\PrepareHandler;
 use App\Model\EntityId;
@@ -262,9 +261,6 @@ class PrepareHandlerTest extends WebTestCase
         return [
             UnableToReadFile::class => [
                 'runSourceSerializerException' => UnableToReadFile::fromLocation('/path/to/file'),
-            ],
-            ReadFileException::class => [
-                'runSourceSerializerException' => \Mockery::mock(ReadFileException::class),
             ],
             ParseException::class => [
                 'runSourceSerializerException' => new ParseException('invalid'),
