@@ -8,7 +8,6 @@ use App\Entity\FileSource;
 use App\Entity\GitSource;
 use App\Entity\RunSource;
 use App\Model\UserGitRepository;
-use App\Services\FileStoreInterface;
 use App\Services\GitRepositoryStore;
 use App\Services\RunSourceSerializer;
 use App\Tests\Model\UserId;
@@ -24,7 +23,7 @@ class RunSourceSerializerTest extends WebTestCase
     private FilesystemOperator $fileSourceStorage;
     private FilesystemOperator $gitRepositoryStorage;
     private FilesystemOperator $runSourceStorage;
-    private FileStoreInterface $fixtureFileStore;
+    private FilesystemOperator $fixtureStorage;
 
     protected function setUp(): void
     {
@@ -50,9 +49,9 @@ class RunSourceSerializerTest extends WebTestCase
         \assert($runSourceStorage instanceof FilesystemOperator);
         $this->runSourceStorage = $runSourceStorage;
 
-        $fixtureFileStore = self::getContainer()->get('app.tests.services.file_store_manager.fixtures');
-        \assert($fixtureFileStore instanceof FileStoreInterface);
-        $this->fixtureFileStore = $fixtureFileStore;
+        $fixtureStorage = self::getContainer()->get('test_fixtures.storage');
+        \assert($fixtureStorage instanceof FilesystemOperator);
+        $this->fixtureStorage = $fixtureStorage;
     }
 
     public function testWriteFileSource(): void
@@ -72,7 +71,7 @@ class RunSourceSerializerTest extends WebTestCase
         self::assertTrue($this->runSourceStorage->directoryExists((string) $runSource));
         self::assertTrue($this->runSourceStorage->fileExists($serializedRunSourcePath));
         self::assertSame(
-            trim($this->fixtureFileStore->read('RunSource/source_yml_yaml_entire.yaml')),
+            trim($this->fixtureStorage->read('RunSource/source_yml_yaml_entire.yaml')),
             $this->runSourceStorage->read($serializedRunSourcePath)
         );
     }
@@ -109,7 +108,7 @@ class RunSourceSerializerTest extends WebTestCase
 
         self::assertTrue($this->runSourceStorage->fileExists($serializedRunSourcePath));
         self::assertSame(
-            trim($this->fixtureFileStore->read($expectedSerializedFixturePath)),
+            trim($this->fixtureStorage->read($expectedSerializedFixturePath)),
             $this->runSourceStorage->read($serializedRunSourcePath)
         );
 
