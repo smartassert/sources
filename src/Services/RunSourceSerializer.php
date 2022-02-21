@@ -8,7 +8,6 @@ use App\Entity\FileSource;
 use App\Entity\GitSource;
 use App\Entity\RunSource;
 use App\Exception\GitRepositoryException;
-use App\Exception\Storage\RemoveException;
 use App\Exception\Storage\WriteException;
 use League\Flysystem\FilesystemException;
 use League\Flysystem\FilesystemOperator;
@@ -21,12 +20,11 @@ class RunSourceSerializer
 
     public function __construct(
         private SourceSerializer $sourceSerializer,
-        private FileStoreInterface $gitRepositoryFileStore,
         private FileStoreInterface $runSourceFileStore,
         private GitRepositoryStore $gitRepositoryStore,
         private SerializableSourceLister $sourceLister,
         private FilesystemReader $fileSourceStorage,
-        private FilesystemReader $gitRepositoryStorage,
+        private FilesystemOperator $gitRepositoryStorage,
         private FilesystemOperator $runSourceStorage,
     ) {
     }
@@ -61,8 +59,8 @@ class RunSourceSerializer
             $content = $this->sourceSerializer->serialize($this->gitRepositoryStorage, $files);
 
             try {
-                $this->gitRepositoryFileStore->remove((string) $gitRepository);
-            } catch (RemoveException) {
+                $this->gitRepositoryStorage->deleteDirectory((string) $gitRepository);
+            } catch (FilesystemException) {
             }
         }
 
