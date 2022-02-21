@@ -16,7 +16,6 @@ use App\Repository\SourceRepository;
 use App\Request\FileSourceRequest;
 use App\Request\GitSourceRequest;
 use App\Request\SourceRequestInterface;
-use App\Services\FileStoreInterface;
 use App\Services\RunSourceSerializer;
 use App\Services\Source\Store;
 use App\Tests\Model\UserId;
@@ -36,7 +35,7 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
     private AuthorizationRequestAsserter $authorizationRequestAsserter;
     private FilesystemOperator $runSourceStorage;
     private FilesystemOperator $fileSourceStorage;
-    private FileStoreInterface $fixtureFileStore;
+    private FilesystemOperator $fixtureStorage;
 
     protected function setUp(): void
     {
@@ -70,9 +69,9 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
         \assert($fileSourceStorage instanceof FilesystemOperator);
         $this->fileSourceStorage = $fileSourceStorage;
 
-        $fixtureFileStore = self::getContainer()->get('app.tests.services.file_store_manager.fixtures');
-        \assert($fixtureFileStore instanceof FileStoreInterface);
-        $this->fixtureFileStore = $fixtureFileStore;
+        $fixtureStorage = self::getContainer()->get('test_fixtures.storage');
+        \assert($fixtureStorage instanceof FilesystemOperator);
+        $this->fixtureStorage = $fixtureStorage;
 
         $entityRemover = self::getContainer()->get(EntityRemover::class);
         if ($entityRemover instanceof EntityRemover) {
@@ -546,7 +545,7 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
         $serializedRunSourceFixturePath = 'RunSource/source_yml_yaml_entire.yaml';
 
         $expectedResponse = new SymfonyResponse(
-            trim($this->fixtureFileStore->read($serializedRunSourceFixturePath)),
+            trim($this->fixtureStorage->read($serializedRunSourceFixturePath)),
             200,
             [
                 'content-type' => 'text/x-yaml; charset=utf-8',
