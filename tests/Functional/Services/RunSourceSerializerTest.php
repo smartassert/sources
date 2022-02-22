@@ -61,7 +61,8 @@ class RunSourceSerializerTest extends WebTestCase
         $originSource = \Mockery::mock(OriginSourceInterface::class);
         $originSource
             ->shouldReceive('getUserId')
-            ->andReturn(UserId::create());
+            ->andReturn(UserId::create())
+        ;
 
         $runSource = new RunSource($originSource);
 

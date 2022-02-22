@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Tests\Services;
 
 use App\Services\FileLister;
-use League\Flysystem\FilesystemOperator;
 use League\Flysystem\FilesystemReader;
+use League\Flysystem\FilesystemWriter;
 
 class FileStoreFixtureCreator
 {
@@ -18,7 +18,7 @@ class FileStoreFixtureCreator
 
     public function copySetTo(
         string $originRelativePath,
-        FilesystemOperator $storage,
+        FilesystemWriter $storage,
         string $targetRelativeDirectory
     ): void {
         $originFiles = $this->fileLister->list($this->fixturesReader, $originRelativePath);
@@ -32,7 +32,7 @@ class FileStoreFixtureCreator
         }
     }
 
-    public function copyTo(string $originRelativePath, FilesystemOperator $storage, string $targetRelativePath): void
+    public function copyTo(string $originRelativePath, FilesystemWriter $storage, string $targetRelativePath): void
     {
         $storage->write($targetRelativePath, $this->fixturesReader->read($originRelativePath));
     }

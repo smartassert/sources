@@ -23,16 +23,10 @@ services:
     App\Tests\Services\EntityRemover:
         public: true
 
-    App\Services\Source\Finder:
-        public: true
-
     App\Tests\Services\FileStoreFixtureCreator:
         public: true
         arguments:
             $fixturesReader: '@test_fixtures.storage'
-
-    App\Services\GitRepositoryCheckoutHandler:
-        public: true
 
     App\Tests\Services\ApplicationClient:
         public: true

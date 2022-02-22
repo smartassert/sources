@@ -31,4 +31,9 @@ class UserGitRepository implements UserFileLocatorInterface, SerializableSourceI
     {
         return $this->source;
     }
+
+    public function getSerializableSourcePath(): string
+    {
+        return $this->source->getPath();
+    }
 }
