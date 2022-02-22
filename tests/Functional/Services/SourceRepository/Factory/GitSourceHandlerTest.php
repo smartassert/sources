@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Functional\Services\SerializableSource\Factory;
+namespace App\Tests\Functional\Services\SourceRepository\Factory;
 
 use App\Entity\GitSource;
 use App\Exception\GitRepositoryException;
-use App\Exception\SerializableSourceCreationException;
+use App\Exception\SourceRepositoryCreationException;
 use App\Services\GitRepositoryStore;
-use App\Services\SerializableSource\Factory\GitSourceHandler;
+use App\Services\SourceRepository\Factory\GitSourceHandler;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use webignition\ObjectReflector\ObjectReflector;
 
@@ -25,7 +25,7 @@ class GitSourceHandlerTest extends WebTestCase
         $this->handler = $handler;
     }
 
-    public function testCreateThrowsSerializableSourceCreationException(): void
+    public function testCreateThrowsSourceRepositoryCreationException(): void
     {
         $gitRepositoryException = \Mockery::mock(GitRepositoryException::class);
 
@@ -47,8 +47,8 @@ class GitSourceHandlerTest extends WebTestCase
 
         try {
             $this->handler->create($source, []);
-            self::fail(SerializableSourceCreationException::class . ' not thrown');
-        } catch (SerializableSourceCreationException $exception) {
+            self::fail(SourceRepositoryCreationException::class . ' not thrown');
+        } catch (SourceRepositoryCreationException $exception) {
             self::assertSame($gitRepositoryException, $exception->getPrevious());
         }
     }

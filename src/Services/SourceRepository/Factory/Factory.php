@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace App\Services\SerializableSource\Factory;
+namespace App\Services\SourceRepository\Factory;
 
 use App\Entity\OriginSourceInterface;
-use App\Exception\SerializableSourceCreationException;
-use App\Model\SerializableSourceInterface;
+use App\Exception\SourceRepositoryCreationException;
+use App\Model\SourceRepositoryInterface;
 use League\Flysystem\FilesystemException;
 
 class Factory implements CreatorInterface, DestructorInterface
@@ -25,9 +25,9 @@ class Factory implements CreatorInterface, DestructorInterface
     }
 
     /**
-     * @throws SerializableSourceCreationException
+     * @throws SourceRepositoryCreationException
      */
-    public function create(OriginSourceInterface $origin, array $parameters): ?SerializableSourceInterface
+    public function create(OriginSourceInterface $origin, array $parameters): ?SourceRepositoryInterface
     {
         $creator = $this->findCreator($origin);
 
@@ -36,20 +36,20 @@ class Factory implements CreatorInterface, DestructorInterface
             : null;
     }
 
-    public function removes(SerializableSourceInterface $serializableSource): bool
+    public function removes(SourceRepositoryInterface $sourceRepository): bool
     {
-        return $this->findDestructor($serializableSource) instanceof DestructorInterface;
+        return $this->findDestructor($sourceRepository) instanceof DestructorInterface;
     }
 
     /**
      * @throws FilesystemException
      */
-    public function remove(SerializableSourceInterface $serializableSource): void
+    public function remove(SourceRepositoryInterface $sourceRepository): void
     {
-        $destructor = $this->findDestructor($serializableSource);
+        $destructor = $this->findDestructor($sourceRepository);
 
         if ($destructor instanceof DestructorInterface) {
-            $destructor->remove($serializableSource);
+            $destructor->remove($sourceRepository);
         }
     }
 
@@ -67,12 +67,12 @@ class Factory implements CreatorInterface, DestructorInterface
         return null;
     }
 
-    private function findDestructor(SerializableSourceInterface $serializableSource): ?DestructorInterface
+    private function findDestructor(SourceRepositoryInterface $sourceRepository): ?DestructorInterface
     {
         foreach ($this->handlers as $handler) {
             if (
                 $handler instanceof DestructorInterface
-                && $handler->removes($serializableSource)
+                && $handler->removes($sourceRepository)
             ) {
                 return $handler;
             }

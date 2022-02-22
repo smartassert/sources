@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace App\Services\SerializableSource\Factory;
+namespace App\Services\SourceRepository\Factory;
 
 use App\Entity\OriginSourceInterface;
-use App\Exception\SerializableSourceCreationException;
-use App\Model\SerializableSourceInterface;
+use App\Exception\SourceRepositoryCreationException;
+use App\Model\SourceRepositoryInterface;
 
 interface CreatorInterface
 {
@@ -15,10 +15,10 @@ interface CreatorInterface
     /**
      * @param array<string, string> $parameters
      *
-     * @throws SerializableSourceCreationException
+     * @throws SourceRepositoryCreationException
      */
     public function create(
         OriginSourceInterface $origin,
         array $parameters
-    ): ?SerializableSourceInterface;
+    ): ?SourceRepositoryInterface;
 }

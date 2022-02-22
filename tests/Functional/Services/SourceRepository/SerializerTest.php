@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Functional\Services\SerializableSource;
+namespace App\Tests\Functional\Services\SourceRepository;
 
 use App\Entity\FileSource;
 use App\Entity\GitSource;
 use App\Exception\UnparseableSourceFileException;
-use App\Model\SerializableSourceInterface;
+use App\Model\SourceRepositoryInterface;
 use App\Model\UserGitRepository;
-use App\Services\SerializableSource\Serializer;
+use App\Services\SourceRepository\Serializer;
 use App\Tests\Model\UserId;
 use App\Tests\Services\FileStoreFixtureCreator;
 use League\Flysystem\FilesystemOperator;
@@ -86,7 +86,7 @@ class SerializerTest extends WebTestCase
     public function testSerializeSuccess(
         string $fixtureSetIdentifier,
         string $sourceStorageId,
-        SerializableSourceInterface $source,
+        SourceRepositoryInterface $source,
         string $expectedFixturePath
     ): void {
         $storage = self::getContainer()->get($sourceStorageId);

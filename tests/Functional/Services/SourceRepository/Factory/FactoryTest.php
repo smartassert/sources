@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Functional\Services\SerializableSource\Factory;
+namespace App\Tests\Functional\Services\SourceRepository\Factory;
 
 use App\Entity\FileSource;
 use App\Entity\GitSource;
 use App\Entity\OriginSourceInterface;
-use App\Model\SerializableSourceInterface;
+use App\Model\SourceRepositoryInterface;
 use App\Model\UserGitRepository;
-use App\Services\SerializableSource\Factory\Factory;
-use App\Services\SerializableSource\Factory\GitSourceHandler;
+use App\Services\SourceRepository\Factory\Factory;
+use App\Services\SourceRepository\Factory\GitSourceHandler;
 use App\Tests\Model\UserId;
 use App\Tests\Services\FileStoreFixtureCreator;
 use League\Flysystem\FilesystemOperator;
@@ -62,7 +62,7 @@ class FactoryTest extends WebTestCase
     /**
      * @dataProvider removesDataProvider
      */
-    public function testRemoves(SerializableSourceInterface $source, bool $expected): void
+    public function testRemoves(SourceRepositoryInterface $source, bool $expected): void
     {
         self::assertSame($expected, $this->factory->removes($source));
     }
@@ -81,8 +81,8 @@ class FactoryTest extends WebTestCase
                 'source' => \Mockery::mock(UserGitRepository::class),
                 'expected' => true,
             ],
-            SerializableSourceInterface::class => [
-                'source' => \Mockery::mock(SerializableSourceInterface::class),
+            SourceRepositoryInterface::class => [
+                'source' => \Mockery::mock(SourceRepositoryInterface::class),
                 'expected' => false,
             ],
         ];
@@ -141,7 +141,7 @@ class FactoryTest extends WebTestCase
     {
         self::expectNotToPerformAssertions();
 
-        $this->factory->remove(\Mockery::mock(SerializableSourceInterface::class));
+        $this->factory->remove(\Mockery::mock(SourceRepositoryInterface::class));
     }
 
     public function testRemoveForFileSource(): void

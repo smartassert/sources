@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace App\Services\SerializableSource;
+namespace App\Services\SourceRepository;
 
-use App\Exception\SerializableSourceReaderNotFoundException;
+use App\Exception\SourceRepositoryReaderNotFoundException;
 use App\Exception\UnparseableSourceFileException;
 use App\Model\FilePathIdentifier;
-use App\Model\SerializableSourceInterface;
+use App\Model\SourceRepositoryInterface;
 use App\Services\FileLister;
-use App\Services\SerializableSource\Reader\Provider;
+use App\Services\SourceRepository\Reader\Provider;
 use League\Flysystem\FilesystemException;
 use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Parser as YamlParser;
@@ -28,14 +28,14 @@ class Serializer
     /**
      * @throws FilesystemException
      * @throws UnparseableSourceFileException
-     * @throws SerializableSourceReaderNotFoundException
+     * @throws SourceRepositoryReaderNotFoundException
      */
-    public function serialize(SerializableSourceInterface $serializableSource): string
+    public function serialize(SourceRepositoryInterface $sourceRepository): string
     {
-        $reader = $this->readerProvider->find($serializableSource);
+        $reader = $this->readerProvider->find($sourceRepository);
 
-        $sourcePath = $serializableSource->getDirectoryPath();
-        $listPath = rtrim($sourcePath . '/' . ltrim($serializableSource->getSerializablePath(), '/'), '/');
+        $sourcePath = $sourceRepository->getDirectoryPath();
+        $listPath = rtrim($sourcePath . '/' . ltrim($sourceRepository->getSerializablePath(), '/'), '/');
         $files = $this->fileLister->list($reader, $listPath, ['yml', 'yaml']);
 
         $documents = [];

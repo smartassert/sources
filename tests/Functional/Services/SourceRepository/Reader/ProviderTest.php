@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Functional\Services\SerializableSource\Reader;
+namespace App\Tests\Functional\Services\SourceRepository\Reader;
 
 use App\Entity\FileSource;
-use App\Exception\SerializableSourceReaderNotFoundException;
-use App\Model\SerializableSourceInterface;
+use App\Exception\SourceRepositoryReaderNotFoundException;
+use App\Model\SourceRepositoryInterface;
 use App\Model\UserGitRepository;
-use App\Services\SerializableSource\Reader\Provider;
+use App\Services\SourceRepository\Reader\Provider;
 use League\Flysystem\FilesystemReader;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
@@ -27,21 +27,21 @@ class ProviderTest extends WebTestCase
 
     public function testFindReaderNotFound(): void
     {
-        $serializableSource = \Mockery::mock(SerializableSourceInterface::class);
+        $sourceRepository = \Mockery::mock(SourceRepositoryInterface::class);
 
-        $this->expectExceptionObject(new SerializableSourceReaderNotFoundException($serializableSource));
+        $this->expectExceptionObject(new SourceRepositoryReaderNotFoundException($sourceRepository));
 
-        $this->provider->find($serializableSource);
+        $this->provider->find($sourceRepository);
     }
 
     /**
      * @dataProvider findSuccessDataProvider
      */
     public function testFindSuccess(
-        SerializableSourceInterface $serializableSource,
+        SourceRepositoryInterface $sourceRepository,
         string $expectedReaderServiceId,
     ): void {
-        $reader = $this->provider->find($serializableSource);
+        $reader = $this->provider->find($sourceRepository);
 
         self::assertInstanceOf(FilesystemReader::class, $reader);
         self::assertSame(
@@ -57,11 +57,11 @@ class ProviderTest extends WebTestCase
     {
         return [
             'file source' => [
-                'serializableSource' => \Mockery::mock(FileSource::class),
+                'sourceRepository' => \Mockery::mock(FileSource::class),
                 'expectedReaderServiceId' => 'file_source.storage',
             ],
             'git repository' => [
-                'serializableSource' => \Mockery::mock(UserGitRepository::class),
+                'sourceRepository' => \Mockery::mock(UserGitRepository::class),
                 'expectedReaderServiceId' => 'git_repository.storage',
             ],
         ];

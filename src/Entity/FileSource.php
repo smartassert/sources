@@ -6,14 +6,14 @@ namespace App\Entity;
 
 use App\Enum\Source\Type;
 use App\Model\DirectoryLocatorInterface;
-use App\Model\SerializableSourceInterface;
+use App\Model\SourceRepositoryInterface;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity]
 class FileSource extends AbstractSource implements
     OriginSourceInterface,
     DirectoryLocatorInterface,
-    SerializableSourceInterface,
+    SourceRepositoryInterface,
     \JsonSerializable
 {
     #[ORM\Column(type: 'string', length: 255)]

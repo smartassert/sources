@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace App\Services\SerializableSource\Factory;
+namespace App\Services\SourceRepository\Factory;
 
 use App\Entity\FileSource;
 use App\Entity\OriginSourceInterface;
-use App\Model\SerializableSourceInterface;
+use App\Model\SourceRepositoryInterface;
 
 class FileSourceHandler implements CreatorInterface
 {
@@ -15,7 +15,7 @@ class FileSourceHandler implements CreatorInterface
         return $origin instanceof FileSource;
     }
 
-    public function create(OriginSourceInterface $origin, array $parameters): ?SerializableSourceInterface
+    public function create(OriginSourceInterface $origin, array $parameters): ?SourceRepositoryInterface
     {
         return $origin instanceof FileSource ? $origin : null;
     }
