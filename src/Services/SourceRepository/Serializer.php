@@ -37,6 +37,7 @@ class Serializer
         $listPath = rtrim(ltrim($sourceRepository->getRepositoryPath(), '/'), '/');
         $files = $this->fileLister->list($reader, $listPath, ['yml', 'yaml']);
 
+        $directoryPath = $sourceRepository->getDirectoryPath();
         $documents = [];
         foreach ($files as $file) {
             $content = $reader->read($listPath . '/' . $file);
@@ -47,13 +48,8 @@ class Serializer
                 throw new UnparseableSourceFileException($file, $parseException);
             }
 
-            $documents[] = sprintf(
-                self::DOCUMENT_TEMPLATE,
-                new FilePathIdentifier(
-                    $this->removePathPrefix($sourceRepository->getDirectoryPath(), $file),
-                    md5($content)
-                )
-            );
+            $filePath = $this->removePathPrefix($directoryPath, $file);
+            $documents[] = sprintf(self::DOCUMENT_TEMPLATE, new FilePathIdentifier($filePath, md5($content)));
             $documents[] = sprintf(self::DOCUMENT_TEMPLATE, trim($content));
         }
 
