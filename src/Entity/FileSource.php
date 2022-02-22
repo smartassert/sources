@@ -50,7 +50,7 @@ class FileSource extends AbstractSource implements
 
     public function getSerializablePath(): string
     {
-        return '/';
+        return $this->getDirectoryPath() . '/';
     }
 
     /**

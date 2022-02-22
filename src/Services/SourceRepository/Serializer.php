@@ -34,8 +34,7 @@ class Serializer
     {
         $reader = $this->readerProvider->find($sourceRepository);
 
-        $sourcePath = $sourceRepository->getDirectoryPath();
-        $listPath = rtrim($sourcePath . '/' . ltrim($sourceRepository->getSerializablePath(), '/'), '/');
+        $listPath = rtrim(ltrim($sourceRepository->getSerializablePath(), '/'), '/');
         $files = $this->fileLister->list($reader, $listPath, ['yml', 'yaml']);
 
         $documents = [];
@@ -50,7 +49,10 @@ class Serializer
 
             $documents[] = sprintf(
                 self::DOCUMENT_TEMPLATE,
-                new FilePathIdentifier($this->removePathPrefix($sourcePath, $file), md5($content))
+                new FilePathIdentifier(
+                    $this->removePathPrefix($sourceRepository->getDirectoryPath(), $file),
+                    md5($content)
+                )
             );
             $documents[] = sprintf(self::DOCUMENT_TEMPLATE, trim($content));
         }
