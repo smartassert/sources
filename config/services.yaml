@@ -72,3 +72,23 @@ services:
             -  endpoint: '%env(DIGITALOCEAN_SPACES_ENDPOINT)%'
                accessKeyId: '%env(DIGITALOCEAN_SPACES_ID)%'
                accessKeySecret: '%env(DIGITALOCEAN_SPACES_SECRET)%'
+
+    App\Services\SerializableSource\Factory\Factory:
+        arguments:
+            $handlers:
+                - '@App\Services\SerializableSource\Factory\FileSourceHandler'
+                - '@App\Services\SerializableSource\Factory\GitSourceHandler'
+
+    App\Services\SerializableSource\Reader\FileSourceReader:
+        arguments:
+            $reader: '@file_source.storage'
+
+    App\Services\SerializableSource\Reader\UserGitRepositoryReader:
+        arguments:
+            $reader: '@git_repository.storage'
+
+    App\Services\SerializableSource\Reader\Provider:
+        arguments:
+            $readers:
+                - '@App\Services\SerializableSource\Reader\FileSourceReader'
+                - '@App\Services\SerializableSource\Reader\UserGitRepositoryReader'
