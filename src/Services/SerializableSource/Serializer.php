@@ -36,7 +36,7 @@ class Serializer
 
         $sourcePath = (string) $serializableSource;
         $listPath = rtrim($sourcePath . '/' . ltrim($serializableSource->getSerializableSourcePath(), '/'), '/');
-        $files = $this->fileLister->list($reader, $listPath);
+        $files = $this->fileLister->list($reader, $listPath, ['yml', 'yaml']);
 
         $documents = [];
         foreach ($files as $file) {

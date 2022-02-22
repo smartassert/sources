@@ -47,6 +47,18 @@ class SerializerTest extends WebTestCase
         );
     }
 
+    public function testSerializeNoYamlFiles(): void
+    {
+        $storage = self::getContainer()->get('file_source.storage');
+        assert($storage instanceof FilesystemWriter);
+
+        $source = new FileSource(UserId::create(), 'file source label');
+
+        $this->fixtureCreator->copySetTo('Source/txt', $storage, (string) $source);
+
+        self::assertSame('', $this->serializer->serialize($source));
+    }
+
     public function testSerializeInvalidFileSourceYaml(): void
     {
         $storage = self::getContainer()->get('file_source.storage');
