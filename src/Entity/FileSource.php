@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
-use App\Enum\Source\Type as SourceType;
+use App\Enum\Source\Type;
 use App\Model\SerializableSourceInterface;
 use App\Model\UserFileLocatorInterface;
 use App\Model\UserSourceFileLocatorTrait;
@@ -41,9 +41,9 @@ class FileSource extends AbstractSource implements
         return $this;
     }
 
-    public function getType(): SourceType
+    public function getType(): Type
     {
-        return SourceType::FILE;
+        return Type::FILE;
     }
 
     public function getRunParameterNames(): array
@@ -69,7 +69,7 @@ class FileSource extends AbstractSource implements
         return [
             'id' => $this->id,
             'user_id' => $this->getUserId(),
-            'type' => SourceType::FILE->value,
+            'type' => Type::FILE->value,
             'label' => $this->label
         ];
     }
