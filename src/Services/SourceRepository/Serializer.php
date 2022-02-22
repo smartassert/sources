@@ -34,7 +34,7 @@ class Serializer
     {
         $reader = $this->readerProvider->find($sourceRepository);
 
-        $listPath = rtrim(ltrim($sourceRepository->getSerializablePath(), '/'), '/');
+        $listPath = rtrim(ltrim($sourceRepository->getRepositoryPath(), '/'), '/');
         $files = $this->fileLister->list($reader, $listPath, ['yml', 'yaml']);
 
         $documents = [];

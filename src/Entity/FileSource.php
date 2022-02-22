@@ -48,7 +48,7 @@ class FileSource extends AbstractSource implements
         return [];
     }
 
-    public function getSerializablePath(): string
+    public function getRepositoryPath(): string
     {
         return $this->getDirectoryPath() . '/';
     }

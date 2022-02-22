@@ -6,7 +6,7 @@ namespace App\Model;
 
 interface SourceRepositoryInterface
 {
-    public function getSerializablePath(): string;
+    public function getRepositoryPath(): string;
 
     public function getDirectoryPath(): string;
 }
