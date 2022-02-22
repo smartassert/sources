@@ -6,7 +6,7 @@ namespace App\Model;
 
 interface SerializableSourceInterface
 {
-    public function getSerializableSourcePath(): string;
+    public function getSerializablePath(): string;
 
     public function getDirectoryPath(): string;
 }

@@ -30,7 +30,7 @@ class UserGitRepository implements DirectoryLocatorInterface, SerializableSource
         return $this->source;
     }
 
-    public function getSerializableSourcePath(): string
+    public function getSerializablePath(): string
     {
         return $this->source->getPath();
     }
