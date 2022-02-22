@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Functional\Services\SerializableSource;
+namespace App\Tests\Functional\Services\SourceRepository;
 
 use App\Entity\FileSource;
 use App\Entity\GitSource;
 use App\Exception\UnparseableSourceFileException;
-use App\Model\SerializableSourceInterface;
+use App\Model\SourceRepositoryInterface;
 use App\Model\UserGitRepository;
-use App\Services\SerializableSource\Serializer;
+use App\Services\SourceRepository\Serializer;
 use App\Tests\Model\UserId;
 use App\Tests\Services\FileStoreFixtureCreator;
 use League\Flysystem\FilesystemOperator;
@@ -54,7 +54,7 @@ class SerializerTest extends WebTestCase
 
         $source = new FileSource(UserId::create(), 'file source label');
 
-        $this->fixtureCreator->copySetTo('Source/txt', $storage, (string) $source);
+        $this->fixtureCreator->copySetTo('Source/txt', $storage, $source->getDirectoryPath());
 
         self::assertSame('', $this->serializer->serialize($source));
     }
@@ -66,7 +66,7 @@ class SerializerTest extends WebTestCase
 
         $source = new FileSource(UserId::create(), 'file source label');
 
-        $this->fixtureCreator->copySetTo('Source/yml_yaml_invalid', $storage, (string) $source);
+        $this->fixtureCreator->copySetTo('Source/yml_yaml_invalid', $storage, $source->getDirectoryPath());
 
         try {
             $this->serializer->serialize($source);
@@ -86,13 +86,13 @@ class SerializerTest extends WebTestCase
     public function testSerializeSuccess(
         string $fixtureSetIdentifier,
         string $sourceStorageId,
-        SerializableSourceInterface $source,
+        SourceRepositoryInterface $source,
         string $expectedFixturePath
     ): void {
         $storage = self::getContainer()->get($sourceStorageId);
         assert($storage instanceof FilesystemWriter);
 
-        $this->fixtureCreator->copySetTo($fixtureSetIdentifier, $storage, (string) $source);
+        $this->fixtureCreator->copySetTo($fixtureSetIdentifier, $storage, $source->getDirectoryPath());
 
         self::assertSame(
             trim($this->fixtureStorage->read($expectedFixturePath)),

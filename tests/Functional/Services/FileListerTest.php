@@ -55,7 +55,7 @@ class FileListerTest extends WebTestCase
      */
     public function listDataProvider(): array
     {
-        $basePath = (string) new FileSource(UserId::create(), '');
+        $basePath = (new FileSource(UserId::create(), ''))->getDirectoryPath();
 
         return [
             'source: txt, no extensions' => [

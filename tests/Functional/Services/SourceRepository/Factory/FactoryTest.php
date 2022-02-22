@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Functional\Services\SerializableSource\Factory;
+namespace App\Tests\Functional\Services\SourceRepository\Factory;
 
 use App\Entity\FileSource;
 use App\Entity\GitSource;
-use App\Entity\OriginSourceInterface;
-use App\Model\SerializableSourceInterface;
+use App\Entity\SourceOriginInterface;
+use App\Model\SourceRepositoryInterface;
 use App\Model\UserGitRepository;
-use App\Services\SerializableSource\Factory\Factory;
-use App\Services\SerializableSource\Factory\GitSourceHandler;
+use App\Services\SourceRepository\Factory\Factory;
+use App\Services\SourceRepository\Factory\GitSourceHandler;
 use App\Tests\Model\UserId;
 use App\Tests\Services\FileStoreFixtureCreator;
 use League\Flysystem\FilesystemOperator;
@@ -33,7 +33,7 @@ class FactoryTest extends WebTestCase
     /**
      * @dataProvider createsForDataProvider
      */
-    public function testCreatesFor(OriginSourceInterface $source, bool $expected): void
+    public function testCreatesFor(SourceOriginInterface $source, bool $expected): void
     {
         self::assertSame($expected, $this->factory->createsFor($source));
     }
@@ -52,8 +52,8 @@ class FactoryTest extends WebTestCase
                 'source' => \Mockery::mock(GitSource::class),
                 'expected' => true,
             ],
-            OriginSourceInterface::class => [
-                'source' => \Mockery::mock(OriginSourceInterface::class),
+            SourceOriginInterface::class => [
+                'source' => \Mockery::mock(SourceOriginInterface::class),
                 'expected' => false,
             ],
         ];
@@ -62,7 +62,7 @@ class FactoryTest extends WebTestCase
     /**
      * @dataProvider removesDataProvider
      */
-    public function testRemoves(SerializableSourceInterface $source, bool $expected): void
+    public function testRemoves(SourceRepositoryInterface $source, bool $expected): void
     {
         self::assertSame($expected, $this->factory->removes($source));
     }
@@ -81,8 +81,8 @@ class FactoryTest extends WebTestCase
                 'source' => \Mockery::mock(UserGitRepository::class),
                 'expected' => true,
             ],
-            SerializableSourceInterface::class => [
-                'source' => \Mockery::mock(SerializableSourceInterface::class),
+            SourceRepositoryInterface::class => [
+                'source' => \Mockery::mock(SourceRepositoryInterface::class),
                 'expected' => false,
             ],
         ];
@@ -91,7 +91,7 @@ class FactoryTest extends WebTestCase
     public function testCreateForUnknownSource(): void
     {
         self::assertNull(
-            $this->factory->create(\Mockery::mock(OriginSourceInterface::class), [])
+            $this->factory->create(\Mockery::mock(SourceOriginInterface::class), [])
         );
     }
 
@@ -141,7 +141,7 @@ class FactoryTest extends WebTestCase
     {
         self::expectNotToPerformAssertions();
 
-        $this->factory->remove(\Mockery::mock(SerializableSourceInterface::class));
+        $this->factory->remove(\Mockery::mock(SourceRepositoryInterface::class));
     }
 
     public function testRemoveForFileSource(): void
@@ -163,10 +163,10 @@ class FactoryTest extends WebTestCase
             new GitSource(UserId::create(), 'https://example.com/repository.git')
         );
 
-        $fixtureCreator->copySetTo('Source/mixed', $gitRepositoryStorage, (string) $userGitRepository);
-        self::assertTrue($gitRepositoryStorage->directoryExists((string) $userGitRepository));
+        $fixtureCreator->copySetTo('Source/mixed', $gitRepositoryStorage, $userGitRepository->getDirectoryPath());
+        self::assertTrue($gitRepositoryStorage->directoryExists($userGitRepository->getDirectoryPath()));
 
         $this->factory->remove($userGitRepository);
-        self::assertFalse($gitRepositoryStorage->directoryExists((string) $userGitRepository));
+        self::assertFalse($gitRepositoryStorage->directoryExists($userGitRepository->getDirectoryPath()));
     }
 }

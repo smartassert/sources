@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use App\Entity\FileSource;
-use App\Entity\OriginSourceInterface as OriginSource;
 use App\Entity\RunSource;
 use App\Entity\SourceInterface;
+use App\Entity\SourceOriginInterface;
 use App\Exception\InvalidRequestException;
 use App\Message\Prepare;
 use App\Request\SourceRequestInterface;
@@ -52,7 +52,7 @@ class UserSourceController
     public function update(
         RequestValidator $requestValidator,
         Mutator $mutator,
-        OriginSource $source,
+        SourceOriginInterface $source,
         SourceRequestInterface $request,
     ): Response {
         $this->userSourceAccessChecker->denyAccessUnlessGranted($source);
@@ -77,11 +77,11 @@ class UserSourceController
         $store->remove($source);
 
         if ($source instanceof FileSource) {
-            $fileSourceWriter->deleteDirectory((string) $source);
+            $fileSourceWriter->deleteDirectory($source->getDirectoryPath());
         }
 
         if ($source instanceof RunSource) {
-            $runSourceWriter->deleteDirectory((string) $source);
+            $runSourceWriter->deleteDirectory($source->getDirectoryPath());
         }
 
         return new JsonResponse();
@@ -93,7 +93,7 @@ class UserSourceController
     #[Route(SourceRoutes::ROUTE_SOURCE . '/prepare', name: 'user_source_prepare', methods: ['POST'])]
     public function prepare(
         Request $request,
-        OriginSource $source,
+        SourceOriginInterface $source,
         MessageBusInterface $messageBus,
         RunSourceFactory $runSourceFactory,
     ): Response {

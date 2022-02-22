@@ -8,7 +8,7 @@ use App\Enum\Source\Type;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity]
-class GitSource extends AbstractSource implements OriginSourceInterface, \JsonSerializable
+class GitSource extends AbstractSource implements SourceOriginInterface, \JsonSerializable
 {
     #[ORM\Column(type: 'string', length: 255)]
     private string $hostUrl;

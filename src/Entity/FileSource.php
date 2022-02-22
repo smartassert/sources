@@ -5,20 +5,17 @@ declare(strict_types=1);
 namespace App\Entity;
 
 use App\Enum\Source\Type;
-use App\Model\SerializableSourceInterface;
-use App\Model\UserFileLocatorInterface;
-use App\Model\UserSourceFileLocatorTrait;
+use App\Model\DirectoryLocatorInterface;
+use App\Model\SourceRepositoryInterface;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity]
 class FileSource extends AbstractSource implements
-    OriginSourceInterface,
-    UserFileLocatorInterface,
-    SerializableSourceInterface,
+    SourceOriginInterface,
+    DirectoryLocatorInterface,
+    SourceRepositoryInterface,
     \JsonSerializable
 {
-    use UserSourceFileLocatorTrait;
-
     #[ORM\Column(type: 'string', length: 255)]
     private string $label;
 
@@ -51,9 +48,9 @@ class FileSource extends AbstractSource implements
         return [];
     }
 
-    public function getSerializableSourcePath(): string
+    public function getRepositoryPath(): string
     {
-        return '/';
+        return $this->getDirectoryPath() . '/';
     }
 
     /**
@@ -72,5 +69,14 @@ class FileSource extends AbstractSource implements
             'type' => Type::FILE->value,
             'label' => $this->label
         ];
+    }
+
+    public function getDirectoryPath(): string
+    {
+        return sprintf(
+            '%s/%s',
+            $this->getUserId(),
+            $this->getId(),
+        );
     }
 }

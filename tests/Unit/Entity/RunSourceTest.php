@@ -123,17 +123,4 @@ class RunSourceTest extends TestCase
             ],
         ];
     }
-
-    public function testGetPathEqualsToString(): void
-    {
-        $userId = UserId::create();
-        $source = new RunSource(
-            new FileSource($userId, 'file source label')
-        );
-        $expectedPath = sprintf('%s/%s', $userId, $source->getId());
-
-        self::assertSame($expectedPath, $source->getPath());
-        self::assertSame($expectedPath, (string) $source);
-        self::assertSame($source->getPath(), (string) $source);
-    }
 }

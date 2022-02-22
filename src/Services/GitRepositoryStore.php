@@ -29,7 +29,7 @@ class GitRepositoryStore
     public function initialize(GitSource $source, ?string $ref): UserGitRepository
     {
         $gitRepository = $this->gitRepositoryFactory->create($source);
-        $relativePath = (string) $gitRepository;
+        $relativePath = $gitRepository->getDirectoryPath();
         $absolutePath = $this->gitRepositoryBasePath . '/' . $relativePath;
 
         $gitRepositoryUrl = $this->createRepositoryUrl($gitRepository->getSource());
@@ -58,7 +58,7 @@ class GitRepositoryStore
      */
     public function remove(UserGitRepository $gitRepository): void
     {
-        $this->gitRepositoryWriter->deleteDirectory((string) $gitRepository);
+        $this->gitRepositoryWriter->deleteDirectory($gitRepository->getDirectoryPath());
     }
 
     private function createRepositoryUrl(GitSource $source): string

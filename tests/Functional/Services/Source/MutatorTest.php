@@ -6,7 +6,7 @@ namespace App\Tests\Functional\Services\Source;
 
 use App\Entity\FileSource;
 use App\Entity\GitSource;
-use App\Entity\OriginSourceInterface;
+use App\Entity\SourceOriginInterface;
 use App\Request\FileSourceRequest;
 use App\Request\GitSourceRequest;
 use App\Request\SourceRequestInterface;
@@ -37,7 +37,7 @@ class MutatorTest extends WebTestCase
     /**
      * @dataProvider updateNoChangesDataProvider
      */
-    public function testUpdateNoChanges(OriginSourceInterface $source, SourceRequestInterface $request): void
+    public function testUpdateNoChanges(SourceOriginInterface $source, SourceRequestInterface $request): void
     {
         $mutatedSource = $this->mutator->update($source, $request);
 
@@ -95,9 +95,9 @@ class MutatorTest extends WebTestCase
      * @dataProvider updateDataProvider
      */
     public function testUpdate(
-        OriginSourceInterface $source,
+        SourceOriginInterface $source,
         SourceRequestInterface $request,
-        OriginSourceInterface $expected,
+        SourceOriginInterface $expected,
     ): void {
         $mutatedSource = $this->mutator->update($source, $request);
 

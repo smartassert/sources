@@ -7,18 +7,15 @@ namespace App\Entity;
 use App\Enum\RunSource\FailureReason;
 use App\Enum\RunSource\State;
 use App\Enum\Source\Type;
-use App\Model\UserFileLocatorInterface;
-use App\Model\UserSourceFileLocatorTrait;
+use App\Model\DirectoryLocatorInterface;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity]
-class RunSource extends AbstractSource implements UserFileLocatorInterface, \JsonSerializable
+class RunSource extends AbstractSource implements DirectoryLocatorInterface, \JsonSerializable
 {
-    use UserSourceFileLocatorTrait;
-
     #[ORM\ManyToOne(targetEntity: AbstractSource::class, cascade: ['persist'])]
     #[ORM\JoinColumn(nullable: true)]
-    private ?OriginSourceInterface $parent;
+    private ?SourceOriginInterface $parent;
 
     /**
      * @var array<string, string>
@@ -38,7 +35,7 @@ class RunSource extends AbstractSource implements UserFileLocatorInterface, \Jso
     /**
      * @param array<string, string> $parameters
      */
-    public function __construct(OriginSourceInterface $parent, array $parameters = [])
+    public function __construct(SourceOriginInterface $parent, array $parameters = [])
     {
         parent::__construct($parent->getUserId());
 
@@ -48,7 +45,7 @@ class RunSource extends AbstractSource implements UserFileLocatorInterface, \Jso
         $this->state = State::REQUESTED;
     }
 
-    public function getParent(): ?OriginSourceInterface
+    public function getParent(): ?SourceOriginInterface
     {
         return $this->parent;
     }
@@ -139,5 +136,14 @@ class RunSource extends AbstractSource implements UserFileLocatorInterface, \Jso
         }
 
         return $data;
+    }
+
+    public function getDirectoryPath(): string
+    {
+        return sprintf(
+            '%s/%s',
+            $this->getUserId(),
+            $this->getId(),
+        );
     }
 }

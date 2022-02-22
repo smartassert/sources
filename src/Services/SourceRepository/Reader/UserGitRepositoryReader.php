@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\Services\SerializableSource\Reader;
+namespace App\Services\SourceRepository\Reader;
 
-use App\Model\SerializableSourceInterface;
+use App\Model\SourceRepositoryInterface;
 use App\Model\UserGitRepository;
 use League\Flysystem\FilesystemReader;
 
@@ -15,9 +15,9 @@ class UserGitRepositoryReader implements ReaderInterface
     ) {
     }
 
-    public function handles(SerializableSourceInterface $serializableSource): bool
+    public function handles(SourceRepositoryInterface $sourceRepository): bool
     {
-        return $serializableSource instanceof UserGitRepository;
+        return $sourceRepository instanceof UserGitRepository;
     }
 
     public function getReader(): FilesystemReader

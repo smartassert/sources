@@ -6,10 +6,8 @@ namespace App\Model;
 
 use App\Entity\GitSource;
 
-class UserGitRepository implements UserFileLocatorInterface, SerializableSourceInterface
+class UserGitRepository implements DirectoryLocatorInterface, SourceRepositoryInterface
 {
-    use UserSourceFileLocatorTrait;
-
     private string $id;
 
     public function __construct(private GitSource $source)
@@ -32,8 +30,17 @@ class UserGitRepository implements UserFileLocatorInterface, SerializableSourceI
         return $this->source;
     }
 
-    public function getSerializableSourcePath(): string
+    public function getRepositoryPath(): string
     {
-        return $this->source->getPath();
+        return $this->getDirectoryPath() . '/' . ltrim($this->source->getPath(), '/');
+    }
+
+    public function getDirectoryPath(): string
+    {
+        return sprintf(
+            '%s/%s',
+            $this->getUserId(),
+            $this->getId(),
+        );
     }
 }

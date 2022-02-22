@@ -6,8 +6,8 @@ namespace App\Services\Source;
 
 use App\Entity\FileSource;
 use App\Entity\GitSource;
-use App\Entity\OriginSourceInterface;
 use App\Entity\SourceInterface;
+use App\Entity\SourceOriginInterface;
 use App\Request\FileSourceRequest;
 use App\Request\GitSourceRequest;
 use App\Request\SourceRequestInterface;
@@ -19,7 +19,7 @@ class Mutator
     ) {
     }
 
-    public function update(OriginSourceInterface $source, SourceRequestInterface $request): SourceInterface
+    public function update(SourceOriginInterface $source, SourceRequestInterface $request): SourceInterface
     {
         $isMutated = false;
         if ($source instanceof FileSource && $request instanceof FileSourceRequest) {

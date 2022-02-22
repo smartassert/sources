@@ -4,17 +4,17 @@ declare(strict_types=1);
 
 namespace App\ArgumentResolver;
 
-use App\Entity\OriginSourceInterface;
+use App\Entity\SourceOriginInterface;
 
 class OriginSourceResolver extends AbstractSourceResolver
 {
     protected function supportsArgumentType(string $type): bool
     {
-        return OriginSourceInterface::class === $type;
+        return SourceOriginInterface::class === $type;
     }
 
     protected function getExpectedInstanceClassName(): string
     {
-        return OriginSourceInterface::class;
+        return SourceOriginInterface::class;
     }
 }

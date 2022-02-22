@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace App\Services\SerializableSource\Reader;
+namespace App\Services\SourceRepository\Reader;
 
 use App\Entity\FileSource;
-use App\Model\SerializableSourceInterface;
+use App\Model\SourceRepositoryInterface;
 use League\Flysystem\FilesystemReader;
 
 class FileSourceReader implements ReaderInterface
@@ -15,9 +15,9 @@ class FileSourceReader implements ReaderInterface
     ) {
     }
 
-    public function handles(SerializableSourceInterface $serializableSource): bool
+    public function handles(SourceRepositoryInterface $sourceRepository): bool
     {
-        return $serializableSource instanceof FileSource;
+        return $sourceRepository instanceof FileSource;
     }
 
     public function getReader(): FilesystemReader
