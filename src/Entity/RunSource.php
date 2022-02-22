@@ -7,11 +7,11 @@ namespace App\Entity;
 use App\Enum\RunSource\FailureReason;
 use App\Enum\RunSource\State;
 use App\Enum\Source\Type;
-use App\Model\FileLocatorInterface;
+use App\Model\DirectoryLocatorInterface;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity]
-class RunSource extends AbstractSource implements FileLocatorInterface, \JsonSerializable
+class RunSource extends AbstractSource implements DirectoryLocatorInterface, \JsonSerializable
 {
     #[ORM\ManyToOne(targetEntity: AbstractSource::class, cascade: ['persist'])]
     #[ORM\JoinColumn(nullable: true)]

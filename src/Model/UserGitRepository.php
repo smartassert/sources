@@ -6,7 +6,7 @@ namespace App\Model;
 
 use App\Entity\GitSource;
 
-class UserGitRepository implements FileLocatorInterface, SerializableSourceInterface
+class UserGitRepository implements DirectoryLocatorInterface, SerializableSourceInterface
 {
     private string $id;
 

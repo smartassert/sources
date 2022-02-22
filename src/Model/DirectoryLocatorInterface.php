@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Model;
 
-interface FileLocatorInterface
+interface DirectoryLocatorInterface
 {
     public function getFilePath(): string;
 }
