@@ -8,6 +8,7 @@ use App\Entity\GitSource;
 use App\Exception\GitActionException;
 use App\Exception\GitRepositoryException;
 use App\Model\UserGitRepository;
+use League\Flysystem\FilesystemException;
 use League\Flysystem\FilesystemWriter;
 use Symfony\Component\String\UnicodeString;
 
@@ -50,6 +51,14 @@ class GitRepositoryStore
         }
 
         return $gitRepository;
+    }
+
+    /**
+     * @throws FilesystemException
+     */
+    public function remove(UserGitRepository $gitRepository): void
+    {
+        $this->gitRepositoryWriter->deleteDirectory((string) $gitRepository);
     }
 
     private function createRepositoryUrl(GitSource $source): string

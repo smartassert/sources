@@ -6,7 +6,7 @@ namespace App\Model;
 
 use App\Entity\GitSource;
 
-class UserGitRepository implements UserFileLocatorInterface
+class UserGitRepository implements UserFileLocatorInterface, SerializableSourceInterface
 {
     use UserSourceFileLocatorTrait;
 
@@ -30,5 +30,10 @@ class UserGitRepository implements UserFileLocatorInterface
     public function getSource(): GitSource
     {
         return $this->source;
+    }
+
+    public function getSerializableSourcePath(): string
+    {
+        return $this->source->getPath();
     }
 }

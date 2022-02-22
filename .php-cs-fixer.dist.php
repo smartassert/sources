@@ -21,6 +21,9 @@ return (new PhpCsFixer\Config())
         'php_unit_internal_class' => false,
         'php_unit_test_class_requires_covers' => false,
         'declare_strict_types' => true,
+        'class_definition' => [
+            'multi_line_extends_each_single_line' => true,
+        ],
         'blank_line_before_statement' => [
             'statements' => [
                 'break',
