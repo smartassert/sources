@@ -8,8 +8,6 @@ use App\Entity\GitSource;
 
 class UserGitRepository implements UserFileLocatorInterface, SerializableSourceInterface
 {
-    use UserSourceFileLocatorTrait;
-
     private string $id;
 
     public function __construct(private GitSource $source)
@@ -35,5 +33,14 @@ class UserGitRepository implements UserFileLocatorInterface, SerializableSourceI
     public function getSerializableSourcePath(): string
     {
         return $this->source->getPath();
+    }
+
+    public function getFilePath(): string
+    {
+        return sprintf(
+            '%s/%s',
+            $this->getUserId(),
+            $this->getId(),
+        );
     }
 }

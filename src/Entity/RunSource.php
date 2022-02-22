@@ -8,14 +8,11 @@ use App\Enum\RunSource\FailureReason;
 use App\Enum\RunSource\State;
 use App\Enum\Source\Type;
 use App\Model\UserFileLocatorInterface;
-use App\Model\UserSourceFileLocatorTrait;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity]
 class RunSource extends AbstractSource implements UserFileLocatorInterface, \JsonSerializable
 {
-    use UserSourceFileLocatorTrait;
-
     #[ORM\ManyToOne(targetEntity: AbstractSource::class, cascade: ['persist'])]
     #[ORM\JoinColumn(nullable: true)]
     private ?OriginSourceInterface $parent;
@@ -139,5 +136,14 @@ class RunSource extends AbstractSource implements UserFileLocatorInterface, \Jso
         }
 
         return $data;
+    }
+
+    public function getFilePath(): string
+    {
+        return sprintf(
+            '%s/%s',
+            $this->getUserId(),
+            $this->getId(),
+        );
     }
 }
