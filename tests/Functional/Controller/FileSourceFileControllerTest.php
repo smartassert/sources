@@ -36,7 +36,7 @@ class FileSourceFileControllerTest extends AbstractSourceControllerTest
 
         $this->userId = UserId::create();
         $this->fileSource = new FileSource($this->userId, 'file source label');
-        $this->sourceRelativePath = $this->fileSource->getPath();
+        $this->sourceRelativePath = $this->fileSource->getFilePath();
 
         $store = self::getContainer()->get(Store::class);
         \assert($store instanceof Store);

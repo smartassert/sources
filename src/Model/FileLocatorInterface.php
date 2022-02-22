@@ -6,5 +6,5 @@ namespace App\Model;
 
 interface FileLocatorInterface
 {
-    public function getPath(): string;
+    public function getFilePath(): string;
 }

@@ -54,7 +54,7 @@ class SerializerTest extends WebTestCase
 
         $source = new FileSource(UserId::create(), 'file source label');
 
-        $this->fixtureCreator->copySetTo('Source/txt', $storage, $source->getPath());
+        $this->fixtureCreator->copySetTo('Source/txt', $storage, $source->getFilePath());
 
         self::assertSame('', $this->serializer->serialize($source));
     }
@@ -66,7 +66,7 @@ class SerializerTest extends WebTestCase
 
         $source = new FileSource(UserId::create(), 'file source label');
 
-        $this->fixtureCreator->copySetTo('Source/yml_yaml_invalid', $storage, $source->getPath());
+        $this->fixtureCreator->copySetTo('Source/yml_yaml_invalid', $storage, $source->getFilePath());
 
         try {
             $this->serializer->serialize($source);

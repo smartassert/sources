@@ -6,7 +6,7 @@ namespace App\Model;
 
 trait UserSourceFileLocatorTrait
 {
-    public function getPath(): string
+    public function getFilePath(): string
     {
         return sprintf(
             '%s/%s',

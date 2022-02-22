@@ -80,15 +80,15 @@ class RunSourceSerializerTest extends WebTestCase
         $this->fixtureCreator->copySetTo(
             'Source/yml_yaml_valid',
             $this->fileSourceStorage,
-            $fileSource->getPath()
+            $fileSource->getFilePath()
         );
 
         $runSource = new RunSource($fileSource);
         $this->runSourceSerializer->write($runSource);
 
-        $serializedRunSourcePath = $runSource->getPath() . '/' . RunSourceSerializer::SERIALIZED_FILENAME;
+        $serializedRunSourcePath = $runSource->getFilePath() . '/' . RunSourceSerializer::SERIALIZED_FILENAME;
 
-        self::assertTrue($this->runSourceStorage->directoryExists($runSource->getPath()));
+        self::assertTrue($this->runSourceStorage->directoryExists($runSource->getFilePath()));
         self::assertTrue($this->runSourceStorage->fileExists($serializedRunSourcePath));
         self::assertSame(
             trim($this->fixtureStorage->read('RunSource/source_yml_yaml_entire.yaml')),
@@ -103,11 +103,11 @@ class RunSourceSerializerTest extends WebTestCase
         $this->fixtureCreator->copyTo(
             'RunSource/source_yml_yaml_entire.yaml',
             $this->runSourceStorage,
-            $runSource->getPath() . '/' . RunSourceSerializer::SERIALIZED_FILENAME
+            $runSource->getFilePath() . '/' . RunSourceSerializer::SERIALIZED_FILENAME
         );
 
         $expected = $this->runSourceStorage->read(
-            $runSource->getPath() . '/' . RunSourceSerializer::SERIALIZED_FILENAME
+            $runSource->getFilePath() . '/' . RunSourceSerializer::SERIALIZED_FILENAME
         );
 
         self::assertSame(trim($expected), $this->runSourceSerializer->read($runSource));
