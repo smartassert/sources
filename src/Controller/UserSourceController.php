@@ -77,11 +77,11 @@ class UserSourceController
         $store->remove($source);
 
         if ($source instanceof FileSource) {
-            $fileSourceWriter->deleteDirectory((string) $source);
+            $fileSourceWriter->deleteDirectory($source->getPath());
         }
 
         if ($source instanceof RunSource) {
-            $runSourceWriter->deleteDirectory((string) $source);
+            $runSourceWriter->deleteDirectory($source->getPath());
         }
 
         return new JsonResponse();

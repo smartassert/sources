@@ -77,19 +77,19 @@ class GitRepositoryStoreTest extends WebTestCase
 
         $gitRepositoryBasePath = self::getContainer()->getParameter('git_repository_store_directory');
         \assert(is_string($gitRepositoryBasePath));
-        $this->gitRepositoryAbsolutePath = $gitRepositoryBasePath . '/' . $this->gitRepository;
+        $this->gitRepositoryAbsolutePath = $gitRepositoryBasePath . '/' . $this->gitRepository->getPath();
 
         $this->setGitRepositoryStoreUserGitRepositoryFactory();
     }
 
     public function testInitializeUnableToRemoveExistingFileStore(): void
     {
-        $unableToDeleteDirectoryException = UnableToDeleteDirectory::atLocation((string) $this->gitRepository);
+        $unableToDeleteDirectoryException = UnableToDeleteDirectory::atLocation($this->gitRepository->getPath());
 
         $gitRepositoryWriter = \Mockery::mock(FilesystemWriter::class);
         $gitRepositoryWriter
             ->shouldReceive('deleteDirectory')
-            ->with((string) $this->gitRepository)
+            ->with($this->gitRepository->getPath())
             ->andThrow($unableToDeleteDirectoryException)
         ;
 
@@ -133,7 +133,7 @@ class GitRepositoryStoreTest extends WebTestCase
 
         self::assertGreaterThan($assertionCount, self::getCount());
         self::assertInstanceOf(RepositoryException::class, $userGitRepositoryException);
-        self::assertFalse($this->gitRepositoryStorage->directoryExists((string) $this->gitRepository));
+        self::assertFalse($this->gitRepositoryStorage->directoryExists($this->gitRepository->getPath()));
     }
 
     /**
@@ -234,12 +234,10 @@ class GitRepositoryStoreTest extends WebTestCase
 
         $this->gitRepositoryStore->initialize($this->source, self::REF);
 
-        $userGitRepositoryPath = (string) $this->gitRepository;
-
-        self::assertTrue($this->gitRepositoryStorage->directoryExists($userGitRepositoryPath));
+        self::assertTrue($this->gitRepositoryStorage->directoryExists($this->gitRepository->getPath()));
         self::assertSame(
             $this->fileLister->list($this->fixturesStorage, $fixtureSetIdentifier),
-            $this->fileLister->list($this->gitRepositoryStorage, $userGitRepositoryPath)
+            $this->fileLister->list($this->gitRepositoryStorage, $this->gitRepository->getPath())
         );
     }
 

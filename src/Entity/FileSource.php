@@ -56,6 +56,11 @@ class FileSource extends AbstractSource implements
         return '/';
     }
 
+    public function getFilePath(): string
+    {
+        return $this->getPath();
+    }
+
     /**
      * @return array{
      *     "id": string,
