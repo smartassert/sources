@@ -1,0 +1,22 @@
+name: Integration tests
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  docker-build:
+    name: Build docker image
+    strategy:
+      matrix:
+        operating-system: [ubuntu-latest]
+    runs-on: ${{ matrix.operating-system }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Build
+        run: docker build .
