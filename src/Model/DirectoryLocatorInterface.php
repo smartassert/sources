@@ -6,5 +6,5 @@ namespace App\Model;
 
 interface DirectoryLocatorInterface
 {
-    public function getFilePath(): string;
+    public function getDirectoryPath(): string;
 }

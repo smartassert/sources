@@ -355,11 +355,11 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
         $this->store->add($fileSource);
         $this->store->add($runSource);
 
-        $serializedRunSourcePath = $runSource->getFilePath() . '/' . RunSourceSerializer::SERIALIZED_FILENAME;
+        $serializedRunSourcePath = $runSource->getDirectoryPath() . '/' . RunSourceSerializer::SERIALIZED_FILENAME;
 
         $this->runSourceStorage->write($serializedRunSourcePath, '- serialized content');
 
-        self::assertTrue($this->runSourceStorage->directoryExists($runSource->getFilePath()));
+        self::assertTrue($this->runSourceStorage->directoryExists($runSource->getDirectoryPath()));
         self::assertTrue($this->runSourceStorage->fileExists($serializedRunSourcePath));
 
         $this->setUserServiceAuthorizedResponse($userId);
@@ -371,7 +371,7 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
         );
 
         self::assertSame(200, $response->getStatusCode());
-        self::assertFalse($this->runSourceStorage->directoryExists($runSource->getFilePath()));
+        self::assertFalse($this->runSourceStorage->directoryExists($runSource->getDirectoryPath()));
         self::assertFalse($this->runSourceStorage->fileExists($serializedRunSourcePath));
     }
 
@@ -383,7 +383,7 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
 
         $this->store->add($fileSource);
 
-        $sourceRelativePath = $fileSource->getFilePath();
+        $sourceRelativePath = $fileSource->getDirectoryPath();
         $fileRelativePath = $sourceRelativePath . '/' . $filename;
 
         $this->fileSourceStorage->write($fileRelativePath, '- content');
@@ -561,7 +561,7 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
         $this->fixtureCreator->copyTo(
             $serializedRunSourceFixturePath,
             $this->runSourceStorage,
-            $runSource->getFilePath() . '/' . RunSourceSerializer::SERIALIZED_FILENAME
+            $runSource->getDirectoryPath() . '/' . RunSourceSerializer::SERIALIZED_FILENAME
         );
 
         $this->setUserServiceAuthorizedResponse($userId);

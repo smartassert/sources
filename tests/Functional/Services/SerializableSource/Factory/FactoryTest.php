@@ -163,10 +163,10 @@ class FactoryTest extends WebTestCase
             new GitSource(UserId::create(), 'https://example.com/repository.git')
         );
 
-        $fixtureCreator->copySetTo('Source/mixed', $gitRepositoryStorage, $userGitRepository->getFilePath());
-        self::assertTrue($gitRepositoryStorage->directoryExists($userGitRepository->getFilePath()));
+        $fixtureCreator->copySetTo('Source/mixed', $gitRepositoryStorage, $userGitRepository->getDirectoryPath());
+        self::assertTrue($gitRepositoryStorage->directoryExists($userGitRepository->getDirectoryPath()));
 
         $this->factory->remove($userGitRepository);
-        self::assertFalse($gitRepositoryStorage->directoryExists($userGitRepository->getFilePath()));
+        self::assertFalse($gitRepositoryStorage->directoryExists($userGitRepository->getDirectoryPath()));
     }
 }

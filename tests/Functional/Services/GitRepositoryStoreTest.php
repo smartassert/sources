@@ -77,20 +77,20 @@ class GitRepositoryStoreTest extends WebTestCase
 
         $gitRepositoryBasePath = self::getContainer()->getParameter('git_repository_store_directory');
         \assert(is_string($gitRepositoryBasePath));
-        $this->gitRepositoryAbsolutePath = $gitRepositoryBasePath . '/' . $this->gitRepository->getFilePath();
+        $this->gitRepositoryAbsolutePath = $gitRepositoryBasePath . '/' . $this->gitRepository->getDirectoryPath();
 
         $this->setGitRepositoryStoreUserGitRepositoryFactory();
     }
 
     public function testInitializeUnableToRemoveExistingFileStore(): void
     {
-        $unableToDeleteDirectoryException = UnableToDeleteDirectory::atLocation($this->gitRepository->getFilePath());
+        $unableToDeleteException = UnableToDeleteDirectory::atLocation($this->gitRepository->getDirectoryPath());
 
         $gitRepositoryWriter = \Mockery::mock(FilesystemWriter::class);
         $gitRepositoryWriter
             ->shouldReceive('deleteDirectory')
-            ->with($this->gitRepository->getFilePath())
-            ->andThrow($unableToDeleteDirectoryException)
+            ->with($this->gitRepository->getDirectoryPath())
+            ->andThrow($unableToDeleteException)
         ;
 
         ObjectReflector::setProperty(
@@ -100,7 +100,7 @@ class GitRepositoryStoreTest extends WebTestCase
             $gitRepositoryWriter
         );
 
-        $this->expectExceptionObject(new GitRepositoryException($unableToDeleteDirectoryException));
+        $this->expectExceptionObject(new GitRepositoryException($unableToDeleteException));
 
         $this->gitRepositoryStore->initialize($this->source, 'ref value goes right here');
     }
@@ -133,7 +133,7 @@ class GitRepositoryStoreTest extends WebTestCase
 
         self::assertGreaterThan($assertionCount, self::getCount());
         self::assertInstanceOf(RepositoryException::class, $userGitRepositoryException);
-        self::assertFalse($this->gitRepositoryStorage->directoryExists($this->gitRepository->getFilePath()));
+        self::assertFalse($this->gitRepositoryStorage->directoryExists($this->gitRepository->getDirectoryPath()));
     }
 
     /**
@@ -234,10 +234,10 @@ class GitRepositoryStoreTest extends WebTestCase
 
         $this->gitRepositoryStore->initialize($this->source, self::REF);
 
-        self::assertTrue($this->gitRepositoryStorage->directoryExists($this->gitRepository->getFilePath()));
+        self::assertTrue($this->gitRepositoryStorage->directoryExists($this->gitRepository->getDirectoryPath()));
         self::assertSame(
             $this->fileLister->list($this->fixturesStorage, $fixtureSetIdentifier),
-            $this->fileLister->list($this->gitRepositoryStorage, $this->gitRepository->getFilePath())
+            $this->fileLister->list($this->gitRepositoryStorage, $this->gitRepository->getDirectoryPath())
         );
     }
 

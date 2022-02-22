@@ -35,7 +35,7 @@ class UserGitRepository implements DirectoryLocatorInterface, SerializableSource
         return $this->source->getPath();
     }
 
-    public function getFilePath(): string
+    public function getDirectoryPath(): string
     {
         return sprintf(
             '%s/%s',

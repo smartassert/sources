@@ -46,7 +46,7 @@ class RunSourceSerializer
             throw new UnserializableSourceException($source);
         }
 
-        $targetPath = $target->getFilePath() . '/' . self::SERIALIZED_FILENAME;
+        $targetPath = $target->getDirectoryPath() . '/' . self::SERIALIZED_FILENAME;
         $this->runSourceWriter->write($targetPath, $this->serializer->serialize($serializableSource));
         $this->serializableSourceFactory->remove($serializableSource);
 
@@ -58,6 +58,6 @@ class RunSourceSerializer
      */
     public function read(RunSource $runSource): string
     {
-        return trim($this->runSourceReader->read($runSource->getFilePath() . '/' . self::SERIALIZED_FILENAME));
+        return trim($this->runSourceReader->read($runSource->getDirectoryPath() . '/' . self::SERIALIZED_FILENAME));
     }
 }

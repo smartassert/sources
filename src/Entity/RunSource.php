@@ -138,7 +138,7 @@ class RunSource extends AbstractSource implements DirectoryLocatorInterface, \Js
         return $data;
     }
 
-    public function getFilePath(): string
+    public function getDirectoryPath(): string
     {
         return sprintf(
             '%s/%s',

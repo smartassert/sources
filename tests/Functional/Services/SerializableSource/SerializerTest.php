@@ -54,7 +54,7 @@ class SerializerTest extends WebTestCase
 
         $source = new FileSource(UserId::create(), 'file source label');
 
-        $this->fixtureCreator->copySetTo('Source/txt', $storage, $source->getFilePath());
+        $this->fixtureCreator->copySetTo('Source/txt', $storage, $source->getDirectoryPath());
 
         self::assertSame('', $this->serializer->serialize($source));
     }
@@ -66,7 +66,7 @@ class SerializerTest extends WebTestCase
 
         $source = new FileSource(UserId::create(), 'file source label');
 
-        $this->fixtureCreator->copySetTo('Source/yml_yaml_invalid', $storage, $source->getFilePath());
+        $this->fixtureCreator->copySetTo('Source/yml_yaml_invalid', $storage, $source->getDirectoryPath());
 
         try {
             $this->serializer->serialize($source);
@@ -92,7 +92,7 @@ class SerializerTest extends WebTestCase
         $storage = self::getContainer()->get($sourceStorageId);
         assert($storage instanceof FilesystemWriter);
 
-        $this->fixtureCreator->copySetTo($fixtureSetIdentifier, $storage, $source->getFilePath());
+        $this->fixtureCreator->copySetTo($fixtureSetIdentifier, $storage, $source->getDirectoryPath());
 
         self::assertSame(
             trim($this->fixtureStorage->read($expectedFixturePath)),

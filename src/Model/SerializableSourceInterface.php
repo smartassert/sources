@@ -8,5 +8,5 @@ interface SerializableSourceInterface
 {
     public function getSerializableSourcePath(): string;
 
-    public function getFilePath(): string;
+    public function getDirectoryPath(): string;
 }

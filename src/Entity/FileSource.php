@@ -71,7 +71,7 @@ class FileSource extends AbstractSource implements
         ];
     }
 
-    public function getFilePath(): string
+    public function getDirectoryPath(): string
     {
         return sprintf(
             '%s/%s',
