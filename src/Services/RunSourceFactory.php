@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use App\Entity\OriginSourceInterface;
 use App\Entity\RunSource;
+use App\Entity\SourceOriginInterface;
 use App\Services\Source\Store;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -16,7 +16,7 @@ class RunSourceFactory
     ) {
     }
 
-    public function createFromRequest(OriginSourceInterface $source, Request $request): RunSource
+    public function createFromRequest(SourceOriginInterface $source, Request $request): RunSource
     {
         $parameters = [];
         foreach ($source->getRunParameterNames() as $runParameterName) {

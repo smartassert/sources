@@ -11,7 +11,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity]
 class FileSource extends AbstractSource implements
-    OriginSourceInterface,
+    SourceOriginInterface,
     DirectoryLocatorInterface,
     SourceRepositoryInterface,
     \JsonSerializable

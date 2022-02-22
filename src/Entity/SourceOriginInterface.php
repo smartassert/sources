@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
-interface OriginSourceInterface extends SourceInterface
+interface SourceOriginInterface extends SourceInterface
 {
     /**
      * @return string[]

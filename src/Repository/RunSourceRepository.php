@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Repository;
 
-use App\Entity\OriginSourceInterface;
 use App\Entity\RunSource;
+use App\Entity\SourceOriginInterface;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -24,7 +24,7 @@ class RunSourceRepository extends ServiceEntityRepository
         parent::__construct($registry, RunSource::class);
     }
 
-    public function findByParent(OriginSourceInterface $parent): ?RunSource
+    public function findByParent(SourceOriginInterface $parent): ?RunSource
     {
         return $this->findOneBy([
             'parent' => $parent,

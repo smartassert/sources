@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Tests\Functional\Services;
 
 use App\Entity\FileSource;
-use App\Entity\OriginSourceInterface;
 use App\Entity\RunSource;
+use App\Entity\SourceOriginInterface;
 use App\Exception\UnserializableSourceException;
 use App\Services\RunSourceSerializer;
 use App\Tests\Model\UserId;
@@ -58,7 +58,7 @@ class RunSourceSerializerTest extends WebTestCase
 
     public function testWriteUnserializableSource(): void
     {
-        $originSource = \Mockery::mock(OriginSourceInterface::class);
+        $originSource = \Mockery::mock(SourceOriginInterface::class);
         $originSource
             ->shouldReceive('getUserId')
             ->andReturn(UserId::create())

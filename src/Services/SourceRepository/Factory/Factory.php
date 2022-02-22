@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services\SourceRepository\Factory;
 
-use App\Entity\OriginSourceInterface;
+use App\Entity\SourceOriginInterface;
 use App\Exception\SourceRepositoryCreationException;
 use App\Model\SourceRepositoryInterface;
 use League\Flysystem\FilesystemException;
@@ -19,20 +19,20 @@ class Factory implements CreatorInterface, DestructorInterface
     ) {
     }
 
-    public function createsFor(OriginSourceInterface $origin): bool
+    public function createsFor(SourceOriginInterface $source): bool
     {
-        return $this->findCreator($origin) instanceof CreatorInterface;
+        return $this->findCreator($source) instanceof CreatorInterface;
     }
 
     /**
      * @throws SourceRepositoryCreationException
      */
-    public function create(OriginSourceInterface $origin, array $parameters): ?SourceRepositoryInterface
+    public function create(SourceOriginInterface $source, array $parameters): ?SourceRepositoryInterface
     {
-        $creator = $this->findCreator($origin);
+        $creator = $this->findCreator($source);
 
         return $creator instanceof CreatorInterface
-            ? $creator->create($origin, $parameters)
+            ? $creator->create($source, $parameters)
             : null;
     }
 
@@ -53,12 +53,12 @@ class Factory implements CreatorInterface, DestructorInterface
         }
     }
 
-    private function findCreator(OriginSourceInterface $origin): ?CreatorInterface
+    private function findCreator(SourceOriginInterface $source): ?CreatorInterface
     {
         foreach ($this->handlers as $handler) {
             if (
                 $handler instanceof CreatorInterface
-                && $handler->createsFor($origin)
+                && $handler->createsFor($source)
             ) {
                 return $handler;
             }

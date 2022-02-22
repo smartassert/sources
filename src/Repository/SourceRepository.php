@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Repository;
 
 use App\Entity\AbstractSource;
-use App\Entity\OriginSourceInterface;
 use App\Entity\SourceInterface;
+use App\Entity\SourceOriginInterface;
 use App\Enum\Source\Type;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -30,7 +30,7 @@ class SourceRepository extends ServiceEntityRepository
     /**
      * @param Type[] $types
      *
-     * @return OriginSourceInterface[]
+     * @return SourceOriginInterface[]
      */
     public function findByUserAndType(UserInterface $user, array $types): array
     {
@@ -53,7 +53,7 @@ class SourceRepository extends ServiceEntityRepository
         }
 
         return array_filter($result, function ($item) {
-            return $item instanceof OriginSourceInterface;
+            return $item instanceof SourceOriginInterface;
         });
     }
 
