@@ -19,6 +19,15 @@ services:
     volumes:
       - ./caddy-users-service/Caddyfile:/etc/caddy/Caddyfile
 
+  s3-mock:
+    image: adobe/s3mock
+    container_name: s3-mock
+    ports:
+      - "9090:9090"
+    environment:
+      - validKmsKeys=remote_storage_key_id
+      - initialBuckets=file_source_bucket,run_source_bucket
+
   caddy-app:
     image: caddy:2.4.5-alpine
     container_name: caddy-app
