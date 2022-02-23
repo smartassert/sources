@@ -15,6 +15,7 @@ services:
     environment:
       VALID_TOKEN: valid-token-content
       INVALID_TOKEN: invalid-token-content
+      USER_ID: 01FWKGED9E2NZZR5HP21HS2YYT
     ports:
       - "8080:8080"
     volumes:

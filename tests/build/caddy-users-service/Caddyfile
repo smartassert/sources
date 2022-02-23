@@ -12,7 +12,7 @@ http://localhost:8080 {
     }
 
     respond @valid-token-matcher 200 {
-        body "01FWK9FB5AV4HSVK6QW376XK91"
+        body "{$USER_ID}"
     }
 
     respond @invalid-token-matcher 401 {
