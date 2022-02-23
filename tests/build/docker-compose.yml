@@ -16,6 +16,8 @@ services:
       VALID_TOKEN: ${USERS_VALID_TOKEN:-valid-token}
       INVALID_TOKEN: ${USERS_INVALID_TOKEN:-INvalid-token}
       USER_ID: ${USERS_USER_ID:-01FWKGED9E2NZZR5HP21HS2YYT}
+    ports:
+      - "8080:8080"
     volumes:
       - ./caddy-users-service/Caddyfile:/etc/caddy/Caddyfile
 
@@ -40,9 +42,6 @@ services:
       context: ../..
       args:
         DATABASE_URL: postgresql://postgres:${POSTGRES_PASSWORD}@postgres:5432/users-db?serverVersion=12&charset=utf8
-        AUTHENTICATION_BASE_URL: http://users-service
     container_name: smartassert-sources
-    links:
-      - caddy-users-service:users-service
     depends_on:
       - postgres
