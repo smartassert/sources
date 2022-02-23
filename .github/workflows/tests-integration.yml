@@ -7,28 +7,30 @@ on:
   pull_request:
 
 jobs:
-  docker-build:
-    name: Build docker image
+  integration:
+    name: Integration tests - PHP ${{ matrix.php }}
     strategy:
       matrix:
         operating-system: [ubuntu-latest]
+        php: ['8.1']
     runs-on: ${{ matrix.operating-system }}
 
     steps:
-      - name: Checkout code
+      - name: Checkout
         uses: actions/checkout@v2
 
-      - name: Set image tag
-        id: image_tag
-        run: echo "::set-output name=value::smartassert/sources:$(date +%s)"
+      - name: Setup php
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
 
-      - name: Build
-        run: docker build -t ${{ steps.image_tag.outputs.value }} .
+      - name: Install Composer dependencies
+        run: composer install --no-progress --prefer-dist --optimize-autoloader
 
-      - name: Verify application has more than zero routes
-        run: |
-          ROUTES=$(docker run ${{ steps.image_tag.outputs.value }} php bin/console debug:router --format=json)
-          
-          if [ "[]" == "$ROUTES" ]; then
-            exit 1
-          fi
+      - name: Pull images
+        run: composer integration-pull
+
+      - name: Setup integration environment
+        env:
+          DATABASE_URL: postgres://postgres:password!@127.0.0.1:5432/users-db?charset=UTF-8
+        run: composer integration-setup
