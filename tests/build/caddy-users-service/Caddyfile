@@ -1,0 +1,23 @@
+http://localhost:8080 {
+    @valid-token-matcher {
+        header Authorization "Bearer valid-token"
+    }
+
+    @invalid-token-matcher {
+        header Authorization "Bearer invalid-token"
+    }
+
+    @no-authorization-matcher {
+        header !Authorization
+    }
+
+    respond @valid-token-matcher 200 {
+        body "01FWK9FB5AV4HSVK6QW376XK91"
+    }
+
+    respond @invalid-token-matcher 401 {
+    }
+
+    respond @no-authorization-matcher 401 {
+    }
+}

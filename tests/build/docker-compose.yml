@@ -8,6 +8,15 @@ services:
     ports:
       - 5432:5432
 
+  caddy-users-service:
+    image: caddy:2.4.5-alpine
+    container_name: caddy-users-service
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./caddy-users-service/Caddyfile:/etc/caddy/Caddyfile
+
   caddy-app:
     image: caddy:2.4.5-alpine
     container_name: caddy-app
