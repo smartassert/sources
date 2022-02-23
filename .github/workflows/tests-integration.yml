@@ -29,7 +29,6 @@ jobs:
       - name: Verify application has more than zero routes
         run: |
           ROUTES=$(docker run ${{ steps.image_tag.outputs.value }} php bin/console debug:router --format=json)
-          echo "$ROUTES"
           
           if [ "[]" == "$ROUTES" ]; then
             exit 1
