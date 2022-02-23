@@ -66,7 +66,7 @@ services:
         arguments:
             $gitRepositoryBasePath: '%git_repository_store_directory%'
 
-    digitalocean_spaces_client:
+    app.services.remote_storage.client:
         class: AsyncAws\S3\S3Client
         arguments:
             -  endpoint: '%env(DIGITALOCEAN_SPACES_ENDPOINT)%'
