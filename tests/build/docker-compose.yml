@@ -6,29 +6,4 @@ services:
     image: postgres:12.5-alpine
     container_name: postgres
     ports:
-      - 5432:5432
-
-  caddy-app:
-    image: caddy:2.4.5-alpine
-    container_name: caddy-app
-    restart: unless-stopped
-    environment:
-      DOMAIN: ${CADDY_DOMAIN:-localhost}
-      TLS_INTERNAL: ${CADDY_TLS_INTERNAL:-internal}
-    ports:
-      - "443:443"
-    links:
-      - app:app
-    volumes:
-      - ./caddy-app/index.php:/app/public/index.php
-      - ./caddy-app/Caddyfile:/etc/caddy/Caddyfile
-
-  app:
-    env_file: .env
-    build:
-      context: ../..
-      args:
-        DATABASE_URL: postgresql://postgres:${POSTGRES_PASSWORD}@postgres:5432/users-db?serverVersion=12&charset=utf8
-    container_name: smartassert-sources
-    depends_on:
-      - postgres
+      - "5432:5432"
