@@ -1,10 +1,10 @@
 http://localhost:8080 {
     @valid-token-matcher {
-        header Authorization "Bearer valid-token"
+        header Authorization "Bearer {$VALID_TOKEN}"
     }
 
     @invalid-token-matcher {
-        header Authorization "Bearer invalid-token"
+        header Authorization "Bearer {$INVALID_TOKEN}"
     }
 
     @no-authorization-matcher {

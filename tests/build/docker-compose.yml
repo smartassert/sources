@@ -12,6 +12,9 @@ services:
     image: caddy:2.4.5-alpine
     container_name: caddy-users-service
     restart: unless-stopped
+    environment:
+      VALID_TOKEN: valid-token-content
+      INVALID_TOKEN: invalid-token-content
     ports:
       - "8080:8080"
     volumes:
