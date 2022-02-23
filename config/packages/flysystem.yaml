@@ -5,13 +5,13 @@ flysystem:
             adapter: 'asyncaws'
             options:
                 client: 'app.services.remote_storage.client'
-                bucket: '%env(DIGITALOCEAN_SPACES_FILE_SOURCE_BUCKET)%'
+                bucket: '%env(REMOTE_STORAGE_FILE_SOURCE_BUCKET)%'
 
         run_source.storage:
             adapter: 'asyncaws'
             options:
                 client: 'app.services.remote_storage.client'
-                bucket: '%env(DIGITALOCEAN_SPACES_RUN_SOURCE_BUCKET)%'
+                bucket: '%env(REMOTE_STORAGE_RUN_SOURCE_BUCKET)%'
 
         git_repository.storage:
             adapter: 'local'
