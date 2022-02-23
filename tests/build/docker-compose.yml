@@ -50,6 +50,8 @@ services:
       args:
         DATABASE_URL: postgresql://postgres:${POSTGRES_PASSWORD}@postgres:5432/users-db?serverVersion=12&charset=utf8
         AUTHENTICATION_BASE_URL: http://users-service
+        REMOTE_STORAGE_ENDPOINT: http://s3-mock:9090
+        REMOTE_STORAGE_KEY_ID: remote_storage_key_id
     container_name: smartassert-sources
     links:
       - caddy-users-service:users-service
