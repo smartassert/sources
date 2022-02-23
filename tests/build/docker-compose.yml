@@ -19,6 +19,15 @@ services:
     volumes:
       - ./caddy-users-service/Caddyfile:/etc/caddy/Caddyfile
 
+  s3-mock:
+    image: adobe/s3mock
+    container_name: s3-mock
+    ports:
+      - "9090:9090"
+    environment:
+      - validKmsKeys=remote_storage_key_id
+      - initialBuckets=file_source_bucket,run_source_bucket
+
   caddy-app:
     image: caddy:2.4.5-alpine
     container_name: caddy-app
@@ -41,6 +50,8 @@ services:
       args:
         DATABASE_URL: postgresql://postgres:${POSTGRES_PASSWORD}@postgres:5432/users-db?serverVersion=12&charset=utf8
         AUTHENTICATION_BASE_URL: http://users-service
+        REMOTE_STORAGE_ENDPOINT: http://s3-mock:9090
+        REMOTE_STORAGE_KEY_ID: remote_storage_key_id
     container_name: smartassert-sources
     links:
       - caddy-users-service:users-service
