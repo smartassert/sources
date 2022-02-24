@@ -1,4 +1,4 @@
-http://*:80 {
+http://*:80, http://*:8080 {
     @valid-token-matcher {
         header Authorization "Bearer {$VALID_TOKEN}"
     }
