@@ -6,6 +6,7 @@ namespace App\Tests\Functional\Controller;
 
 use App\Entity\FileSource;
 use App\Services\Source\Store;
+use App\Tests\Model\UserId;
 use App\Tests\Services\AuthorizationRequestAsserter;
 use App\Validator\YamlFilenameConstraint;
 use League\Flysystem\FilesystemOperator;
@@ -17,6 +18,7 @@ class FileSourceFileControllerTest extends AbstractSourceControllerTest
     private FilesystemOperator $fileSourceStorage;
 
     private FileSource $fileSource;
+    private Store $store;
     private string $sourceRelativePath;
 
     protected function setUp(): void
@@ -39,6 +41,8 @@ class FileSourceFileControllerTest extends AbstractSourceControllerTest
 
         $store = self::getContainer()->get(Store::class);
         \assert($store instanceof Store);
+        $this->store = $store;
+
         $store->add($this->fileSource);
     }
 
@@ -55,6 +59,21 @@ class FileSourceFileControllerTest extends AbstractSourceControllerTest
         $this->authorizationRequestAsserter->assertAuthorizationRequestIsMade(
             $this->authenticationConfiguration->invalidToken
         );
+    }
+
+    public function testAddFileInvalidSourceUser(): void
+    {
+        $source = new FileSource(UserId::create(), '');
+        $this->store->add($source);
+
+        $url = $this->generateUrl('file_source_file_add', [
+            'sourceId' => $source->getId(),
+            'filename' => 'filename.yaml',
+        ]);
+
+        $response = $this->applicationClient->makeAuthorizedRequest('POST', $url, [], '- content');
+
+        self::assertSame(403, $response->getStatusCode());
     }
 
     /**
@@ -211,6 +230,21 @@ class FileSourceFileControllerTest extends AbstractSourceControllerTest
         $this->authorizationRequestAsserter->assertAuthorizationRequestIsMade(
             $this->authenticationConfiguration->invalidToken
         );
+    }
+
+    public function testRemoveFileInvalidSourceUser(): void
+    {
+        $source = new FileSource(UserId::create(), '');
+        $this->store->add($source);
+
+        $url = $this->generateUrl('file_source_file_remove', [
+            'sourceId' => $source->getId(),
+            'filename' => 'filename.yaml',
+        ]);
+
+        $response = $this->applicationClient->makeAuthorizedRequest('POST', $url);
+
+        self::assertSame(403, $response->getStatusCode());
     }
 
     /**
