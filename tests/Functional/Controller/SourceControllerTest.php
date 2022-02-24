@@ -15,7 +15,6 @@ use App\Request\GitSourceRequest;
 use App\Request\InvalidSourceTypeRequest;
 use App\Request\SourceRequestInterface;
 use App\Services\Source\Store;
-use App\Tests\Model\Route;
 use App\Tests\Model\UserId;
 use App\Tests\Services\AuthorizationRequestAsserter;
 use App\Tests\Services\EntityRemover;
@@ -62,7 +61,7 @@ class SourceControllerTest extends AbstractSourceControllerTest
 
         $response = $this->applicationClient->makeAuthorizedRequest(
             'POST',
-            new Route('source_create'),
+            $this->generateUrl('source_create'),
             $requestParameters
         );
 
@@ -128,7 +127,7 @@ class SourceControllerTest extends AbstractSourceControllerTest
 
         $response = $this->applicationClient->makeAuthorizedRequest(
             'POST',
-            new Route('source_create'),
+            $this->generateUrl('source_create'),
             $requestParameters
         );
 
@@ -218,7 +217,10 @@ class SourceControllerTest extends AbstractSourceControllerTest
 
         $this->setUserServiceAuthorizedResponse($userId);
 
-        $response = $this->applicationClient->makeAuthorizedRequest('GET', new Route('source_list'));
+        $response = $this->applicationClient->makeAuthorizedRequest(
+            'GET',
+            $this->generateUrl('source_list')
+        );
 
         self::assertSame(200, $response->getStatusCode());
         $this->authorizationRequestAsserter->assertAuthorizationRequestIsMade();
