@@ -38,6 +38,7 @@ class SourceRepository extends ServiceEntityRepository
             ->where('Source.userId = :UserId')
             ->andWhere(implode(' OR ', $this->createTypePredicates($types)))
             ->setParameter('UserId', $user->getUserIdentifier())
+            ->orderBy('Source.id', 'ASC')
         ;
 
         $typeParameters = $this->createTypeParameters($types);
