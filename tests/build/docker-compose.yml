@@ -13,8 +13,8 @@ services:
     container_name: users-service
     restart: unless-stopped
     environment:
-      VALID_TOKEN: ${USERS_VALID_TOKEN:-valid-token}
-      INVALID_TOKEN: ${USERS_INVALID_TOKEN:-invalid-token}
+      VALID_TOKEN: ${VALID_AUTHENTICATION_TOKEN:-valid-token}
+      INVALID_TOKEN: ${INVALID_AUTHENTICATION_TOKEN:-invalid-token}
       USER_ID: ${USERS_USER_ID:-01FWKGED9E2NZZR5HP21HS2YYT}
     ports:
       - "8080:8080"
