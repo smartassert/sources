@@ -6,7 +6,6 @@ namespace App\Tests\Functional\Controller;
 
 use App\Entity\FileSource;
 use App\Services\Source\Store;
-use App\Tests\Model\Route;
 use App\Tests\Model\UserId;
 use App\Tests\Services\AuthorizationRequestAsserter;
 use App\Validator\YamlFilenameConstraint;
@@ -55,16 +54,14 @@ class FileSourceFileControllerTest extends AbstractSourceControllerTest
     ): void {
         $this->setUserServiceAuthorizedResponse($this->userId);
 
-        $response = $this->applicationClient->makeAuthorizedRequest(
-            'POST',
-            new Route('file_source_file_add', [
-                'sourceId' => $this->fileSource->getId(),
-                'filename' => $filename,
-            ]),
-            [
-                'content' => $content,
-            ]
-        );
+        $url = $this->generateUrl('file_source_file_add', [
+            'sourceId' => $this->fileSource->getId(),
+            'filename' => $filename,
+        ]);
+
+        $response = $this->applicationClient->makeAuthorizedRequest('POST', $url, [
+            'content' => $content,
+        ]);
 
         self::assertSame(400, $response->getStatusCode());
         $this->authorizationRequestAsserter->assertAuthorizationRequestIsMade();
@@ -152,16 +149,14 @@ class FileSourceFileControllerTest extends AbstractSourceControllerTest
 
         $this->setUserServiceAuthorizedResponse($this->userId);
 
-        $response = $this->applicationClient->makeAuthorizedRequest(
-            'POST',
-            new Route('file_source_file_add', [
-                'sourceId' => $this->fileSource->getId(),
-                'filename' => $filename,
-            ]),
-            [
-                'content' => $content,
-            ]
-        );
+        $url = $this->generateUrl('file_source_file_add', [
+            'sourceId' => $this->fileSource->getId(),
+            'filename' => $filename,
+        ]);
+
+        $response = $this->applicationClient->makeAuthorizedRequest('POST', $url, [
+            'content' => $content,
+        ]);
 
         self::assertSame(200, $response->getStatusCode());
         self::assertTrue($this->fileSourceStorage->directoryExists($this->sourceRelativePath));
@@ -180,16 +175,14 @@ class FileSourceFileControllerTest extends AbstractSourceControllerTest
 
         $this->setUserServiceAuthorizedResponse($this->userId);
 
-        $response = $this->applicationClient->makeAuthorizedRequest(
-            'POST',
-            new Route('file_source_file_add', [
-                'sourceId' => $this->fileSource->getId(),
-                'filename' => $filename,
-            ]),
-            [
-                'content' => $updatedContent,
-            ]
-        );
+        $url = $this->generateUrl('file_source_file_add', [
+            'sourceId' => $this->fileSource->getId(),
+            'filename' => $filename,
+        ]);
+
+        $response = $this->applicationClient->makeAuthorizedRequest('POST', $url, [
+            'content' => $updatedContent,
+        ]);
 
         self::assertSame(200, $response->getStatusCode());
         self::assertTrue($this->fileSourceStorage->directoryExists($this->sourceRelativePath));
@@ -208,13 +201,12 @@ class FileSourceFileControllerTest extends AbstractSourceControllerTest
     ): void {
         $this->setUserServiceAuthorizedResponse($this->userId);
 
-        $response = $this->applicationClient->makeAuthorizedRequest(
-            'DELETE',
-            new Route('file_source_file_remove', [
-                'sourceId' => $this->fileSource->getId(),
-                'filename' => $filename,
-            ])
-        );
+        $url = $this->generateUrl('file_source_file_remove', [
+            'sourceId' => $this->fileSource->getId(),
+            'filename' => $filename,
+        ]);
+
+        $response = $this->applicationClient->makeAuthorizedRequest('DELETE', $url);
 
         self::assertSame(400, $response->getStatusCode());
         $this->authorizationRequestAsserter->assertAuthorizationRequestIsMade();
@@ -267,13 +259,12 @@ class FileSourceFileControllerTest extends AbstractSourceControllerTest
 
         $this->setUserServiceAuthorizedResponse($this->userId);
 
-        $response = $this->applicationClient->makeAuthorizedRequest(
-            'DELETE',
-            new Route('file_source_file_remove', [
-                'sourceId' => $this->fileSource->getId(),
-                'filename' => $filename,
-            ])
-        );
+        $url = $this->generateUrl('file_source_file_remove', [
+            'sourceId' => $this->fileSource->getId(),
+            'filename' => $filename,
+        ]);
+
+        $response = $this->applicationClient->makeAuthorizedRequest('DELETE', $url);
 
         self::assertSame(200, $response->getStatusCode());
         self::assertFalse($this->fileSourceStorage->fileExists($fileRelativePath));

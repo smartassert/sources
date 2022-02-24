@@ -7,7 +7,6 @@ namespace App\Tests\Functional\Controller;
 use App\Entity\FileSource;
 use App\Model\EntityId;
 use App\Services\Source\Store;
-use App\Tests\Model\Route;
 use App\Tests\Model\UserId;
 use App\Tests\Services\EntityRemover;
 
@@ -31,20 +30,26 @@ class InvalidSourceRequestTest extends AbstractSourceControllerTest
 
     /**
      * @dataProvider requestSourceDataProvider
+     *
+     * @param array<string, int|string> $routeParameters
      */
-    public function testRequestSourceNotFound(string $method, Route $route): void
+    public function testRequestSourceNotFound(string $method, string $routeName, array $routeParameters): void
     {
         $this->setUserServiceAuthorizedResponse(UserId::create());
 
-        $response = $this->applicationClient->makeAuthorizedRequest($method, $route);
+        $url = $this->generateUrl($routeName, $routeParameters);
+
+        $response = $this->applicationClient->makeAuthorizedRequest($method, $url);
 
         self::assertSame(404, $response->getStatusCode());
     }
 
     /**
      * @dataProvider requestSourceDataProvider
+     *
+     * @param array<string, int|string> $routeParameters
      */
-    public function testRequestInvalidSourceUser(string $method, Route $route): void
+    public function testRequestInvalidSourceUser(string $method, string $routeName, array $routeParameters): void
     {
         $sourceUserId = UserId::create();
         $requestUserId = UserId::create();
@@ -56,12 +61,9 @@ class InvalidSourceRequestTest extends AbstractSourceControllerTest
 
         $this->setUserServiceAuthorizedResponse($requestUserId);
 
-        $routeWithSourceId = new Route(
-            $route->name,
-            array_merge($route->parameters, ['sourceId' => $sourceId])
-        );
+        $url = $this->generateUrl($routeName, array_merge($routeParameters, ['sourceId' => $sourceId]));
 
-        $response = $this->applicationClient->makeAuthorizedRequest($method, $routeWithSourceId);
+        $response = $this->applicationClient->makeAuthorizedRequest($method, $url);
 
         self::assertSame(403, $response->getStatusCode());
     }
@@ -76,37 +78,43 @@ class InvalidSourceRequestTest extends AbstractSourceControllerTest
         return [
             'get source' => [
                 'method' => 'GET',
-                'route' => new Route('user_source_get', $sourceRouteParameters),
+                'routeName' => 'user_source_get',
+                'routeParameters' => $sourceRouteParameters,
             ],
             'update source' => [
                 'method' => 'PUT',
-                'route' => new Route('user_source_update', $sourceRouteParameters),
+                'routeName' => 'user_source_update',
+                'routeParameters' => $sourceRouteParameters,
             ],
             'delete source' => [
                 'method' => 'DELETE',
-                'route' => new Route('user_source_delete', $sourceRouteParameters),
+                'routeName' => 'user_source_delete',
+                'routeParameters' => $sourceRouteParameters,
             ],
             'prepare source' => [
                 'method' => 'POST',
-                'route' => new Route('user_source_prepare', $sourceRouteParameters),
+                'routeName' => 'user_source_prepare',
+                'routeParameters' => $sourceRouteParameters,
             ],
             'add file' => [
                 'method' => 'POST',
-                'route' => new Route('file_source_file_add', array_merge(
+                'routeName' => 'file_source_file_add',
+                'routeParameters' => array_merge(
                     $sourceRouteParameters,
                     [
                         'filename' => 'filename.yaml',
                     ]
-                )),
+                ),
             ],
             'remove file' => [
                 'method' => 'POST',
-                'route' => new Route('file_source_file_remove', array_merge(
+                'routeName' => 'file_source_file_remove',
+                'routeParameters' => array_merge(
                     $sourceRouteParameters,
                     [
                         'filename' => 'filename.yaml',
                     ]
-                )),
+                ),
             ],
         ];
     }

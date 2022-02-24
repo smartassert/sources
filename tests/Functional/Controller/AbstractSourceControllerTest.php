@@ -9,10 +9,12 @@ use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\Psr7\Response;
 use Psr\Http\Message\ResponseInterface;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Symfony\Component\Routing\RouterInterface;
 
 abstract class AbstractSourceControllerTest extends WebTestCase
 {
     protected ApplicationClient $applicationClient;
+    private RouterInterface $router;
 
     protected function setUp(): void
     {
@@ -24,6 +26,10 @@ abstract class AbstractSourceControllerTest extends WebTestCase
         \assert($applicationClient instanceof ApplicationClient);
         $this->applicationClient = $applicationClient;
         $applicationClient->setClient($client);
+
+        $router = self::getContainer()->get(RouterInterface::class);
+        \assert($router instanceof RouterInterface);
+        $this->router = $router;
     }
 
     protected function setUserServiceAuthorizedResponse(string $userId): void
@@ -34,6 +40,14 @@ abstract class AbstractSourceControllerTest extends WebTestCase
     protected function setUserServiceUnauthorizedResponse(): void
     {
         $this->setUserServiceResponse(new Response(401));
+    }
+
+    /**
+     * @param array<string, int|string> $routeParameters
+     */
+    protected function generateUrl(string $routeName, array $routeParameters = []): string
+    {
+        return $this->router->generate($routeName, $routeParameters);
     }
 
     private function setUserServiceResponse(ResponseInterface $response): void
