@@ -20,7 +20,7 @@ services:
     App\Tests\Services\ApplicationClient:
         public: true
 
-    App\Tests\Services\AuthenticationTokens:
+    App\Tests\Services\AuthenticationConfiguration:
         public: true
         arguments:
             $valid: '%env(VALID_AUTHENTICATION_TOKEN)%'

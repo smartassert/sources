@@ -16,7 +16,7 @@ class ApplicationClient
     private KernelBrowser $client;
 
     public function __construct(
-        private AuthenticationTokens $authenticationTokens,
+        private AuthenticationConfiguration $authenticationConfiguration,
     ) {
     }
 
@@ -39,7 +39,7 @@ class ApplicationClient
             $url,
             [
                 AuthProperties::DEFAULT_HEADER_NAME => AuthProperties::DEFAULT_VALUE_PREFIX
-                    . $this->authenticationTokens->invalid
+                    . $this->authenticationConfiguration->invalid
             ],
             $parameters,
             $content,
@@ -60,7 +60,7 @@ class ApplicationClient
             $url,
             [
                 AuthProperties::DEFAULT_HEADER_NAME => AuthProperties::DEFAULT_VALUE_PREFIX
-                    . $this->authenticationTokens->valid
+                    . $this->authenticationConfiguration->valid
             ],
             $parameters,
             $content,
