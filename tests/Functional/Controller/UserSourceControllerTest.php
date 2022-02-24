@@ -334,7 +334,7 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
 
     public function testDeleteRunSourceDeletesRunSourceFiles(): void
     {
-        $fileSource = new FileSource($this->authenticatedUserId, 'file source label');
+        $fileSource = new FileSource($this->authenticationConfiguration->authenticatedUserId, 'file source label');
         $runSource = new RunSource($fileSource);
 
         $this->store->add($fileSource);
@@ -358,7 +358,7 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
 
     public function testDeleteFileSourceDeletesFileSourceFiles(): void
     {
-        $fileSource = new FileSource($this->authenticatedUserId, 'file source label');
+        $fileSource = new FileSource($this->authenticationConfiguration->authenticatedUserId, 'file source label');
         $filename = 'file.yaml';
 
         $this->store->add($fileSource);
@@ -384,7 +384,7 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
 
     public function testPrepareRunSource(): void
     {
-        $fileSource = new FileSource($this->authenticatedUserId, 'file source label');
+        $fileSource = new FileSource($this->authenticationConfiguration->authenticatedUserId, 'file source label');
         $source = new RunSource($fileSource);
 
         $this->store->add($source);
@@ -515,7 +515,7 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
             ]
         );
 
-        $fileSource = new FileSource($this->authenticatedUserId, 'file source label');
+        $fileSource = new FileSource($this->authenticationConfiguration->authenticatedUserId, 'file source label');
         $runSource = new RunSource($fileSource);
         $this->store->add($runSource);
 

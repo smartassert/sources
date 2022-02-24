@@ -31,7 +31,10 @@ class FileSourceFileControllerTest extends AbstractSourceControllerTest
         \assert($fileSourceStorage instanceof FilesystemOperator);
         $this->fileSourceStorage = $fileSourceStorage;
 
-        $this->fileSource = new FileSource($this->authenticatedUserId, 'file source label');
+        $this->fileSource = new FileSource(
+            $this->authenticationConfiguration->authenticatedUserId,
+            'file source label'
+        );
         $this->sourceRelativePath = $this->fileSource->getDirectoryPath();
 
         $store = self::getContainer()->get(Store::class);
