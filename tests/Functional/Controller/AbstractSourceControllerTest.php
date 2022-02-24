@@ -17,7 +17,7 @@ abstract class AbstractSourceControllerTest extends WebTestCase
     protected const AUTHENTICATED_USER_ID_PLACEHOLDER = '{{ authenticated_user_id }}';
 
     protected ApplicationClient $applicationClient;
-    protected string $authenticatedUserId = '';
+    protected AuthenticationConfiguration $authenticationConfiguration;
     private RouterInterface $router;
 
     protected function setUp(): void
@@ -37,7 +37,7 @@ abstract class AbstractSourceControllerTest extends WebTestCase
 
         $authenticationConfiguration = self::getContainer()->get(AuthenticationConfiguration::class);
         \assert($authenticationConfiguration instanceof AuthenticationConfiguration);
-        $this->authenticatedUserId = $authenticationConfiguration->authenticatedUserId;
+        $this->authenticationConfiguration = $authenticationConfiguration;
     }
 
     /**
@@ -55,7 +55,7 @@ abstract class AbstractSourceControllerTest extends WebTestCase
                 $source,
                 AbstractSource::class,
                 'userId',
-                $this->authenticatedUserId
+                $this->authenticationConfiguration->authenticatedUserId
             );
         }
 
@@ -87,7 +87,7 @@ abstract class AbstractSourceControllerTest extends WebTestCase
             array_key_exists('user_id', $sourceData)
             && self::AUTHENTICATED_USER_ID_PLACEHOLDER == $sourceData['user_id']
         ) {
-            $sourceData['user_id'] = $this->authenticatedUserId;
+            $sourceData['user_id'] = $this->authenticationConfiguration->authenticatedUserId;
         }
 
         return $sourceData;

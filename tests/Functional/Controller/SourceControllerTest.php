@@ -137,7 +137,7 @@ class SourceControllerTest extends AbstractSourceControllerTest
         self::assertInstanceOf(SourceInterface::class, $source);
 
         $expected['id'] = $source->getId();
-        $expected['user_id'] = $this->authenticatedUserId;
+        $expected['user_id'] = $this->authenticationConfiguration->authenticatedUserId;
         self::assertEquals($expected, json_decode((string) $response->getContent(), true));
     }
 
