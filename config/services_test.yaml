@@ -9,17 +9,6 @@ services:
     webignition\HttpHistoryContainer\Container:
         public: true
 
-    GuzzleHttp\Handler\MockHandler:
-        public: true
-        class: GuzzleHttp\Handler\MockHandler
-
-    GuzzleHttp\HandlerStack:
-        public: true
-        class: GuzzleHttp\HandlerStack
-        factory: ['GuzzleHttp\HandlerStack', 'create']
-        arguments:
-            $handler: '@GuzzleHttp\Handler\MockHandler'
-
     App\Tests\Services\EntityRemover:
         public: true
 
@@ -30,6 +19,15 @@ services:
 
     App\Tests\Services\ApplicationClient:
         public: true
+
+    App\Tests\Services\AuthenticationConfiguration:
+        public: true
+        arguments:
+            $validToken: '%env(VALID_AUTHENTICATION_TOKEN)%'
+            $invalidToken: '%env(INVALID_AUTHENTICATION_TOKEN)%'
+            $headerName: !php/const SmartAssert\UsersSecurityBundle\Security\AuthorizationProperties::DEFAULT_HEADER_NAME
+            $headerValuePrefix: !php/const SmartAssert\UsersSecurityBundle\Security\AuthorizationProperties::DEFAULT_VALUE_PREFIX
+            $authenticatedUserId: '%env(AUTHENTICATED_USER_ID)%'
 
     App\Tests\Services\AuthorizationRequestAsserter:
         public: true

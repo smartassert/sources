@@ -35,8 +35,6 @@ class InvalidSourceRequestTest extends AbstractSourceControllerTest
      */
     public function testRequestSourceNotFound(string $method, string $routeName, array $routeParameters): void
     {
-        $this->setUserServiceAuthorizedResponse(UserId::create());
-
         $url = $this->generateUrl($routeName, $routeParameters);
 
         $response = $this->applicationClient->makeAuthorizedRequest($method, $url);
@@ -52,14 +50,11 @@ class InvalidSourceRequestTest extends AbstractSourceControllerTest
     public function testRequestInvalidSourceUser(string $method, string $routeName, array $routeParameters): void
     {
         $sourceUserId = UserId::create();
-        $requestUserId = UserId::create();
         $label = 'source label';
 
         $source = new FileSource($sourceUserId, $label);
         $sourceId = $source->getId();
         $this->store->add($source);
-
-        $this->setUserServiceAuthorizedResponse($requestUserId);
 
         $url = $this->generateUrl($routeName, array_merge($routeParameters, ['sourceId' => $sourceId]));
 
