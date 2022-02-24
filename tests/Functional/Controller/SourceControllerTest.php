@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\Controller;
 
-use App\Entity\AbstractSource;
 use App\Entity\FileSource;
 use App\Entity\GitSource;
 use App\Entity\RunSource;
@@ -20,7 +19,6 @@ use App\Tests\Model\UserId;
 use App\Tests\Services\AuthorizationRequestAsserter;
 use App\Tests\Services\EntityRemover;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use webignition\ObjectReflector\ObjectReflector;
 
 class SourceControllerTest extends AbstractSourceControllerTest
 {
@@ -200,7 +198,7 @@ class SourceControllerTest extends AbstractSourceControllerTest
     /**
      * @dataProvider listSuccessDataProvider
      *
-     * @param SourceInterface[] $sources
+     * @param SourceInterface[]        $sources
      * @param array<int, array<mixed>> $expectedResponseData
      */
     public function testListSuccess(array $sources, array $expectedResponseData): void
