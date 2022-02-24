@@ -27,13 +27,18 @@ class ApplicationClient
     /**
      * @param array<string, string> $parameters
      */
-    public function makeAuthorizedRequest(string $method, string $url, array $parameters = []): Response
-    {
+    public function makeAuthorizedRequest(
+        string $method,
+        string $url,
+        array $parameters = [],
+        ?string $content = null
+    ): Response {
         return $this->makeRequest(
             $method,
             $url,
             [AuthProperties::DEFAULT_HEADER_NAME => AuthProperties::DEFAULT_VALUE_PREFIX . self::AUTH_TOKEN],
-            $parameters
+            $parameters,
+            $content,
         );
     }
 
@@ -41,13 +46,19 @@ class ApplicationClient
      * @param array<string, string> $headers
      * @param array<string, string> $parameters
      */
-    private function makeRequest(string $method, string $url, array $headers, array $parameters): Response
-    {
+    private function makeRequest(
+        string $method,
+        string $url,
+        array $headers,
+        array $parameters,
+        ?string $content = null
+    ): Response {
         $this->client->request(
             method: $method,
             uri: $url,
             parameters: $parameters,
-            server: $this->createRequestServerPropertiesFromHeaders($headers)
+            server: $this->createRequestServerPropertiesFromHeaders($headers),
+            content: $content,
         );
 
         return $this->client->getResponse();
