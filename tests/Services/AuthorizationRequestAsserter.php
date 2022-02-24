@@ -18,13 +18,18 @@ class AuthorizationRequestAsserter
         HandlerStack $handlerStack,
         private HttpHistoryContainer $httpHistoryContainer,
         private string $usersSecurityBundleBaseUrl,
+        private readonly AuthenticationTokens $authenticationTokens,
     ) {
         $handlerStack->push(Middleware::history($this->httpHistoryContainer), 'history');
     }
 
     public function assertAuthorizationRequestIsMade(
-        string $expectedToken = ApplicationClient::VALID_AUTH_TOKEN,
+        ?string $expectedToken = null,
     ): void {
+        $expectedToken = is_string($expectedToken)
+            ? $expectedToken
+            : $this->authenticationTokens->valid;
+
         $request = $this->httpHistoryContainer->getTransactions()->getRequests()->getLast();
         TestCase::assertInstanceOf(RequestInterface::class, $request);
 

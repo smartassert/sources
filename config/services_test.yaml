@@ -20,6 +20,12 @@ services:
     App\Tests\Services\ApplicationClient:
         public: true
 
+    App\Tests\Services\AuthenticationTokens:
+        public: true
+        arguments:
+            $valid: '%env(VALID_AUTHENTICATION_TOKEN)%'
+            $invalid: '%env(INVALID_AUTHENTICATION_TOKEN)%'
+
     App\Tests\Services\AuthorizationRequestAsserter:
         public: true
         arguments:

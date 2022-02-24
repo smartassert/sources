@@ -12,9 +12,13 @@ class ApplicationClient
 {
     public const AUTH_HEADER_KEY = AuthProperties::DEFAULT_HEADER_NAME;
 
-    public const VALID_AUTH_TOKEN = 'valid-token';
     public const INVALID_AUTH_TOKEN = 'invalid-token';
     private KernelBrowser $client;
+
+    public function __construct(
+        private AuthenticationTokens $authenticationTokens,
+    ) {
+    }
 
     public function setClient(KernelBrowser $client): void
     {
@@ -33,7 +37,10 @@ class ApplicationClient
         return $this->makeRequest(
             $method,
             $url,
-            [AuthProperties::DEFAULT_HEADER_NAME => AuthProperties::DEFAULT_VALUE_PREFIX . self::INVALID_AUTH_TOKEN],
+            [
+                AuthProperties::DEFAULT_HEADER_NAME => AuthProperties::DEFAULT_VALUE_PREFIX
+                    . $this->authenticationTokens->invalid
+            ],
             $parameters,
             $content,
         );
@@ -51,7 +58,10 @@ class ApplicationClient
         return $this->makeRequest(
             $method,
             $url,
-            [AuthProperties::DEFAULT_HEADER_NAME => AuthProperties::DEFAULT_VALUE_PREFIX . self::VALID_AUTH_TOKEN],
+            [
+                AuthProperties::DEFAULT_HEADER_NAME => AuthProperties::DEFAULT_VALUE_PREFIX
+                    . $this->authenticationTokens->valid
+            ],
             $parameters,
             $content,
         );
