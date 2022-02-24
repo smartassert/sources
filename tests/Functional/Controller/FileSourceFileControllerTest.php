@@ -59,9 +59,7 @@ class FileSourceFileControllerTest extends AbstractSourceControllerTest
             'filename' => $filename,
         ]);
 
-        $response = $this->applicationClient->makeAuthorizedRequest('POST', $url, [
-            'content' => $content,
-        ]);
+        $response = $this->applicationClient->makeAuthorizedRequest('POST', $url, [], $content);
 
         self::assertSame(400, $response->getStatusCode());
         $this->authorizationRequestAsserter->assertAuthorizationRequestIsMade();
@@ -154,9 +152,12 @@ class FileSourceFileControllerTest extends AbstractSourceControllerTest
             'filename' => $filename,
         ]);
 
-        $response = $this->applicationClient->makeAuthorizedRequest('POST', $url, [
-            'content' => $content,
-        ]);
+        $response = $this->applicationClient->makeAuthorizedRequest(
+            'POST',
+            $url,
+            [],
+            $content,
+        );
 
         self::assertSame(200, $response->getStatusCode());
         self::assertTrue($this->fileSourceStorage->directoryExists($this->sourceRelativePath));
@@ -180,9 +181,7 @@ class FileSourceFileControllerTest extends AbstractSourceControllerTest
             'filename' => $filename,
         ]);
 
-        $response = $this->applicationClient->makeAuthorizedRequest('POST', $url, [
-            'content' => $updatedContent,
-        ]);
+        $response = $this->applicationClient->makeAuthorizedRequest('POST', $url, [], $updatedContent);
 
         self::assertSame(200, $response->getStatusCode());
         self::assertTrue($this->fileSourceStorage->directoryExists($this->sourceRelativePath));

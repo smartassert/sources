@@ -11,8 +11,6 @@ use webignition\EncapsulatingRequestResolverBundle\Model\EncapsulatingRequestInt
 
 class AddYamlFileRequest extends AbstractYamlFileRequest implements EncapsulatingRequestInterface
 {
-    public const KEY_POST_CONTENT = 'content';
-
     public function __construct(
         #[YamlFileConstraint]
         private YamlFile $file,
@@ -22,12 +20,10 @@ class AddYamlFileRequest extends AbstractYamlFileRequest implements Encapsulatin
 
     public static function create(Request $request): self
     {
-        $filename = self::createFilenameFromRequest($request);
-
         return new self(
             new YamlFile(
-                $filename,
-                trim((string) $request->request->get(self::KEY_POST_CONTENT))
+                self::createFilenameFromRequest($request),
+                trim($request->getContent())
             )
         );
     }
