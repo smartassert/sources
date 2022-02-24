@@ -27,6 +27,7 @@ services:
             $invalidToken: '%env(INVALID_AUTHENTICATION_TOKEN)%'
             $headerName: !php/const SmartAssert\UsersSecurityBundle\Security\AuthorizationProperties::DEFAULT_HEADER_NAME
             $headerValuePrefix: !php/const SmartAssert\UsersSecurityBundle\Security\AuthorizationProperties::DEFAULT_VALUE_PREFIX
+            $authenticatedUserId: '%env(AUTHENTICATED_USER_ID)%'
 
     App\Tests\Services\AuthorizationRequestAsserter:
         public: true

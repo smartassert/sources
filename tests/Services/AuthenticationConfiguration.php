@@ -11,6 +11,7 @@ class AuthenticationConfiguration
         public readonly string $invalidToken,
         public readonly string $headerName,
         public readonly string $headerValuePrefix,
+        public readonly string $authenticatedUserId,
     ) {
     }
 }
