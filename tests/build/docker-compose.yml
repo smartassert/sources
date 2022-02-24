@@ -8,9 +8,9 @@ services:
     ports:
       - "5432:5432"
 
-  caddy-users-service:
+  users-service:
     image: caddy:2.4.5-alpine
-    container_name: caddy-users-service
+    container_name: users-service
     restart: unless-stopped
     environment:
       VALID_TOKEN: ${USERS_VALID_TOKEN:-valid-token}
@@ -54,6 +54,6 @@ services:
         REMOTE_STORAGE_KEY_ID: remote_storage_key_id
     container_name: smartassert-sources
     links:
-      - caddy-users-service:users-service
+      - users-service:users-service
     depends_on:
       - postgres
