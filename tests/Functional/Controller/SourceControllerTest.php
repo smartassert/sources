@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\Controller;
 
+use App\Entity\AbstractSource;
 use App\Entity\FileSource;
 use App\Entity\GitSource;
 use App\Entity\RunSource;
@@ -19,6 +20,7 @@ use App\Tests\Model\UserId;
 use App\Tests\Services\AuthorizationRequestAsserter;
 use App\Tests\Services\EntityRemover;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use webignition\ObjectReflector\ObjectReflector;
 
 class SourceControllerTest extends AbstractSourceControllerTest
 {
@@ -137,6 +139,7 @@ class SourceControllerTest extends AbstractSourceControllerTest
         self::assertInstanceOf(SourceInterface::class, $source);
 
         $expected['id'] = $source->getId();
+        $expected['user_id'] = $this->authenticatedUserId;
         self::assertEquals($expected, json_decode((string) $response->getContent(), true));
     }
 
@@ -158,7 +161,7 @@ class SourceControllerTest extends AbstractSourceControllerTest
                     GitSourceRequest::PARAMETER_PATH => $path
                 ],
                 'expected' => [
-                    'user_id' => self::AUTHENTICATED_USER_ID,
+                    'user_id' => self::AUTHENTICATED_USER_ID_PLACEHOLDER,
                     'type' => Type::GIT->value,
                     'host_url' => $hostUrl,
                     'path' => $path,
@@ -173,7 +176,7 @@ class SourceControllerTest extends AbstractSourceControllerTest
                     GitSourceRequest::PARAMETER_CREDENTIALS => $credentials,
                 ],
                 'expected' => [
-                    'user_id' => self::AUTHENTICATED_USER_ID,
+                    'user_id' => self::AUTHENTICATED_USER_ID_PLACEHOLDER,
                     'type' => Type::GIT->value,
                     'host_url' => $hostUrl,
                     'path' => $path,
@@ -186,7 +189,7 @@ class SourceControllerTest extends AbstractSourceControllerTest
                     FileSourceRequest::PARAMETER_LABEL => $label
                 ],
                 'expected' => [
-                    'user_id' => self::AUTHENTICATED_USER_ID,
+                    'user_id' => self::AUTHENTICATED_USER_ID_PLACEHOLDER,
                     'type' => Type::FILE->value,
                     'label' => $label,
                 ],
@@ -198,11 +201,12 @@ class SourceControllerTest extends AbstractSourceControllerTest
      * @dataProvider listSuccessDataProvider
      *
      * @param SourceInterface[] $sources
-     * @param array<mixed>      $expectedResponseData
+     * @param array<int, array<mixed>> $expectedResponseData
      */
     public function testListSuccess(array $sources, array $expectedResponseData): void
     {
         foreach ($sources as $source) {
+            $source = $this->setSourceUserIdToAuthenticatedUserId($source);
             $this->store->add($source);
         }
 
@@ -215,6 +219,8 @@ class SourceControllerTest extends AbstractSourceControllerTest
         $this->authorizationRequestAsserter->assertAuthorizationRequestIsMade();
         self::assertInstanceOf(JsonResponse::class, $response);
 
+        $expectedResponseData = $this->replaceAuthenticatedUserIdInSourceDataCollection($expectedResponseData);
+
         $responseData = json_decode((string) $response->getContent(), true);
         self::assertEquals($expectedResponseData, $responseData);
     }
@@ -225,11 +231,11 @@ class SourceControllerTest extends AbstractSourceControllerTest
     public function listSuccessDataProvider(): array
     {
         $userFileSources = [
-            new FileSource(self::AUTHENTICATED_USER_ID, 'file source label'),
+            new FileSource(self::AUTHENTICATED_USER_ID_PLACEHOLDER, 'file source label'),
         ];
 
         $userGitSources = [
-            new GitSource(self::AUTHENTICATED_USER_ID, 'https://example.com/repository.git'),
+            new GitSource(self::AUTHENTICATED_USER_ID_PLACEHOLDER, 'https://example.com/repository.git'),
         ];
 
         $userRunSources = [

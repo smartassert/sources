@@ -85,6 +85,7 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
      */
     public function testGetSuccess(SourceInterface $source, array $expectedResponseData): void
     {
+        $source = $this->setSourceUserIdToAuthenticatedUserId($source);
         $this->store->add($source);
 
         $url = $this->generateUrl('user_source_get', ['sourceId' => $source->getId()]);
@@ -95,6 +96,8 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
         $this->authorizationRequestAsserter->assertAuthorizationRequestIsMade();
         self::assertInstanceOf(JsonResponse::class, $response);
 
+        $expectedResponseData = $this->replaceAuthenticatedUserIdInSourceData($expectedResponseData);
+
         $responseData = json_decode((string) $response->getContent(), true);
         self::assertEquals($expectedResponseData, $responseData);
     }
@@ -104,7 +107,7 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
      */
     public function getSuccessDataProvider(): array
     {
-        $userId = self::AUTHENTICATED_USER_ID;
+        $userId = self::AUTHENTICATED_USER_ID_PLACEHOLDER;
 
         $gitSource = new GitSource($userId, 'https://example.com/repository.git', '/', md5((string) rand()));
         $fileSource = new FileSource($userId, 'file source label');
@@ -172,11 +175,11 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
      */
     public function testUpdate(
         SourceInterface $source,
-        string $userId,
         array $requestData,
         int $expectedResponseStatusCode,
         array $expectedResponseData
     ): void {
+        $this->setSourceUserIdToAuthenticatedUserId($source);
         $this->store->add($source);
 
         $url = $this->generateUrl('user_source_update', ['sourceId' => $source->getId()]);
@@ -187,6 +190,8 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
         $this->authorizationRequestAsserter->assertAuthorizationRequestIsMade();
         self::assertInstanceOf(JsonResponse::class, $response);
 
+        $expectedResponseData = $this->replaceAuthenticatedUserIdInSourceData($expectedResponseData);
+
         $responseData = json_decode((string) $response->getContent(), true);
         self::assertEquals($expectedResponseData, $responseData);
     }
@@ -196,7 +201,6 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
      */
     public function updateDataProvider(): array
     {
-        $userId = self::AUTHENTICATED_USER_ID;
         $hostUrl = 'https://example.com/repository.git';
         $path = '/';
         $credentials = md5((string) rand());
@@ -206,13 +210,12 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
         $label = 'file source label';
         $newLabel = 'new file source label';
 
-        $fileSource = new FileSource($userId, $label);
-        $gitSource = new GitSource($userId, $hostUrl, $path, $credentials);
+        $fileSource = new FileSource(self::AUTHENTICATED_USER_ID_PLACEHOLDER, $label);
+        $gitSource = new GitSource(self::AUTHENTICATED_USER_ID_PLACEHOLDER, $hostUrl, $path, $credentials);
 
         return [
             Type::FILE->value => [
                 'source' => $fileSource,
-                'userId' => $userId,
                 'requestData' => [
                     SourceRequestInterface::PARAMETER_TYPE => Type::FILE->value,
                     FileSourceRequest::PARAMETER_LABEL => $newLabel,
@@ -227,7 +230,6 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
             ],
             Type::GIT->value . ' credentials present and empty' => [
                 'source' => $gitSource,
-                'userId' => $userId,
                 'requestData' => [
                     SourceRequestInterface::PARAMETER_TYPE => Type::GIT->value,
                     GitSourceRequest::PARAMETER_HOST_URL => $newHostUrl,
@@ -246,7 +248,6 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
             ],
             Type::GIT->value . ' credentials not present' => [
                 'source' => $gitSource,
-                'userId' => $userId,
                 'requestData' => [
                     SourceRequestInterface::PARAMETER_TYPE => Type::GIT->value,
                     GitSourceRequest::PARAMETER_HOST_URL => $newHostUrl,
@@ -264,7 +265,6 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
             ],
             Type::GIT->value . ' missing host url' => [
                 'source' => $gitSource,
-                'userId' => $userId,
                 'requestData' => [
                     SourceRequestInterface::PARAMETER_TYPE => Type::GIT->value,
                     GitSourceRequest::PARAMETER_HOST_URL => '',
@@ -289,8 +289,10 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
     /**
      * @dataProvider deleteSuccessDataProvider
      */
-    public function testDeleteSuccess(SourceInterface $source, string $userId, int $expectedRepositoryCount): void
+    public function testDeleteSuccess(SourceInterface $source, int $expectedRepositoryCount): void
     {
+        $this->setSourceUserIdToAuthenticatedUserId($source);
+
         $this->store->add($source);
         self::assertGreaterThan(0, $this->sourceRepository->count([]));
 
@@ -309,24 +311,22 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
      */
     public function deleteSuccessDataProvider(): array
     {
-        $userId = self::AUTHENTICATED_USER_ID;
-
         return [
             Type::FILE->value => [
-                'source' => new FileSource($userId, 'label'),
-                'userId' => $userId,
+                'source' => new FileSource(self::AUTHENTICATED_USER_ID_PLACEHOLDER, 'label'),
                 'expectedRepositoryCount' => 0,
             ],
             Type::GIT->value => [
-                'source' => new GitSource($userId, 'https://example.com/repository.git'),
-                'userId' => $userId,
+                'source' => new GitSource(
+                    self::AUTHENTICATED_USER_ID_PLACEHOLDER,
+                    'https://example.com/repository.git'
+                ),
                 'expectedRepositoryCount' => 0,
             ],
             Type::RUN->value => [
                 'source' => new RunSource(
-                    new FileSource($userId, 'label')
+                    new FileSource(self::AUTHENTICATED_USER_ID_PLACEHOLDER, 'label')
                 ),
-                'userId' => $userId,
                 'expectedRepositoryCount' => 1,
             ],
         ];
@@ -334,8 +334,7 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
 
     public function testDeleteRunSourceDeletesRunSourceFiles(): void
     {
-        $userId = self::AUTHENTICATED_USER_ID;
-        $fileSource = new FileSource($userId, 'file source label');
+        $fileSource = new FileSource($this->authenticatedUserId, 'file source label');
         $runSource = new RunSource($fileSource);
 
         $this->store->add($fileSource);
@@ -359,8 +358,7 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
 
     public function testDeleteFileSourceDeletesFileSourceFiles(): void
     {
-        $userId = self::AUTHENTICATED_USER_ID;
-        $fileSource = new FileSource($userId, 'file source label');
+        $fileSource = new FileSource($this->authenticatedUserId, 'file source label');
         $filename = 'file.yaml';
 
         $this->store->add($fileSource);
@@ -386,7 +384,7 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
 
     public function testPrepareRunSource(): void
     {
-        $fileSource = new FileSource(self::AUTHENTICATED_USER_ID, 'file source label');
+        $fileSource = new FileSource($this->authenticatedUserId, 'file source label');
         $source = new RunSource($fileSource);
 
         $this->store->add($source);
@@ -410,6 +408,7 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
         array $requestParameters,
         array $expectedResponseData
     ): void {
+        $this->setSourceUserIdToAuthenticatedUserId($source);
         $this->store->add($source);
 
         $url = $this->generateUrl('user_source_prepare', ['sourceId' => $source->getId()]);
@@ -426,6 +425,8 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
         $runSource = $this->runSourceRepository->findByParent($source);
         self::assertInstanceOf(RunSource::class, $runSource);
 
+        $expectedResponseData = $this->replaceAuthenticatedUserIdInSourceData($expectedResponseData);
+
         $expectedResponseData['id'] = $runSource->getId();
         self::assertSame($expectedResponseData, $responseData);
     }
@@ -435,7 +436,7 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
      */
     public function prepareSuccessDataProvider(): array
     {
-        $userId = self::AUTHENTICATED_USER_ID;
+        $userId = self::AUTHENTICATED_USER_ID_PLACEHOLDER;
 
         $fileSource = new FileSource($userId, 'file source label');
         $gitSource = new GitSource($userId, 'https://example.com/repository.git', '/', md5((string) rand()));
@@ -514,9 +515,7 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
             ]
         );
 
-        $userId = self::AUTHENTICATED_USER_ID;
-
-        $fileSource = new FileSource($userId, 'file source label');
+        $fileSource = new FileSource($this->authenticatedUserId, 'file source label');
         $runSource = new RunSource($fileSource);
         $this->store->add($runSource);
 
