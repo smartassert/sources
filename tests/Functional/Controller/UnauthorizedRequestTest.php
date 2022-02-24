@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Functional\Controller;
 
 use App\Model\EntityId;
+use App\Tests\Services\ApplicationClient;
 use App\Tests\Services\AuthorizationRequestAsserter;
 
 class UnauthorizedRequestTest extends AbstractSourceControllerTest
@@ -27,14 +28,14 @@ class UnauthorizedRequestTest extends AbstractSourceControllerTest
      */
     public function testRequestForUnauthorizedUser(string $method, string $routeName, array $routeParameters): void
     {
-        $this->setUserServiceUnauthorizedResponse();
-
         $url = $this->generateUrl($routeName, $routeParameters);
 
-        $response = $this->applicationClient->makeAuthorizedRequest($method, $url);
+        $response = $this->applicationClient->makeUnauthorizedRequest($method, $url);
 
         self::assertSame(401, $response->getStatusCode());
-        $this->authorizationRequestAsserter->assertAuthorizationRequestIsMade();
+        $this->authorizationRequestAsserter->assertAuthorizationRequestIsMade(
+            ApplicationClient::INVALID_AUTH_TOKEN
+        );
     }
 
     /**

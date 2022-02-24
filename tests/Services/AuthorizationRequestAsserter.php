@@ -9,6 +9,7 @@ use GuzzleHttp\Middleware;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\RequestInterface;
 use SmartAssert\UsersClient\Routes;
+use SmartAssert\UsersSecurityBundle\Security\AuthorizationProperties as AuthProperties;
 use webignition\HttpHistoryContainer\Container as HttpHistoryContainer;
 
 class AuthorizationRequestAsserter
@@ -21,8 +22,9 @@ class AuthorizationRequestAsserter
         $handlerStack->push(Middleware::history($this->httpHistoryContainer), 'history');
     }
 
-    public function assertAuthorizationRequestIsMade(): void
-    {
+    public function assertAuthorizationRequestIsMade(
+        string $expectedToken = ApplicationClient::VALID_AUTH_TOKEN,
+    ): void {
         $request = $this->httpHistoryContainer->getTransactions()->getRequests()->getLast();
         TestCase::assertInstanceOf(RequestInterface::class, $request);
 
@@ -30,7 +32,7 @@ class AuthorizationRequestAsserter
 
         TestCase::assertSame($expectedUrl, (string) $request->getUri());
         TestCase::assertSame(
-            ApplicationClient::AUTH_HEADER_VALUE,
+            AuthProperties::DEFAULT_VALUE_PREFIX . $expectedToken,
             $request->getHeaderLine(ApplicationClient::AUTH_HEADER_KEY)
         );
     }

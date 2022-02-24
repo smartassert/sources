@@ -6,7 +6,6 @@ namespace App\Tests\Functional\Controller;
 
 use App\Entity\FileSource;
 use App\Services\Source\Store;
-use App\Tests\Model\UserId;
 use App\Tests\Services\AuthorizationRequestAsserter;
 use App\Validator\YamlFilenameConstraint;
 use League\Flysystem\FilesystemOperator;
@@ -17,7 +16,6 @@ class FileSourceFileControllerTest extends AbstractSourceControllerTest
     private AuthorizationRequestAsserter $authorizationRequestAsserter;
     private FilesystemOperator $fileSourceStorage;
 
-    private string $userId;
     private FileSource $fileSource;
     private string $sourceRelativePath;
 
@@ -33,8 +31,7 @@ class FileSourceFileControllerTest extends AbstractSourceControllerTest
         \assert($fileSourceStorage instanceof FilesystemOperator);
         $this->fileSourceStorage = $fileSourceStorage;
 
-        $this->userId = UserId::create();
-        $this->fileSource = new FileSource($this->userId, 'file source label');
+        $this->fileSource = new FileSource(self::AUTHENTICATED_USER_ID, 'file source label');
         $this->sourceRelativePath = $this->fileSource->getDirectoryPath();
 
         $store = self::getContainer()->get(Store::class);
@@ -52,8 +49,6 @@ class FileSourceFileControllerTest extends AbstractSourceControllerTest
         string $content,
         array $expectedResponseData
     ): void {
-        $this->setUserServiceAuthorizedResponse($this->userId);
-
         $url = $this->generateUrl('file_source_file_add', [
             'sourceId' => $this->fileSource->getId(),
             'filename' => $filename,
@@ -145,8 +140,6 @@ class FileSourceFileControllerTest extends AbstractSourceControllerTest
         self::assertFalse($this->fileSourceStorage->directoryExists($this->sourceRelativePath));
         self::assertFalse($this->fileSourceStorage->fileExists($fileRelativePath));
 
-        $this->setUserServiceAuthorizedResponse($this->userId);
-
         $url = $this->generateUrl('file_source_file_add', [
             'sourceId' => $this->fileSource->getId(),
             'filename' => $filename,
@@ -174,8 +167,6 @@ class FileSourceFileControllerTest extends AbstractSourceControllerTest
 
         $this->fileSourceStorage->write($fileRelativePath, $initialContent);
 
-        $this->setUserServiceAuthorizedResponse($this->userId);
-
         $url = $this->generateUrl('file_source_file_add', [
             'sourceId' => $this->fileSource->getId(),
             'filename' => $filename,
@@ -198,8 +189,6 @@ class FileSourceFileControllerTest extends AbstractSourceControllerTest
         string $filename,
         array $expectedResponseData
     ): void {
-        $this->setUserServiceAuthorizedResponse($this->userId);
-
         $url = $this->generateUrl('file_source_file_remove', [
             'sourceId' => $this->fileSource->getId(),
             'filename' => $filename,
@@ -255,8 +244,6 @@ class FileSourceFileControllerTest extends AbstractSourceControllerTest
         $fileRelativePath = $this->sourceRelativePath . '/' . $filename;
 
         $this->fileSourceStorage->write($fileRelativePath, $content);
-
-        $this->setUserServiceAuthorizedResponse($this->userId);
 
         $url = $this->generateUrl('file_source_file_remove', [
             'sourceId' => $this->fileSource->getId(),
