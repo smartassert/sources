@@ -42,6 +42,21 @@ class FileSourceFileControllerTest extends AbstractSourceControllerTest
         $store->add($this->fileSource);
     }
 
+    public function testAddFileUnauthorizedUser(): void
+    {
+        $url = $this->generateUrl('file_source_file_add', [
+            'sourceId' => $this->fileSource->getId(),
+            'filename' => 'filename.yaml',
+        ]);
+
+        $response = $this->applicationClient->makeUnauthorizedRequest('POST', $url);
+
+        self::assertSame(401, $response->getStatusCode());
+        $this->authorizationRequestAsserter->assertAuthorizationRequestIsMade(
+            $this->authenticationConfiguration->invalidToken
+        );
+    }
+
     /**
      * @dataProvider addFileInvalidRequestDataProvider
      *
@@ -181,6 +196,21 @@ class FileSourceFileControllerTest extends AbstractSourceControllerTest
         self::assertTrue($this->fileSourceStorage->directoryExists($this->sourceRelativePath));
         self::assertTrue($this->fileSourceStorage->fileExists($fileRelativePath));
         self::assertSame($updatedContent, $this->fileSourceStorage->read($fileRelativePath));
+    }
+
+    public function testRemoveFileUnauthorizedUser(): void
+    {
+        $url = $this->generateUrl('file_source_file_remove', [
+            'sourceId' => $this->fileSource->getId(),
+            'filename' => 'filename.yaml',
+        ]);
+
+        $response = $this->applicationClient->makeUnauthorizedRequest('POST', $url);
+
+        self::assertSame(401, $response->getStatusCode());
+        $this->authorizationRequestAsserter->assertAuthorizationRequestIsMade(
+            $this->authenticationConfiguration->invalidToken
+        );
     }
 
     /**

@@ -48,6 +48,16 @@ class SourceControllerTest extends AbstractSourceControllerTest
         }
     }
 
+    public function testCreateUnauthorizedUser(): void
+    {
+        $response = $this->applicationClient->makeUnauthorizedRequest('POST', $this->generateUrl('source_create'));
+
+        self::assertSame(401, $response->getStatusCode());
+        $this->authorizationRequestAsserter->assertAuthorizationRequestIsMade(
+            $this->authenticationConfiguration->invalidToken
+        );
+    }
+
     /**
      * @dataProvider createInvalidRequestDataProvider
      *
@@ -193,6 +203,16 @@ class SourceControllerTest extends AbstractSourceControllerTest
                 ],
             ],
         ];
+    }
+
+    public function testListUnauthorizedUser(): void
+    {
+        $response = $this->applicationClient->makeUnauthorizedRequest('GET', $this->generateUrl('source_list'));
+
+        self::assertSame(401, $response->getStatusCode());
+        $this->authorizationRequestAsserter->assertAuthorizationRequestIsMade(
+            $this->authenticationConfiguration->invalidToken
+        );
     }
 
     /**

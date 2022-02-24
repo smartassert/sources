@@ -78,6 +78,19 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
         }
     }
 
+    public function testGetUnauthorizedUser(): void
+    {
+        $source = new FileSource($this->authenticationConfiguration->authenticatedUserId, '');
+        $url = $this->generateUrl('user_source_get', ['sourceId' => $source->getId()]);
+
+        $response = $this->applicationClient->makeUnauthorizedRequest('GET', $url);
+
+        self::assertSame(401, $response->getStatusCode());
+        $this->authorizationRequestAsserter->assertAuthorizationRequestIsMade(
+            $this->authenticationConfiguration->invalidToken
+        );
+    }
+
     /**
      * @dataProvider getSuccessDataProvider
      *
@@ -165,6 +178,19 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
                 ],
             ],
         ];
+    }
+
+    public function testUpdateUnauthorizedUser(): void
+    {
+        $source = new FileSource($this->authenticationConfiguration->authenticatedUserId, '');
+        $url = $this->generateUrl('user_source_update', ['sourceId' => $source->getId()]);
+
+        $response = $this->applicationClient->makeUnauthorizedRequest('PUT', $url);
+
+        self::assertSame(401, $response->getStatusCode());
+        $this->authorizationRequestAsserter->assertAuthorizationRequestIsMade(
+            $this->authenticationConfiguration->invalidToken
+        );
     }
 
     /**
@@ -286,6 +312,19 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
         ];
     }
 
+    public function testDeleteUnauthorizedUser(): void
+    {
+        $source = new FileSource($this->authenticationConfiguration->authenticatedUserId, '');
+        $url = $this->generateUrl('user_source_delete', ['sourceId' => $source->getId()]);
+
+        $response = $this->applicationClient->makeUnauthorizedRequest('DELETE', $url);
+
+        self::assertSame(401, $response->getStatusCode());
+        $this->authorizationRequestAsserter->assertAuthorizationRequestIsMade(
+            $this->authenticationConfiguration->invalidToken
+        );
+    }
+
     /**
      * @dataProvider deleteSuccessDataProvider
      */
@@ -380,6 +419,19 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
 
         self::assertFalse($this->fileSourceStorage->directoryExists($sourceRelativePath));
         self::assertFalse($this->fileSourceStorage->fileExists($fileRelativePath));
+    }
+
+    public function testPrepareUnauthorizedUser(): void
+    {
+        $source = new FileSource($this->authenticationConfiguration->authenticatedUserId, '');
+        $url = $this->generateUrl('user_source_prepare', ['sourceId' => $source->getId()]);
+
+        $response = $this->applicationClient->makeUnauthorizedRequest('POST', $url);
+
+        self::assertSame(401, $response->getStatusCode());
+        $this->authorizationRequestAsserter->assertAuthorizationRequestIsMade(
+            $this->authenticationConfiguration->invalidToken
+        );
     }
 
     public function testPrepareRunSource(): void
