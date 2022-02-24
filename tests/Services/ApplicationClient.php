@@ -4,15 +4,11 @@ declare(strict_types=1);
 
 namespace App\Tests\Services;
 
-use SmartAssert\UsersSecurityBundle\Security\AuthorizationProperties as AuthProperties;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Component\HttpFoundation\Response;
 
 class ApplicationClient
 {
-    public const AUTH_HEADER_KEY = AuthProperties::DEFAULT_HEADER_NAME;
-
-    public const INVALID_AUTH_TOKEN = 'invalid-token';
     private KernelBrowser $client;
 
     public function __construct(
@@ -34,15 +30,12 @@ class ApplicationClient
         array $parameters = [],
         ?string $content = null
     ): Response {
-        return $this->makeRequest(
+        return $this->makeAuthenticatedRequest(
+            $this->authenticationConfiguration->invalidToken,
             $method,
             $url,
-            [
-                AuthProperties::DEFAULT_HEADER_NAME => AuthProperties::DEFAULT_VALUE_PREFIX
-                    . $this->authenticationConfiguration->invalid
-            ],
             $parameters,
-            $content,
+            $content
         );
     }
 
@@ -55,12 +48,31 @@ class ApplicationClient
         array $parameters = [],
         ?string $content = null
     ): Response {
+        return $this->makeAuthenticatedRequest(
+            $this->authenticationConfiguration->validToken,
+            $method,
+            $url,
+            $parameters,
+            $content
+        );
+    }
+
+    /**
+     * @param array<string, string> $parameters
+     */
+    private function makeAuthenticatedRequest(
+        string $token,
+        string $method,
+        string $url,
+        array $parameters = [],
+        ?string $content = null
+    ): Response {
         return $this->makeRequest(
             $method,
             $url,
             [
-                AuthProperties::DEFAULT_HEADER_NAME => AuthProperties::DEFAULT_VALUE_PREFIX
-                    . $this->authenticationConfiguration->valid
+                $this->authenticationConfiguration->headerName => $this->authenticationConfiguration->headerValuePrefix
+                    . $token
             ],
             $parameters,
             $content,

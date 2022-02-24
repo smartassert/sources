@@ -36,7 +36,9 @@ class UnauthorizedRequestTest extends AbstractSourceControllerTest
         $response = $this->applicationClient->makeUnauthorizedRequest($method, $url);
 
         self::assertSame(401, $response->getStatusCode());
-        $this->authorizationRequestAsserter->assertAuthorizationRequestIsMade($authenticationConfiguration->invalid);
+        $this->authorizationRequestAsserter->assertAuthorizationRequestIsMade(
+            $authenticationConfiguration->invalidToken
+        );
     }
 
     /**

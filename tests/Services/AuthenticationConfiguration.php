@@ -7,8 +7,10 @@ namespace App\Tests\Services;
 class AuthenticationConfiguration
 {
     public function __construct(
-        public readonly string $valid,
-        public readonly string $invalid,
+        public readonly string $validToken,
+        public readonly string $invalidToken,
+        public readonly string $headerName,
+        public readonly string $headerValuePrefix,
     ) {
     }
 }
