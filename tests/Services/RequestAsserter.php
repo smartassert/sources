@@ -11,7 +11,7 @@ use Psr\Http\Message\RequestInterface;
 use SmartAssert\UsersClient\Routes;
 use webignition\HttpHistoryContainer\Container as HttpHistoryContainer;
 
-class AuthorizationRequestAsserter
+class RequestAsserter
 {
     public function __construct(
         HandlerStack $handlerStack,
