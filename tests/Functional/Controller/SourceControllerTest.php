@@ -45,7 +45,7 @@ class SourceControllerTest extends AbstractSourceControllerTest
     {
         $response = $this->application->makeCreateSourceRequest($this->invalidToken, []);
 
-        self::assertSame(401, $response->getStatusCode());
+        $this->responseAsserter->assertUnauthorizedResponse($response);
         $this->requestAsserter->assertAuthorizationRequestIsMade($this->invalidToken);
     }
 
@@ -192,7 +192,7 @@ class SourceControllerTest extends AbstractSourceControllerTest
     {
         $response = $this->application->makeListSourcesRequest($this->invalidToken);
 
-        self::assertSame(401, $response->getStatusCode());
+        $this->responseAsserter->assertUnauthorizedResponse($response);
         $this->requestAsserter->assertAuthorizationRequestIsMade($this->invalidToken);
     }
 

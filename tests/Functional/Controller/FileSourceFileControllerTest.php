@@ -48,7 +48,7 @@ class FileSourceFileControllerTest extends AbstractSourceControllerTest
             '- content'
         );
 
-        self::assertSame(401, $response->getStatusCode());
+        $this->responseAsserter->assertUnauthorizedResponse($response);
         $this->requestAsserter->assertAuthorizationRequestIsMade($this->invalidToken);
     }
 
@@ -64,7 +64,7 @@ class FileSourceFileControllerTest extends AbstractSourceControllerTest
             '- content'
         );
 
-        self::assertSame(403, $response->getStatusCode());
+        $this->responseAsserter->assertForbiddenResponse($response);
     }
 
     /**
@@ -205,7 +205,7 @@ class FileSourceFileControllerTest extends AbstractSourceControllerTest
             'filename.yaml'
         );
 
-        self::assertSame(401, $response->getStatusCode());
+        $this->responseAsserter->assertUnauthorizedResponse($response);
         $this->requestAsserter->assertAuthorizationRequestIsMade($this->invalidToken);
     }
 
@@ -216,7 +216,7 @@ class FileSourceFileControllerTest extends AbstractSourceControllerTest
 
         $response = $this->application->makeRemoveFileRequest($this->validToken, $source->getId(), 'filename.yaml');
 
-        self::assertSame(403, $response->getStatusCode());
+        $this->responseAsserter->assertForbiddenResponse($response);
     }
 
     /**

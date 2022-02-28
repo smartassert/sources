@@ -77,7 +77,7 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
     {
         $response = $this->application->makeGetSourceRequest($this->invalidToken, EntityId::create());
 
-        self::assertSame(401, $response->getStatusCode());
+        $this->responseAsserter->assertUnauthorizedResponse($response);
         $this->requestAsserter->assertAuthorizationRequestIsMade($this->invalidToken);
     }
 
@@ -95,7 +95,7 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
 
         $response = $this->application->makeGetSourceRequest($this->validToken, $source->getId());
 
-        self::assertSame(403, $response->getStatusCode());
+        $this->responseAsserter->assertForbiddenResponse($response);
     }
 
     /**
@@ -189,7 +189,7 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
     {
         $response = $this->application->makeUpdateSourceRequest($this->invalidToken, EntityId::create(), []);
 
-        self::assertSame(401, $response->getStatusCode());
+        $this->responseAsserter->assertUnauthorizedResponse($response);
         $this->requestAsserter->assertAuthorizationRequestIsMade($this->invalidToken);
     }
 
@@ -200,7 +200,7 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
 
         $response = $this->application->makeUpdateSourceRequest($this->validToken, $source->getId(), []);
 
-        self::assertSame(403, $response->getStatusCode());
+        $this->responseAsserter->assertForbiddenResponse($response);
     }
 
     /**
@@ -324,7 +324,7 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
     {
         $response = $this->application->makeDeleteSourceRequest($this->invalidToken, EntityId::create());
 
-        self::assertSame(401, $response->getStatusCode());
+        $this->responseAsserter->assertUnauthorizedResponse($response);
         $this->requestAsserter->assertAuthorizationRequestIsMade($this->invalidToken);
     }
 
@@ -335,7 +335,7 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
 
         $response = $this->application->makeDeleteSourceRequest($this->validToken, $source->getId());
 
-        self::assertSame(403, $response->getStatusCode());
+        $this->responseAsserter->assertForbiddenResponse($response);
     }
 
     /**
@@ -431,7 +431,7 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
     {
         $response = $this->application->makePrepareSourceRequest($this->invalidToken, EntityId::create(), []);
 
-        self::assertSame(401, $response->getStatusCode());
+        $this->responseAsserter->assertUnauthorizedResponse($response);
         $this->requestAsserter->assertAuthorizationRequestIsMade($this->invalidToken);
     }
 
@@ -442,7 +442,7 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
 
         $response = $this->application->makePrepareSourceRequest($this->validToken, $source->getId(), []);
 
-        self::assertSame(403, $response->getStatusCode());
+        $this->responseAsserter->assertForbiddenResponse($response);
     }
 
     public function testPrepareRunSource(): void
