@@ -36,6 +36,10 @@ RUN apt-get -qq update && apt-get -qq -y install  \
   && apt-get autoremove -y \
   && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
+RUN mkdir -p var/log/supervisor
+COPY build/supervisor/supervisord.conf /etc/supervisor/supervisord.conf
+COPY build/supervisor/conf.d/app.conf /etc/supervisor/conf.d/supervisord.conf
+
 COPY composer.json composer.lock /app/
 COPY bin/console /app/bin/console
 COPY public/index.php public/
@@ -53,3 +57,5 @@ RUN mkdir -p /app/var/log \
   && composer install --no-dev --no-scripts \
   && rm composer.lock \
   && php bin/console cache:clear
+
+CMD supervisord -c /etc/supervisor/supervisord.conf
