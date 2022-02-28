@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Services\Application;
+namespace App\Tests\Services\ApplicationClient;
 
 use Psr\Http\Message\ResponseInterface;
 
-class Application
+class Client
 {
     public function __construct(
-        private ClientInterface $client,
+        private AdapterInterface $client,
         private Routes $routes,
     ) {
     }

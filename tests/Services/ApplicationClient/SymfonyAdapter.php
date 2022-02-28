@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Services\Application;
+namespace App\Tests\Services\ApplicationClient;
 
 use Psr\Http\Message\ResponseInterface;
 use Symfony\Bridge\PsrHttpMessage\HttpMessageFactoryInterface;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 
-class SymfonyClient implements ClientInterface
+class SymfonyAdapter implements AdapterInterface
 {
     private KernelBrowser $kernelBrowser;
 

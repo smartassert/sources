@@ -34,7 +34,7 @@ services:
     App\Tests\Services\DirectoryLister:
         public: true
 
-    App\Tests\Services\Application\Routes:
+    App\Tests\Services\ApplicationClient\Routes:
         arguments:
             $addFileUrl: '/{{ sourceId }}/{{ filename }}'
             $removeFileUrl: '/{{ sourceId }}/{{ filename }}'
@@ -46,7 +46,7 @@ services:
             $prepareSourceUrl: '/{{ sourceId }}/prepare'
             $readSourceUrl: '/{{ sourceId }}/read'
 
-    App\Tests\Services\Application\SymfonyClient:
+    App\Tests\Services\ApplicationClient\SymfonyAdapter:
 
     app.tests.integration.http.client:
         public: true
@@ -56,21 +56,21 @@ services:
                 base_uri: "https://localhost/"
                 verify: false
 
-    App\Tests\Services\Application\HttpClient:
+    App\Tests\Services\ApplicationClient\HttpAdapter:
         arguments:
             $httpClient: '@app.tests.integration.http.client'
 
-    app.tests.services.application.functional:
+    app.tests.services.application.client.functional:
         public: true
-        class: App\Tests\Services\Application\Application
+        class: App\Tests\Services\ApplicationClient\Client
         arguments:
-            $client: '@App\Tests\Services\Application\SymfonyClient'
+            $client: '@App\Tests\Services\ApplicationClient\SymfonyAdapter'
 
-    app.tests.services.application.integration:
+    app.tests.services.application.client.integration:
         public: true
-        class: App\Tests\Services\Application\Application
+        class: App\Tests\Services\ApplicationClient\Client
         arguments:
-            $client: '@App\Tests\Services\Application\HttpClient'
+            $client: '@App\Tests\Services\ApplicationClient\HttpAdapter'
 
     GuzzleHttp\Psr7\HttpFactory:
 

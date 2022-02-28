@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Services\Application;
+namespace App\Tests\Services\ApplicationClient;
 
 use GuzzleHttp\Psr7\Utils;
 use Psr\Http\Client\ClientInterface as HttpClientInterface;
@@ -10,7 +10,7 @@ use Psr\Http\Message\RequestFactoryInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 
-class HttpClient implements ClientInterface
+class HttpAdapter implements AdapterInterface
 {
     public function __construct(
         private RequestFactoryInterface $requestFactory,

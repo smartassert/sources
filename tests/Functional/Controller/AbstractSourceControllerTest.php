@@ -6,8 +6,8 @@ namespace App\Tests\Functional\Controller;
 
 use App\Entity\AbstractSource;
 use App\Entity\SourceInterface;
-use App\Tests\Services\Application\Application;
-use App\Tests\Services\Application\SymfonyClient;
+use App\Tests\Services\ApplicationClient\Client;
+use App\Tests\Services\ApplicationClient\SymfonyAdapter;
 use App\Tests\Services\AuthenticationConfiguration;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Routing\RouterInterface;
@@ -18,7 +18,7 @@ abstract class AbstractSourceControllerTest extends WebTestCase
     protected const AUTHENTICATED_USER_ID_PLACEHOLDER = '{{ authenticated_user_id }}';
 
     protected AuthenticationConfiguration $authenticationConfiguration;
-    protected Application $application;
+    protected Client $application;
     private RouterInterface $router;
 
     protected function setUp(): void
@@ -31,11 +31,11 @@ abstract class AbstractSourceControllerTest extends WebTestCase
         \assert($router instanceof RouterInterface);
         $this->router = $router;
 
-        $application = self::getContainer()->get('app.tests.services.application.functional');
-        \assert($application instanceof Application);
+        $application = self::getContainer()->get('app.tests.services.application.client.functional');
+        \assert($application instanceof Client);
 
-        $symfonyClient = self::getContainer()->get(SymfonyClient::class);
-        \assert($symfonyClient instanceof SymfonyClient);
+        $symfonyClient = self::getContainer()->get(SymfonyAdapter::class);
+        \assert($symfonyClient instanceof SymfonyAdapter);
         $symfonyClient->setKernelBrowser($client);
 
         $this->application = $application;

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Services\Application;
+namespace App\Tests\Services\ApplicationClient;
 
 class Routes
 {

@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Services\Application;
+namespace App\Tests\Services\ApplicationClient;
 
 use Psr\Http\Message\ResponseInterface;
 
-interface ClientInterface
+interface AdapterInterface
 {
     /**
      * @param array<string, string> $headers
