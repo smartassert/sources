@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Tests\Services;
 
+use App\Tests\Services\Asserter\Response\BodyContentAsserter;
 use App\Tests\Services\Asserter\Response\JsonResponseAsserter;
-use App\Tests\Services\Asserter\Response\ResponseAsserter as FooResponseAsserter;
 use App\Tests\Services\Asserter\Response\YamlResponseAsserter;
 use PHPUnit\Framework\Assert;
 use Psr\Http\Message\ResponseInterface;
@@ -33,100 +33,29 @@ class ResponseAsserter
     /**
      * @param array<mixed> $expectedData
      */
-    public function assertAddFileInvalidRequestResponse(ResponseInterface $response, array $expectedData): void
+    public function assertInvalidRequestJsonResponse(ResponseInterface $response, array $expectedData): void
     {
         (new JsonResponseAsserter(Response::HTTP_BAD_REQUEST, $expectedData))
             ->assert($response)
         ;
     }
 
-    public function assertAddFileSuccessResponse(ResponseInterface $response): void
+    public function assertSuccessfulResponseWithNoBody(ResponseInterface $response): void
     {
-        (new FooResponseAsserter(Response::HTTP_OK))
+        (new Asserter\Response\ResponseAsserter(Response::HTTP_OK))
+            ->addBodyAsserter(new BodyContentAsserter(''))
             ->assert($response)
         ;
+
+        Assert::assertSame('', $response->getBody()->getContents());
     }
 
     /**
      * @param array<mixed> $expectedData
      */
-    public function assertRemoveFileInvalidRequestResponse(ResponseInterface $response, array $expectedData): void
-    {
-        (new JsonResponseAsserter(Response::HTTP_BAD_REQUEST, $expectedData))
-            ->assert($response)
-        ;
-    }
-
-    public function assertRemoveFileSuccessResponse(ResponseInterface $response): void
-    {
-        (new FooResponseAsserter(Response::HTTP_OK))
-            ->assert($response)
-        ;
-    }
-
-    /**
-     * @param array<mixed> $expectedData
-     */
-    public function assertCreateSourceInvalidRequestResponse(ResponseInterface $response, array $expectedData): void
-    {
-        (new JsonResponseAsserter(Response::HTTP_BAD_REQUEST, $expectedData))
-            ->assert($response)
-        ;
-    }
-
-    /**
-     * @param array<mixed> $expectedData
-     */
-    public function assertCreateSourceSuccessResponse(ResponseInterface $response, array $expectedData): void
+    public function assertSuccessfulJsonResponse(ResponseInterface $response, array $expectedData): void
     {
         (new JsonResponseAsserter(Response::HTTP_OK, $expectedData))
-            ->assert($response)
-        ;
-    }
-
-    /**
-     * @param array<mixed> $expectedData
-     */
-    public function assertListSourcesSuccessResponse(ResponseInterface $response, array $expectedData): void
-    {
-        (new JsonResponseAsserter(Response::HTTP_OK, $expectedData))
-            ->assert($response)
-        ;
-    }
-
-    /**
-     * @param array<mixed> $expectedData
-     */
-    public function assertGetSourceSuccessResponse(ResponseInterface $response, array $expectedData): void
-    {
-        (new JsonResponseAsserter(Response::HTTP_OK, $expectedData))
-            ->assert($response)
-        ;
-    }
-
-    /**
-     * @param array<mixed> $expectedData
-     */
-    public function assertUpdateSourceSuccessResponse(ResponseInterface $response, array $expectedData): void
-    {
-        (new JsonResponseAsserter(Response::HTTP_OK, $expectedData))
-            ->assert($response)
-        ;
-    }
-
-    /**
-     * @param array<mixed> $expectedData
-     */
-    public function assertUpdateSourceInvalidRequestResponse(ResponseInterface $response, array $expectedData): void
-    {
-        (new JsonResponseAsserter(Response::HTTP_BAD_REQUEST, $expectedData))
-            ->assert($response)
-        ;
-    }
-
-    public function assertDeleteSourceSuccessResponse(ResponseInterface $response): void
-    {
-        (new FooResponseAsserter(Response::HTTP_OK))
             ->assert($response)
         ;
     }

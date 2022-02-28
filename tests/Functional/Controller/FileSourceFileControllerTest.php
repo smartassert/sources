@@ -84,7 +84,7 @@ class FileSourceFileControllerTest extends AbstractSourceControllerTest
             $content
         );
 
-        $this->responseAsserter->assertAddFileInvalidRequestResponse($response, $expectedResponseData);
+        $this->responseAsserter->assertInvalidRequestJsonResponse($response, $expectedResponseData);
         $this->requestAsserter->assertAuthorizationRequestIsMade();
     }
 
@@ -186,7 +186,7 @@ class FileSourceFileControllerTest extends AbstractSourceControllerTest
             $updatedContent
         );
 
-        $this->responseAsserter->assertAddFileSuccessResponse($response);
+        $this->responseAsserter->assertSuccessfulResponseWithNoBody($response);
         self::assertTrue($this->fileSourceStorage->directoryExists($this->sourceRelativePath));
         self::assertTrue($this->fileSourceStorage->fileExists($fileRelativePath));
         self::assertSame($updatedContent, $this->fileSourceStorage->read($fileRelativePath));
@@ -225,7 +225,7 @@ class FileSourceFileControllerTest extends AbstractSourceControllerTest
     ): void {
         $response = $this->application->makeRemoveFileRequest($this->validToken, $this->fileSource->getId(), $filename);
 
-        $this->responseAsserter->assertRemoveFileInvalidRequestResponse($response, $expectedResponseData);
+        $this->responseAsserter->assertInvalidRequestJsonResponse($response, $expectedResponseData);
         $this->requestAsserter->assertAuthorizationRequestIsMade();
     }
 
@@ -266,7 +266,7 @@ class FileSourceFileControllerTest extends AbstractSourceControllerTest
 
         $response = $this->application->makeRemoveFileRequest($this->validToken, $this->fileSource->getId(), $filename);
 
-        $this->responseAsserter->assertRemoveFileSuccessResponse($response);
+        $this->responseAsserter->assertSuccessfulResponseWithNoBody($response);
         self::assertFalse($this->fileSourceStorage->fileExists($fileRelativePath));
     }
 

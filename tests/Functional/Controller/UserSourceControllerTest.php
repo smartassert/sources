@@ -111,7 +111,7 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
 
         $expectedResponseData = $this->replaceAuthenticatedUserIdInSourceData($expectedResponseData);
 
-        $this->responseAsserter->assertGetSourceSuccessResponse($response, $expectedResponseData);
+        $this->responseAsserter->assertSuccessfulJsonResponse($response, $expectedResponseData);
         $this->requestAsserter->assertAuthorizationRequestIsMade();
     }
 
@@ -216,7 +216,7 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
 
         $expectedResponseData = $this->replaceAuthenticatedUserIdInSourceData($expectedResponseData);
 
-        $this->responseAsserter->assertUpdateSourceInvalidRequestResponse($response, $expectedResponseData);
+        $this->responseAsserter->assertInvalidRequestJsonResponse($response, $expectedResponseData);
         $this->requestAsserter->assertAuthorizationRequestIsMade();
     }
 
@@ -272,7 +272,7 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
 
         $expectedResponseData = $this->replaceAuthenticatedUserIdInSourceData($expectedResponseData);
 
-        $this->responseAsserter->assertUpdateSourceSuccessResponse($response, $expectedResponseData);
+        $this->responseAsserter->assertSuccessfulJsonResponse($response, $expectedResponseData);
         $this->requestAsserter->assertAuthorizationRequestIsMade();
     }
 
@@ -373,7 +373,7 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
 
         $response = $this->application->makeDeleteSourceRequest($this->validToken, $source->getId());
 
-        $this->responseAsserter->assertDeleteSourceSuccessResponse($response);
+        $this->responseAsserter->assertSuccessfulResponseWithNoBody($response);
         $this->requestAsserter->assertAuthorizationRequestIsMade();
         self::assertSame($expectedRepositoryCount, $this->sourceRepository->count([]));
     }
@@ -421,7 +421,7 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
 
         $response = $this->application->makeDeleteSourceRequest($this->validToken, $runSource->getId());
 
-        $this->responseAsserter->assertDeleteSourceSuccessResponse($response);
+        $this->responseAsserter->assertSuccessfulResponseWithNoBody($response);
         self::assertFalse($this->runSourceStorage->directoryExists($runSource->getDirectoryPath()));
         self::assertFalse($this->runSourceStorage->fileExists($serializedRunSourcePath));
     }
@@ -443,7 +443,7 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
 
         $response = $this->application->makeDeleteSourceRequest($this->validToken, $fileSource->getId());
 
-        $this->responseAsserter->assertDeleteSourceSuccessResponse($response);
+        $this->responseAsserter->assertSuccessfulResponseWithNoBody($response);
         self::assertSame(0, $this->sourceRepository->count([]));
 
         self::assertFalse($this->fileSourceStorage->directoryExists($sourceRelativePath));

@@ -59,7 +59,7 @@ class SourceControllerTest extends AbstractSourceControllerTest
     {
         $response = $this->application->makeCreateSourceRequest($this->validToken, $requestParameters);
 
-        $this->responseAsserter->assertCreateSourceInvalidRequestResponse($response, $expectedResponseData);
+        $this->responseAsserter->assertInvalidRequestJsonResponse($response, $expectedResponseData);
     }
 
     /**
@@ -123,7 +123,7 @@ class SourceControllerTest extends AbstractSourceControllerTest
         $expected['id'] = $source->getId();
         $expected['user_id'] = $this->authenticationConfiguration->authenticatedUserId;
 
-        $this->responseAsserter->assertCreateSourceSuccessResponse($response, $expected);
+        $this->responseAsserter->assertSuccessfulJsonResponse($response, $expected);
         $this->requestAsserter->assertAuthorizationRequestIsMade();
     }
 
@@ -206,7 +206,7 @@ class SourceControllerTest extends AbstractSourceControllerTest
 
         $expectedResponseData = $this->replaceAuthenticatedUserIdInSourceDataCollection($expectedResponseData);
 
-        $this->responseAsserter->assertListSourcesSuccessResponse($response, $expectedResponseData);
+        $this->responseAsserter->assertSuccessfulJsonResponse($response, $expectedResponseData);
         $this->requestAsserter->assertAuthorizationRequestIsMade();
     }
 
