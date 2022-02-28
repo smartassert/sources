@@ -84,13 +84,8 @@ class FileSourceFileControllerTest extends AbstractSourceControllerTest
             $content
         );
 
-        self::assertSame(400, $response->getStatusCode());
+        $this->responseAsserter->assertAddFileInvalidRequestResponse($response, $expectedResponseData);
         $this->requestAsserter->assertAuthorizationRequestIsMade();
-        self::assertSame('application/json', $response->getHeaderLine('content-type'));
-
-        $responseData = json_decode($response->getBody()->getContents(), true);
-
-        self::assertEquals($expectedResponseData, $responseData);
     }
 
     /**
@@ -191,7 +186,7 @@ class FileSourceFileControllerTest extends AbstractSourceControllerTest
             $updatedContent
         );
 
-        self::assertSame(200, $response->getStatusCode());
+        $this->responseAsserter->assertAddFileSuccessResponse($response);
         self::assertTrue($this->fileSourceStorage->directoryExists($this->sourceRelativePath));
         self::assertTrue($this->fileSourceStorage->fileExists($fileRelativePath));
         self::assertSame($updatedContent, $this->fileSourceStorage->read($fileRelativePath));
@@ -230,12 +225,8 @@ class FileSourceFileControllerTest extends AbstractSourceControllerTest
     ): void {
         $response = $this->application->makeRemoveFileRequest($this->validToken, $this->fileSource->getId(), $filename);
 
-        self::assertSame(400, $response->getStatusCode());
+        $this->responseAsserter->assertRemoveFileInvalidRequestResponse($response, $expectedResponseData);
         $this->requestAsserter->assertAuthorizationRequestIsMade();
-        self::assertSame('application/json', $response->getHeaderLine('content-type'));
-
-        $responseData = json_decode($response->getBody()->getContents(), true);
-        self::assertEquals($expectedResponseData, $responseData);
     }
 
     /**
@@ -275,7 +266,7 @@ class FileSourceFileControllerTest extends AbstractSourceControllerTest
 
         $response = $this->application->makeRemoveFileRequest($this->validToken, $this->fileSource->getId(), $filename);
 
-        self::assertSame(200, $response->getStatusCode());
+        $this->responseAsserter->assertRemoveFileSuccessResponse($response);
         self::assertFalse($this->fileSourceStorage->fileExists($fileRelativePath));
     }
 

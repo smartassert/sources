@@ -6,7 +6,7 @@ namespace App\Tests\Services\Asserter\Response;
 
 use PHPUnit\Framework\Assert;
 
-class TextPlainBodyAsserter implements BodyAsserterInterface
+class BodyContentAsserter implements BodyAsserterInterface
 {
     public function __construct(
         private string $expected

@@ -59,13 +59,7 @@ class SourceControllerTest extends AbstractSourceControllerTest
     {
         $response = $this->application->makeCreateSourceRequest($this->validToken, $requestParameters);
 
-        self::assertSame(400, $response->getStatusCode());
-        self::assertSame('application/json', $response->getHeaderLine('content-type'));
-
-        self::assertSame(
-            $expectedResponseData,
-            json_decode($response->getBody()->getContents(), true)
-        );
+        $this->responseAsserter->assertCreateSourceInvalidRequestResponse($response, $expectedResponseData);
     }
 
     /**
@@ -119,9 +113,6 @@ class SourceControllerTest extends AbstractSourceControllerTest
     {
         $response = $this->application->makeCreateSourceRequest($this->validToken, $requestParameters);
 
-        self::assertSame(200, $response->getStatusCode());
-        $this->requestAsserter->assertAuthorizationRequestIsMade();
-
         $sources = $this->sourceRepository->findAll();
         self::assertIsArray($sources);
         self::assertCount(1, $sources);
@@ -131,7 +122,9 @@ class SourceControllerTest extends AbstractSourceControllerTest
 
         $expected['id'] = $source->getId();
         $expected['user_id'] = $this->authenticationConfiguration->authenticatedUserId;
-        self::assertEquals($expected, json_decode($response->getBody()->getContents(), true));
+
+        $this->responseAsserter->assertCreateSourceSuccessResponse($response, $expected);
+        $this->requestAsserter->assertAuthorizationRequestIsMade();
     }
 
     /**
@@ -211,14 +204,10 @@ class SourceControllerTest extends AbstractSourceControllerTest
 
         $response = $this->application->makeListSourcesRequest($this->validToken);
 
-        self::assertSame(200, $response->getStatusCode());
-        $this->requestAsserter->assertAuthorizationRequestIsMade();
-        self::assertSame('application/json', $response->getHeaderLine('content-type'));
-
         $expectedResponseData = $this->replaceAuthenticatedUserIdInSourceDataCollection($expectedResponseData);
 
-        $responseData = json_decode($response->getBody()->getContents(), true);
-        self::assertEquals($expectedResponseData, $responseData);
+        $this->responseAsserter->assertListSourcesSuccessResponse($response, $expectedResponseData);
+        $this->requestAsserter->assertAuthorizationRequestIsMade();
     }
 
     /**
