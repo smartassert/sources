@@ -16,14 +16,12 @@ use App\Request\InvalidSourceTypeRequest;
 use App\Request\SourceRequestInterface;
 use App\Services\Source\Store;
 use App\Tests\Model\UserId;
-use App\Tests\Services\AuthorizationRequestAsserter;
 use App\Tests\Services\EntityRemover;
 
 class SourceControllerTest extends AbstractSourceControllerTest
 {
     private SourceRepository $sourceRepository;
     private Store $store;
-    private AuthorizationRequestAsserter $authorizationRequestAsserter;
 
     protected function setUp(): void
     {
@@ -37,10 +35,6 @@ class SourceControllerTest extends AbstractSourceControllerTest
         \assert($sourceRepository instanceof SourceRepository);
         $this->sourceRepository = $sourceRepository;
 
-        $authorizationRequestAsserter = self::getContainer()->get(AuthorizationRequestAsserter::class);
-        \assert($authorizationRequestAsserter instanceof AuthorizationRequestAsserter);
-        $this->authorizationRequestAsserter = $authorizationRequestAsserter;
-
         $entityRemover = self::getContainer()->get(EntityRemover::class);
         if ($entityRemover instanceof EntityRemover) {
             $entityRemover->removeAll();
@@ -52,7 +46,7 @@ class SourceControllerTest extends AbstractSourceControllerTest
         $response = $this->application->makeCreateSourceRequest($this->invalidToken, []);
 
         self::assertSame(401, $response->getStatusCode());
-        $this->authorizationRequestAsserter->assertAuthorizationRequestIsMade($this->invalidToken);
+        $this->requestAsserter->assertAuthorizationRequestIsMade($this->invalidToken);
     }
 
     /**
@@ -126,7 +120,7 @@ class SourceControllerTest extends AbstractSourceControllerTest
         $response = $this->application->makeCreateSourceRequest($this->validToken, $requestParameters);
 
         self::assertSame(200, $response->getStatusCode());
-        $this->authorizationRequestAsserter->assertAuthorizationRequestIsMade();
+        $this->requestAsserter->assertAuthorizationRequestIsMade();
 
         $sources = $this->sourceRepository->findAll();
         self::assertIsArray($sources);
@@ -199,7 +193,7 @@ class SourceControllerTest extends AbstractSourceControllerTest
         $response = $this->application->makeListSourcesRequest($this->invalidToken);
 
         self::assertSame(401, $response->getStatusCode());
-        $this->authorizationRequestAsserter->assertAuthorizationRequestIsMade($this->invalidToken);
+        $this->requestAsserter->assertAuthorizationRequestIsMade($this->invalidToken);
     }
 
     /**
@@ -218,7 +212,7 @@ class SourceControllerTest extends AbstractSourceControllerTest
         $response = $this->application->makeListSourcesRequest($this->validToken);
 
         self::assertSame(200, $response->getStatusCode());
-        $this->authorizationRequestAsserter->assertAuthorizationRequestIsMade();
+        $this->requestAsserter->assertAuthorizationRequestIsMade();
         self::assertSame('application/json', $response->getHeaderLine('content-type'));
 
         $expectedResponseData = $this->replaceAuthenticatedUserIdInSourceDataCollection($expectedResponseData);

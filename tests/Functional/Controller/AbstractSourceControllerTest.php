@@ -9,6 +9,7 @@ use App\Entity\SourceInterface;
 use App\Tests\Services\ApplicationClient\Client;
 use App\Tests\Services\ApplicationClient\SymfonyAdapter;
 use App\Tests\Services\AuthenticationConfiguration;
+use App\Tests\Services\RequestAsserter;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Routing\RouterInterface;
 use webignition\ObjectReflector\ObjectReflector;
@@ -17,6 +18,7 @@ abstract class AbstractSourceControllerTest extends WebTestCase
 {
     protected const AUTHENTICATED_USER_ID_PLACEHOLDER = '{{ authenticated_user_id }}';
 
+    protected RequestAsserter $requestAsserter;
     protected AuthenticationConfiguration $authenticationConfiguration;
     protected string $validToken;
     protected string $invalidToken;
@@ -41,6 +43,10 @@ abstract class AbstractSourceControllerTest extends WebTestCase
         $symfonyClient->setKernelBrowser($client);
 
         $this->application = $application;
+
+        $requestAsserter = self::getContainer()->get(RequestAsserter::class);
+        \assert($requestAsserter instanceof RequestAsserter);
+        $this->requestAsserter = $requestAsserter;
 
         $authenticationConfiguration = self::getContainer()->get(AuthenticationConfiguration::class);
         \assert($authenticationConfiguration instanceof AuthenticationConfiguration);

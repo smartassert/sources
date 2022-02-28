@@ -20,7 +20,6 @@ use App\Request\SourceRequestInterface;
 use App\Services\RunSourceSerializer;
 use App\Services\Source\Store;
 use App\Tests\Model\UserId;
-use App\Tests\Services\AuthorizationRequestAsserter;
 use App\Tests\Services\EntityRemover;
 use App\Tests\Services\FileStoreFixtureCreator;
 use League\Flysystem\FilesystemOperator;
@@ -32,7 +31,6 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
     private RunSourceRepository $runSourceRepository;
     private Store $store;
     private FileStoreFixtureCreator $fixtureCreator;
-    private AuthorizationRequestAsserter $authorizationRequestAsserter;
     private FilesystemOperator $runSourceStorage;
     private FilesystemOperator $fileSourceStorage;
     private FilesystemOperator $fixtureStorage;
@@ -57,10 +55,6 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
         \assert($fixtureCreator instanceof FileStoreFixtureCreator);
         $this->fixtureCreator = $fixtureCreator;
 
-        $authorizationRequestAsserter = self::getContainer()->get(AuthorizationRequestAsserter::class);
-        \assert($authorizationRequestAsserter instanceof AuthorizationRequestAsserter);
-        $this->authorizationRequestAsserter = $authorizationRequestAsserter;
-
         $runSourceStorage = self::getContainer()->get('run_source.storage');
         \assert($runSourceStorage instanceof FilesystemOperator);
         $this->runSourceStorage = $runSourceStorage;
@@ -84,7 +78,7 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
         $response = $this->application->makeGetSourceRequest($this->invalidToken, EntityId::create());
 
         self::assertSame(401, $response->getStatusCode());
-        $this->authorizationRequestAsserter->assertAuthorizationRequestIsMade($this->invalidToken);
+        $this->requestAsserter->assertAuthorizationRequestIsMade($this->invalidToken);
     }
 
     public function testGetSourceNotFound(): void
@@ -117,7 +111,7 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
         $response = $this->application->makeGetSourceRequest($this->validToken, $source->getId());
 
         self::assertSame(200, $response->getStatusCode());
-        $this->authorizationRequestAsserter->assertAuthorizationRequestIsMade();
+        $this->requestAsserter->assertAuthorizationRequestIsMade();
         self::assertSame('application/json', $response->getHeaderLine('content-type'));
 
         $expectedResponseData = $this->replaceAuthenticatedUserIdInSourceData($expectedResponseData);
@@ -196,7 +190,7 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
         $response = $this->application->makeUpdateSourceRequest($this->invalidToken, EntityId::create(), []);
 
         self::assertSame(401, $response->getStatusCode());
-        $this->authorizationRequestAsserter->assertAuthorizationRequestIsMade($this->invalidToken);
+        $this->requestAsserter->assertAuthorizationRequestIsMade($this->invalidToken);
     }
 
     public function testUpdateInvalidSourceUser(): void
@@ -227,7 +221,7 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
         $response = $this->application->makeUpdateSourceRequest($this->validToken, $source->getId(), $payload);
 
         self::assertSame($expectedResponseStatusCode, $response->getStatusCode());
-        $this->authorizationRequestAsserter->assertAuthorizationRequestIsMade();
+        $this->requestAsserter->assertAuthorizationRequestIsMade();
         self::assertSame('application/json', $response->getHeaderLine('content-type'));
 
         $expectedResponseData = $this->replaceAuthenticatedUserIdInSourceData($expectedResponseData);
@@ -331,7 +325,7 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
         $response = $this->application->makeDeleteSourceRequest($this->invalidToken, EntityId::create());
 
         self::assertSame(401, $response->getStatusCode());
-        $this->authorizationRequestAsserter->assertAuthorizationRequestIsMade($this->invalidToken);
+        $this->requestAsserter->assertAuthorizationRequestIsMade($this->invalidToken);
     }
 
     public function testDeleteInvalidSourceUser(): void
@@ -357,7 +351,7 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
         $response = $this->application->makeDeleteSourceRequest($this->validToken, $source->getId());
 
         self::assertSame(200, $response->getStatusCode());
-        $this->authorizationRequestAsserter->assertAuthorizationRequestIsMade();
+        $this->requestAsserter->assertAuthorizationRequestIsMade();
         self::assertSame($expectedRepositoryCount, $this->sourceRepository->count([]));
     }
 
@@ -438,7 +432,7 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
         $response = $this->application->makePrepareSourceRequest($this->invalidToken, EntityId::create(), []);
 
         self::assertSame(401, $response->getStatusCode());
-        $this->authorizationRequestAsserter->assertAuthorizationRequestIsMade($this->invalidToken);
+        $this->requestAsserter->assertAuthorizationRequestIsMade($this->invalidToken);
     }
 
     public function testPrepareInvalidSourceUser(): void
@@ -461,7 +455,7 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
         $response = $this->application->makePrepareSourceRequest($this->validToken, $source->getId(), []);
 
         self::assertSame(404, $response->getStatusCode());
-        $this->authorizationRequestAsserter->assertAuthorizationRequestIsMade();
+        $this->requestAsserter->assertAuthorizationRequestIsMade();
     }
 
     /**
@@ -481,7 +475,7 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
         $response = $this->application->makePrepareSourceRequest($this->validToken, $source->getId(), $payload);
 
         self::assertSame(202, $response->getStatusCode());
-        $this->authorizationRequestAsserter->assertAuthorizationRequestIsMade();
+        $this->requestAsserter->assertAuthorizationRequestIsMade();
         self::assertSame('application/json', $response->getHeaderLine('content-type'));
 
         $responseData = json_decode($response->getBody()->getContents(), true);
