@@ -18,6 +18,8 @@ abstract class AbstractSourceControllerTest extends WebTestCase
     protected const AUTHENTICATED_USER_ID_PLACEHOLDER = '{{ authenticated_user_id }}';
 
     protected AuthenticationConfiguration $authenticationConfiguration;
+    protected string $validToken;
+    protected string $invalidToken;
     protected Client $application;
     private RouterInterface $router;
 
@@ -43,6 +45,9 @@ abstract class AbstractSourceControllerTest extends WebTestCase
         $authenticationConfiguration = self::getContainer()->get(AuthenticationConfiguration::class);
         \assert($authenticationConfiguration instanceof AuthenticationConfiguration);
         $this->authenticationConfiguration = $authenticationConfiguration;
+
+        $this->validToken = $authenticationConfiguration->validToken;
+        $this->invalidToken = $authenticationConfiguration->invalidToken;
     }
 
     /**

@@ -81,23 +81,15 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
 
     public function testGetUnauthorizedUser(): void
     {
-        $response = $this->application->makeGetSourceRequest(
-            $this->authenticationConfiguration->invalidToken,
-            EntityId::create()
-        );
+        $response = $this->application->makeGetSourceRequest($this->invalidToken, EntityId::create());
 
         self::assertSame(401, $response->getStatusCode());
-        $this->authorizationRequestAsserter->assertAuthorizationRequestIsMade(
-            $this->authenticationConfiguration->invalidToken
-        );
+        $this->authorizationRequestAsserter->assertAuthorizationRequestIsMade($this->invalidToken);
     }
 
     public function testGetSourceNotFound(): void
     {
-        $response = $this->application->makeGetSourceRequest(
-            $this->authenticationConfiguration->validToken,
-            EntityId::create()
-        );
+        $response = $this->application->makeGetSourceRequest($this->validToken, EntityId::create());
 
         self::assertSame(404, $response->getStatusCode());
     }
@@ -107,10 +99,7 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
         $source = new FileSource(UserId::create(), '');
         $this->store->add($source);
 
-        $response = $this->application->makeGetSourceRequest(
-            $this->authenticationConfiguration->validToken,
-            $source->getId()
-        );
+        $response = $this->application->makeGetSourceRequest($this->validToken, $source->getId());
 
         self::assertSame(403, $response->getStatusCode());
     }
@@ -125,10 +114,7 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
         $source = $this->setSourceUserIdToAuthenticatedUserId($source);
         $this->store->add($source);
 
-        $response = $this->application->makeGetSourceRequest(
-            $this->authenticationConfiguration->validToken,
-            $source->getId()
-        );
+        $response = $this->application->makeGetSourceRequest($this->validToken, $source->getId());
 
         self::assertSame(200, $response->getStatusCode());
         $this->authorizationRequestAsserter->assertAuthorizationRequestIsMade();
@@ -207,16 +193,10 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
 
     public function testUpdateUnauthorizedUser(): void
     {
-        $response = $this->application->makeUpdateSourceRequest(
-            $this->authenticationConfiguration->invalidToken,
-            EntityId::create(),
-            []
-        );
+        $response = $this->application->makeUpdateSourceRequest($this->invalidToken, EntityId::create(), []);
 
         self::assertSame(401, $response->getStatusCode());
-        $this->authorizationRequestAsserter->assertAuthorizationRequestIsMade(
-            $this->authenticationConfiguration->invalidToken
-        );
+        $this->authorizationRequestAsserter->assertAuthorizationRequestIsMade($this->invalidToken);
     }
 
     public function testUpdateInvalidSourceUser(): void
@@ -224,11 +204,7 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
         $source = new FileSource(UserId::create(), '');
         $this->store->add($source);
 
-        $response = $this->application->makeUpdateSourceRequest(
-            $this->authenticationConfiguration->validToken,
-            $source->getId(),
-            []
-        );
+        $response = $this->application->makeUpdateSourceRequest($this->validToken, $source->getId(), []);
 
         self::assertSame(403, $response->getStatusCode());
     }
@@ -236,23 +212,19 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
     /**
      * @dataProvider updateDataProvider
      *
-     * @param array<string, string> $requestData
+     * @param array<string, string> $payload
      * @param array<mixed>          $expectedResponseData
      */
     public function testUpdateSuccess(
         SourceInterface $source,
-        array $requestData,
+        array $payload,
         int $expectedResponseStatusCode,
         array $expectedResponseData
     ): void {
         $this->setSourceUserIdToAuthenticatedUserId($source);
         $this->store->add($source);
 
-        $response = $this->application->makeUpdateSourceRequest(
-            $this->authenticationConfiguration->validToken,
-            $source->getId(),
-            $requestData
-        );
+        $response = $this->application->makeUpdateSourceRequest($this->validToken, $source->getId(), $payload);
 
         self::assertSame($expectedResponseStatusCode, $response->getStatusCode());
         $this->authorizationRequestAsserter->assertAuthorizationRequestIsMade();
@@ -284,7 +256,7 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
         return [
             Type::FILE->value => [
                 'source' => $fileSource,
-                'requestData' => [
+                'payload' => [
                     SourceRequestInterface::PARAMETER_TYPE => Type::FILE->value,
                     FileSourceRequest::PARAMETER_LABEL => $newLabel,
                 ],
@@ -298,7 +270,7 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
             ],
             Type::GIT->value . ' credentials present and empty' => [
                 'source' => $gitSource,
-                'requestData' => [
+                'payload' => [
                     SourceRequestInterface::PARAMETER_TYPE => Type::GIT->value,
                     GitSourceRequest::PARAMETER_HOST_URL => $newHostUrl,
                     GitSourceRequest::PARAMETER_PATH => $newPath,
@@ -316,7 +288,7 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
             ],
             Type::GIT->value . ' credentials not present' => [
                 'source' => $gitSource,
-                'requestData' => [
+                'payload' => [
                     SourceRequestInterface::PARAMETER_TYPE => Type::GIT->value,
                     GitSourceRequest::PARAMETER_HOST_URL => $newHostUrl,
                     GitSourceRequest::PARAMETER_PATH => $newPath,
@@ -333,7 +305,7 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
             ],
             Type::GIT->value . ' missing host url' => [
                 'source' => $gitSource,
-                'requestData' => [
+                'payload' => [
                     SourceRequestInterface::PARAMETER_TYPE => Type::GIT->value,
                     GitSourceRequest::PARAMETER_HOST_URL => '',
                     GitSourceRequest::PARAMETER_PATH => $path,
@@ -356,15 +328,10 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
 
     public function testDeleteUnauthorizedUser(): void
     {
-        $response = $this->application->makeDeleteSourceRequest(
-            $this->authenticationConfiguration->invalidToken,
-            EntityId::create()
-        );
+        $response = $this->application->makeDeleteSourceRequest($this->invalidToken, EntityId::create());
 
         self::assertSame(401, $response->getStatusCode());
-        $this->authorizationRequestAsserter->assertAuthorizationRequestIsMade(
-            $this->authenticationConfiguration->invalidToken
-        );
+        $this->authorizationRequestAsserter->assertAuthorizationRequestIsMade($this->invalidToken);
     }
 
     public function testDeleteInvalidSourceUser(): void
@@ -372,10 +339,7 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
         $source = new FileSource(UserId::create(), '');
         $this->store->add($source);
 
-        $response = $this->application->makeDeleteSourceRequest(
-            $this->authenticationConfiguration->validToken,
-            $source->getId()
-        );
+        $response = $this->application->makeDeleteSourceRequest($this->validToken, $source->getId());
 
         self::assertSame(403, $response->getStatusCode());
     }
@@ -390,10 +354,7 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
         $this->store->add($source);
         self::assertGreaterThan(0, $this->sourceRepository->count([]));
 
-        $response = $this->application->makeDeleteSourceRequest(
-            $this->authenticationConfiguration->validToken,
-            $source->getId()
-        );
+        $response = $this->application->makeDeleteSourceRequest($this->validToken, $source->getId());
 
         self::assertSame(200, $response->getStatusCode());
         $this->authorizationRequestAsserter->assertAuthorizationRequestIsMade();
@@ -442,10 +403,7 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
         self::assertTrue($this->runSourceStorage->directoryExists($runSource->getDirectoryPath()));
         self::assertTrue($this->runSourceStorage->fileExists($serializedRunSourcePath));
 
-        $response = $this->application->makeDeleteSourceRequest(
-            $this->authenticationConfiguration->validToken,
-            $runSource->getId()
-        );
+        $response = $this->application->makeDeleteSourceRequest($this->validToken, $runSource->getId());
 
         self::assertSame(200, $response->getStatusCode());
         self::assertFalse($this->runSourceStorage->directoryExists($runSource->getDirectoryPath()));
@@ -467,10 +425,7 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
         self::assertTrue($this->fileSourceStorage->directoryExists($sourceRelativePath));
         self::assertTrue($this->fileSourceStorage->fileExists($fileRelativePath));
 
-        $response = $this->application->makeDeleteSourceRequest(
-            $this->authenticationConfiguration->validToken,
-            $fileSource->getId()
-        );
+        $response = $this->application->makeDeleteSourceRequest($this->validToken, $fileSource->getId());
 
         self::assertSame(200, $response->getStatusCode());
         self::assertSame(0, $this->sourceRepository->count([]));
@@ -481,16 +436,10 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
 
     public function testPrepareUnauthorizedUser(): void
     {
-        $response = $this->application->makePrepareSourceRequest(
-            $this->authenticationConfiguration->invalidToken,
-            EntityId::create(),
-            []
-        );
+        $response = $this->application->makePrepareSourceRequest($this->invalidToken, EntityId::create(), []);
 
         self::assertSame(401, $response->getStatusCode());
-        $this->authorizationRequestAsserter->assertAuthorizationRequestIsMade(
-            $this->authenticationConfiguration->invalidToken
-        );
+        $this->authorizationRequestAsserter->assertAuthorizationRequestIsMade($this->invalidToken);
     }
 
     public function testPrepareInvalidSourceUser(): void
@@ -498,11 +447,7 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
         $source = new FileSource(UserId::create(), '');
         $this->store->add($source);
 
-        $response = $this->application->makePrepareSourceRequest(
-            $this->authenticationConfiguration->validToken,
-            $source->getId(),
-            []
-        );
+        $response = $this->application->makePrepareSourceRequest($this->validToken, $source->getId(), []);
 
         self::assertSame(403, $response->getStatusCode());
     }
@@ -514,11 +459,7 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
 
         $this->store->add($source);
 
-        $response = $this->application->makePrepareSourceRequest(
-            $this->authenticationConfiguration->validToken,
-            $source->getId(),
-            []
-        );
+        $response = $this->application->makePrepareSourceRequest($this->validToken, $source->getId(), []);
 
         self::assertSame(404, $response->getStatusCode());
         $this->authorizationRequestAsserter->assertAuthorizationRequestIsMade();
@@ -527,22 +468,18 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
     /**
      * @dataProvider prepareSuccessDataProvider
      *
-     * @param array<string, string> $requestParameters
+     * @param array<string, string> $payload
      * @param array<mixed>          $expectedResponseData
      */
     public function testPrepareSuccess(
         FileSource|GitSource $source,
-        array $requestParameters,
+        array $payload,
         array $expectedResponseData
     ): void {
         $this->setSourceUserIdToAuthenticatedUserId($source);
         $this->store->add($source);
 
-        $response = $this->application->makePrepareSourceRequest(
-            $this->authenticationConfiguration->validToken,
-            $source->getId(),
-            $requestParameters
-        );
+        $response = $this->application->makePrepareSourceRequest($this->validToken, $source->getId(), $payload);
 
         self::assertSame(202, $response->getStatusCode());
         $this->authorizationRequestAsserter->assertAuthorizationRequestIsMade();
@@ -573,7 +510,7 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
         return [
             Type::FILE->value => [
                 'source' => $fileSource,
-                'requestParameters' => [],
+                'payload' => [],
                 'expectedResponseData' => [
                     'id' => '{{ runSourceId }}',
                     'user_id' => $gitSource->getUserId(),
@@ -585,7 +522,7 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
             ],
             Type::GIT->value => [
                 'source' => $gitSource,
-                'requestParameters' => [],
+                'payload' => [],
                 'expectedResponseData' => [
                     'id' => '{{ runSourceId }}',
                     'user_id' => $gitSource->getUserId(),
@@ -597,7 +534,7 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
             ],
             Type::GIT->value . ' with ref request parameters' => [
                 'source' => $gitSource,
-                'requestParameters' => [
+                'payload' => [
                     'ref' => 'v1.1',
                 ],
                 'expectedResponseData' => [
@@ -613,7 +550,7 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
             ],
             Type::GIT->value . ' with request parameters including ref' => [
                 'source' => $gitSource,
-                'requestParameters' => [
+                'payload' => [
                     'ref' => 'v1.1',
                     'ignored1' => 'value',
                     'ignored2' => 'value',
@@ -654,10 +591,7 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
             $runSource->getDirectoryPath() . '/' . RunSourceSerializer::SERIALIZED_FILENAME
         );
 
-        $response = $this->application->makeReadSourceRequest(
-            $this->authenticationConfiguration->validToken,
-            $runSource->getId()
-        );
+        $response = $this->application->makeReadSourceRequest($this->validToken, $runSource->getId());
 
         self::assertSame($expectedResponse->getStatusCode(), $response->getStatusCode());
         self::assertSame($expectedResponse->headers->get('content-type'), $response->getHeaderLine('content-type'));
