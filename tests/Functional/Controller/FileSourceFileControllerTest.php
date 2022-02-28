@@ -7,13 +7,11 @@ namespace App\Tests\Functional\Controller;
 use App\Entity\FileSource;
 use App\Services\Source\Store;
 use App\Tests\Model\UserId;
-use App\Tests\Services\AuthorizationRequestAsserter;
 use App\Validator\YamlFilenameConstraint;
 use League\Flysystem\FilesystemOperator;
 
 class FileSourceFileControllerTest extends AbstractSourceControllerTest
 {
-    private AuthorizationRequestAsserter $authorizationRequestAsserter;
     private FilesystemOperator $fileSourceStorage;
 
     private FileSource $fileSource;
@@ -23,10 +21,6 @@ class FileSourceFileControllerTest extends AbstractSourceControllerTest
     protected function setUp(): void
     {
         parent::setUp();
-
-        $authorizationRequestAsserter = self::getContainer()->get(AuthorizationRequestAsserter::class);
-        \assert($authorizationRequestAsserter instanceof AuthorizationRequestAsserter);
-        $this->authorizationRequestAsserter = $authorizationRequestAsserter;
 
         $fileSourceStorage = self::getContainer()->get('file_source.storage');
         \assert($fileSourceStorage instanceof FilesystemOperator);
@@ -54,8 +48,8 @@ class FileSourceFileControllerTest extends AbstractSourceControllerTest
             '- content'
         );
 
-        self::assertSame(401, $response->getStatusCode());
-        $this->authorizationRequestAsserter->assertAuthorizationRequestIsMade($this->invalidToken);
+        $this->responseAsserter->assertUnauthorizedResponse($response);
+        $this->requestAsserter->assertAuthorizationRequestIsMade($this->invalidToken);
     }
 
     public function testAddFileInvalidSourceUser(): void
@@ -70,7 +64,7 @@ class FileSourceFileControllerTest extends AbstractSourceControllerTest
             '- content'
         );
 
-        self::assertSame(403, $response->getStatusCode());
+        $this->responseAsserter->assertForbiddenResponse($response);
     }
 
     /**
@@ -90,13 +84,8 @@ class FileSourceFileControllerTest extends AbstractSourceControllerTest
             $content
         );
 
-        self::assertSame(400, $response->getStatusCode());
-        $this->authorizationRequestAsserter->assertAuthorizationRequestIsMade();
-        self::assertSame('application/json', $response->getHeaderLine('content-type'));
-
-        $responseData = json_decode($response->getBody()->getContents(), true);
-
-        self::assertEquals($expectedResponseData, $responseData);
+        $this->responseAsserter->assertInvalidRequestJsonResponse($response, $expectedResponseData);
+        $this->requestAsserter->assertAuthorizationRequestIsMade();
     }
 
     /**
@@ -197,7 +186,7 @@ class FileSourceFileControllerTest extends AbstractSourceControllerTest
             $updatedContent
         );
 
-        self::assertSame(200, $response->getStatusCode());
+        $this->responseAsserter->assertSuccessfulResponseWithNoBody($response);
         self::assertTrue($this->fileSourceStorage->directoryExists($this->sourceRelativePath));
         self::assertTrue($this->fileSourceStorage->fileExists($fileRelativePath));
         self::assertSame($updatedContent, $this->fileSourceStorage->read($fileRelativePath));
@@ -211,8 +200,8 @@ class FileSourceFileControllerTest extends AbstractSourceControllerTest
             'filename.yaml'
         );
 
-        self::assertSame(401, $response->getStatusCode());
-        $this->authorizationRequestAsserter->assertAuthorizationRequestIsMade($this->invalidToken);
+        $this->responseAsserter->assertUnauthorizedResponse($response);
+        $this->requestAsserter->assertAuthorizationRequestIsMade($this->invalidToken);
     }
 
     public function testRemoveFileInvalidSourceUser(): void
@@ -222,7 +211,7 @@ class FileSourceFileControllerTest extends AbstractSourceControllerTest
 
         $response = $this->application->makeRemoveFileRequest($this->validToken, $source->getId(), 'filename.yaml');
 
-        self::assertSame(403, $response->getStatusCode());
+        $this->responseAsserter->assertForbiddenResponse($response);
     }
 
     /**
@@ -236,12 +225,8 @@ class FileSourceFileControllerTest extends AbstractSourceControllerTest
     ): void {
         $response = $this->application->makeRemoveFileRequest($this->validToken, $this->fileSource->getId(), $filename);
 
-        self::assertSame(400, $response->getStatusCode());
-        $this->authorizationRequestAsserter->assertAuthorizationRequestIsMade();
-        self::assertSame('application/json', $response->getHeaderLine('content-type'));
-
-        $responseData = json_decode($response->getBody()->getContents(), true);
-        self::assertEquals($expectedResponseData, $responseData);
+        $this->responseAsserter->assertInvalidRequestJsonResponse($response, $expectedResponseData);
+        $this->requestAsserter->assertAuthorizationRequestIsMade();
     }
 
     /**
@@ -281,7 +266,7 @@ class FileSourceFileControllerTest extends AbstractSourceControllerTest
 
         $response = $this->application->makeRemoveFileRequest($this->validToken, $this->fileSource->getId(), $filename);
 
-        self::assertSame(200, $response->getStatusCode());
+        $this->responseAsserter->assertSuccessfulResponseWithNoBody($response);
         self::assertFalse($this->fileSourceStorage->fileExists($fileRelativePath));
     }
 
