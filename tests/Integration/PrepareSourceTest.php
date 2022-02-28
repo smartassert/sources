@@ -75,6 +75,8 @@ class PrepareSourceTest extends AbstractIntegrationTest
             $content
         );
 
+        echo $addFileResponse->getBody()->getContents();
+
         $this->responseAsserter->assertSuccessfulResponseWithNoBody($addFileResponse);
 
         $prepareResponse = $this->client->makePrepareSourceRequest(
