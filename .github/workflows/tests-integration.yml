@@ -37,3 +37,7 @@ jobs:
 
       - name: Run tests
         run: composer test-integration
+
+      - name: Dump docker-compose logs
+        if: always()
+        run: composer integration-logs
