@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Tests\Services;
 
-use App\Tests\Services\Asserter\Response\ArrayBodyAsserter;
 use App\Tests\Services\Asserter\Response\JsonResponseAsserter;
 use App\Tests\Services\Asserter\Response\ResponseAsserter as FooResponseAsserter;
 use App\Tests\Services\Asserter\Response\YamlResponseAsserter;
@@ -36,8 +35,7 @@ class ResponseAsserter
      */
     public function assertAddFileInvalidRequestResponse(ResponseInterface $response, array $expectedData): void
     {
-        (new JsonResponseAsserter(Response::HTTP_BAD_REQUEST))
-            ->addBodyAsserter(new ArrayBodyAsserter($expectedData))
+        (new JsonResponseAsserter(Response::HTTP_BAD_REQUEST, $expectedData))
             ->assert($response)
         ;
     }
@@ -54,8 +52,7 @@ class ResponseAsserter
      */
     public function assertRemoveFileInvalidRequestResponse(ResponseInterface $response, array $expectedData): void
     {
-        (new JsonResponseAsserter(Response::HTTP_BAD_REQUEST))
-            ->addBodyAsserter(new ArrayBodyAsserter($expectedData))
+        (new JsonResponseAsserter(Response::HTTP_BAD_REQUEST, $expectedData))
             ->assert($response)
         ;
     }
@@ -72,8 +69,7 @@ class ResponseAsserter
      */
     public function assertCreateSourceInvalidRequestResponse(ResponseInterface $response, array $expectedData): void
     {
-        (new JsonResponseAsserter(Response::HTTP_BAD_REQUEST))
-            ->addBodyAsserter(new ArrayBodyAsserter($expectedData))
+        (new JsonResponseAsserter(Response::HTTP_BAD_REQUEST, $expectedData))
             ->assert($response)
         ;
     }
@@ -83,8 +79,7 @@ class ResponseAsserter
      */
     public function assertCreateSourceSuccessResponse(ResponseInterface $response, array $expectedData): void
     {
-        (new JsonResponseAsserter(Response::HTTP_OK))
-            ->addBodyAsserter(new ArrayBodyAsserter($expectedData))
+        (new JsonResponseAsserter(Response::HTTP_OK, $expectedData))
             ->assert($response)
         ;
     }
@@ -94,8 +89,7 @@ class ResponseAsserter
      */
     public function assertListSourcesSuccessResponse(ResponseInterface $response, array $expectedData): void
     {
-        (new JsonResponseAsserter(Response::HTTP_OK))
-            ->addBodyAsserter(new ArrayBodyAsserter($expectedData))
+        (new JsonResponseAsserter(Response::HTTP_OK, $expectedData))
             ->assert($response)
         ;
     }
@@ -105,8 +99,7 @@ class ResponseAsserter
      */
     public function assertGetSourceSuccessResponse(ResponseInterface $response, array $expectedData): void
     {
-        (new JsonResponseAsserter(Response::HTTP_OK))
-            ->addBodyAsserter(new ArrayBodyAsserter($expectedData))
+        (new JsonResponseAsserter(Response::HTTP_OK, $expectedData))
             ->assert($response)
         ;
     }
@@ -116,8 +109,7 @@ class ResponseAsserter
      */
     public function assertUpdateSourceSuccessResponse(ResponseInterface $response, array $expectedData): void
     {
-        (new JsonResponseAsserter(Response::HTTP_OK))
-            ->addBodyAsserter(new ArrayBodyAsserter($expectedData))
+        (new JsonResponseAsserter(Response::HTTP_OK, $expectedData))
             ->assert($response)
         ;
     }
@@ -127,8 +119,7 @@ class ResponseAsserter
      */
     public function assertUpdateSourceInvalidRequestResponse(ResponseInterface $response, array $expectedData): void
     {
-        (new JsonResponseAsserter(Response::HTTP_BAD_REQUEST))
-            ->addBodyAsserter(new ArrayBodyAsserter($expectedData))
+        (new JsonResponseAsserter(Response::HTTP_BAD_REQUEST, $expectedData))
             ->assert($response)
         ;
     }
@@ -145,8 +136,7 @@ class ResponseAsserter
      */
     public function assertPrepareSourceSuccessResponse(ResponseInterface $response, array $expectedData): void
     {
-        (new JsonResponseAsserter(Response::HTTP_ACCEPTED))
-            ->addBodyAsserter(new ArrayBodyAsserter($expectedData))
+        (new JsonResponseAsserter(Response::HTTP_ACCEPTED, $expectedData))
             ->assert($response)
         ;
     }

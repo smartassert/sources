@@ -6,14 +6,17 @@ namespace App\Tests\Services\Asserter\Response;
 
 class JsonResponseAsserter extends ResponseAsserter
 {
-    public const IGNORE_VALUE = null;
-
-    public function __construct(int $expectedStatusCode)
+    /**
+     * @param array<mixed> $expectedData
+     */
+    public function __construct(int $expectedStatusCode, array $expectedData)
     {
         parent::__construct($expectedStatusCode);
 
         $this->addHeaderAsserter(new HeaderAsserter([
             'content-type' => 'application/json'
         ]));
+
+        $this->addBodyAsserter(new ArrayBodyAsserter($expectedData));
     }
 }
