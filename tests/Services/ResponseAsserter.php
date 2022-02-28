@@ -4,14 +4,6 @@ declare(strict_types=1);
 
 namespace App\Tests\Services;
 
-//use App\Entity\User;
-//use App\Security\AudienceClaimInterface;
-//use App\Security\TokenInterface;
-//use App\Tests\Services\Asserter\ResponseAsserter\ArrayBodyAsserter;
-//use App\Tests\Services\Asserter\ResponseAsserter\JsonResponseAsserter;
-//use App\Tests\Services\Asserter\ResponseAsserter\JwtTokenBodyAsserterFactory;
-//use App\Tests\Services\Asserter\ResponseAsserter\TextPlainBodyAsserter;
-//use App\Tests\Services\Asserter\ResponseAsserter\TextPlainResponseAsserter;
 use App\Tests\Services\Asserter\Response\ArrayBodyAsserter;
 use App\Tests\Services\Asserter\Response\JsonResponseAsserter;
 use App\Tests\Services\Asserter\Response\ResponseAsserter as FooResponseAsserter;
@@ -22,11 +14,6 @@ use Symfony\Component\HttpFoundation\Response;
 
 class ResponseAsserter
 {
-//    public function __construct(
-//        private JwtTokenBodyAsserterFactory $jwtTokenBodyAsserterFactory,
-//    ) {
-//    }
-
     public function assertUnauthorizedResponse(ResponseInterface $response): void
     {
         Assert::assertSame(401, $response->getStatusCode());
