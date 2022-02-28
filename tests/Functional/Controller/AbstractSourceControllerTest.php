@@ -6,7 +6,8 @@ namespace App\Tests\Functional\Controller;
 
 use App\Entity\AbstractSource;
 use App\Entity\SourceInterface;
-use App\Tests\Services\ApplicationClient;
+use App\Tests\Services\ApplicationClient\Client;
+use App\Tests\Services\ApplicationClient\SymfonyAdapter;
 use App\Tests\Services\AuthenticationConfiguration;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Routing\RouterInterface;
@@ -16,8 +17,10 @@ abstract class AbstractSourceControllerTest extends WebTestCase
 {
     protected const AUTHENTICATED_USER_ID_PLACEHOLDER = '{{ authenticated_user_id }}';
 
-    protected ApplicationClient $applicationClient;
     protected AuthenticationConfiguration $authenticationConfiguration;
+    protected string $validToken;
+    protected string $invalidToken;
+    protected Client $application;
     private RouterInterface $router;
 
     protected function setUp(): void
@@ -26,18 +29,25 @@ abstract class AbstractSourceControllerTest extends WebTestCase
 
         $client = static::createClient();
 
-        $applicationClient = self::getContainer()->get(ApplicationClient::class);
-        \assert($applicationClient instanceof ApplicationClient);
-        $this->applicationClient = $applicationClient;
-        $applicationClient->setClient($client);
-
         $router = self::getContainer()->get(RouterInterface::class);
         \assert($router instanceof RouterInterface);
         $this->router = $router;
 
+        $application = self::getContainer()->get('app.tests.services.application.client.functional');
+        \assert($application instanceof Client);
+
+        $symfonyClient = self::getContainer()->get(SymfonyAdapter::class);
+        \assert($symfonyClient instanceof SymfonyAdapter);
+        $symfonyClient->setKernelBrowser($client);
+
+        $this->application = $application;
+
         $authenticationConfiguration = self::getContainer()->get(AuthenticationConfiguration::class);
         \assert($authenticationConfiguration instanceof AuthenticationConfiguration);
         $this->authenticationConfiguration = $authenticationConfiguration;
+
+        $this->validToken = $authenticationConfiguration->validToken;
+        $this->invalidToken = $authenticationConfiguration->invalidToken;
     }
 
     /**
