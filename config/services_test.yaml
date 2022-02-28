@@ -97,3 +97,6 @@ services:
 
     App\Tests\Services\ResponseAsserter:
         public: true
+
+    App\Tests\Services\SourceUserIdMutator:
+        public: true
