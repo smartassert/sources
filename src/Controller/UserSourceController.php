@@ -84,7 +84,7 @@ class UserSourceController
             $runSourceWriter->deleteDirectory($source->getDirectoryPath());
         }
 
-        return new JsonResponse();
+        return new Response();
     }
 
     /**
