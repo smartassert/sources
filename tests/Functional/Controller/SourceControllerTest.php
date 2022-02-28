@@ -18,7 +18,6 @@ use App\Services\Source\Store;
 use App\Tests\Model\UserId;
 use App\Tests\Services\AuthorizationRequestAsserter;
 use App\Tests\Services\EntityRemover;
-use Symfony\Component\HttpFoundation\JsonResponse;
 
 class SourceControllerTest extends AbstractSourceControllerTest
 {
@@ -50,12 +49,10 @@ class SourceControllerTest extends AbstractSourceControllerTest
 
     public function testCreateUnauthorizedUser(): void
     {
-        $response = $this->applicationClient->makeUnauthorizedRequest('POST', $this->generateUrl('source_create'));
+        $response = $this->application->makeCreateSourceRequest($this->invalidToken, []);
 
         self::assertSame(401, $response->getStatusCode());
-        $this->authorizationRequestAsserter->assertAuthorizationRequestIsMade(
-            $this->authenticationConfiguration->invalidToken
-        );
+        $this->authorizationRequestAsserter->assertAuthorizationRequestIsMade($this->invalidToken);
     }
 
     /**
@@ -66,18 +63,14 @@ class SourceControllerTest extends AbstractSourceControllerTest
      */
     public function testCreateInvalidSourceRequest(array $requestParameters, array $expectedResponseData): void
     {
-        $response = $this->applicationClient->makeAuthorizedRequest(
-            'POST',
-            $this->generateUrl('source_create'),
-            $requestParameters
-        );
+        $response = $this->application->makeCreateSourceRequest($this->validToken, $requestParameters);
 
         self::assertSame(400, $response->getStatusCode());
-        self::assertInstanceOf(JsonResponse::class, $response);
+        self::assertSame('application/json', $response->getHeaderLine('content-type'));
 
         self::assertSame(
             $expectedResponseData,
-            json_decode((string) $response->getContent(), true)
+            json_decode($response->getBody()->getContents(), true)
         );
     }
 
@@ -130,11 +123,7 @@ class SourceControllerTest extends AbstractSourceControllerTest
      */
     public function testCreateSuccess(array $requestParameters, array $expected): void
     {
-        $response = $this->applicationClient->makeAuthorizedRequest(
-            'POST',
-            $this->generateUrl('source_create'),
-            $requestParameters
-        );
+        $response = $this->application->makeCreateSourceRequest($this->validToken, $requestParameters);
 
         self::assertSame(200, $response->getStatusCode());
         $this->authorizationRequestAsserter->assertAuthorizationRequestIsMade();
@@ -148,7 +137,7 @@ class SourceControllerTest extends AbstractSourceControllerTest
 
         $expected['id'] = $source->getId();
         $expected['user_id'] = $this->authenticationConfiguration->authenticatedUserId;
-        self::assertEquals($expected, json_decode((string) $response->getContent(), true));
+        self::assertEquals($expected, json_decode($response->getBody()->getContents(), true));
     }
 
     /**
@@ -207,12 +196,10 @@ class SourceControllerTest extends AbstractSourceControllerTest
 
     public function testListUnauthorizedUser(): void
     {
-        $response = $this->applicationClient->makeUnauthorizedRequest('GET', $this->generateUrl('source_list'));
+        $response = $this->application->makeListSourcesRequest($this->invalidToken);
 
         self::assertSame(401, $response->getStatusCode());
-        $this->authorizationRequestAsserter->assertAuthorizationRequestIsMade(
-            $this->authenticationConfiguration->invalidToken
-        );
+        $this->authorizationRequestAsserter->assertAuthorizationRequestIsMade($this->invalidToken);
     }
 
     /**
@@ -228,18 +215,15 @@ class SourceControllerTest extends AbstractSourceControllerTest
             $this->store->add($source);
         }
 
-        $response = $this->applicationClient->makeAuthorizedRequest(
-            'GET',
-            $this->generateUrl('source_list')
-        );
+        $response = $this->application->makeListSourcesRequest($this->validToken);
 
         self::assertSame(200, $response->getStatusCode());
         $this->authorizationRequestAsserter->assertAuthorizationRequestIsMade();
-        self::assertInstanceOf(JsonResponse::class, $response);
+        self::assertSame('application/json', $response->getHeaderLine('content-type'));
 
         $expectedResponseData = $this->replaceAuthenticatedUserIdInSourceDataCollection($expectedResponseData);
 
-        $responseData = json_decode((string) $response->getContent(), true);
+        $responseData = json_decode($response->getBody()->getContents(), true);
         self::assertEquals($expectedResponseData, $responseData);
     }
 
