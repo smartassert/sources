@@ -17,6 +17,7 @@ use App\Request\SourceRequestInterface;
 use App\Services\Source\Store;
 use App\Tests\Model\UserId;
 use App\Tests\Services\EntityRemover;
+use App\Tests\Services\SourceUserIdMutator;
 
 class SourceControllerTest extends AbstractSourceControllerTest
 {
@@ -145,7 +146,7 @@ class SourceControllerTest extends AbstractSourceControllerTest
                     GitSourceRequest::PARAMETER_PATH => $path
                 ],
                 'expected' => [
-                    'user_id' => self::AUTHENTICATED_USER_ID_PLACEHOLDER,
+                    'user_id' => SourceUserIdMutator::AUTHENTICATED_USER_ID_PLACEHOLDER,
                     'type' => Type::GIT->value,
                     'host_url' => $hostUrl,
                     'path' => $path,
@@ -160,7 +161,7 @@ class SourceControllerTest extends AbstractSourceControllerTest
                     GitSourceRequest::PARAMETER_CREDENTIALS => $credentials,
                 ],
                 'expected' => [
-                    'user_id' => self::AUTHENTICATED_USER_ID_PLACEHOLDER,
+                    'user_id' => SourceUserIdMutator::AUTHENTICATED_USER_ID_PLACEHOLDER,
                     'type' => Type::GIT->value,
                     'host_url' => $hostUrl,
                     'path' => $path,
@@ -173,7 +174,7 @@ class SourceControllerTest extends AbstractSourceControllerTest
                     FileSourceRequest::PARAMETER_LABEL => $label
                 ],
                 'expected' => [
-                    'user_id' => self::AUTHENTICATED_USER_ID_PLACEHOLDER,
+                    'user_id' => SourceUserIdMutator::AUTHENTICATED_USER_ID_PLACEHOLDER,
                     'type' => Type::FILE->value,
                     'label' => $label,
                 ],
@@ -198,13 +199,13 @@ class SourceControllerTest extends AbstractSourceControllerTest
     public function testListSuccess(array $sources, array $expectedResponseData): void
     {
         foreach ($sources as $source) {
-            $source = $this->setSourceUserIdToAuthenticatedUserId($source);
+            $source = $this->sourceUserIdMutator->setSourceUserId($source);
             $this->store->add($source);
         }
 
         $response = $this->application->makeListSourcesRequest($this->validToken);
 
-        $expectedResponseData = $this->replaceAuthenticatedUserIdInSourceDataCollection($expectedResponseData);
+        $expectedResponseData = $this->sourceUserIdMutator->setSourceDataCollectionUserId($expectedResponseData);
 
         $this->responseAsserter->assertSuccessfulJsonResponse($response, $expectedResponseData);
         $this->requestAsserter->assertAuthorizationRequestIsMade();
@@ -216,11 +217,11 @@ class SourceControllerTest extends AbstractSourceControllerTest
     public function listSuccessDataProvider(): array
     {
         $userFileSources = [
-            new FileSource(self::AUTHENTICATED_USER_ID_PLACEHOLDER, 'file source label'),
+            new FileSource(SourceUserIdMutator::AUTHENTICATED_USER_ID_PLACEHOLDER, 'file source label'),
         ];
 
         $userGitSources = [
-            new GitSource(self::AUTHENTICATED_USER_ID_PLACEHOLDER, 'https://example.com/repository.git'),
+            new GitSource(SourceUserIdMutator::AUTHENTICATED_USER_ID_PLACEHOLDER, 'https://example.com/repository.git'),
         ];
 
         $userRunSources = [
