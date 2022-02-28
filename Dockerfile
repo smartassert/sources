@@ -29,6 +29,7 @@ RUN apt-get -qq update && apt-get -qq -y install  \
   git \
   libpq-dev \
   libzip-dev \
+  supervisor \
   zip \
   && docker-php-ext-install \
   pdo_pgsql \
