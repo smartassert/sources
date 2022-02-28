@@ -11,6 +11,7 @@ use App\Entity\SourceInterface;
 use App\Enum\RunSource\FailureReason;
 use App\Enum\RunSource\State;
 use App\Enum\Source\Type;
+use App\Model\EntityId;
 use App\Repository\RunSourceRepository;
 use App\Repository\SourceRepository;
 use App\Request\FileSourceRequest;
@@ -23,7 +24,6 @@ use App\Tests\Services\AuthorizationRequestAsserter;
 use App\Tests\Services\EntityRemover;
 use App\Tests\Services\FileStoreFixtureCreator;
 use League\Flysystem\FilesystemOperator;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
 class UserSourceControllerTest extends AbstractSourceControllerTest
@@ -81,10 +81,10 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
 
     public function testGetUnauthorizedUser(): void
     {
-        $source = new FileSource($this->authenticationConfiguration->authenticatedUserId, '');
-        $url = $this->generateUrl('user_source_get', ['sourceId' => $source->getId()]);
-
-        $response = $this->applicationClient->makeUnauthorizedRequest('GET', $url);
+        $response = $this->application->makeGetSourceRequest(
+            $this->authenticationConfiguration->invalidToken,
+            EntityId::create()
+        );
 
         self::assertSame(401, $response->getStatusCode());
         $this->authorizationRequestAsserter->assertAuthorizationRequestIsMade(
@@ -94,10 +94,10 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
 
     public function testGetSourceNotFound(): void
     {
-        $source = new FileSource($this->authenticationConfiguration->authenticatedUserId, '');
-        $url = $this->generateUrl('user_source_get', ['sourceId' => $source->getId()]);
-
-        $response = $this->applicationClient->makeAuthorizedRequest('GET', $url);
+        $response = $this->application->makeGetSourceRequest(
+            $this->authenticationConfiguration->validToken,
+            EntityId::create()
+        );
 
         self::assertSame(404, $response->getStatusCode());
     }
@@ -107,9 +107,10 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
         $source = new FileSource(UserId::create(), '');
         $this->store->add($source);
 
-        $url = $this->generateUrl('user_source_get', ['sourceId' => $source->getId()]);
-
-        $response = $this->applicationClient->makeAuthorizedRequest('GET', $url);
+        $response = $this->application->makeGetSourceRequest(
+            $this->authenticationConfiguration->validToken,
+            $source->getId()
+        );
 
         self::assertSame(403, $response->getStatusCode());
     }
@@ -124,17 +125,18 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
         $source = $this->setSourceUserIdToAuthenticatedUserId($source);
         $this->store->add($source);
 
-        $url = $this->generateUrl('user_source_get', ['sourceId' => $source->getId()]);
-
-        $response = $this->applicationClient->makeAuthorizedRequest('GET', $url);
+        $response = $this->application->makeGetSourceRequest(
+            $this->authenticationConfiguration->validToken,
+            $source->getId()
+        );
 
         self::assertSame(200, $response->getStatusCode());
         $this->authorizationRequestAsserter->assertAuthorizationRequestIsMade();
-        self::assertInstanceOf(JsonResponse::class, $response);
+        self::assertSame('application/json', $response->getHeaderLine('content-type'));
 
         $expectedResponseData = $this->replaceAuthenticatedUserIdInSourceData($expectedResponseData);
 
-        $responseData = json_decode((string) $response->getContent(), true);
+        $responseData = json_decode($response->getBody()->getContents(), true);
         self::assertEquals($expectedResponseData, $responseData);
     }
 
@@ -205,10 +207,11 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
 
     public function testUpdateUnauthorizedUser(): void
     {
-        $source = new FileSource($this->authenticationConfiguration->authenticatedUserId, '');
-        $url = $this->generateUrl('user_source_update', ['sourceId' => $source->getId()]);
-
-        $response = $this->applicationClient->makeUnauthorizedRequest('PUT', $url);
+        $response = $this->application->makeUpdateSourceRequest(
+            $this->authenticationConfiguration->invalidToken,
+            EntityId::create(),
+            []
+        );
 
         self::assertSame(401, $response->getStatusCode());
         $this->authorizationRequestAsserter->assertAuthorizationRequestIsMade(
@@ -221,9 +224,11 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
         $source = new FileSource(UserId::create(), '');
         $this->store->add($source);
 
-        $url = $this->generateUrl('user_source_update', ['sourceId' => $source->getId()]);
-
-        $response = $this->applicationClient->makeAuthorizedRequest('PUT', $url);
+        $response = $this->application->makeUpdateSourceRequest(
+            $this->authenticationConfiguration->validToken,
+            $source->getId(),
+            []
+        );
 
         self::assertSame(403, $response->getStatusCode());
     }
@@ -234,7 +239,7 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
      * @param array<string, string> $requestData
      * @param array<mixed>          $expectedResponseData
      */
-    public function testUpdate(
+    public function testUpdateSuccess(
         SourceInterface $source,
         array $requestData,
         int $expectedResponseStatusCode,
@@ -243,17 +248,19 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
         $this->setSourceUserIdToAuthenticatedUserId($source);
         $this->store->add($source);
 
-        $url = $this->generateUrl('user_source_update', ['sourceId' => $source->getId()]);
-
-        $response = $this->applicationClient->makeAuthorizedRequest('PUT', $url, $requestData);
+        $response = $this->application->makeUpdateSourceRequest(
+            $this->authenticationConfiguration->validToken,
+            $source->getId(),
+            $requestData
+        );
 
         self::assertSame($expectedResponseStatusCode, $response->getStatusCode());
         $this->authorizationRequestAsserter->assertAuthorizationRequestIsMade();
-        self::assertInstanceOf(JsonResponse::class, $response);
+        self::assertSame('application/json', $response->getHeaderLine('content-type'));
 
         $expectedResponseData = $this->replaceAuthenticatedUserIdInSourceData($expectedResponseData);
 
-        $responseData = json_decode((string) $response->getContent(), true);
+        $responseData = json_decode($response->getBody()->getContents(), true);
         self::assertEquals($expectedResponseData, $responseData);
     }
 
@@ -349,10 +356,10 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
 
     public function testDeleteUnauthorizedUser(): void
     {
-        $source = new FileSource($this->authenticationConfiguration->authenticatedUserId, '');
-        $url = $this->generateUrl('user_source_delete', ['sourceId' => $source->getId()]);
-
-        $response = $this->applicationClient->makeUnauthorizedRequest('DELETE', $url);
+        $response = $this->application->makeDeleteSourceRequest(
+            $this->authenticationConfiguration->invalidToken,
+            EntityId::create()
+        );
 
         self::assertSame(401, $response->getStatusCode());
         $this->authorizationRequestAsserter->assertAuthorizationRequestIsMade(
@@ -365,9 +372,10 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
         $source = new FileSource(UserId::create(), '');
         $this->store->add($source);
 
-        $url = $this->generateUrl('user_source_delete', ['sourceId' => $source->getId()]);
-
-        $response = $this->applicationClient->makeAuthorizedRequest('DELETE', $url);
+        $response = $this->application->makeDeleteSourceRequest(
+            $this->authenticationConfiguration->validToken,
+            $source->getId()
+        );
 
         self::assertSame(403, $response->getStatusCode());
     }
@@ -382,13 +390,14 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
         $this->store->add($source);
         self::assertGreaterThan(0, $this->sourceRepository->count([]));
 
-        $url = $this->generateUrl('user_source_delete', ['sourceId' => $source->getId()]);
-
-        $response = $this->applicationClient->makeAuthorizedRequest('DELETE', $url);
+        $response = $this->application->makeDeleteSourceRequest(
+            $this->authenticationConfiguration->validToken,
+            $source->getId()
+        );
 
         self::assertSame(200, $response->getStatusCode());
         $this->authorizationRequestAsserter->assertAuthorizationRequestIsMade();
-        self::assertInstanceOf(JsonResponse::class, $response);
+        self::assertSame('application/json', $response->getHeaderLine('content-type'));
         self::assertSame($expectedRepositoryCount, $this->sourceRepository->count([]));
     }
 
@@ -433,9 +442,10 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
         self::assertTrue($this->runSourceStorage->directoryExists($runSource->getDirectoryPath()));
         self::assertTrue($this->runSourceStorage->fileExists($serializedRunSourcePath));
 
-        $url = $this->generateUrl('user_source_delete', ['sourceId' => $runSource->getId()]);
-
-        $response = $this->applicationClient->makeAuthorizedRequest('DELETE', $url);
+        $response = $this->application->makeDeleteSourceRequest(
+            $this->authenticationConfiguration->validToken,
+            $runSource->getId()
+        );
 
         self::assertSame(200, $response->getStatusCode());
         self::assertFalse($this->runSourceStorage->directoryExists($runSource->getDirectoryPath()));
@@ -457,9 +467,10 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
         self::assertTrue($this->fileSourceStorage->directoryExists($sourceRelativePath));
         self::assertTrue($this->fileSourceStorage->fileExists($fileRelativePath));
 
-        $url = $this->generateUrl('user_source_delete', ['sourceId' => $fileSource->getId()]);
-
-        $response = $this->applicationClient->makeAuthorizedRequest('DELETE', $url);
+        $response = $this->application->makeDeleteSourceRequest(
+            $this->authenticationConfiguration->validToken,
+            $fileSource->getId()
+        );
 
         self::assertSame(200, $response->getStatusCode());
         self::assertSame(0, $this->sourceRepository->count([]));
@@ -470,10 +481,11 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
 
     public function testPrepareUnauthorizedUser(): void
     {
-        $source = new FileSource($this->authenticationConfiguration->authenticatedUserId, '');
-        $url = $this->generateUrl('user_source_prepare', ['sourceId' => $source->getId()]);
-
-        $response = $this->applicationClient->makeUnauthorizedRequest('POST', $url);
+        $response = $this->application->makePrepareSourceRequest(
+            $this->authenticationConfiguration->invalidToken,
+            EntityId::create(),
+            []
+        );
 
         self::assertSame(401, $response->getStatusCode());
         $this->authorizationRequestAsserter->assertAuthorizationRequestIsMade(
@@ -486,9 +498,11 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
         $source = new FileSource(UserId::create(), '');
         $this->store->add($source);
 
-        $url = $this->generateUrl('user_source_prepare', ['sourceId' => $source->getId()]);
-
-        $response = $this->applicationClient->makeAuthorizedRequest('POST', $url);
+        $response = $this->application->makePrepareSourceRequest(
+            $this->authenticationConfiguration->validToken,
+            $source->getId(),
+            []
+        );
 
         self::assertSame(403, $response->getStatusCode());
     }
@@ -500,9 +514,11 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
 
         $this->store->add($source);
 
-        $url = $this->generateUrl('user_source_prepare', ['sourceId' => $source->getId()]);
-
-        $response = $this->applicationClient->makeAuthorizedRequest('POST', $url);
+        $response = $this->application->makePrepareSourceRequest(
+            $this->authenticationConfiguration->validToken,
+            $source->getId(),
+            []
+        );
 
         self::assertSame(404, $response->getStatusCode());
         $this->authorizationRequestAsserter->assertAuthorizationRequestIsMade();
@@ -522,15 +538,17 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
         $this->setSourceUserIdToAuthenticatedUserId($source);
         $this->store->add($source);
 
-        $url = $this->generateUrl('user_source_prepare', ['sourceId' => $source->getId()]);
-
-        $response = $this->applicationClient->makeAuthorizedRequest('POST', $url, $requestParameters);
+        $response = $this->application->makePrepareSourceRequest(
+            $this->authenticationConfiguration->validToken,
+            $source->getId(),
+            $requestParameters
+        );
 
         self::assertSame(202, $response->getStatusCode());
         $this->authorizationRequestAsserter->assertAuthorizationRequestIsMade();
-        self::assertInstanceOf(JsonResponse::class, $response);
+        self::assertSame('application/json', $response->getHeaderLine('content-type'));
 
-        $responseData = json_decode((string) $response->getContent(), true);
+        $responseData = json_decode($response->getBody()->getContents(), true);
         self::assertIsArray($responseData);
 
         $runSource = $this->runSourceRepository->findByParent($source);
@@ -636,12 +654,13 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
             $runSource->getDirectoryPath() . '/' . RunSourceSerializer::SERIALIZED_FILENAME
         );
 
-        $url = $this->generateUrl('user_source_read', ['sourceId' => $runSource->getId()]);
-
-        $response = $this->applicationClient->makeAuthorizedRequest('GET', $url);
+        $response = $this->application->makeReadSourceRequest(
+            $this->authenticationConfiguration->validToken,
+            $runSource->getId()
+        );
 
         self::assertSame($expectedResponse->getStatusCode(), $response->getStatusCode());
-        self::assertSame($expectedResponse->headers->get('content-type'), $response->headers->get('content-type'));
-        self::assertSame($expectedResponse->getContent(), $response->getContent());
+        self::assertSame($expectedResponse->headers->get('content-type'), $response->getHeaderLine('content-type'));
+        self::assertSame($expectedResponse->getContent(), $response->getBody()->getContents());
     }
 }

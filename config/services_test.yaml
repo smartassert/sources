@@ -17,9 +17,6 @@ services:
         arguments:
             $fixturesReader: '@test_fixtures.storage'
 
-    App\Tests\Services\ApplicationClient:
-        public: true
-
     App\Tests\Services\AuthenticationConfiguration:
         public: true
         arguments:
@@ -36,3 +33,64 @@ services:
 
     App\Tests\Services\DirectoryLister:
         public: true
+
+    App\Tests\Services\Application\Routes:
+        arguments:
+            $addFileUrl: '/{{ sourceId }}/{{ filename }}'
+            $removeFileUrl: '/{{ sourceId }}/{{ filename }}'
+            $createSourceUrl: '/'
+            $listSourcesUrl: '/list'
+            $getSourceUrl: '/{{ sourceId }}'
+            $updateSourceUrl: '/{{ sourceId }}'
+            $deleteSourceUrl: '/{{ sourceId }}'
+            $prepareSourceUrl: '/{{ sourceId }}/prepare'
+            $readSourceUrl: '/{{ sourceId }}/read'
+
+    App\Tests\Services\Application\SymfonyClient:
+
+    app.tests.integration.http.client:
+        public: true
+        class: GuzzleHttp\Client
+        arguments:
+            $config:
+                base_uri: "https://localhost/"
+                verify: false
+
+    App\Tests\Services\Application\HttpClient:
+        arguments:
+            $httpClient: '@app.tests.integration.http.client'
+
+    app.tests.services.application.functional:
+        public: true
+        class: App\Tests\Services\Application\Application
+        arguments:
+            $client: '@App\Tests\Services\Application\SymfonyClient'
+
+    app.tests.services.application.integration:
+        public: true
+        class: App\Tests\Services\Application\Application
+        arguments:
+            $client: '@App\Tests\Services\Application\HttpClient'
+
+    GuzzleHttp\Psr7\HttpFactory:
+
+    Psr\Http\Message\RequestFactoryInterface:
+        alias: GuzzleHttp\Psr7\HttpFactory
+
+    Psr\Http\Message\ResponseFactoryInterface:
+        alias: GuzzleHttp\Psr7\HttpFactory
+
+    Psr\Http\Message\ServerRequestFactoryInterface:
+        alias: GuzzleHttp\Psr7\HttpFactory
+
+    Psr\Http\Message\StreamFactoryInterface:
+        alias: GuzzleHttp\Psr7\HttpFactory
+
+    Psr\Http\Message\UploadedFileFactoryInterface:
+        alias: GuzzleHttp\Psr7\HttpFactory
+
+    Psr\Http\Message\UriFactoryInterface:
+        alias: GuzzleHttp\Psr7\HttpFactory
+
+    Symfony\Bridge\PsrHttpMessage\HttpMessageFactoryInterface:
+        class: Symfony\Bridge\PsrHttpMessage\Factory\PsrHttpFactory
