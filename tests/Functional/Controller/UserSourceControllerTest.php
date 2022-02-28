@@ -358,7 +358,6 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
 
         self::assertSame(200, $response->getStatusCode());
         $this->authorizationRequestAsserter->assertAuthorizationRequestIsMade();
-        self::assertSame('application/json', $response->getHeaderLine('content-type'));
         self::assertSame($expectedRepositoryCount, $this->sourceRepository->count([]));
     }
 
