@@ -10,7 +10,6 @@ use App\Tests\Model\UserId;
 use App\Tests\Services\AuthorizationRequestAsserter;
 use App\Validator\YamlFilenameConstraint;
 use League\Flysystem\FilesystemOperator;
-use Symfony\Component\HttpFoundation\JsonResponse;
 
 class FileSourceFileControllerTest extends AbstractSourceControllerTest
 {
@@ -48,17 +47,15 @@ class FileSourceFileControllerTest extends AbstractSourceControllerTest
 
     public function testAddFileUnauthorizedUser(): void
     {
-        $url = $this->generateUrl('file_source_file_add', [
-            'sourceId' => $this->fileSource->getId(),
-            'filename' => 'filename.yaml',
-        ]);
-
-        $response = $this->applicationClient->makeUnauthorizedRequest('POST', $url);
+        $response = $this->application->makeAddFileRequest(
+            $this->invalidToken,
+            $this->fileSource->getId(),
+            'filename.yaml',
+            '- content'
+        );
 
         self::assertSame(401, $response->getStatusCode());
-        $this->authorizationRequestAsserter->assertAuthorizationRequestIsMade(
-            $this->authenticationConfiguration->invalidToken
-        );
+        $this->authorizationRequestAsserter->assertAuthorizationRequestIsMade($this->invalidToken);
     }
 
     public function testAddFileInvalidSourceUser(): void
@@ -66,12 +63,12 @@ class FileSourceFileControllerTest extends AbstractSourceControllerTest
         $source = new FileSource(UserId::create(), '');
         $this->store->add($source);
 
-        $url = $this->generateUrl('file_source_file_add', [
-            'sourceId' => $source->getId(),
-            'filename' => 'filename.yaml',
-        ]);
-
-        $response = $this->applicationClient->makeAuthorizedRequest('POST', $url, [], '- content');
+        $response = $this->application->makeAddFileRequest(
+            $this->validToken,
+            $source->getId(),
+            'filename.yaml',
+            '- content'
+        );
 
         self::assertSame(403, $response->getStatusCode());
     }
@@ -86,18 +83,19 @@ class FileSourceFileControllerTest extends AbstractSourceControllerTest
         string $content,
         array $expectedResponseData
     ): void {
-        $url = $this->generateUrl('file_source_file_add', [
-            'sourceId' => $this->fileSource->getId(),
-            'filename' => $filename,
-        ]);
-
-        $response = $this->applicationClient->makeAuthorizedRequest('POST', $url, [], $content);
+        $response = $this->application->makeAddFileRequest(
+            $this->validToken,
+            $this->fileSource->getId(),
+            $filename,
+            $content
+        );
 
         self::assertSame(400, $response->getStatusCode());
         $this->authorizationRequestAsserter->assertAuthorizationRequestIsMade();
-        self::assertInstanceOf(JsonResponse::class, $response);
+        self::assertSame('application/json', $response->getHeaderLine('content-type'));
 
-        $responseData = json_decode((string) $response->getContent(), true);
+        $responseData = json_decode($response->getBody()->getContents(), true);
+
         self::assertEquals($expectedResponseData, $responseData);
     }
 
@@ -116,13 +114,6 @@ class FileSourceFileControllerTest extends AbstractSourceControllerTest
             ],
             'name contains backslash characters, content non-empty' => [
                 'filename' => 'one-two-\\-three.yaml',
-                'content' => 'non-empty value',
-                'expectedResponseData' => $this->createExpectedInvalidFilenameResponseData(
-                    YamlFilenameConstraint::MESSAGE_FILENAME_INVALID
-                ),
-            ],
-            'name contains null byte characters, content non-empty' => [
-                'filename' => 'one-' . chr(0) . '-two-three' . chr(0) . '.yaml',
                 'content' => 'non-empty value',
                 'expectedResponseData' => $this->createExpectedInvalidFilenameResponseData(
                     YamlFilenameConstraint::MESSAGE_FILENAME_INVALID
@@ -177,16 +168,11 @@ class FileSourceFileControllerTest extends AbstractSourceControllerTest
         self::assertFalse($this->fileSourceStorage->directoryExists($this->sourceRelativePath));
         self::assertFalse($this->fileSourceStorage->fileExists($fileRelativePath));
 
-        $url = $this->generateUrl('file_source_file_add', [
-            'sourceId' => $this->fileSource->getId(),
-            'filename' => $filename,
-        ]);
-
-        $response = $this->applicationClient->makeAuthorizedRequest(
-            'POST',
-            $url,
-            [],
-            $content,
+        $response = $this->application->makeAddFileRequest(
+            $this->validToken,
+            $this->fileSource->getId(),
+            $filename,
+            $content
         );
 
         self::assertSame(200, $response->getStatusCode());
@@ -204,12 +190,12 @@ class FileSourceFileControllerTest extends AbstractSourceControllerTest
 
         $this->fileSourceStorage->write($fileRelativePath, $initialContent);
 
-        $url = $this->generateUrl('file_source_file_add', [
-            'sourceId' => $this->fileSource->getId(),
-            'filename' => $filename,
-        ]);
-
-        $response = $this->applicationClient->makeAuthorizedRequest('POST', $url, [], $updatedContent);
+        $response = $this->application->makeAddFileRequest(
+            $this->validToken,
+            $this->fileSource->getId(),
+            $filename,
+            $updatedContent
+        );
 
         self::assertSame(200, $response->getStatusCode());
         self::assertTrue($this->fileSourceStorage->directoryExists($this->sourceRelativePath));
@@ -219,17 +205,14 @@ class FileSourceFileControllerTest extends AbstractSourceControllerTest
 
     public function testRemoveFileUnauthorizedUser(): void
     {
-        $url = $this->generateUrl('file_source_file_remove', [
-            'sourceId' => $this->fileSource->getId(),
-            'filename' => 'filename.yaml',
-        ]);
-
-        $response = $this->applicationClient->makeUnauthorizedRequest('DELETE', $url);
+        $response = $this->application->makeRemoveFileRequest(
+            $this->invalidToken,
+            $this->fileSource->getId(),
+            'filename.yaml'
+        );
 
         self::assertSame(401, $response->getStatusCode());
-        $this->authorizationRequestAsserter->assertAuthorizationRequestIsMade(
-            $this->authenticationConfiguration->invalidToken
-        );
+        $this->authorizationRequestAsserter->assertAuthorizationRequestIsMade($this->invalidToken);
     }
 
     public function testRemoveFileInvalidSourceUser(): void
@@ -237,12 +220,7 @@ class FileSourceFileControllerTest extends AbstractSourceControllerTest
         $source = new FileSource(UserId::create(), '');
         $this->store->add($source);
 
-        $url = $this->generateUrl('file_source_file_remove', [
-            'sourceId' => $source->getId(),
-            'filename' => 'filename.yaml',
-        ]);
-
-        $response = $this->applicationClient->makeAuthorizedRequest('DELETE', $url);
+        $response = $this->application->makeRemoveFileRequest($this->validToken, $source->getId(), 'filename.yaml');
 
         self::assertSame(403, $response->getStatusCode());
     }
@@ -256,18 +234,13 @@ class FileSourceFileControllerTest extends AbstractSourceControllerTest
         string $filename,
         array $expectedResponseData
     ): void {
-        $url = $this->generateUrl('file_source_file_remove', [
-            'sourceId' => $this->fileSource->getId(),
-            'filename' => $filename,
-        ]);
-
-        $response = $this->applicationClient->makeAuthorizedRequest('DELETE', $url);
+        $response = $this->application->makeRemoveFileRequest($this->validToken, $this->fileSource->getId(), $filename);
 
         self::assertSame(400, $response->getStatusCode());
         $this->authorizationRequestAsserter->assertAuthorizationRequestIsMade();
-        self::assertInstanceOf(JsonResponse::class, $response);
+        self::assertSame('application/json', $response->getHeaderLine('content-type'));
 
-        $responseData = json_decode((string) $response->getContent(), true);
+        $responseData = json_decode($response->getBody()->getContents(), true);
         self::assertEquals($expectedResponseData, $responseData);
     }
 
@@ -279,12 +252,7 @@ class FileSourceFileControllerTest extends AbstractSourceControllerTest
 
         $this->fileSourceStorage->write($fileRelativePath, $content);
 
-        $url = $this->generateUrl('file_source_file_remove', [
-            'sourceId' => $this->fileSource->getId(),
-            'filename' => $filename,
-        ]);
-
-        $response = $this->applicationClient->makeAuthorizedRequest('DELETE', $url);
+        $response = $this->application->makeRemoveFileRequest($this->validToken, $this->fileSource->getId(), $filename);
 
         self::assertSame(200, $response->getStatusCode());
         self::assertFalse($this->fileSourceStorage->fileExists($fileRelativePath));
@@ -406,12 +374,6 @@ class FileSourceFileControllerTest extends AbstractSourceControllerTest
             ],
             'name contains backslash characters' => [
                 'filename' => 'one-two-\\-three.yaml',
-                'expectedResponseData' => $this->createExpectedInvalidFilenameResponseData(
-                    YamlFilenameConstraint::MESSAGE_FILENAME_INVALID
-                ),
-            ],
-            'name contains null byte characters' => [
-                'filename' => 'one-' . chr(0) . '-two-three' . chr(0) . '.yaml',
                 'expectedResponseData' => $this->createExpectedInvalidFilenameResponseData(
                     YamlFilenameConstraint::MESSAGE_FILENAME_INVALID
                 ),
