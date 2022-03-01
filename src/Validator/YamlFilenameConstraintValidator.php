@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 namespace App\Validator;
 
-use App\Model\Filename;
-use App\Model\YamlFile;
+use App\Model\YamlFilename;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
@@ -15,6 +14,7 @@ class YamlFilenameConstraintValidator extends ConstraintValidator
 {
     public function __construct(
         private readonly FilenameValidator $filenameValidator,
+        private readonly YamlFilenameValidator $yamlFilenameValidator,
     ) {
     }
 
@@ -28,8 +28,8 @@ class YamlFilenameConstraintValidator extends ConstraintValidator
             return;
         }
 
-        if (!$value instanceof Filename) {
-            throw new UnexpectedValueException($value, Filename::class);
+        if (!$value instanceof YamlFilename) {
+            throw new UnexpectedValueException($value, YamlFilename::class);
         }
 
         if (false === $this->filenameValidator->isValid($value->getValue())) {
@@ -39,14 +39,14 @@ class YamlFilenameConstraintValidator extends ConstraintValidator
             ;
         }
 
-        if ('' === $value->getName()) {
+        if (false === $this->yamlFilenameValidator->isNameValid($value->getName())) {
             $this->context->buildViolation($constraint::MESSAGE_NAME_EMPTY)
                 ->atPath('name')
                 ->addViolation()
             ;
         }
 
-        if (!in_array($value->getExtension(), YamlFile::EXTENSIONS)) {
+        if (false === $this->yamlFilenameValidator->isExtensionValid($value->getExtension())) {
             $this->context->buildViolation($constraint::MESSAGE_EXTENSION_INVALID)
                 ->atPath('name')
                 ->addViolation()

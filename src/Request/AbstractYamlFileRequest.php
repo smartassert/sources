@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Request;
 
 use App\Model\Filename;
+use App\Model\YamlFilename;
 use App\Validator\YamlFilenameConstraint;
 use Symfony\Component\HttpFoundation\Request;
 use webignition\EncapsulatingRequestResolverBundle\Model\EncapsulatingRequestInterface;
@@ -15,7 +16,7 @@ abstract class AbstractYamlFileRequest implements EncapsulatingRequestInterface
 
     public function __construct(
         #[YamlFilenameConstraint]
-        private Filename $filename,
+        private YamlFilename $filename,
     ) {
     }
 
@@ -24,11 +25,11 @@ abstract class AbstractYamlFileRequest implements EncapsulatingRequestInterface
         return $this->filename;
     }
 
-    protected static function createFilenameFromRequest(Request $request): Filename
+    protected static function createFilenameFromRequest(Request $request): YamlFilename
     {
         $filename = $request->attributes->get(self::KEY_ATTRIBUTE_FILENAME);
         $filename = is_scalar($filename) ? (string) $filename : '';
 
-        return new Filename(trim($filename));
+        return new YamlFilename(trim($filename));
     }
 }
