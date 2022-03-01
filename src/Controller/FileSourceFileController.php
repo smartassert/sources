@@ -7,10 +7,12 @@ namespace App\Controller;
 use App\Entity\FileSource;
 use App\Exception\InvalidRequestException;
 use App\Request\AddYamlFileRequest;
-use App\Request\RemoveYamlFileRequest;
+use App\Request\YamlFileRequest;
+use App\Response\YamlResponse;
 use App\Security\UserSourceAccessChecker;
 use App\Services\RequestValidator;
 use League\Flysystem\FilesystemException;
+use League\Flysystem\FilesystemReader;
 use League\Flysystem\FilesystemWriter;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -25,6 +27,7 @@ class FileSourceFileController
         private UserSourceAccessChecker $userSourceAccessChecker,
         private RequestValidator $requestValidator,
         private FilesystemWriter $fileSourceWriter,
+        private FilesystemReader $fileSourceReader,
     ) {
     }
 
@@ -51,8 +54,24 @@ class FileSourceFileController
      * @throws InvalidRequestException
      * @throws FilesystemException
      */
+    #[Route(self::ROUTE_SOURCE_FILE, name: 'file_source_file_read', methods: ['GET'])]
+    public function read(FileSource $source, YamlFileRequest $request): Response
+    {
+        $this->userSourceAccessChecker->denyAccessUnlessGranted($source);
+        $this->requestValidator->validate($request, ['filename.']);
+
+        return new YamlResponse(
+            $this->fileSourceReader->read($source->getDirectoryPath() . '/' . $request->getFilename())
+        );
+    }
+
+    /**
+     * @throws AccessDeniedException
+     * @throws InvalidRequestException
+     * @throws FilesystemException
+     */
     #[Route(self::ROUTE_SOURCE_FILE, name: 'file_source_file_remove', methods: ['DELETE'])]
-    public function remove(FileSource $source, RemoveYamlFileRequest $request): Response
+    public function remove(FileSource $source, YamlFileRequest $request): Response
     {
         $this->userSourceAccessChecker->denyAccessUnlessGranted($source);
         $this->requestValidator->validate($request, ['filename.']);

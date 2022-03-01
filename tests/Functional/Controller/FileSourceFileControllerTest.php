@@ -224,7 +224,7 @@ class FileSourceFileControllerTest extends AbstractSourceControllerTest
             'filename' => 'filename.yaml',
         ]);
 
-        $response = $this->applicationClient->makeUnauthorizedRequest('POST', $url);
+        $response = $this->applicationClient->makeUnauthorizedRequest('DELETE', $url);
 
         self::assertSame(401, $response->getStatusCode());
         $this->authorizationRequestAsserter->assertAuthorizationRequestIsMade(
@@ -242,13 +242,13 @@ class FileSourceFileControllerTest extends AbstractSourceControllerTest
             'filename' => 'filename.yaml',
         ]);
 
-        $response = $this->applicationClient->makeAuthorizedRequest('POST', $url);
+        $response = $this->applicationClient->makeAuthorizedRequest('DELETE', $url);
 
         self::assertSame(403, $response->getStatusCode());
     }
 
     /**
-     * @dataProvider removeFileInvalidRequestDataProvider
+     * @dataProvider yamlFileInvalidRequestDataProvider
      *
      * @param array<mixed> $expectedResponseData
      */
@@ -271,10 +271,103 @@ class FileSourceFileControllerTest extends AbstractSourceControllerTest
         self::assertEquals($expectedResponseData, $responseData);
     }
 
+    public function testRemoveFileSuccess(): void
+    {
+        $filename = 'filename.yaml';
+        $content = '- file content';
+        $fileRelativePath = $this->sourceRelativePath . '/' . $filename;
+
+        $this->fileSourceStorage->write($fileRelativePath, $content);
+
+        $url = $this->generateUrl('file_source_file_remove', [
+            'sourceId' => $this->fileSource->getId(),
+            'filename' => $filename,
+        ]);
+
+        $response = $this->applicationClient->makeAuthorizedRequest('DELETE', $url);
+
+        self::assertSame(200, $response->getStatusCode());
+        self::assertFalse($this->fileSourceStorage->fileExists($fileRelativePath));
+    }
+
+    public function testReadFileUnauthorizedUser(): void
+    {
+        $url = $this->generateUrl('file_source_file_read', [
+            'sourceId' => $this->fileSource->getId(),
+            'filename' => 'filename.yaml',
+        ]);
+
+        $response = $this->applicationClient->makeUnauthorizedRequest('GET', $url);
+
+        self::assertSame(401, $response->getStatusCode());
+        $this->authorizationRequestAsserter->assertAuthorizationRequestIsMade(
+            $this->authenticationConfiguration->invalidToken
+        );
+    }
+
+    public function testReadFileInvalidSourceUser(): void
+    {
+        $source = new FileSource(UserId::create(), '');
+        $this->store->add($source);
+
+        $url = $this->generateUrl('file_source_file_read', [
+            'sourceId' => $source->getId(),
+            'filename' => 'filename.yaml',
+        ]);
+
+        $response = $this->applicationClient->makeAuthorizedRequest('GET', $url);
+
+        self::assertSame(403, $response->getStatusCode());
+    }
+
+    /**
+     * @dataProvider yamlFileInvalidRequestDataProvider
+     *
+     * @param array<mixed> $expectedResponseData
+     */
+    public function testReadFileInvalidRequest(
+        string $filename,
+        array $expectedResponseData
+    ): void {
+        $url = $this->generateUrl('file_source_file_read', [
+            'sourceId' => $this->fileSource->getId(),
+            'filename' => $filename,
+        ]);
+
+        $response = $this->applicationClient->makeAuthorizedRequest('GET', $url);
+
+        self::assertSame(400, $response->getStatusCode());
+        $this->authorizationRequestAsserter->assertAuthorizationRequestIsMade();
+        self::assertInstanceOf(JsonResponse::class, $response);
+
+        $responseData = json_decode((string) $response->getContent(), true);
+        self::assertEquals($expectedResponseData, $responseData);
+    }
+
+    public function testReadFileSuccess(): void
+    {
+        $filename = 'filename.yaml';
+        $content = '- file content';
+        $fileRelativePath = $this->sourceRelativePath . '/' . $filename;
+
+        $this->fileSourceStorage->write($fileRelativePath, $content);
+
+        $url = $this->generateUrl('file_source_file_read', [
+            'sourceId' => $this->fileSource->getId(),
+            'filename' => $filename,
+        ]);
+
+        $response = $this->applicationClient->makeAuthorizedRequest('GET', $url);
+
+        self::assertSame(200, $response->getStatusCode());
+        self::assertSame('text/x-yaml; charset=utf-8', $response->headers->get('content-type'));
+        self::assertSame($content, $response->getContent());
+    }
+
     /**
      * @return array<mixed>
      */
-    public function removeFileInvalidRequestDataProvider(): array
+    public function yamlFileInvalidRequestDataProvider(): array
     {
         return [
             'name empty with .yaml extension' => [
@@ -302,25 +395,6 @@ class FileSourceFileControllerTest extends AbstractSourceControllerTest
                 ),
             ],
         ];
-    }
-
-    public function testRemoveFileSuccess(): void
-    {
-        $filename = 'filename.yaml';
-        $content = '- file content';
-        $fileRelativePath = $this->sourceRelativePath . '/' . $filename;
-
-        $this->fileSourceStorage->write($fileRelativePath, $content);
-
-        $url = $this->generateUrl('file_source_file_remove', [
-            'sourceId' => $this->fileSource->getId(),
-            'filename' => $filename,
-        ]);
-
-        $response = $this->applicationClient->makeAuthorizedRequest('DELETE', $url);
-
-        self::assertSame(200, $response->getStatusCode());
-        self::assertFalse($this->fileSourceStorage->fileExists($fileRelativePath));
     }
 
     /**

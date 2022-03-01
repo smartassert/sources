@@ -11,6 +11,7 @@ use App\Entity\SourceOriginInterface;
 use App\Exception\InvalidRequestException;
 use App\Message\Prepare;
 use App\Request\SourceRequestInterface;
+use App\Response\YamlResponse;
 use App\Security\UserSourceAccessChecker;
 use App\Services\RequestValidator;
 use App\Services\RunSourceFactory;
@@ -114,8 +115,6 @@ class UserSourceController
     {
         $this->userSourceAccessChecker->denyAccessUnlessGranted($source);
 
-        return new Response($runSourceSerializer->read($source), 200, [
-            'content-type' => 'text/x-yaml; charset=utf-8',
-        ]);
+        return new YamlResponse($runSourceSerializer->read($source));
     }
 }
