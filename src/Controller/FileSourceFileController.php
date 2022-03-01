@@ -11,6 +11,7 @@ use App\Request\YamlFileRequest;
 use App\Security\UserSourceAccessChecker;
 use App\Services\RequestValidator;
 use League\Flysystem\FilesystemException;
+use League\Flysystem\FilesystemReader;
 use League\Flysystem\FilesystemWriter;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -25,6 +26,7 @@ class FileSourceFileController
         private UserSourceAccessChecker $userSourceAccessChecker,
         private RequestValidator $requestValidator,
         private FilesystemWriter $fileSourceWriter,
+        private FilesystemReader $fileSourceReader,
     ) {
     }
 
@@ -44,6 +46,24 @@ class FileSourceFileController
         $this->fileSourceWriter->write($source->getDirectoryPath() . '/' . $yamlFile->name, $yamlFile->content);
 
         return new Response();
+    }
+
+    /**
+     * @throws AccessDeniedException
+     * @throws InvalidRequestException
+     * @throws FilesystemException
+     */
+    #[Route(self::ROUTE_SOURCE_FILE, name: 'file_source_file_read', methods: ['GET'])]
+    public function read(FileSource $source, YamlFileRequest $request): Response
+    {
+        $this->userSourceAccessChecker->denyAccessUnlessGranted($source);
+        $this->requestValidator->validate($request, ['filename.']);
+
+        $content = $this->fileSourceReader->read($source->getDirectoryPath() . '/' . $request->getFilename());
+
+        return new Response($content, 200, [
+            'content-type' => 'text/x-yaml; charset=utf-8',
+        ]);
     }
 
     /**
