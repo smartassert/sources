@@ -9,7 +9,7 @@ class JsonResponseAsserter extends ResponseAsserter
     /**
      * @param array<mixed> $expectedData
      */
-    public function __construct(int $expectedStatusCode, array $expectedData)
+    public function __construct(int $expectedStatusCode, ?array $expectedData = null)
     {
         parent::__construct($expectedStatusCode);
 
@@ -17,6 +17,10 @@ class JsonResponseAsserter extends ResponseAsserter
             'content-type' => 'application/json'
         ]));
 
-        $this->addBodyAsserter(new ArrayBodyAsserter($expectedData));
+        if (is_array($expectedData)) {
+            $this->addBodyAsserter(new ArrayBodyAsserter($expectedData));
+        } else {
+            $this->addBodyAsserter(new NonEmptyBodyContentAsserter());
+        }
     }
 }

@@ -54,14 +54,16 @@ class ResponseAsserter
             }
         }
 
-        $response->getBody()->rewind();
-        $body = $response->getBody()->getContents();
-
         foreach ($this->bodyAsserters as $bodyAsserter) {
             if ($bodyAsserter instanceof BodyAsserterInterface) {
+                $response->getBody()->rewind();
+                $body = $response->getBody()->getContents();
+
                 $bodyAsserter->assert($body);
             }
         }
+
+        $response->getBody()->rewind();
     }
 
     public function assertFromSymfonyResponse(Response $response): void
