@@ -60,9 +60,13 @@ class FileSourceFileController
         $this->userSourceAccessChecker->denyAccessUnlessGranted($source);
         $this->requestValidator->validate($request, ['filename.']);
 
-        return new YamlResponse(
-            $this->fileSourceReader->read($source->getDirectoryPath() . '/' . $request->getFilename())
-        );
+        $location = $source->getDirectoryPath() . '/' . $request->getFilename();
+
+        if (false === $this->fileSourceReader->fileExists($location)) {
+            return new Response('', 404);
+        }
+
+        return new YamlResponse($this->fileSourceReader->read($location));
     }
 
     /**
