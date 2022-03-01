@@ -35,11 +35,11 @@ jobs:
           DATABASE_URL: postgres://postgres:password!@127.0.0.1:5432/sources?charset=UTF-8
         run: composer integration-setup
 
-      - name: Verify integration environment state
-        env:
-          DATABASE_URL: postgres://postgres:password!@127.0.0.1:5432/sources?charset=UTF-8
-        run: |
-          composer integration-status
+#      - name: Verify integration environment state
+#        env:
+#          DATABASE_URL: postgres://postgres:password!@127.0.0.1:5432/sources?charset=UTF-8
+#        run: |
+#          composer integration-status
 
 #          sudo netstat -nlp | grep 9090
 #
