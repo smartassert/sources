@@ -36,6 +36,8 @@ jobs:
         run: |
           composer integration-setup
           sudo netstat -nlp | grep 9090
+          composer integration-status
+          netcat -vz localhost 9090
 
       - name: Run tests
         run: composer test-integration
