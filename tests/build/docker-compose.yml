@@ -24,6 +24,7 @@ services:
   s3-mock:
     image: adobe/s3mock
     container_name: s3-mock
+    restart: unless-stopped
     ports:
       - "9090:9090"
     environment:
