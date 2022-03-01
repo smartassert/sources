@@ -248,7 +248,7 @@ class FileSourceFileControllerTest extends AbstractSourceControllerTest
     }
 
     /**
-     * @dataProvider removeFileInvalidRequestDataProvider
+     * @dataProvider yamlFileInvalidRequestDataProvider
      *
      * @param array<mixed> $expectedResponseData
      */
@@ -269,39 +269,6 @@ class FileSourceFileControllerTest extends AbstractSourceControllerTest
 
         $responseData = json_decode((string) $response->getContent(), true);
         self::assertEquals($expectedResponseData, $responseData);
-    }
-
-    /**
-     * @return array<mixed>
-     */
-    public function removeFileInvalidRequestDataProvider(): array
-    {
-        return [
-            'name empty with .yaml extension' => [
-                'filename' => '.yaml',
-                'expectedResponseData' => $this->createExpectedInvalidFilenameResponseData(
-                    YamlFilenameConstraint::MESSAGE_NAME_EMPTY
-                ),
-            ],
-            'name contains backslash characters' => [
-                'filename' => 'one-two-\\-three.yaml',
-                'expectedResponseData' => $this->createExpectedInvalidFilenameResponseData(
-                    YamlFilenameConstraint::MESSAGE_FILENAME_INVALID
-                ),
-            ],
-            'name contains null byte characters' => [
-                'filename' => 'one-' . chr(0) . '-two-three' . chr(0) . '.yaml',
-                'expectedResponseData' => $this->createExpectedInvalidFilenameResponseData(
-                    YamlFilenameConstraint::MESSAGE_FILENAME_INVALID
-                ),
-            ],
-            'name contains space characters' => [
-                'filename' => 'one two three.yaml',
-                'expectedResponseData' => $this->createExpectedInvalidFilenameResponseData(
-                    YamlFilenameConstraint::MESSAGE_FILENAME_INVALID
-                ),
-            ],
-        ];
     }
 
     public function testRemoveFileSuccess(): void
@@ -354,7 +321,7 @@ class FileSourceFileControllerTest extends AbstractSourceControllerTest
     }
 
     /**
-     * @dataProvider readFileInvalidRequestDataProvider
+     * @dataProvider yamlFileInvalidRequestDataProvider
      *
      * @param array<mixed> $expectedResponseData
      */
@@ -377,10 +344,30 @@ class FileSourceFileControllerTest extends AbstractSourceControllerTest
         self::assertEquals($expectedResponseData, $responseData);
     }
 
+    public function testReadFileSuccess(): void
+    {
+        $filename = 'filename.yaml';
+        $content = '- file content';
+        $fileRelativePath = $this->sourceRelativePath . '/' . $filename;
+
+        $this->fileSourceStorage->write($fileRelativePath, $content);
+
+        $url = $this->generateUrl('file_source_file_read', [
+            'sourceId' => $this->fileSource->getId(),
+            'filename' => $filename,
+        ]);
+
+        $response = $this->applicationClient->makeAuthorizedRequest('GET', $url);
+
+        self::assertSame(200, $response->getStatusCode());
+        self::assertSame('text/x-yaml; charset=utf-8', $response->headers->get('content-type'));
+        self::assertSame($content, $response->getContent());
+    }
+
     /**
      * @return array<mixed>
      */
-    public function readFileInvalidRequestDataProvider(): array
+    public function yamlFileInvalidRequestDataProvider(): array
     {
         return [
             'name empty with .yaml extension' => [
@@ -408,26 +395,6 @@ class FileSourceFileControllerTest extends AbstractSourceControllerTest
                 ),
             ],
         ];
-    }
-
-    public function testReadFileSuccess(): void
-    {
-        $filename = 'filename.yaml';
-        $content = '- file content';
-        $fileRelativePath = $this->sourceRelativePath . '/' . $filename;
-
-        $this->fileSourceStorage->write($fileRelativePath, $content);
-
-        $url = $this->generateUrl('file_source_file_read', [
-            'sourceId' => $this->fileSource->getId(),
-            'filename' => $filename,
-        ]);
-
-        $response = $this->applicationClient->makeAuthorizedRequest('GET', $url);
-
-        self::assertSame(200, $response->getStatusCode());
-        self::assertSame('text/x-yaml; charset=utf-8', $response->headers->get('content-type'));
-        self::assertSame($content, $response->getContent());
     }
 
     /**

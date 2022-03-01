@@ -59,11 +59,13 @@ class FileSourceFileController
         $this->userSourceAccessChecker->denyAccessUnlessGranted($source);
         $this->requestValidator->validate($request, ['filename.']);
 
-        $content = $this->fileSourceReader->read($source->getDirectoryPath() . '/' . $request->getFilename());
-
-        return new Response($content, 200, [
-            'content-type' => 'text/x-yaml; charset=utf-8',
-        ]);
+        return new Response(
+            $this->fileSourceReader->read($source->getDirectoryPath() . '/' . $request->getFilename()),
+            200,
+            [
+                'content-type' => 'text/x-yaml; charset=utf-8',
+            ]
+        );
     }
 
     /**
