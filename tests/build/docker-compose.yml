@@ -60,3 +60,4 @@ services:
       - users-service:users-service
     depends_on:
       - postgres
+      - s3-mock
