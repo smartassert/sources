@@ -127,6 +127,7 @@
         "integration-pull": "docker-compose -f tests/build/docker-compose.yml pull",
         "integration-up": "docker-compose -f tests/build/docker-compose.yml  up -d --build",
         "integration-status": "docker-compose -f tests/build/docker-compose.yml ps",
+        "integration-logs": "docker-compose -f tests/build/docker-compose.yml logs",
         "integration-teardown": "@functional-teardown",
         "integration-setup": [
             "@integration-build",
