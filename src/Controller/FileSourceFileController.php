@@ -7,7 +7,7 @@ namespace App\Controller;
 use App\Entity\FileSource;
 use App\Exception\InvalidRequestException;
 use App\Request\AddYamlFileRequest;
-use App\Request\RemoveYamlFileRequest;
+use App\Request\YamlFileRequest;
 use App\Security\UserSourceAccessChecker;
 use App\Services\RequestValidator;
 use League\Flysystem\FilesystemException;
@@ -52,7 +52,7 @@ class FileSourceFileController
      * @throws FilesystemException
      */
     #[Route(self::ROUTE_SOURCE_FILE, name: 'file_source_file_remove', methods: ['DELETE'])]
-    public function remove(FileSource $source, RemoveYamlFileRequest $request): Response
+    public function remove(FileSource $source, YamlFileRequest $request): Response
     {
         $this->userSourceAccessChecker->denyAccessUnlessGranted($source);
         $this->requestValidator->validate($request, ['filename.']);
