@@ -45,6 +45,7 @@ services:
             $deleteSourceUrl: '/{{ sourceId }}'
             $prepareSourceUrl: '/{{ sourceId }}/prepare'
             $readSourceUrl: '/{{ sourceId }}/read'
+            $readFileUrl: '/{{ sourceId }}/{{ filename }}'
 
     App\Tests\Services\ApplicationClient\SymfonyAdapter:
 

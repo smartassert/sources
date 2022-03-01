@@ -33,6 +33,23 @@ class Client
         );
     }
 
+    public function makeReadFileRequest(
+        string $authenticationToken,
+        string $sourceId,
+        string $filename
+    ): ResponseInterface {
+        return $this->client->makeRequest(
+            'GET',
+            $this->createUrl($this->routes->readFileUrl, [
+                'sourceId' => $sourceId,
+                'filename' => $filename,
+            ]),
+            [
+                'authorization' => 'Bearer ' . $authenticationToken,
+            ]
+        );
+    }
+
     public function makeRemoveFileRequest(
         string $authenticationToken,
         string $sourceId,
