@@ -123,7 +123,7 @@ class PrepareSourceTest extends AbstractIntegrationTest
 
     private function waitUntilSourceIsPrepared(string $runSourceId): void
     {
-        $timeout = 10000;
+        $timeout = 30000;
         $duration = 0;
         $period = 1000;
         $state = null;
