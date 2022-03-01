@@ -9,6 +9,7 @@ use App\Model\EntityId;
 use App\Services\Source\Store;
 use App\Tests\Model\UserId;
 use App\Tests\Services\EntityRemover;
+use App\Tests\Services\InvalidFilenameResponseDataFactory;
 use App\Validator\YamlFilenameConstraint;
 
 class AddReadDeleteFileTest extends AbstractIntegrationTest
@@ -91,21 +92,21 @@ class AddReadDeleteFileTest extends AbstractIntegrationTest
             'name empty with .yaml extension, content non-empty' => [
                 'filename' => '.yaml',
                 'content' => 'non-empty value',
-                'expectedResponseData' => $this->createExpectedInvalidFilenameResponseData(
+                'expectedResponseData' => InvalidFilenameResponseDataFactory::createForMessage(
                     YamlFilenameConstraint::MESSAGE_NAME_EMPTY
                 ),
             ],
             'name contains backslash characters, content non-empty' => [
                 'filename' => 'one-two-\\-three.yaml',
                 'content' => 'non-empty value',
-                'expectedResponseData' => $this->createExpectedInvalidFilenameResponseData(
+                'expectedResponseData' => InvalidFilenameResponseDataFactory::createForMessage(
                     YamlFilenameConstraint::MESSAGE_FILENAME_INVALID
                 ),
             ],
             'name contains space characters, content non-empty' => [
                 'filename' => 'one two three.yaml',
                 'content' => 'non-empty value',
-                'expectedResponseData' => $this->createExpectedInvalidFilenameResponseData(
+                'expectedResponseData' => InvalidFilenameResponseDataFactory::createForMessage(
                     YamlFilenameConstraint::MESSAGE_FILENAME_INVALID
                 ),
             ],
@@ -189,19 +190,19 @@ class AddReadDeleteFileTest extends AbstractIntegrationTest
         return [
             'name empty with .yaml extension' => [
                 'filename' => '.yaml',
-                'expectedResponseData' => $this->createExpectedInvalidFilenameResponseData(
+                'expectedResponseData' => InvalidFilenameResponseDataFactory::createForMessage(
                     YamlFilenameConstraint::MESSAGE_NAME_EMPTY
                 ),
             ],
             'name contains backslash characters' => [
                 'filename' => 'one-two-\\-three.yaml',
-                'expectedResponseData' => $this->createExpectedInvalidFilenameResponseData(
+                'expectedResponseData' => InvalidFilenameResponseDataFactory::createForMessage(
                     YamlFilenameConstraint::MESSAGE_FILENAME_INVALID
                 ),
             ],
             'name contains space characters' => [
                 'filename' => 'one two three.yaml',
-                'expectedResponseData' => $this->createExpectedInvalidFilenameResponseData(
+                'expectedResponseData' => InvalidFilenameResponseDataFactory::createForMessage(
                     YamlFilenameConstraint::MESSAGE_FILENAME_INVALID
                 ),
             ],
@@ -297,23 +298,5 @@ class AddReadDeleteFileTest extends AbstractIntegrationTest
         );
 
         $this->responseAsserter->assertNotFoundResponse($notFoundReadResponse);
-    }
-
-    /**
-     * @return array<mixed>
-     */
-    private function createExpectedInvalidFilenameResponseData(string $message): array
-    {
-        return [
-            'error' => [
-                'type' => 'invalid_request',
-                'payload' => [
-                    'name' => [
-                        'value' => '',
-                        'message' => $message,
-                    ],
-                ],
-            ],
-        ];
     }
 }
