@@ -290,6 +290,20 @@ class FileSourceFileControllerTest extends AbstractSourceControllerTest
         self::assertFalse($this->fileSourceStorage->fileExists($fileRelativePath));
     }
 
+    public function testRemoveFileNotFound(): void
+    {
+        $filename = 'filename.yaml';
+
+        $url = $this->generateUrl('file_source_file_remove', [
+            'sourceId' => $this->fileSource->getId(),
+            'filename' => $filename,
+        ]);
+
+        $response = $this->applicationClient->makeAuthorizedRequest('DELETE', $url);
+
+        self::assertSame(200, $response->getStatusCode());
+    }
+
     public function testReadFileUnauthorizedUser(): void
     {
         $url = $this->generateUrl('file_source_file_read', [
@@ -342,6 +356,20 @@ class FileSourceFileControllerTest extends AbstractSourceControllerTest
 
         $responseData = json_decode((string) $response->getContent(), true);
         self::assertEquals($expectedResponseData, $responseData);
+    }
+
+    public function testReadFileNotFound(): void
+    {
+        $filename = 'filename.yaml';
+
+        $url = $this->generateUrl('file_source_file_read', [
+            'sourceId' => $this->fileSource->getId(),
+            'filename' => $filename,
+        ]);
+
+        $response = $this->applicationClient->makeAuthorizedRequest('GET', $url);
+
+        self::assertSame(404, $response->getStatusCode());
     }
 
     public function testReadFileSuccess(): void
