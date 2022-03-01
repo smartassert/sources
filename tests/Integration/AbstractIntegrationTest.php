@@ -7,6 +7,7 @@ namespace App\Tests\Integration;
 use App\Tests\Services\ApplicationClient\Client;
 use App\Tests\Services\AuthenticationConfiguration;
 use App\Tests\Services\ResponseAsserter;
+use App\Tests\Services\SourceUserIdMutator;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 abstract class AbstractIntegrationTest extends WebTestCase
@@ -16,6 +17,7 @@ abstract class AbstractIntegrationTest extends WebTestCase
     protected Client $client;
     protected ResponseAsserter $responseAsserter;
     protected AuthenticationConfiguration $authenticationConfiguration;
+    protected SourceUserIdMutator $sourceUserIdMutator;
     protected string $validToken;
     protected string $invalidToken;
 
@@ -39,5 +41,9 @@ abstract class AbstractIntegrationTest extends WebTestCase
         $responseAsserter = self::getContainer()->get(ResponseAsserter::class);
         \assert($responseAsserter instanceof ResponseAsserter);
         $this->responseAsserter = $responseAsserter;
+
+        $sourceUserIdMutator = self::getContainer()->get(SourceUserIdMutator::class);
+        \assert($sourceUserIdMutator instanceof SourceUserIdMutator);
+        $this->sourceUserIdMutator = $sourceUserIdMutator;
     }
 }
