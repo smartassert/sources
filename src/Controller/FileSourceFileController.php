@@ -8,6 +8,7 @@ use App\Entity\FileSource;
 use App\Exception\InvalidRequestException;
 use App\Request\AddYamlFileRequest;
 use App\Request\YamlFileRequest;
+use App\Response\YamlResponse;
 use App\Security\UserSourceAccessChecker;
 use App\Services\RequestValidator;
 use League\Flysystem\FilesystemException;
@@ -59,12 +60,8 @@ class FileSourceFileController
         $this->userSourceAccessChecker->denyAccessUnlessGranted($source);
         $this->requestValidator->validate($request, ['filename.']);
 
-        return new Response(
-            $this->fileSourceReader->read($source->getDirectoryPath() . '/' . $request->getFilename()),
-            200,
-            [
-                'content-type' => 'text/x-yaml; charset=utf-8',
-            ]
+        return new YamlResponse(
+            $this->fileSourceReader->read($source->getDirectoryPath() . '/' . $request->getFilename())
         );
     }
 
