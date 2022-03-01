@@ -24,12 +24,12 @@ services:
   s3-mock:
     image: adobe/s3mock
     container_name: s3-mock
-    restart: unless-stopped
     ports:
       - "9090:9090"
     environment:
       - validKmsKeys=remote_storage_key_id
       - initialBuckets=file_source_bucket,run_source_bucket
+    restart: unless-stopped
 
   caddy-app:
     image: caddy:2.4.5-alpine
@@ -56,8 +56,10 @@ services:
         REMOTE_STORAGE_ENDPOINT: http://s3-mock:9090
         REMOTE_STORAGE_KEY_ID: remote_storage_key_id
     container_name: smartassert-sources
+    restart: unless-stopped
     links:
       - users-service:users-service
     depends_on:
       - postgres
       - s3-mock
+      - users-service
