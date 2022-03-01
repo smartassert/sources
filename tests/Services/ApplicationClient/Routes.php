@@ -16,6 +16,7 @@ class Routes
         public readonly string $deleteSourceUrl,
         public readonly string $prepareSourceUrl,
         public readonly string $readSourceUrl,
+        public readonly string $readFileUrl,
     ) {
     }
 }
