@@ -11,7 +11,6 @@ use App\Tests\Services\RequestAsserter;
 use App\Tests\Services\ResponseAsserter;
 use App\Tests\Services\SourceUserIdMutator;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-use Symfony\Component\Routing\RouterInterface;
 
 abstract class AbstractSourceControllerTest extends WebTestCase
 {
@@ -24,17 +23,12 @@ abstract class AbstractSourceControllerTest extends WebTestCase
     protected string $validToken;
     protected string $invalidToken;
     protected Client $application;
-    private RouterInterface $router;
 
     protected function setUp(): void
     {
         parent::setUp();
 
         $client = static::createClient();
-
-        $router = self::getContainer()->get(RouterInterface::class);
-        \assert($router instanceof RouterInterface);
-        $this->router = $router;
 
         $application = self::getContainer()->get('app.tests.services.application.client.functional');
         \assert($application instanceof Client);
@@ -63,13 +57,5 @@ abstract class AbstractSourceControllerTest extends WebTestCase
 
         $this->validToken = $authenticationConfiguration->validToken;
         $this->invalidToken = $authenticationConfiguration->invalidToken;
-    }
-
-    /**
-     * @param array<string, int|string> $routeParameters
-     */
-    protected function generateUrl(string $routeName, array $routeParameters = []): string
-    {
-        return $this->router->generate($routeName, $routeParameters);
     }
 }
