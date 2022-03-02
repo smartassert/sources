@@ -9,7 +9,6 @@ use App\Services\Source\Store;
 use App\Tests\DataProvider\AddFileInvalidRequestDataProviderTrait;
 use App\Tests\DataProvider\TestConstants;
 use App\Tests\DataProvider\YamlFileInvalidRequestDataProviderTrait;
-use App\Tests\Model\UserId;
 use League\Flysystem\FilesystemOperator;
 
 class FileSourceFileControllerTest extends AbstractSourceControllerTest
@@ -20,7 +19,6 @@ class FileSourceFileControllerTest extends AbstractSourceControllerTest
     private FilesystemOperator $fileSourceStorage;
 
     private FileSource $fileSource;
-    private Store $store;
     private string $sourceRelativePath;
 
     protected function setUp(): void
@@ -39,24 +37,7 @@ class FileSourceFileControllerTest extends AbstractSourceControllerTest
 
         $store = self::getContainer()->get(Store::class);
         \assert($store instanceof Store);
-        $this->store = $store;
-
         $store->add($this->fileSource);
-    }
-
-    public function testAddFileInvalidSourceUser(): void
-    {
-        $source = new FileSource(UserId::create(), '');
-        $this->store->add($source);
-
-        $response = $this->applicationClient->makeAddFileRequest(
-            $this->validToken,
-            $source->getId(),
-            TestConstants::FILENAME,
-            '- content'
-        );
-
-        $this->responseAsserter->assertForbiddenResponse($response);
     }
 
     /**
@@ -123,20 +104,6 @@ class FileSourceFileControllerTest extends AbstractSourceControllerTest
         self::assertSame($updatedContent, $this->fileSourceStorage->read($fileRelativePath));
     }
 
-    public function testRemoveFileInvalidSourceUser(): void
-    {
-        $source = new FileSource(UserId::create(), '');
-        $this->store->add($source);
-
-        $response = $this->applicationClient->makeRemoveFileRequest(
-            $this->validToken,
-            $source->getId(),
-            TestConstants::FILENAME
-        );
-
-        $this->responseAsserter->assertForbiddenResponse($response);
-    }
-
     /**
      * @dataProvider yamlFileInvalidRequestDataProvider
      *
@@ -182,20 +149,6 @@ class FileSourceFileControllerTest extends AbstractSourceControllerTest
         );
 
         $this->responseAsserter->assertSuccessfulResponseWithNoBody($response);
-    }
-
-    public function testReadFileInvalidSourceUser(): void
-    {
-        $source = new FileSource(UserId::create(), '');
-        $this->store->add($source);
-
-        $response = $this->applicationClient->makeRemoveFileRequest(
-            $this->validToken,
-            $source->getId(),
-            TestConstants::FILENAME
-        );
-
-        $this->responseAsserter->assertForbiddenResponse($response);
     }
 
     /**
