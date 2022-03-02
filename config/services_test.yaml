@@ -6,9 +6,6 @@ services:
         autowire: true
         autoconfigure: true
 
-    webignition\HttpHistoryContainer\Container:
-        public: true
-
     App\Tests\Services\EntityRemover:
         public: true
 
@@ -25,11 +22,6 @@ services:
             $headerName: !php/const SmartAssert\UsersSecurityBundle\Security\AuthorizationProperties::DEFAULT_HEADER_NAME
             $headerValuePrefix: !php/const SmartAssert\UsersSecurityBundle\Security\AuthorizationProperties::DEFAULT_VALUE_PREFIX
             $authenticatedUserId: '%env(AUTHENTICATED_USER_ID)%'
-
-    App\Tests\Services\RequestAsserter:
-        public: true
-        arguments:
-            $usersSecurityBundleBaseUrl: '%users_security_bundle_base_url%'
 
     App\Tests\Services\DirectoryLister:
         public: true
