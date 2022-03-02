@@ -9,12 +9,14 @@ use App\Enum\Source\Type;
 use App\Repository\SourceRepository;
 use App\Request\FileSourceRequest;
 use App\Request\GitSourceRequest;
-use App\Request\InvalidSourceTypeRequest;
 use App\Request\SourceRequestInterface;
+use App\Tests\DataProvider\CreateSourceInvalidRequestDataProviderTrait;
 use App\Tests\Services\EntityRemover;
 
 class CreateSourceTest extends AbstractIntegrationTest
 {
+    use CreateSourceInvalidRequestDataProviderTrait;
+
     private SourceRepository $sourceRepository;
 
     protected function setUp(): void
@@ -39,7 +41,7 @@ class CreateSourceTest extends AbstractIntegrationTest
     }
 
     /**
-     * @dataProvider createInvalidRequestDataProvider
+     * @dataProvider createSourceInvalidRequestDataProvider
      *
      * @param array<string, string> $requestParameters
      * @param array<string, string> $expectedResponseData
@@ -49,47 +51,6 @@ class CreateSourceTest extends AbstractIntegrationTest
         $response = $this->client->makeCreateSourceRequest($this->validToken, $requestParameters);
 
         $this->responseAsserter->assertInvalidRequestJsonResponse($response, $expectedResponseData);
-    }
-
-    /**
-     * @return array<mixed>
-     */
-    public function createInvalidRequestDataProvider(): array
-    {
-        return [
-            'invalid source type' => [
-                'requestParameters' => [
-                    SourceRequestInterface::PARAMETER_TYPE => 'invalid',
-                ],
-                'expectedResponseData' => [
-                    'error' => [
-                        'type' => 'invalid_request',
-                        'payload' => [
-                            'type' => [
-                                'value' => 'invalid',
-                                'message' => InvalidSourceTypeRequest::ERROR_MESSAGE,
-                            ],
-                        ],
-                    ],
-                ],
-            ],
-            'git source missing host url' => [
-                'requestParameters' => [
-                    SourceRequestInterface::PARAMETER_TYPE => Type::GIT->value,
-                ],
-                'expectedResponseData' => [
-                    'error' => [
-                        'type' => 'invalid_request',
-                        'payload' => [
-                            'host-url' => [
-                                'value' => '',
-                                'message' => 'This value should not be blank.',
-                            ],
-                        ],
-                    ],
-                ],
-            ],
-        ];
     }
 
     /**
