@@ -20,7 +20,6 @@ use App\Tests\DataProvider\GetSourceSuccessDataProviderTrait;
 use App\Tests\DataProvider\TestConstants;
 use App\Tests\DataProvider\UpdateSourceInvalidRequestDataProviderTrait;
 use App\Tests\DataProvider\UpdateSourceSuccessDataProviderTrait;
-use App\Tests\Model\UserId;
 use App\Tests\Services\EntityRemover;
 use App\Tests\Services\FileStoreFixtureCreator;
 use League\Flysystem\FilesystemOperator;
@@ -85,16 +84,6 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
         $this->responseAsserter->assertNotFoundResponse($response);
     }
 
-    public function testGetInvalidSourceUser(): void
-    {
-        $source = new FileSource(UserId::create(), '');
-        $this->store->add($source);
-
-        $response = $this->applicationClient->makeGetSourceRequest($this->validToken, $source->getId());
-
-        $this->responseAsserter->assertForbiddenResponse($response);
-    }
-
     /**
      * @dataProvider getSourceSuccessDataProvider
      *
@@ -110,16 +99,6 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
         $expectedResponseData = $this->sourceUserIdMutator->setSourceDataUserId($expectedResponseData);
 
         $this->responseAsserter->assertSuccessfulJsonResponse($response, $expectedResponseData);
-    }
-
-    public function testUpdateInvalidSourceUser(): void
-    {
-        $source = new FileSource(UserId::create(), '');
-        $this->store->add($source);
-
-        $response = $this->applicationClient->makeUpdateSourceRequest($this->validToken, $source->getId(), []);
-
-        $this->responseAsserter->assertForbiddenResponse($response);
     }
 
     /**
@@ -162,16 +141,6 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
         $expectedResponseData = $this->sourceUserIdMutator->setSourceDataUserId($expectedResponseData);
 
         $this->responseAsserter->assertSuccessfulJsonResponse($response, $expectedResponseData);
-    }
-
-    public function testDeleteInvalidSourceUser(): void
-    {
-        $source = new FileSource(UserId::create(), '');
-        $this->store->add($source);
-
-        $response = $this->applicationClient->makeDeleteSourceRequest($this->validToken, $source->getId());
-
-        $this->responseAsserter->assertForbiddenResponse($response);
     }
 
     /**
@@ -234,16 +203,6 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
 
         self::assertFalse($this->fileSourceStorage->directoryExists($sourceRelativePath));
         self::assertFalse($this->fileSourceStorage->fileExists($fileRelativePath));
-    }
-
-    public function testPrepareInvalidSourceUser(): void
-    {
-        $source = new FileSource(UserId::create(), '');
-        $this->store->add($source);
-
-        $response = $this->applicationClient->makePrepareSourceRequest($this->validToken, $source->getId(), []);
-
-        $this->responseAsserter->assertForbiddenResponse($response);
     }
 
     public function testPrepareRunSource(): void
