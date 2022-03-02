@@ -8,20 +8,13 @@ use App\Entity\FileSource;
 use App\Entity\GitSource;
 use App\Entity\RunSource;
 use App\Entity\SourceInterface;
-use App\Repository\SourceRepository;
 use App\Services\Source\Store;
-use App\Tests\DataProvider\CreateSourceInvalidRequestDataProviderTrait;
-use App\Tests\DataProvider\CreateSourceSuccessDataProviderTrait;
 use App\Tests\DataProvider\TestConstants;
 use App\Tests\Model\UserId;
 use App\Tests\Services\EntityRemover;
 
 class SourceControllerTest extends AbstractSourceControllerTest
 {
-    use CreateSourceInvalidRequestDataProviderTrait;
-    use CreateSourceSuccessDataProviderTrait;
-
-    private SourceRepository $sourceRepository;
     private Store $store;
 
     protected function setUp(): void
@@ -32,50 +25,10 @@ class SourceControllerTest extends AbstractSourceControllerTest
         \assert($store instanceof Store);
         $this->store = $store;
 
-        $sourceRepository = self::getContainer()->get(SourceRepository::class);
-        \assert($sourceRepository instanceof SourceRepository);
-        $this->sourceRepository = $sourceRepository;
-
         $entityRemover = self::getContainer()->get(EntityRemover::class);
         if ($entityRemover instanceof EntityRemover) {
             $entityRemover->removeAll();
         }
-    }
-
-    /**
-     * @dataProvider createSourceInvalidRequestDataProvider
-     *
-     * @param array<string, string> $requestParameters
-     * @param array<string, string> $expectedResponseData
-     */
-    public function testCreateInvalidSourceRequest(array $requestParameters, array $expectedResponseData): void
-    {
-        $response = $this->applicationClient->makeCreateSourceRequest($this->validToken, $requestParameters);
-
-        $this->responseAsserter->assertInvalidRequestJsonResponse($response, $expectedResponseData);
-    }
-
-    /**
-     * @dataProvider createSourceSuccessDataProvider
-     *
-     * @param array<string, string> $requestParameters
-     * @param array<mixed>          $expected
-     */
-    public function testCreateSuccess(array $requestParameters, array $expected): void
-    {
-        $response = $this->applicationClient->makeCreateSourceRequest($this->validToken, $requestParameters);
-
-        $sources = $this->sourceRepository->findAll();
-        self::assertIsArray($sources);
-        self::assertCount(1, $sources);
-
-        $source = $sources[0];
-        self::assertInstanceOf(SourceInterface::class, $source);
-
-        $expected['id'] = $source->getId();
-        $expected['user_id'] = $this->authenticationConfiguration->authenticatedUserId;
-
-        $this->responseAsserter->assertSuccessfulJsonResponse($response, $expected);
     }
 
     /**
