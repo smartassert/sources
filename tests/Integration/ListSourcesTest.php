@@ -24,7 +24,7 @@ class ListSourcesTest extends AbstractIntegrationTest
 
     public function testListUnauthorizedUser(): void
     {
-        $response = $this->client->makeListSourcesRequest($this->invalidToken);
+        $response = $this->applicationClient->makeListSourcesRequest($this->invalidToken);
 
         $this->responseAsserter->assertUnauthorizedResponse($response);
     }
@@ -33,7 +33,7 @@ class ListSourcesTest extends AbstractIntegrationTest
     {
         $sourceIds = [];
 
-        $createResponse = $this->client->makeCreateSourceRequest($this->validToken, [
+        $createResponse = $this->applicationClient->makeCreateSourceRequest($this->validToken, [
             SourceRequestInterface::PARAMETER_TYPE => Type::GIT->value,
             GitSourceRequest::PARAMETER_HOST_URL => 'http://example.com/repository.git',
             GitSourceRequest::PARAMETER_PATH => '/without-credentials-path'
@@ -43,7 +43,7 @@ class ListSourcesTest extends AbstractIntegrationTest
         $sourceIds[] = is_array($createResponseData) ? $createResponseData['id'] ?? null : null;
 
         $credentials = md5((string) rand());
-        $createResponse = $this->client->makeCreateSourceRequest($this->validToken, [
+        $createResponse = $this->applicationClient->makeCreateSourceRequest($this->validToken, [
             SourceRequestInterface::PARAMETER_TYPE => Type::GIT->value,
             GitSourceRequest::PARAMETER_HOST_URL => 'http://example.com/repository-with-credentials.git',
             GitSourceRequest::PARAMETER_PATH => '/with-credentials-path',
@@ -54,7 +54,7 @@ class ListSourcesTest extends AbstractIntegrationTest
         $sourceIds[] = is_array($createResponseData) ? $createResponseData['id'] ?? null : null;
 
         $label = 'file source label';
-        $createResponse = $this->client->makeCreateSourceRequest($this->validToken, [
+        $createResponse = $this->applicationClient->makeCreateSourceRequest($this->validToken, [
             SourceRequestInterface::PARAMETER_TYPE => Type::FILE->value,
             FileSourceRequest::PARAMETER_LABEL => $label
         ]);
@@ -62,7 +62,7 @@ class ListSourcesTest extends AbstractIntegrationTest
         $createResponseData = json_decode($createResponse->getBody()->getContents(), true);
         $sourceIds[] = is_array($createResponseData) ? $createResponseData['id'] ?? null : null;
 
-        $listResponse = $this->client->makeListSourcesRequest(
+        $listResponse = $this->applicationClient->makeListSourcesRequest(
             $this->validToken
         );
 

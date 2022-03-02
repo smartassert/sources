@@ -33,7 +33,7 @@ class CreateSourceTest extends AbstractIntegrationTest
 
     public function testCreateUnauthorizedUser(): void
     {
-        $response = $this->client->makeCreateSourceRequest($this->invalidToken, []);
+        $response = $this->applicationClient->makeCreateSourceRequest($this->invalidToken, []);
 
         $this->responseAsserter->assertUnauthorizedResponse($response);
     }
@@ -46,7 +46,7 @@ class CreateSourceTest extends AbstractIntegrationTest
      */
     public function testCreateInvalidSourceRequest(array $requestParameters, array $expectedResponseData): void
     {
-        $response = $this->client->makeCreateSourceRequest($this->validToken, $requestParameters);
+        $response = $this->applicationClient->makeCreateSourceRequest($this->validToken, $requestParameters);
 
         $this->responseAsserter->assertInvalidRequestJsonResponse($response, $expectedResponseData);
     }
@@ -59,7 +59,7 @@ class CreateSourceTest extends AbstractIntegrationTest
      */
     public function testCreateSuccess(array $requestParameters, array $expected): void
     {
-        $response = $this->client->makeCreateSourceRequest($this->validToken, $requestParameters);
+        $response = $this->applicationClient->makeCreateSourceRequest($this->validToken, $requestParameters);
 
         $sources = $this->sourceRepository->findAll();
         self::assertIsArray($sources);

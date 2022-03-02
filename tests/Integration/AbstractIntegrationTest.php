@@ -12,7 +12,7 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 abstract class AbstractIntegrationTest extends WebTestCase
 {
-    protected Client $client;
+    protected Client $applicationClient;
     protected ResponseAsserter $responseAsserter;
     protected AuthenticationConfiguration $authenticationConfiguration;
     protected SourceUserIdMutator $sourceUserIdMutator;
@@ -34,7 +34,7 @@ abstract class AbstractIntegrationTest extends WebTestCase
 
         $application = self::getContainer()->get('app.tests.services.application.client.integration');
         \assert($application instanceof Client);
-        $this->client = $application;
+        $this->applicationClient = $application;
 
         $responseAsserter = self::getContainer()->get(ResponseAsserter::class);
         \assert($responseAsserter instanceof ResponseAsserter);
