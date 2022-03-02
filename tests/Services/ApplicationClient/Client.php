@@ -5,12 +5,13 @@ declare(strict_types=1);
 namespace App\Tests\Services\ApplicationClient;
 
 use Psr\Http\Message\ResponseInterface;
+use Symfony\Component\Routing\RouterInterface;
 
 class Client
 {
     public function __construct(
         private AdapterInterface $client,
-        private Routes $routes,
+        private RouterInterface $router,
     ) {
     }
 
@@ -22,7 +23,7 @@ class Client
     ): ResponseInterface {
         return $this->client->makeRequest(
             'POST',
-            $this->createUrl($this->routes->addFileUrl, [
+            $this->router->generate('file_source_file_add', [
                 'sourceId' => $sourceId,
                 'filename' => $filename,
             ]),
@@ -40,7 +41,7 @@ class Client
     ): ResponseInterface {
         return $this->client->makeRequest(
             'GET',
-            $this->createUrl($this->routes->readFileUrl, [
+            $this->router->generate('file_source_file_read', [
                 'sourceId' => $sourceId,
                 'filename' => $filename,
             ]),
@@ -57,7 +58,7 @@ class Client
     ): ResponseInterface {
         return $this->client->makeRequest(
             'DELETE',
-            $this->createUrl($this->routes->removeFileUrl, [
+            $this->router->generate('file_source_file_remove', [
                 'sourceId' => $sourceId,
                 'filename' => $filename,
             ]),
@@ -74,7 +75,7 @@ class Client
     {
         return $this->client->makeRequest(
             'POST',
-            $this->createUrl($this->routes->createSourceUrl),
+            $this->router->generate('source_create'),
             [
                 'authorization' => 'Bearer ' . $authenticationToken,
                 'content-type' => 'application/x-www-form-urlencoded',
@@ -87,7 +88,7 @@ class Client
     {
         return $this->client->makeRequest(
             'GET',
-            $this->createUrl($this->routes->listSourcesUrl),
+            $this->router->generate('source_list'),
             [
                 'authorization' => 'Bearer ' . $authenticationToken,
             ]
@@ -98,7 +99,7 @@ class Client
     {
         return $this->client->makeRequest(
             'GET',
-            $this->createUrl($this->routes->getSourceUrl, ['sourceId' => $sourceId]),
+            $this->router->generate('user_source_get', ['sourceId' => $sourceId]),
             [
                 'authorization' => 'Bearer ' . $authenticationToken,
             ]
@@ -115,7 +116,7 @@ class Client
     ): ResponseInterface {
         return $this->client->makeRequest(
             'PUT',
-            $this->createUrl($this->routes->updateSourceUrl, ['sourceId' => $sourceId]),
+            $this->router->generate('user_source_update', ['sourceId' => $sourceId]),
             [
                 'authorization' => 'Bearer ' . $authenticationToken,
                 'content-type' => 'application/x-www-form-urlencoded',
@@ -128,7 +129,7 @@ class Client
     {
         return $this->client->makeRequest(
             'DELETE',
-            $this->createUrl($this->routes->deleteSourceUrl, ['sourceId' => $sourceId]),
+            $this->router->generate('user_source_delete', ['sourceId' => $sourceId]),
             [
                 'authorization' => 'Bearer ' . $authenticationToken,
             ]
@@ -145,7 +146,7 @@ class Client
     ): ResponseInterface {
         return $this->client->makeRequest(
             'POST',
-            $this->createUrl($this->routes->prepareSourceUrl, ['sourceId' => $sourceId]),
+            $this->router->generate('user_source_prepare', ['sourceId' => $sourceId]),
             [
                 'authorization' => 'Bearer ' . $authenticationToken,
                 'content-type' => 'application/x-www-form-urlencoded',
@@ -158,24 +159,10 @@ class Client
     {
         return $this->client->makeRequest(
             'GET',
-            $this->createUrl($this->routes->readSourceUrl, ['sourceId' => $sourceId]),
+            $this->router->generate('user_source_read', ['sourceId' => $sourceId]),
             [
                 'authorization' => 'Bearer ' . $authenticationToken,
             ]
         );
-    }
-
-    /**
-     * @param array<string, string> $parameters
-     */
-    private function createUrl(string $template, array $parameters = []): string
-    {
-        $url = $template;
-
-        foreach ($parameters as $key => $value) {
-            $url = str_replace('{{ ' . $key . ' }}', $value, $url);
-        }
-
-        return $url;
     }
 }
