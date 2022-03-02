@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Functional\Controller;
+namespace App\Tests\Application;
 
 use App\Entity\FileSource;
 use App\Entity\GitSource;
@@ -12,10 +12,12 @@ use App\Services\Source\Store;
 use App\Tests\DataProvider\TestConstants;
 use App\Tests\Model\UserId;
 use App\Tests\Services\EntityRemover;
+use App\Tests\Services\SourceUserIdMutator;
 
-class SourceControllerTest extends AbstractSourceControllerTest
+abstract class AbstractListSourcesTest extends AbstractApplicationTest
 {
     private Store $store;
+    private SourceUserIdMutator $sourceUserIdMutator;
 
     protected function setUp(): void
     {
@@ -24,6 +26,10 @@ class SourceControllerTest extends AbstractSourceControllerTest
         $store = self::getContainer()->get(Store::class);
         \assert($store instanceof Store);
         $this->store = $store;
+
+        $sourceUserIdMutator = self::getContainer()->get(SourceUserIdMutator::class);
+        \assert($sourceUserIdMutator instanceof SourceUserIdMutator);
+        $this->sourceUserIdMutator = $sourceUserIdMutator;
 
         $entityRemover = self::getContainer()->get(EntityRemover::class);
         if ($entityRemover instanceof EntityRemover) {
@@ -44,7 +50,7 @@ class SourceControllerTest extends AbstractSourceControllerTest
             $this->store->add($source);
         }
 
-        $response = $this->applicationClient->makeListSourcesRequest($this->validToken);
+        $response = $this->applicationClient->makeListSourcesRequest($this->authenticationConfiguration->validToken);
 
         $expectedResponseData = $this->sourceUserIdMutator->setSourceDataCollectionUserId($expectedResponseData);
 
