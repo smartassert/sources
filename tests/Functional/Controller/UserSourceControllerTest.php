@@ -10,11 +10,9 @@ use App\Entity\RunSource;
 use App\Entity\SourceInterface;
 use App\Enum\RunSource\State;
 use App\Enum\Source\Type;
-use App\Model\EntityId;
 use App\Repository\RunSourceRepository;
 use App\Services\RunSourceSerializer;
 use App\Services\Source\Store;
-use App\Tests\DataProvider\GetSourceSuccessDataProviderTrait;
 use App\Tests\DataProvider\TestConstants;
 use App\Tests\DataProvider\UpdateSourceInvalidRequestDataProviderTrait;
 use App\Tests\DataProvider\UpdateSourceSuccessDataProviderTrait;
@@ -24,7 +22,6 @@ use League\Flysystem\FilesystemOperator;
 
 class UserSourceControllerTest extends AbstractSourceControllerTest
 {
-    use GetSourceSuccessDataProviderTrait;
     use UpdateSourceInvalidRequestDataProviderTrait;
     use UpdateSourceSuccessDataProviderTrait;
 
@@ -62,30 +59,6 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
         if ($entityRemover instanceof EntityRemover) {
             $entityRemover->removeAll();
         }
-    }
-
-    public function testGetSourceNotFound(): void
-    {
-        $response = $this->applicationClient->makeGetSourceRequest($this->validToken, EntityId::create());
-
-        $this->responseAsserter->assertNotFoundResponse($response);
-    }
-
-    /**
-     * @dataProvider getSourceSuccessDataProvider
-     *
-     * @param array<mixed> $expectedResponseData
-     */
-    public function testGetSuccess(SourceInterface $source, array $expectedResponseData): void
-    {
-        $source = $this->sourceUserIdMutator->setSourceUserId($source);
-        $this->store->add($source);
-
-        $response = $this->applicationClient->makeGetSourceRequest($this->validToken, $source->getId());
-
-        $expectedResponseData = $this->sourceUserIdMutator->setSourceDataUserId($expectedResponseData);
-
-        $this->responseAsserter->assertSuccessfulJsonResponse($response, $expectedResponseData);
     }
 
     /**
