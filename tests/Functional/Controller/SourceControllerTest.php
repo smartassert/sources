@@ -8,23 +8,21 @@ use App\Entity\FileSource;
 use App\Entity\GitSource;
 use App\Entity\RunSource;
 use App\Entity\SourceInterface;
-use App\Enum\Source\Type;
 use App\Repository\SourceRepository;
-use App\Request\FileSourceRequest;
-use App\Request\GitSourceRequest;
-use App\Request\InvalidSourceTypeRequest;
-use App\Request\SourceRequestInterface;
 use App\Services\Source\Store;
+use App\Tests\DataProvider\CreateSourceInvalidRequestDataProviderTrait;
+use App\Tests\DataProvider\CreateSourceSuccessDataProviderTrait;
+use App\Tests\DataProvider\TestConstants;
 use App\Tests\Model\UserId;
-use App\Tests\Services\AuthorizationRequestAsserter;
 use App\Tests\Services\EntityRemover;
-use Symfony\Component\HttpFoundation\JsonResponse;
 
 class SourceControllerTest extends AbstractSourceControllerTest
 {
+    use CreateSourceInvalidRequestDataProviderTrait;
+    use CreateSourceSuccessDataProviderTrait;
+
     private SourceRepository $sourceRepository;
     private Store $store;
-    private AuthorizationRequestAsserter $authorizationRequestAsserter;
 
     protected function setUp(): void
     {
@@ -38,10 +36,6 @@ class SourceControllerTest extends AbstractSourceControllerTest
         \assert($sourceRepository instanceof SourceRepository);
         $this->sourceRepository = $sourceRepository;
 
-        $authorizationRequestAsserter = self::getContainer()->get(AuthorizationRequestAsserter::class);
-        \assert($authorizationRequestAsserter instanceof AuthorizationRequestAsserter);
-        $this->authorizationRequestAsserter = $authorizationRequestAsserter;
-
         $entityRemover = self::getContainer()->get(EntityRemover::class);
         if ($entityRemover instanceof EntityRemover) {
             $entityRemover->removeAll();
@@ -50,94 +44,34 @@ class SourceControllerTest extends AbstractSourceControllerTest
 
     public function testCreateUnauthorizedUser(): void
     {
-        $response = $this->applicationClient->makeUnauthorizedRequest('POST', $this->generateUrl('source_create'));
+        $response = $this->application->makeCreateSourceRequest($this->invalidToken, []);
 
-        self::assertSame(401, $response->getStatusCode());
-        $this->authorizationRequestAsserter->assertAuthorizationRequestIsMade(
-            $this->authenticationConfiguration->invalidToken
-        );
+        $this->responseAsserter->assertUnauthorizedResponse($response);
+        $this->requestAsserter->assertAuthorizationRequestIsMade($this->invalidToken);
     }
 
     /**
-     * @dataProvider createInvalidRequestDataProvider
+     * @dataProvider createSourceInvalidRequestDataProvider
      *
      * @param array<string, string> $requestParameters
      * @param array<string, string> $expectedResponseData
      */
     public function testCreateInvalidSourceRequest(array $requestParameters, array $expectedResponseData): void
     {
-        $response = $this->applicationClient->makeAuthorizedRequest(
-            'POST',
-            $this->generateUrl('source_create'),
-            $requestParameters
-        );
+        $response = $this->application->makeCreateSourceRequest($this->validToken, $requestParameters);
 
-        self::assertSame(400, $response->getStatusCode());
-        self::assertInstanceOf(JsonResponse::class, $response);
-
-        self::assertSame(
-            $expectedResponseData,
-            json_decode((string) $response->getContent(), true)
-        );
+        $this->responseAsserter->assertInvalidRequestJsonResponse($response, $expectedResponseData);
     }
 
     /**
-     * @return array<mixed>
-     */
-    public function createInvalidRequestDataProvider(): array
-    {
-        return [
-            'invalid source type' => [
-                'requestParameters' => [
-                    SourceRequestInterface::PARAMETER_TYPE => 'invalid',
-                ],
-                'expectedResponseData' => [
-                    'error' => [
-                        'type' => 'invalid_request',
-                        'payload' => [
-                            'type' => [
-                                'value' => 'invalid',
-                                'message' => InvalidSourceTypeRequest::ERROR_MESSAGE,
-                            ],
-                        ],
-                    ],
-                ],
-            ],
-            'git source missing host url' => [
-                'requestParameters' => [
-                    SourceRequestInterface::PARAMETER_TYPE => Type::GIT->value,
-                ],
-                'expectedResponseData' => [
-                    'error' => [
-                        'type' => 'invalid_request',
-                        'payload' => [
-                            'host-url' => [
-                                'value' => '',
-                                'message' => 'This value should not be blank.',
-                            ],
-                        ],
-                    ],
-                ],
-            ],
-        ];
-    }
-
-    /**
-     * @dataProvider createSuccessDataProvider
+     * @dataProvider createSourceSuccessDataProvider
      *
      * @param array<string, string> $requestParameters
      * @param array<mixed>          $expected
      */
     public function testCreateSuccess(array $requestParameters, array $expected): void
     {
-        $response = $this->applicationClient->makeAuthorizedRequest(
-            'POST',
-            $this->generateUrl('source_create'),
-            $requestParameters
-        );
-
-        self::assertSame(200, $response->getStatusCode());
-        $this->authorizationRequestAsserter->assertAuthorizationRequestIsMade();
+        $response = $this->application->makeCreateSourceRequest($this->validToken, $requestParameters);
 
         $sources = $this->sourceRepository->findAll();
         self::assertIsArray($sources);
@@ -148,71 +82,17 @@ class SourceControllerTest extends AbstractSourceControllerTest
 
         $expected['id'] = $source->getId();
         $expected['user_id'] = $this->authenticationConfiguration->authenticatedUserId;
-        self::assertEquals($expected, json_decode((string) $response->getContent(), true));
-    }
 
-    /**
-     * @return array<mixed>
-     */
-    public function createSuccessDataProvider(): array
-    {
-        $hostUrl = 'https://example.com/repository.git';
-        $path = '/';
-        $credentials = md5((string) rand());
-        $label = 'file source label';
-
-        return [
-            'git source, credentials missing' => [
-                'requestParameters' => [
-                    SourceRequestInterface::PARAMETER_TYPE => Type::GIT->value,
-                    GitSourceRequest::PARAMETER_HOST_URL => $hostUrl,
-                    GitSourceRequest::PARAMETER_PATH => $path
-                ],
-                'expected' => [
-                    'user_id' => self::AUTHENTICATED_USER_ID_PLACEHOLDER,
-                    'type' => Type::GIT->value,
-                    'host_url' => $hostUrl,
-                    'path' => $path,
-                    'has_credentials' => false,
-                ],
-            ],
-            'git source, credentials present' => [
-                'requestParameters' => [
-                    SourceRequestInterface::PARAMETER_TYPE => Type::GIT->value,
-                    GitSourceRequest::PARAMETER_HOST_URL => $hostUrl,
-                    GitSourceRequest::PARAMETER_PATH => $path,
-                    GitSourceRequest::PARAMETER_CREDENTIALS => $credentials,
-                ],
-                'expected' => [
-                    'user_id' => self::AUTHENTICATED_USER_ID_PLACEHOLDER,
-                    'type' => Type::GIT->value,
-                    'host_url' => $hostUrl,
-                    'path' => $path,
-                    'has_credentials' => true,
-                ],
-            ],
-            'file source' => [
-                'requestParameters' => [
-                    SourceRequestInterface::PARAMETER_TYPE => Type::FILE->value,
-                    FileSourceRequest::PARAMETER_LABEL => $label
-                ],
-                'expected' => [
-                    'user_id' => self::AUTHENTICATED_USER_ID_PLACEHOLDER,
-                    'type' => Type::FILE->value,
-                    'label' => $label,
-                ],
-            ],
-        ];
+        $this->responseAsserter->assertSuccessfulJsonResponse($response, $expected);
+        $this->requestAsserter->assertAuthorizationRequestIsMade();
     }
 
     public function testListUnauthorizedUser(): void
     {
-        $response = $this->applicationClient->makeUnauthorizedRequest('GET', $this->generateUrl('source_list'));
+        $response = $this->application->makeListSourcesRequest($this->invalidToken);
 
-        self::assertSame(401, $response->getStatusCode());
-        $this->authorizationRequestAsserter->assertAuthorizationRequestIsMade(
-            $this->authenticationConfiguration->invalidToken
-        );
+        $this->responseAsserter->assertUnauthorizedResponse($response);
+        $this->requestAsserter->assertAuthorizationRequestIsMade($this->invalidToken);
     }
 
     /**
@@ -224,23 +104,16 @@ class SourceControllerTest extends AbstractSourceControllerTest
     public function testListSuccess(array $sources, array $expectedResponseData): void
     {
         foreach ($sources as $source) {
-            $source = $this->setSourceUserIdToAuthenticatedUserId($source);
+            $source = $this->sourceUserIdMutator->setSourceUserId($source);
             $this->store->add($source);
         }
 
-        $response = $this->applicationClient->makeAuthorizedRequest(
-            'GET',
-            $this->generateUrl('source_list')
-        );
+        $response = $this->application->makeListSourcesRequest($this->validToken);
 
-        self::assertSame(200, $response->getStatusCode());
-        $this->authorizationRequestAsserter->assertAuthorizationRequestIsMade();
-        self::assertInstanceOf(JsonResponse::class, $response);
+        $expectedResponseData = $this->sourceUserIdMutator->setSourceDataCollectionUserId($expectedResponseData);
 
-        $expectedResponseData = $this->replaceAuthenticatedUserIdInSourceDataCollection($expectedResponseData);
-
-        $responseData = json_decode((string) $response->getContent(), true);
-        self::assertEquals($expectedResponseData, $responseData);
+        $this->responseAsserter->assertSuccessfulJsonResponse($response, $expectedResponseData);
+        $this->requestAsserter->assertAuthorizationRequestIsMade();
     }
 
     /**
@@ -249,11 +122,11 @@ class SourceControllerTest extends AbstractSourceControllerTest
     public function listSuccessDataProvider(): array
     {
         $userFileSources = [
-            new FileSource(self::AUTHENTICATED_USER_ID_PLACEHOLDER, 'file source label'),
+            new FileSource(TestConstants::AUTHENTICATED_USER_ID_PLACEHOLDER, 'file source label'),
         ];
 
         $userGitSources = [
-            new GitSource(self::AUTHENTICATED_USER_ID_PLACEHOLDER, 'https://example.com/repository.git'),
+            new GitSource(TestConstants::AUTHENTICATED_USER_ID_PLACEHOLDER, 'https://example.com/repository.git'),
         ];
 
         $userRunSources = [

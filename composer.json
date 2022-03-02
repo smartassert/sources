@@ -49,6 +49,7 @@
         "symfony/expression-language": "6.0.*",
         "symfony/maker-bundle": "^1.36",
         "symfony/phpunit-bridge": "^6.0",
+        "symfony/psr-http-message-bridge": "^2.1",
         "webignition/http-history-container": "^2.5",
         "webignition/object-reflector": "^1.0"
     },
@@ -126,6 +127,7 @@
         "integration-pull": "docker-compose -f tests/build/docker-compose.yml pull",
         "integration-up": "docker-compose -f tests/build/docker-compose.yml  up -d --build",
         "integration-status": "docker-compose -f tests/build/docker-compose.yml ps",
+        "integration-logs": "docker-compose -f tests/build/docker-compose.yml logs",
         "integration-teardown": "@functional-teardown",
         "integration-setup": [
             "@integration-build",

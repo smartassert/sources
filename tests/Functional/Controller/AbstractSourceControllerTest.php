@@ -4,21 +4,23 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\Controller;
 
-use App\Entity\AbstractSource;
-use App\Entity\SourceInterface;
-use App\Tests\Services\ApplicationClient;
+use App\Tests\Services\ApplicationClient\Client;
+use App\Tests\Services\ApplicationClient\SymfonyAdapter;
 use App\Tests\Services\AuthenticationConfiguration;
+use App\Tests\Services\RequestAsserter;
+use App\Tests\Services\ResponseAsserter;
+use App\Tests\Services\SourceUserIdMutator;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-use Symfony\Component\Routing\RouterInterface;
-use webignition\ObjectReflector\ObjectReflector;
 
 abstract class AbstractSourceControllerTest extends WebTestCase
 {
-    protected const AUTHENTICATED_USER_ID_PLACEHOLDER = '{{ authenticated_user_id }}';
-
-    protected ApplicationClient $applicationClient;
+    protected RequestAsserter $requestAsserter;
+    protected ResponseAsserter $responseAsserter;
     protected AuthenticationConfiguration $authenticationConfiguration;
-    private RouterInterface $router;
+    protected SourceUserIdMutator $sourceUserIdMutator;
+    protected string $validToken;
+    protected string $invalidToken;
+    protected Client $application;
 
     protected function setUp(): void
     {
@@ -26,70 +28,32 @@ abstract class AbstractSourceControllerTest extends WebTestCase
 
         $client = static::createClient();
 
-        $applicationClient = self::getContainer()->get(ApplicationClient::class);
-        \assert($applicationClient instanceof ApplicationClient);
-        $this->applicationClient = $applicationClient;
-        $applicationClient->setClient($client);
+        $application = self::getContainer()->get('app.tests.services.application.client.functional');
+        \assert($application instanceof Client);
 
-        $router = self::getContainer()->get(RouterInterface::class);
-        \assert($router instanceof RouterInterface);
-        $this->router = $router;
+        $symfonyClient = self::getContainer()->get(SymfonyAdapter::class);
+        \assert($symfonyClient instanceof SymfonyAdapter);
+        $symfonyClient->setKernelBrowser($client);
+
+        $this->application = $application;
+
+        $requestAsserter = self::getContainer()->get(RequestAsserter::class);
+        \assert($requestAsserter instanceof RequestAsserter);
+        $this->requestAsserter = $requestAsserter;
+
+        $responseAsserter = self::getContainer()->get(ResponseAsserter::class);
+        \assert($responseAsserter instanceof ResponseAsserter);
+        $this->responseAsserter = $responseAsserter;
+
+        $sourceUserIdMutator = self::getContainer()->get(SourceUserIdMutator::class);
+        \assert($sourceUserIdMutator instanceof SourceUserIdMutator);
+        $this->sourceUserIdMutator = $sourceUserIdMutator;
 
         $authenticationConfiguration = self::getContainer()->get(AuthenticationConfiguration::class);
         \assert($authenticationConfiguration instanceof AuthenticationConfiguration);
         $this->authenticationConfiguration = $authenticationConfiguration;
-    }
 
-    /**
-     * @param array<string, int|string> $routeParameters
-     */
-    protected function generateUrl(string $routeName, array $routeParameters = []): string
-    {
-        return $this->router->generate($routeName, $routeParameters);
-    }
-
-    protected function setSourceUserIdToAuthenticatedUserId(SourceInterface $source): SourceInterface
-    {
-        if ($source instanceof AbstractSource && self::AUTHENTICATED_USER_ID_PLACEHOLDER == $source->getUserId()) {
-            ObjectReflector::setProperty(
-                $source,
-                AbstractSource::class,
-                'userId',
-                $this->authenticationConfiguration->authenticatedUserId
-            );
-        }
-
-        return $source;
-    }
-
-    /**
-     * @param array<int, array<mixed>> $sourceDataCollection
-     *
-     * @return array<int, array<mixed>>
-     */
-    protected function replaceAuthenticatedUserIdInSourceDataCollection(array $sourceDataCollection): array
-    {
-        foreach ($sourceDataCollection as $sourceIndex => $sourceData) {
-            $sourceDataCollection[$sourceIndex] = $this->replaceAuthenticatedUserIdInSourceData($sourceData);
-        }
-
-        return $sourceDataCollection;
-    }
-
-    /**
-     * @param array<mixed> $sourceData
-     *
-     * @return array<mixed>
-     */
-    protected function replaceAuthenticatedUserIdInSourceData(array $sourceData): array
-    {
-        if (
-            array_key_exists('user_id', $sourceData)
-            && self::AUTHENTICATED_USER_ID_PLACEHOLDER == $sourceData['user_id']
-        ) {
-            $sourceData['user_id'] = $this->authenticationConfiguration->authenticatedUserId;
-        }
-
-        return $sourceData;
+        $this->validToken = $authenticationConfiguration->validToken;
+        $this->invalidToken = $authenticationConfiguration->invalidToken;
     }
 }
