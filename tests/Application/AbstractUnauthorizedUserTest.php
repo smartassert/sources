@@ -61,4 +61,56 @@ abstract class AbstractUnauthorizedUserTest extends AbstractApplicationTest
 
         $this->responseAsserter->assertUnauthorizedResponse($response);
     }
+
+    public function testGetSourceUnauthorizedUser(): void
+    {
+        $response = $this->applicationClient->makeGetSourceRequest(
+            $this->authenticationConfiguration->invalidToken,
+            EntityId::create()
+        );
+
+        $this->responseAsserter->assertUnauthorizedResponse($response);
+    }
+
+    public function testUpdateSourceUnauthorizedUser(): void
+    {
+        $response = $this->applicationClient->makeUpdateSourceRequest(
+            $this->authenticationConfiguration->invalidToken,
+            EntityId::create(),
+            []
+        );
+
+        $this->responseAsserter->assertUnauthorizedResponse($response);
+    }
+
+    public function testDeleteSourceUnauthorizedUser(): void
+    {
+        $response = $this->applicationClient->makeDeleteSourceRequest(
+            $this->authenticationConfiguration->invalidToken,
+            EntityId::create()
+        );
+
+        $this->responseAsserter->assertUnauthorizedResponse($response);
+    }
+
+    public function testPrepareSourceUnauthorizedUser(): void
+    {
+        $response = $this->applicationClient->makePrepareSourceRequest(
+            $this->authenticationConfiguration->invalidToken,
+            EntityId::create(),
+            []
+        );
+
+        $this->responseAsserter->assertUnauthorizedResponse($response);
+    }
+
+    public function testReadSourceUnauthorizedUser(): void
+    {
+        $response = $this->applicationClient->makeReadSourceRequest(
+            $this->authenticationConfiguration->invalidToken,
+            EntityId::create()
+        );
+
+        $this->responseAsserter->assertUnauthorizedResponse($response);
+    }
 }

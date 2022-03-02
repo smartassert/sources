@@ -6,7 +6,6 @@ namespace App\Tests\Integration;
 
 use App\Entity\FileSource;
 use App\Entity\SourceInterface;
-use App\Model\EntityId;
 use App\Services\Source\Store;
 use App\Tests\DataProvider\UpdateSourceInvalidRequestDataProviderTrait;
 use App\Tests\DataProvider\UpdateSourceSuccessDataProviderTrait;
@@ -32,13 +31,6 @@ class UpdateSourceTest extends AbstractIntegrationTest
         if ($entityRemover instanceof EntityRemover) {
             $entityRemover->removeAll();
         }
-    }
-
-    public function testUpdateUnauthorizedUser(): void
-    {
-        $response = $this->applicationClient->makeUpdateSourceRequest($this->invalidToken, EntityId::create(), []);
-
-        $this->responseAsserter->assertUnauthorizedResponse($response);
     }
 
     public function testUpdateInvalidSourceUser(): void

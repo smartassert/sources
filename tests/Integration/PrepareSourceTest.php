@@ -8,7 +8,6 @@ use App\Entity\FileSource;
 use App\Entity\RunSource;
 use App\Enum\RunSource\State;
 use App\Enum\Source\Type;
-use App\Model\EntityId;
 use App\Services\Source\Store;
 use App\Tests\Model\UserId;
 use App\Tests\Services\EntityRemover;
@@ -29,13 +28,6 @@ class PrepareSourceTest extends AbstractIntegrationTest
         if ($entityRemover instanceof EntityRemover) {
             $entityRemover->removeAll();
         }
-    }
-
-    public function testPrepareUnauthorizedUser(): void
-    {
-        $response = $this->applicationClient->makePrepareSourceRequest($this->invalidToken, EntityId::create(), []);
-
-        $this->responseAsserter->assertUnauthorizedResponse($response);
     }
 
     public function testPrepareInvalidSourceUser(): void
