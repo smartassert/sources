@@ -40,7 +40,7 @@ class DeleteSourceTest extends AbstractIntegrationTest
 
     public function testDeleteUnauthorizedUser(): void
     {
-        $response = $this->client->makeDeleteSourceRequest($this->invalidToken, EntityId::create());
+        $response = $this->applicationClient->makeDeleteSourceRequest($this->invalidToken, EntityId::create());
 
         $this->responseAsserter->assertUnauthorizedResponse($response);
     }
@@ -50,7 +50,7 @@ class DeleteSourceTest extends AbstractIntegrationTest
         $source = new FileSource(UserId::create(), '');
         $this->store->add($source);
 
-        $response = $this->client->makeDeleteSourceRequest($this->validToken, $source->getId());
+        $response = $this->applicationClient->makeDeleteSourceRequest($this->validToken, $source->getId());
 
         $this->responseAsserter->assertForbiddenResponse($response);
     }
@@ -65,7 +65,7 @@ class DeleteSourceTest extends AbstractIntegrationTest
         $this->store->add($source);
         self::assertGreaterThan(0, $this->sourceRepository->count([]));
 
-        $response = $this->client->makeDeleteSourceRequest($this->validToken, $source->getId());
+        $response = $this->applicationClient->makeDeleteSourceRequest($this->validToken, $source->getId());
 
         $this->responseAsserter->assertSuccessfulResponseWithNoBody($response);
         self::assertSame($expectedRepositoryCount, $this->sourceRepository->count([]));

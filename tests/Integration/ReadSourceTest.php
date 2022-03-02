@@ -33,7 +33,7 @@ class ReadSourceTest extends AbstractIntegrationTest
 
     public function testReadUnauthorizedUser(): void
     {
-        $response = $this->client->makeReadSourceRequest($this->invalidToken, EntityId::create());
+        $response = $this->applicationClient->makeReadSourceRequest($this->invalidToken, EntityId::create());
 
         $this->responseAsserter->assertUnauthorizedResponse($response);
     }
@@ -43,7 +43,7 @@ class ReadSourceTest extends AbstractIntegrationTest
         $source = new RunSource(new FileSource(UserId::create(), ''));
         $this->store->add($source);
 
-        $response = $this->client->makeReadSourceRequest($this->validToken, $source->getId());
+        $response = $this->applicationClient->makeReadSourceRequest($this->validToken, $source->getId());
 
         $this->responseAsserter->assertForbiddenResponse($response);
     }
@@ -56,7 +56,7 @@ class ReadSourceTest extends AbstractIntegrationTest
         $filename = 'filename.yaml';
         $content = '- file content';
 
-        $addFileResponse = $this->client->makeAddFileRequest(
+        $addFileResponse = $this->applicationClient->makeAddFileRequest(
             $this->authenticationConfiguration->validToken,
             $fileSource->getId(),
             $filename,
@@ -65,7 +65,7 @@ class ReadSourceTest extends AbstractIntegrationTest
 
         $this->responseAsserter->assertSuccessfulResponseWithNoBody($addFileResponse);
 
-        $prepareResponse = $this->client->makePrepareSourceRequest(
+        $prepareResponse = $this->applicationClient->makePrepareSourceRequest(
             $this->authenticationConfiguration->validToken,
             $fileSource->getId(),
             []
@@ -90,7 +90,7 @@ class ReadSourceTest extends AbstractIntegrationTest
 
         $this->waitUntilSourceIsPrepared($runSourceId);
 
-        $readResponse = $this->client->makeReadSourceRequest(
+        $readResponse = $this->applicationClient->makeReadSourceRequest(
             $this->authenticationConfiguration->validToken,
             $runSourceId
         );
@@ -117,7 +117,7 @@ class ReadSourceTest extends AbstractIntegrationTest
         $state = null;
 
         while (State::PREPARED->value !== $state) {
-            $getResponse = $this->client->makeGetSourceRequest(
+            $getResponse = $this->applicationClient->makeGetSourceRequest(
                 $this->authenticationConfiguration->validToken,
                 $runSourceId
             );

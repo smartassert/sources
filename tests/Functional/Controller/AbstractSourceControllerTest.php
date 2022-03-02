@@ -18,7 +18,7 @@ abstract class AbstractSourceControllerTest extends WebTestCase
     protected SourceUserIdMutator $sourceUserIdMutator;
     protected string $validToken;
     protected string $invalidToken;
-    protected Client $application;
+    protected Client $applicationClient;
 
     protected function setUp(): void
     {
@@ -33,7 +33,7 @@ abstract class AbstractSourceControllerTest extends WebTestCase
         \assert($symfonyClient instanceof SymfonyAdapter);
         $symfonyClient->setKernelBrowser($client);
 
-        $this->application = $application;
+        $this->applicationClient = $application;
 
         $responseAsserter = self::getContainer()->get(ResponseAsserter::class);
         \assert($responseAsserter instanceof ResponseAsserter);

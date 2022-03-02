@@ -33,7 +33,7 @@ class PrepareSourceTest extends AbstractIntegrationTest
 
     public function testPrepareUnauthorizedUser(): void
     {
-        $response = $this->client->makePrepareSourceRequest($this->invalidToken, EntityId::create(), []);
+        $response = $this->applicationClient->makePrepareSourceRequest($this->invalidToken, EntityId::create(), []);
 
         $this->responseAsserter->assertUnauthorizedResponse($response);
     }
@@ -43,7 +43,7 @@ class PrepareSourceTest extends AbstractIntegrationTest
         $source = new FileSource(UserId::create(), '');
         $this->store->add($source);
 
-        $response = $this->client->makePrepareSourceRequest($this->validToken, $source->getId(), []);
+        $response = $this->applicationClient->makePrepareSourceRequest($this->validToken, $source->getId(), []);
 
         $this->responseAsserter->assertForbiddenResponse($response);
     }
@@ -55,7 +55,7 @@ class PrepareSourceTest extends AbstractIntegrationTest
 
         $this->store->add($source);
 
-        $response = $this->client->makePrepareSourceRequest($this->validToken, $source->getId(), []);
+        $response = $this->applicationClient->makePrepareSourceRequest($this->validToken, $source->getId(), []);
 
         $this->responseAsserter->assertNotFoundResponse($response);
     }
@@ -68,7 +68,7 @@ class PrepareSourceTest extends AbstractIntegrationTest
         $filename = 'filename.yaml';
         $content = '- file content';
 
-        $addFileResponse = $this->client->makeAddFileRequest(
+        $addFileResponse = $this->applicationClient->makeAddFileRequest(
             $this->authenticationConfiguration->validToken,
             $fileSource->getId(),
             $filename,
@@ -77,7 +77,7 @@ class PrepareSourceTest extends AbstractIntegrationTest
 
         $this->responseAsserter->assertSuccessfulResponseWithNoBody($addFileResponse);
 
-        $prepareResponse = $this->client->makePrepareSourceRequest(
+        $prepareResponse = $this->applicationClient->makePrepareSourceRequest(
             $this->authenticationConfiguration->validToken,
             $fileSource->getId(),
             []
@@ -102,7 +102,7 @@ class PrepareSourceTest extends AbstractIntegrationTest
 
         $this->waitUntilSourceIsPrepared($runSourceId);
 
-        $readResponse = $this->client->makeReadSourceRequest(
+        $readResponse = $this->applicationClient->makeReadSourceRequest(
             $this->authenticationConfiguration->validToken,
             $runSourceId
         );
@@ -129,7 +129,7 @@ class PrepareSourceTest extends AbstractIntegrationTest
         $state = null;
 
         while (State::PREPARED->value !== $state) {
-            $getResponse = $this->client->makeGetSourceRequest(
+            $getResponse = $this->applicationClient->makeGetSourceRequest(
                 $this->authenticationConfiguration->validToken,
                 $runSourceId
             );

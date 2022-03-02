@@ -36,7 +36,7 @@ class UpdateSourceTest extends AbstractIntegrationTest
 
     public function testUpdateUnauthorizedUser(): void
     {
-        $response = $this->client->makeUpdateSourceRequest($this->invalidToken, EntityId::create(), []);
+        $response = $this->applicationClient->makeUpdateSourceRequest($this->invalidToken, EntityId::create(), []);
 
         $this->responseAsserter->assertUnauthorizedResponse($response);
     }
@@ -46,7 +46,7 @@ class UpdateSourceTest extends AbstractIntegrationTest
         $source = new FileSource(UserId::create(), '');
         $this->store->add($source);
 
-        $response = $this->client->makeUpdateSourceRequest($this->validToken, $source->getId(), []);
+        $response = $this->applicationClient->makeUpdateSourceRequest($this->validToken, $source->getId(), []);
 
         $this->responseAsserter->assertForbiddenResponse($response);
     }
@@ -65,7 +65,7 @@ class UpdateSourceTest extends AbstractIntegrationTest
         $this->sourceUserIdMutator->setSourceUserId($source);
         $this->store->add($source);
 
-        $response = $this->client->makeUpdateSourceRequest($this->validToken, $source->getId(), $payload);
+        $response = $this->applicationClient->makeUpdateSourceRequest($this->validToken, $source->getId(), $payload);
 
         $expectedResponseData = $this->sourceUserIdMutator->setSourceDataUserId($expectedResponseData);
 
@@ -86,7 +86,7 @@ class UpdateSourceTest extends AbstractIntegrationTest
         $this->sourceUserIdMutator->setSourceUserId($source);
         $this->store->add($source);
 
-        $response = $this->client->makeUpdateSourceRequest($this->validToken, $source->getId(), $payload);
+        $response = $this->applicationClient->makeUpdateSourceRequest($this->validToken, $source->getId(), $payload);
 
         $expectedResponseData = $this->sourceUserIdMutator->setSourceDataUserId($expectedResponseData);
 

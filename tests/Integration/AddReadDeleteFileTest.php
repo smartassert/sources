@@ -40,7 +40,7 @@ class AddReadDeleteFileTest extends AbstractIntegrationTest
 
     public function testAddFileUnauthorizedUser(): void
     {
-        $response = $this->client->makeAddFileRequest(
+        $response = $this->applicationClient->makeAddFileRequest(
             $this->invalidToken,
             $this->source->getId(),
             TestConstants::FILENAME,
@@ -55,7 +55,7 @@ class AddReadDeleteFileTest extends AbstractIntegrationTest
         $source = new FileSource(UserId::create(), '');
         $this->store->add($source);
 
-        $response = $this->client->makeAddFileRequest(
+        $response = $this->applicationClient->makeAddFileRequest(
             $this->validToken,
             $source->getId(),
             TestConstants::FILENAME,
@@ -75,7 +75,7 @@ class AddReadDeleteFileTest extends AbstractIntegrationTest
         string $content,
         array $expectedResponseData
     ): void {
-        $response = $this->client->makeAddFileRequest(
+        $response = $this->applicationClient->makeAddFileRequest(
             $this->validToken,
             $this->source->getId(),
             $filename,
@@ -87,7 +87,7 @@ class AddReadDeleteFileTest extends AbstractIntegrationTest
 
     public function testReadFileUnauthorizedUser(): void
     {
-        $response = $this->client->makeRemoveFileRequest(
+        $response = $this->applicationClient->makeRemoveFileRequest(
             $this->invalidToken,
             EntityId::create(),
             TestConstants::FILENAME
@@ -101,7 +101,7 @@ class AddReadDeleteFileTest extends AbstractIntegrationTest
         $source = new FileSource(UserId::create(), '');
         $this->store->add($source);
 
-        $response = $this->client->makeReadFileRequest(
+        $response = $this->applicationClient->makeReadFileRequest(
             $this->validToken,
             $source->getId(),
             TestConstants::FILENAME
@@ -119,7 +119,7 @@ class AddReadDeleteFileTest extends AbstractIntegrationTest
         string $filename,
         array $expectedResponseData
     ): void {
-        $response = $this->client->makeReadFileRequest(
+        $response = $this->applicationClient->makeReadFileRequest(
             $this->validToken,
             $this->source->getId(),
             $filename
@@ -130,7 +130,7 @@ class AddReadDeleteFileTest extends AbstractIntegrationTest
 
     public function testRemoveFileUnauthorizedUser(): void
     {
-        $response = $this->client->makeRemoveFileRequest(
+        $response = $this->applicationClient->makeRemoveFileRequest(
             $this->invalidToken,
             $this->source->getId(),
             TestConstants::FILENAME
@@ -144,7 +144,11 @@ class AddReadDeleteFileTest extends AbstractIntegrationTest
         $source = new FileSource(UserId::create(), '');
         $this->store->add($source);
 
-        $response = $this->client->makeRemoveFileRequest($this->validToken, $source->getId(), TestConstants::FILENAME);
+        $response = $this->applicationClient->makeRemoveFileRequest(
+            $this->validToken,
+            $source->getId(),
+            TestConstants::FILENAME
+        );
 
         $this->responseAsserter->assertForbiddenResponse($response);
     }
@@ -158,7 +162,11 @@ class AddReadDeleteFileTest extends AbstractIntegrationTest
         string $filename,
         array $expectedResponseData
     ): void {
-        $response = $this->client->makeRemoveFileRequest($this->validToken, $this->source->getId(), $filename);
+        $response = $this->applicationClient->makeRemoveFileRequest(
+            $this->validToken,
+            $this->source->getId(),
+            $filename
+        );
 
         $this->responseAsserter->assertInvalidRequestJsonResponse($response, $expectedResponseData);
     }
@@ -168,7 +176,7 @@ class AddReadDeleteFileTest extends AbstractIntegrationTest
         $initialContent = '- initial content';
         $updatedContent = '- updated content';
 
-        $addResponse = $this->client->makeAddFileRequest(
+        $addResponse = $this->applicationClient->makeAddFileRequest(
             $this->validToken,
             $this->source->getId(),
             TestConstants::FILENAME,
@@ -177,7 +185,7 @@ class AddReadDeleteFileTest extends AbstractIntegrationTest
 
         $this->responseAsserter->assertSuccessfulResponseWithNoBody($addResponse);
 
-        $initialReadResponse = $this->client->makeReadFileRequest(
+        $initialReadResponse = $this->applicationClient->makeReadFileRequest(
             $this->validToken,
             $this->source->getId(),
             TestConstants::FILENAME
@@ -185,7 +193,7 @@ class AddReadDeleteFileTest extends AbstractIntegrationTest
 
         $this->responseAsserter->assertReadSourceSuccessResponse($initialReadResponse, $initialContent);
 
-        $updateResponse = $this->client->makeAddFileRequest(
+        $updateResponse = $this->applicationClient->makeAddFileRequest(
             $this->validToken,
             $this->source->getId(),
             TestConstants::FILENAME,
@@ -194,7 +202,7 @@ class AddReadDeleteFileTest extends AbstractIntegrationTest
 
         $this->responseAsserter->assertSuccessfulResponseWithNoBody($updateResponse);
 
-        $updatedReadResponse = $this->client->makeReadFileRequest(
+        $updatedReadResponse = $this->applicationClient->makeReadFileRequest(
             $this->validToken,
             $this->source->getId(),
             TestConstants::FILENAME
@@ -202,7 +210,7 @@ class AddReadDeleteFileTest extends AbstractIntegrationTest
 
         $this->responseAsserter->assertReadSourceSuccessResponse($updatedReadResponse, $updatedContent);
 
-        $removeResponse = $this->client->makeRemoveFileRequest(
+        $removeResponse = $this->applicationClient->makeRemoveFileRequest(
             $this->validToken,
             $this->source->getId(),
             TestConstants::FILENAME
@@ -210,7 +218,7 @@ class AddReadDeleteFileTest extends AbstractIntegrationTest
 
         $this->responseAsserter->assertSuccessfulResponseWithNoBody($removeResponse);
 
-        $notFoundReadResponse = $this->client->makeReadFileRequest(
+        $notFoundReadResponse = $this->applicationClient->makeReadFileRequest(
             $this->validToken,
             $this->source->getId(),
             TestConstants::FILENAME
