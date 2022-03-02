@@ -9,7 +9,6 @@ use App\Services\Source\Store;
 use App\Tests\DataProvider\AddFileInvalidRequestDataProviderTrait;
 use App\Tests\DataProvider\TestConstants;
 use App\Tests\DataProvider\YamlFileInvalidRequestDataProviderTrait;
-use App\Tests\Model\UserId;
 use App\Tests\Services\EntityRemover;
 
 class AddReadDeleteFileTest extends AbstractIntegrationTest
@@ -37,21 +36,6 @@ class AddReadDeleteFileTest extends AbstractIntegrationTest
         $this->store->add($this->source);
     }
 
-    public function testAddFileInvalidSourceUser(): void
-    {
-        $source = new FileSource(UserId::create(), '');
-        $this->store->add($source);
-
-        $response = $this->applicationClient->makeAddFileRequest(
-            $this->validToken,
-            $source->getId(),
-            TestConstants::FILENAME,
-            '- content'
-        );
-
-        $this->responseAsserter->assertForbiddenResponse($response);
-    }
-
     /**
      * @dataProvider addFileInvalidRequestDataProvider
      *
@@ -72,20 +56,6 @@ class AddReadDeleteFileTest extends AbstractIntegrationTest
         $this->responseAsserter->assertInvalidRequestJsonResponse($response, $expectedResponseData);
     }
 
-    public function testReadFileInvalidSourceUser(): void
-    {
-        $source = new FileSource(UserId::create(), '');
-        $this->store->add($source);
-
-        $response = $this->applicationClient->makeReadFileRequest(
-            $this->validToken,
-            $source->getId(),
-            TestConstants::FILENAME
-        );
-
-        $this->responseAsserter->assertForbiddenResponse($response);
-    }
-
     /**
      * @dataProvider yamlFileInvalidRequestDataProvider
      *
@@ -102,20 +72,6 @@ class AddReadDeleteFileTest extends AbstractIntegrationTest
         );
 
         $this->responseAsserter->assertInvalidRequestJsonResponse($response, $expectedResponseData);
-    }
-
-    public function testRemoveFileInvalidSourceUser(): void
-    {
-        $source = new FileSource(UserId::create(), '');
-        $this->store->add($source);
-
-        $response = $this->applicationClient->makeRemoveFileRequest(
-            $this->validToken,
-            $source->getId(),
-            TestConstants::FILENAME
-        );
-
-        $this->responseAsserter->assertForbiddenResponse($response);
     }
 
     /**

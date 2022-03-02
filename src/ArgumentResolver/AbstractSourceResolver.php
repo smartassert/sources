@@ -37,7 +37,6 @@ abstract class AbstractSourceResolver implements ArgumentValueResolverInterface
 
             if (is_string($sourceId)) {
                 $source = $this->repository->find($sourceId);
-
                 if (null === $source) {
                     throw new SourceNotFoundException($sourceId);
                 }

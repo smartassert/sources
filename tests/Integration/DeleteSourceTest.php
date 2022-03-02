@@ -4,12 +4,10 @@ declare(strict_types=1);
 
 namespace App\Tests\Integration;
 
-use App\Entity\FileSource;
 use App\Entity\SourceInterface;
 use App\Repository\SourceRepository;
 use App\Services\Source\Store;
 use App\Tests\DataProvider\DeleteSourceSuccessDataProviderTrait;
-use App\Tests\Model\UserId;
 use App\Tests\Services\EntityRemover;
 
 class DeleteSourceTest extends AbstractIntegrationTest
@@ -35,16 +33,6 @@ class DeleteSourceTest extends AbstractIntegrationTest
         if ($entityRemover instanceof EntityRemover) {
             $entityRemover->removeAll();
         }
-    }
-
-    public function testDeleteInvalidSourceUser(): void
-    {
-        $source = new FileSource(UserId::create(), '');
-        $this->store->add($source);
-
-        $response = $this->applicationClient->makeDeleteSourceRequest($this->validToken, $source->getId());
-
-        $this->responseAsserter->assertForbiddenResponse($response);
     }
 
     /**

@@ -9,7 +9,6 @@ use App\Entity\RunSource;
 use App\Enum\RunSource\State;
 use App\Enum\Source\Type;
 use App\Services\Source\Store;
-use App\Tests\Model\UserId;
 use App\Tests\Services\EntityRemover;
 
 class PrepareSourceTest extends AbstractIntegrationTest
@@ -28,16 +27,6 @@ class PrepareSourceTest extends AbstractIntegrationTest
         if ($entityRemover instanceof EntityRemover) {
             $entityRemover->removeAll();
         }
-    }
-
-    public function testPrepareInvalidSourceUser(): void
-    {
-        $source = new FileSource(UserId::create(), '');
-        $this->store->add($source);
-
-        $response = $this->applicationClient->makePrepareSourceRequest($this->validToken, $source->getId(), []);
-
-        $this->responseAsserter->assertForbiddenResponse($response);
     }
 
     public function testPrepareRunSource(): void

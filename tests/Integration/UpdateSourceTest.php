@@ -4,12 +4,10 @@ declare(strict_types=1);
 
 namespace App\Tests\Integration;
 
-use App\Entity\FileSource;
 use App\Entity\SourceInterface;
 use App\Services\Source\Store;
 use App\Tests\DataProvider\UpdateSourceInvalidRequestDataProviderTrait;
 use App\Tests\DataProvider\UpdateSourceSuccessDataProviderTrait;
-use App\Tests\Model\UserId;
 use App\Tests\Services\EntityRemover;
 
 class UpdateSourceTest extends AbstractIntegrationTest
@@ -31,16 +29,6 @@ class UpdateSourceTest extends AbstractIntegrationTest
         if ($entityRemover instanceof EntityRemover) {
             $entityRemover->removeAll();
         }
-    }
-
-    public function testUpdateInvalidSourceUser(): void
-    {
-        $source = new FileSource(UserId::create(), '');
-        $this->store->add($source);
-
-        $response = $this->applicationClient->makeUpdateSourceRequest($this->validToken, $source->getId(), []);
-
-        $this->responseAsserter->assertForbiddenResponse($response);
     }
 
     /**
