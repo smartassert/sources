@@ -5,20 +5,17 @@ declare(strict_types=1);
 namespace App\Tests\Integration;
 
 use App\Entity\FileSource;
-use App\Entity\GitSource;
 use App\Entity\SourceInterface;
-use App\Enum\Source\Type;
 use App\Model\EntityId;
-use App\Request\GitSourceRequest;
-use App\Request\SourceRequestInterface;
 use App\Services\Source\Store;
-use App\Tests\DataProvider\TestConstants;
+use App\Tests\DataProvider\UpdateSourceInvalidRequestDataProviderTrait;
 use App\Tests\DataProvider\UpdateSourceSuccessDataProviderTrait;
 use App\Tests\Model\UserId;
 use App\Tests\Services\EntityRemover;
 
 class UpdateSourceTest extends AbstractIntegrationTest
 {
+    use UpdateSourceInvalidRequestDataProviderTrait;
     use UpdateSourceSuccessDataProviderTrait;
 
     private Store $store;
@@ -55,7 +52,7 @@ class UpdateSourceTest extends AbstractIntegrationTest
     }
 
     /**
-     * @dataProvider updateInvalidRequestDataProvider
+     * @dataProvider updateSourceInvalidRequestDataProvider
      *
      * @param array<string, string> $payload
      * @param array<mixed>          $expectedResponseData
@@ -73,41 +70,6 @@ class UpdateSourceTest extends AbstractIntegrationTest
         $expectedResponseData = $this->sourceUserIdMutator->setSourceDataUserId($expectedResponseData);
 
         $this->responseAsserter->assertInvalidRequestJsonResponse($response, $expectedResponseData);
-    }
-
-    /**
-     * @return array<mixed>
-     */
-    public function updateInvalidRequestDataProvider(): array
-    {
-        $userId = TestConstants::AUTHENTICATED_USER_ID_PLACEHOLDER;
-        $hostUrl = 'https://example.com/repository.git';
-        $path = '/';
-        $credentials = md5((string) rand());
-
-        $gitSource = new GitSource($userId, $hostUrl, $path, $credentials);
-
-        return [
-            Type::GIT->value . ' missing host url' => [
-                'source' => $gitSource,
-                'payload' => [
-                    SourceRequestInterface::PARAMETER_TYPE => Type::GIT->value,
-                    GitSourceRequest::PARAMETER_HOST_URL => '',
-                    GitSourceRequest::PARAMETER_PATH => $path,
-                ],
-                'expectedResponseData' => [
-                    'error' => [
-                        'type' => 'invalid_request',
-                        'payload' => [
-                            'host-url' => [
-                                'value' => '',
-                                'message' => 'This value should not be blank.',
-                            ],
-                        ],
-                    ],
-                ],
-            ],
-        ];
     }
 
     /**
