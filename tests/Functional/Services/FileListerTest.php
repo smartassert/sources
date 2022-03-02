@@ -42,6 +42,10 @@ class FileListerTest extends WebTestCase
         $lister = self::getContainer()->get(FileLister::class);
         self::assertInstanceOf(FileLister::class, $lister);
 
+        $fileSourceStorage = self::getContainer()->get('file_source.storage');
+        \assert($fileSourceStorage instanceof FilesystemOperator);
+        $fileSourceStorage->deleteDirectory($relativePath);
+
         $this->fixtureCreator->copySetTo('Source/' . $fixtureSet, $storage, $relativePath);
 
         $files = $lister->list($storage, $relativePath, $extensions);

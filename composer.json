@@ -113,8 +113,8 @@
             "@test-unit",
             "@test-functional"
         ],
-        "functional-start": "docker-compose -f ./tests/build/docker-compose.yml up -d postgres users-service",
-        "functional-status": "docker-compose -f ./tests/build/docker-compose.yml ps postgres users-service",
+        "functional-start": "docker-compose -f ./tests/build/docker-compose.yml up -d postgres users-service s3-mock",
+        "functional-status": "docker-compose -f ./tests/build/docker-compose.yml ps postgres users-service s3-mock",
         "functional-teardown": [
             "docker-compose -f ./tests/build/docker-compose.yml down"
         ],
