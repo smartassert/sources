@@ -7,7 +7,6 @@ namespace App\Tests\Functional\Controller;
 use App\Entity\FileSource;
 use App\Entity\GitSource;
 use App\Entity\RunSource;
-use App\Entity\SourceInterface;
 use App\Enum\RunSource\State;
 use App\Enum\Source\Type;
 use App\Repository\RunSourceRepository;
@@ -59,48 +58,6 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
         if ($entityRemover instanceof EntityRemover) {
             $entityRemover->removeAll();
         }
-    }
-
-    /**
-     * @dataProvider updateSourceInvalidRequestDataProvider
-     *
-     * @param array<string, string> $payload
-     * @param array<mixed>          $expectedResponseData
-     */
-    public function testUpdateInvalidRequest(
-        SourceInterface $source,
-        array $payload,
-        array $expectedResponseData
-    ): void {
-        $this->sourceUserIdMutator->setSourceUserId($source);
-        $this->store->add($source);
-
-        $response = $this->applicationClient->makeUpdateSourceRequest($this->validToken, $source->getId(), $payload);
-
-        $expectedResponseData = $this->sourceUserIdMutator->setSourceDataUserId($expectedResponseData);
-
-        $this->responseAsserter->assertInvalidRequestJsonResponse($response, $expectedResponseData);
-    }
-
-    /**
-     * @dataProvider updateSourceSuccessDataProvider
-     *
-     * @param array<string, string> $payload
-     * @param array<mixed>          $expectedResponseData
-     */
-    public function testUpdateSuccess(
-        SourceInterface $source,
-        array $payload,
-        array $expectedResponseData
-    ): void {
-        $this->sourceUserIdMutator->setSourceUserId($source);
-        $this->store->add($source);
-
-        $response = $this->applicationClient->makeUpdateSourceRequest($this->validToken, $source->getId(), $payload);
-
-        $expectedResponseData = $this->sourceUserIdMutator->setSourceDataUserId($expectedResponseData);
-
-        $this->responseAsserter->assertSuccessfulJsonResponse($response, $expectedResponseData);
     }
 
     public function testPrepareRunSource(): void
