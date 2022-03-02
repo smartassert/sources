@@ -78,13 +78,6 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
         }
     }
 
-    public function testGetUnauthorizedUser(): void
-    {
-        $response = $this->applicationClient->makeGetSourceRequest($this->invalidToken, EntityId::create());
-
-        $this->responseAsserter->assertUnauthorizedResponse($response);
-    }
-
     public function testGetSourceNotFound(): void
     {
         $response = $this->applicationClient->makeGetSourceRequest($this->validToken, EntityId::create());
@@ -117,13 +110,6 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
         $expectedResponseData = $this->sourceUserIdMutator->setSourceDataUserId($expectedResponseData);
 
         $this->responseAsserter->assertSuccessfulJsonResponse($response, $expectedResponseData);
-    }
-
-    public function testUpdateUnauthorizedUser(): void
-    {
-        $response = $this->applicationClient->makeUpdateSourceRequest($this->invalidToken, EntityId::create(), []);
-
-        $this->responseAsserter->assertUnauthorizedResponse($response);
     }
 
     public function testUpdateInvalidSourceUser(): void
@@ -176,13 +162,6 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
         $expectedResponseData = $this->sourceUserIdMutator->setSourceDataUserId($expectedResponseData);
 
         $this->responseAsserter->assertSuccessfulJsonResponse($response, $expectedResponseData);
-    }
-
-    public function testDeleteUnauthorizedUser(): void
-    {
-        $response = $this->applicationClient->makeDeleteSourceRequest($this->invalidToken, EntityId::create());
-
-        $this->responseAsserter->assertUnauthorizedResponse($response);
     }
 
     public function testDeleteInvalidSourceUser(): void
@@ -255,13 +234,6 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
 
         self::assertFalse($this->fileSourceStorage->directoryExists($sourceRelativePath));
         self::assertFalse($this->fileSourceStorage->fileExists($fileRelativePath));
-    }
-
-    public function testPrepareUnauthorizedUser(): void
-    {
-        $response = $this->applicationClient->makePrepareSourceRequest($this->invalidToken, EntityId::create(), []);
-
-        $this->responseAsserter->assertUnauthorizedResponse($response);
     }
 
     public function testPrepareInvalidSourceUser(): void

@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Tests\Functional\Controller;
 
 use App\Entity\FileSource;
-use App\Model\EntityId;
 use App\Services\Source\Store;
 use App\Tests\DataProvider\AddFileInvalidRequestDataProviderTrait;
 use App\Tests\DataProvider\TestConstants;
@@ -43,18 +42,6 @@ class FileSourceFileControllerTest extends AbstractSourceControllerTest
         $this->store = $store;
 
         $store->add($this->fileSource);
-    }
-
-    public function testAddFileUnauthorizedUser(): void
-    {
-        $response = $this->applicationClient->makeAddFileRequest(
-            $this->invalidToken,
-            $this->fileSource->getId(),
-            TestConstants::FILENAME,
-            '- content'
-        );
-
-        $this->responseAsserter->assertUnauthorizedResponse($response);
     }
 
     public function testAddFileInvalidSourceUser(): void
@@ -136,17 +123,6 @@ class FileSourceFileControllerTest extends AbstractSourceControllerTest
         self::assertSame($updatedContent, $this->fileSourceStorage->read($fileRelativePath));
     }
 
-    public function testRemoveFileUnauthorizedUser(): void
-    {
-        $response = $this->applicationClient->makeRemoveFileRequest(
-            $this->invalidToken,
-            $this->fileSource->getId(),
-            TestConstants::FILENAME
-        );
-
-        $this->responseAsserter->assertUnauthorizedResponse($response);
-    }
-
     public function testRemoveFileInvalidSourceUser(): void
     {
         $source = new FileSource(UserId::create(), '');
@@ -206,17 +182,6 @@ class FileSourceFileControllerTest extends AbstractSourceControllerTest
         );
 
         $this->responseAsserter->assertSuccessfulResponseWithNoBody($response);
-    }
-
-    public function testReadFileUnauthorizedUser(): void
-    {
-        $response = $this->applicationClient->makeRemoveFileRequest(
-            $this->invalidToken,
-            EntityId::create(),
-            TestConstants::FILENAME
-        );
-
-        $this->responseAsserter->assertUnauthorizedResponse($response);
     }
 
     public function testReadFileInvalidSourceUser(): void

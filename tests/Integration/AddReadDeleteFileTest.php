@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Tests\Integration;
 
 use App\Entity\FileSource;
-use App\Model\EntityId;
 use App\Services\Source\Store;
 use App\Tests\DataProvider\AddFileInvalidRequestDataProviderTrait;
 use App\Tests\DataProvider\TestConstants;
@@ -36,18 +35,6 @@ class AddReadDeleteFileTest extends AbstractIntegrationTest
 
         $this->source = new FileSource($this->authenticationConfiguration->authenticatedUserId, '');
         $this->store->add($this->source);
-    }
-
-    public function testAddFileUnauthorizedUser(): void
-    {
-        $response = $this->applicationClient->makeAddFileRequest(
-            $this->invalidToken,
-            $this->source->getId(),
-            TestConstants::FILENAME,
-            '- content'
-        );
-
-        $this->responseAsserter->assertUnauthorizedResponse($response);
     }
 
     public function testAddFileInvalidSourceUser(): void
@@ -85,17 +72,6 @@ class AddReadDeleteFileTest extends AbstractIntegrationTest
         $this->responseAsserter->assertInvalidRequestJsonResponse($response, $expectedResponseData);
     }
 
-    public function testReadFileUnauthorizedUser(): void
-    {
-        $response = $this->applicationClient->makeRemoveFileRequest(
-            $this->invalidToken,
-            EntityId::create(),
-            TestConstants::FILENAME
-        );
-
-        $this->responseAsserter->assertUnauthorizedResponse($response);
-    }
-
     public function testReadFileInvalidSourceUser(): void
     {
         $source = new FileSource(UserId::create(), '');
@@ -126,17 +102,6 @@ class AddReadDeleteFileTest extends AbstractIntegrationTest
         );
 
         $this->responseAsserter->assertInvalidRequestJsonResponse($response, $expectedResponseData);
-    }
-
-    public function testRemoveFileUnauthorizedUser(): void
-    {
-        $response = $this->applicationClient->makeRemoveFileRequest(
-            $this->invalidToken,
-            $this->source->getId(),
-            TestConstants::FILENAME
-        );
-
-        $this->responseAsserter->assertUnauthorizedResponse($response);
     }
 
     public function testRemoveFileInvalidSourceUser(): void

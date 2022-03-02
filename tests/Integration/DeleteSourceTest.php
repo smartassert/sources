@@ -6,7 +6,6 @@ namespace App\Tests\Integration;
 
 use App\Entity\FileSource;
 use App\Entity\SourceInterface;
-use App\Model\EntityId;
 use App\Repository\SourceRepository;
 use App\Services\Source\Store;
 use App\Tests\DataProvider\DeleteSourceSuccessDataProviderTrait;
@@ -36,13 +35,6 @@ class DeleteSourceTest extends AbstractIntegrationTest
         if ($entityRemover instanceof EntityRemover) {
             $entityRemover->removeAll();
         }
-    }
-
-    public function testDeleteUnauthorizedUser(): void
-    {
-        $response = $this->applicationClient->makeDeleteSourceRequest($this->invalidToken, EntityId::create());
-
-        $this->responseAsserter->assertUnauthorizedResponse($response);
     }
 
     public function testDeleteInvalidSourceUser(): void

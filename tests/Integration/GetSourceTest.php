@@ -32,13 +32,6 @@ class GetSourceTest extends AbstractIntegrationTest
         }
     }
 
-    public function testGetUnauthorizedUser(): void
-    {
-        $response = $this->applicationClient->makeGetSourceRequest($this->invalidToken, EntityId::create());
-
-        $this->responseAsserter->assertUnauthorizedResponse($response);
-    }
-
     public function testGetSourceNotFound(): void
     {
         $response = $this->applicationClient->makeGetSourceRequest($this->validToken, EntityId::create());
