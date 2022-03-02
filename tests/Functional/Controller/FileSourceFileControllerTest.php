@@ -7,12 +7,17 @@ namespace App\Tests\Functional\Controller;
 use App\Entity\FileSource;
 use App\Model\EntityId;
 use App\Services\Source\Store;
+use App\Tests\DataProvider\AddFileInvalidRequestDataProviderTrait;
+use App\Tests\DataProvider\TestConstants;
+use App\Tests\DataProvider\YamlFileInvalidRequestDataProviderTrait;
 use App\Tests\Model\UserId;
-use App\Validator\YamlFilenameConstraint;
 use League\Flysystem\FilesystemOperator;
 
 class FileSourceFileControllerTest extends AbstractSourceControllerTest
 {
+    use AddFileInvalidRequestDataProviderTrait;
+    use YamlFileInvalidRequestDataProviderTrait;
+
     private FilesystemOperator $fileSourceStorage;
 
     private FileSource $fileSource;
@@ -45,7 +50,7 @@ class FileSourceFileControllerTest extends AbstractSourceControllerTest
         $response = $this->application->makeAddFileRequest(
             $this->invalidToken,
             $this->fileSource->getId(),
-            'filename.yaml',
+            TestConstants::FILENAME,
             '- content'
         );
 
@@ -61,7 +66,7 @@ class FileSourceFileControllerTest extends AbstractSourceControllerTest
         $response = $this->application->makeAddFileRequest(
             $this->validToken,
             $source->getId(),
-            'filename.yaml',
+            TestConstants::FILENAME,
             '- content'
         );
 
@@ -89,69 +94,9 @@ class FileSourceFileControllerTest extends AbstractSourceControllerTest
         $this->requestAsserter->assertAuthorizationRequestIsMade();
     }
 
-    /**
-     * @return array<mixed>
-     */
-    public function addFileInvalidRequestDataProvider(): array
-    {
-        return [
-            'name empty with .yaml extension, content non-empty' => [
-                'filename' => '.yaml',
-                'content' => 'non-empty value',
-                'expectedResponseData' => $this->createExpectedInvalidFilenameResponseData(
-                    YamlFilenameConstraint::MESSAGE_NAME_EMPTY
-                ),
-            ],
-            'name contains backslash characters, content non-empty' => [
-                'filename' => 'one-two-\\-three.yaml',
-                'content' => 'non-empty value',
-                'expectedResponseData' => $this->createExpectedInvalidFilenameResponseData(
-                    YamlFilenameConstraint::MESSAGE_FILENAME_INVALID
-                ),
-            ],
-            'name contains space characters, content non-empty' => [
-                'filename' => 'one two three.yaml',
-                'content' => 'non-empty value',
-                'expectedResponseData' => $this->createExpectedInvalidFilenameResponseData(
-                    YamlFilenameConstraint::MESSAGE_FILENAME_INVALID
-                ),
-            ],
-            'name valid, content empty' => [
-                'filename' => 'filename.yaml',
-                'content' => '',
-                'expectedResponseData' => [
-                    'error' => [
-                        'type' => 'invalid_request',
-                        'payload' => [
-                            'content' => [
-                                'value' => '',
-                                'message' => 'File content must not be empty.',
-                            ],
-                        ],
-                    ],
-                ],
-            ],
-            'name valid, content invalid yaml' => [
-                'filename' => 'filename.yaml',
-                'content' => "- item\ncontent",
-                'expectedResponseData' => [
-                    'error' => [
-                        'type' => 'invalid_request',
-                        'payload' => [
-                            'content' => [
-                                'value' => '',
-                                'message' => 'Content must be valid YAML: Unable to parse at line 2 (near "content").',
-                            ],
-                        ],
-                    ],
-                ],
-            ],
-        ];
-    }
-
     public function testAddFileSuccess(): void
     {
-        $filename = 'filename.yaml';
+        $filename = TestConstants::FILENAME;
         $content = '- file content';
         $fileRelativePath = $this->sourceRelativePath . '/' . $filename;
 
@@ -173,7 +118,7 @@ class FileSourceFileControllerTest extends AbstractSourceControllerTest
 
     public function testUpdateFileSuccess(): void
     {
-        $filename = 'filename.yaml';
+        $filename = TestConstants::FILENAME;
         $initialContent = '- initial content';
         $updatedContent = '- updated content';
         $fileRelativePath = $this->sourceRelativePath . '/' . $filename;
@@ -198,7 +143,7 @@ class FileSourceFileControllerTest extends AbstractSourceControllerTest
         $response = $this->application->makeRemoveFileRequest(
             $this->invalidToken,
             $this->fileSource->getId(),
-            'filename.yaml'
+            TestConstants::FILENAME
         );
 
         $this->responseAsserter->assertUnauthorizedResponse($response);
@@ -210,7 +155,11 @@ class FileSourceFileControllerTest extends AbstractSourceControllerTest
         $source = new FileSource(UserId::create(), '');
         $this->store->add($source);
 
-        $response = $this->application->makeRemoveFileRequest($this->validToken, $source->getId(), 'filename.yaml');
+        $response = $this->application->makeRemoveFileRequest(
+            $this->validToken,
+            $source->getId(),
+            TestConstants::FILENAME
+        );
 
         $this->responseAsserter->assertForbiddenResponse($response);
     }
@@ -232,7 +181,7 @@ class FileSourceFileControllerTest extends AbstractSourceControllerTest
 
     public function testRemoveFileSuccess(): void
     {
-        $filename = 'filename.yaml';
+        $filename = TestConstants::FILENAME;
         $content = '- file content';
         $fileRelativePath = $this->sourceRelativePath . '/' . $filename;
 
@@ -249,7 +198,7 @@ class FileSourceFileControllerTest extends AbstractSourceControllerTest
         $response = $this->application->makeRemoveFileRequest(
             $this->validToken,
             $this->fileSource->getId(),
-            'filename.yaml'
+            TestConstants::FILENAME
         );
 
         $this->responseAsserter->assertSuccessfulResponseWithNoBody($response);
@@ -257,7 +206,11 @@ class FileSourceFileControllerTest extends AbstractSourceControllerTest
 
     public function testReadFileUnauthorizedUser(): void
     {
-        $response = $this->application->makeRemoveFileRequest($this->invalidToken, EntityId::create(), 'filename.yaml');
+        $response = $this->application->makeRemoveFileRequest(
+            $this->invalidToken,
+            EntityId::create(),
+            TestConstants::FILENAME
+        );
 
         $this->responseAsserter->assertUnauthorizedResponse($response);
         $this->requestAsserter->assertAuthorizationRequestIsMade($this->invalidToken);
@@ -271,7 +224,7 @@ class FileSourceFileControllerTest extends AbstractSourceControllerTest
         $response = $this->application->makeRemoveFileRequest(
             $this->validToken,
             $source->getId(),
-            'filename.yaml'
+            TestConstants::FILENAME
         );
 
         $this->responseAsserter->assertForbiddenResponse($response);
@@ -300,7 +253,7 @@ class FileSourceFileControllerTest extends AbstractSourceControllerTest
         $response = $this->application->makeReadFileRequest(
             $this->validToken,
             $this->fileSource->getId(),
-            'filename.yaml'
+            TestConstants::FILENAME
         );
 
         $this->responseAsserter->assertNotFoundResponse($response);
@@ -308,7 +261,7 @@ class FileSourceFileControllerTest extends AbstractSourceControllerTest
 
     public function testReadFileSuccess(): void
     {
-        $filename = 'filename.yaml';
+        $filename = TestConstants::FILENAME;
         $content = '- file content';
         $fileRelativePath = $this->sourceRelativePath . '/' . $filename;
 
@@ -321,50 +274,5 @@ class FileSourceFileControllerTest extends AbstractSourceControllerTest
         );
 
         $this->responseAsserter->assertReadSourceSuccessResponse($response, $content);
-    }
-
-    /**
-     * @return array<mixed>
-     */
-    public function yamlFileInvalidRequestDataProvider(): array
-    {
-        return [
-            'name empty with .yaml extension' => [
-                'filename' => '.yaml',
-                'expectedResponseData' => $this->createExpectedInvalidFilenameResponseData(
-                    YamlFilenameConstraint::MESSAGE_NAME_EMPTY
-                ),
-            ],
-            'name contains backslash characters' => [
-                'filename' => 'one-two-\\-three.yaml',
-                'expectedResponseData' => $this->createExpectedInvalidFilenameResponseData(
-                    YamlFilenameConstraint::MESSAGE_FILENAME_INVALID
-                ),
-            ],
-            'name contains space characters' => [
-                'filename' => 'one two three.yaml',
-                'expectedResponseData' => $this->createExpectedInvalidFilenameResponseData(
-                    YamlFilenameConstraint::MESSAGE_FILENAME_INVALID
-                ),
-            ],
-        ];
-    }
-
-    /**
-     * @return array<mixed>
-     */
-    private function createExpectedInvalidFilenameResponseData(string $message): array
-    {
-        return [
-            'error' => [
-                'type' => 'invalid_request',
-                'payload' => [
-                    'name' => [
-                        'value' => '',
-                        'message' => $message,
-                    ],
-                ],
-            ],
-        ];
     }
 }

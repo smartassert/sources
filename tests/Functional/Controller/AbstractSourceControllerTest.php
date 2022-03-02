@@ -14,8 +14,6 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 abstract class AbstractSourceControllerTest extends WebTestCase
 {
-    protected const AUTHENTICATED_USER_ID_PLACEHOLDER = '{{ authenticated_user_id }}';
-
     protected RequestAsserter $requestAsserter;
     protected ResponseAsserter $responseAsserter;
     protected AuthenticationConfiguration $authenticationConfiguration;

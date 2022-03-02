@@ -5,18 +5,18 @@ declare(strict_types=1);
 namespace App\Tests\Integration;
 
 use App\Entity\FileSource;
-use App\Entity\GitSource;
-use App\Entity\RunSource;
 use App\Entity\SourceInterface;
-use App\Enum\Source\Type;
 use App\Model\EntityId;
 use App\Repository\SourceRepository;
 use App\Services\Source\Store;
+use App\Tests\DataProvider\DeleteSourceSuccessDataProviderTrait;
 use App\Tests\Model\UserId;
 use App\Tests\Services\EntityRemover;
 
 class DeleteSourceTest extends AbstractIntegrationTest
 {
+    use DeleteSourceSuccessDataProviderTrait;
+
     private SourceRepository $sourceRepository;
     private Store $store;
 
@@ -56,7 +56,7 @@ class DeleteSourceTest extends AbstractIntegrationTest
     }
 
     /**
-     * @dataProvider deleteSuccessDataProvider
+     * @dataProvider deleteSourceSuccessDataProvider
      */
     public function testDeleteSuccess(SourceInterface $source, int $expectedRepositoryCount): void
     {
@@ -69,31 +69,5 @@ class DeleteSourceTest extends AbstractIntegrationTest
 
         $this->responseAsserter->assertSuccessfulResponseWithNoBody($response);
         self::assertSame($expectedRepositoryCount, $this->sourceRepository->count([]));
-    }
-
-    /**
-     * @return array<mixed>
-     */
-    public function deleteSuccessDataProvider(): array
-    {
-        return [
-            Type::FILE->value => [
-                'source' => new FileSource(self::AUTHENTICATED_USER_ID_PLACEHOLDER, 'label'),
-                'expectedRepositoryCount' => 0,
-            ],
-            Type::GIT->value => [
-                'source' => new GitSource(
-                    self::AUTHENTICATED_USER_ID_PLACEHOLDER,
-                    'https://example.com/repository.git'
-                ),
-                'expectedRepositoryCount' => 0,
-            ],
-            Type::RUN->value => [
-                'source' => new RunSource(
-                    new FileSource(self::AUTHENTICATED_USER_ID_PLACEHOLDER, 'label')
-                ),
-                'expectedRepositoryCount' => 1,
-            ],
-        ];
     }
 }
