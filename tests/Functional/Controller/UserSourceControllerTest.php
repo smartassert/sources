@@ -19,6 +19,7 @@ use App\Request\GitSourceRequest;
 use App\Request\SourceRequestInterface;
 use App\Services\RunSourceSerializer;
 use App\Services\Source\Store;
+use App\Tests\DataProvider\DeleteSourceSuccessDataProviderTrait;
 use App\Tests\DataProvider\TestConstants;
 use App\Tests\Model\UserId;
 use App\Tests\Services\EntityRemover;
@@ -27,6 +28,8 @@ use League\Flysystem\FilesystemOperator;
 
 class UserSourceControllerTest extends AbstractSourceControllerTest
 {
+    use DeleteSourceSuccessDataProviderTrait;
+
     private SourceRepository $sourceRepository;
     private RunSourceRepository $runSourceRepository;
     private Store $store;
@@ -365,7 +368,7 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
     }
 
     /**
-     * @dataProvider deleteSuccessDataProvider
+     * @dataProvider deleteSourceSuccessDataProvider
      */
     public function testDeleteSuccess(SourceInterface $source, int $expectedRepositoryCount): void
     {
@@ -379,32 +382,6 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
         $this->responseAsserter->assertSuccessfulResponseWithNoBody($response);
         $this->requestAsserter->assertAuthorizationRequestIsMade();
         self::assertSame($expectedRepositoryCount, $this->sourceRepository->count([]));
-    }
-
-    /**
-     * @return array<mixed>
-     */
-    public function deleteSuccessDataProvider(): array
-    {
-        return [
-            Type::FILE->value => [
-                'source' => new FileSource(TestConstants::AUTHENTICATED_USER_ID_PLACEHOLDER, 'label'),
-                'expectedRepositoryCount' => 0,
-            ],
-            Type::GIT->value => [
-                'source' => new GitSource(
-                    TestConstants::AUTHENTICATED_USER_ID_PLACEHOLDER,
-                    'https://example.com/repository.git'
-                ),
-                'expectedRepositoryCount' => 0,
-            ],
-            Type::RUN->value => [
-                'source' => new RunSource(
-                    new FileSource(TestConstants::AUTHENTICATED_USER_ID_PLACEHOLDER, 'label')
-                ),
-                'expectedRepositoryCount' => 1,
-            ],
-        ];
     }
 
     public function testDeleteRunSourceDeletesRunSourceFiles(): void
