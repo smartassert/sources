@@ -7,6 +7,8 @@ namespace App\Tests\Integration;
 use App\Entity\FileSource;
 use App\Model\EntityId;
 use App\Services\Source\Store;
+use App\Tests\DataProvider\AddFileInvalidRequestDataProviderTrait;
+use App\Tests\DataProvider\TestConstants;
 use App\Tests\Model\UserId;
 use App\Tests\Services\EntityRemover;
 use App\Tests\Services\InvalidFilenameResponseDataFactory;
@@ -14,7 +16,7 @@ use App\Validator\YamlFilenameConstraint;
 
 class AddReadDeleteFileTest extends AbstractIntegrationTest
 {
-    private const FILENAME = 'filename.yaml';
+    use AddFileInvalidRequestDataProviderTrait;
 
     private FileSource $source;
     private Store $store;
@@ -41,7 +43,7 @@ class AddReadDeleteFileTest extends AbstractIntegrationTest
         $response = $this->client->makeAddFileRequest(
             $this->invalidToken,
             $this->source->getId(),
-            self::FILENAME,
+            TestConstants::FILENAME,
             '- content'
         );
 
@@ -56,7 +58,7 @@ class AddReadDeleteFileTest extends AbstractIntegrationTest
         $response = $this->client->makeAddFileRequest(
             $this->validToken,
             $source->getId(),
-            self::FILENAME,
+            TestConstants::FILENAME,
             '- content'
         );
 
@@ -83,69 +85,13 @@ class AddReadDeleteFileTest extends AbstractIntegrationTest
         $this->responseAsserter->assertInvalidRequestJsonResponse($response, $expectedResponseData);
     }
 
-    /**
-     * @return array<mixed>
-     */
-    public function addFileInvalidRequestDataProvider(): array
-    {
-        return [
-            'name empty with .yaml extension, content non-empty' => [
-                'filename' => '.yaml',
-                'content' => 'non-empty value',
-                'expectedResponseData' => InvalidFilenameResponseDataFactory::createForMessage(
-                    YamlFilenameConstraint::MESSAGE_NAME_EMPTY
-                ),
-            ],
-            'name contains backslash characters, content non-empty' => [
-                'filename' => 'one-two-\\-three.yaml',
-                'content' => 'non-empty value',
-                'expectedResponseData' => InvalidFilenameResponseDataFactory::createForMessage(
-                    YamlFilenameConstraint::MESSAGE_FILENAME_INVALID
-                ),
-            ],
-            'name contains space characters, content non-empty' => [
-                'filename' => 'one two three.yaml',
-                'content' => 'non-empty value',
-                'expectedResponseData' => InvalidFilenameResponseDataFactory::createForMessage(
-                    YamlFilenameConstraint::MESSAGE_FILENAME_INVALID
-                ),
-            ],
-            'name valid, content empty' => [
-                'filename' => self::FILENAME,
-                'content' => '',
-                'expectedResponseData' => [
-                    'error' => [
-                        'type' => 'invalid_request',
-                        'payload' => [
-                            'content' => [
-                                'value' => '',
-                                'message' => 'File content must not be empty.',
-                            ],
-                        ],
-                    ],
-                ],
-            ],
-            'name valid, content invalid yaml' => [
-                'filename' => self::FILENAME,
-                'content' => "- item\ncontent",
-                'expectedResponseData' => [
-                    'error' => [
-                        'type' => 'invalid_request',
-                        'payload' => [
-                            'content' => [
-                                'value' => '',
-                                'message' => 'Content must be valid YAML: Unable to parse at line 2 (near "content").',
-                            ],
-                        ],
-                    ],
-                ],
-            ],
-        ];
-    }
-
     public function testReadFileUnauthorizedUser(): void
     {
-        $response = $this->client->makeRemoveFileRequest($this->invalidToken, EntityId::create(), self::FILENAME);
+        $response = $this->client->makeRemoveFileRequest(
+            $this->invalidToken,
+            EntityId::create(),
+            TestConstants::FILENAME
+        );
 
         $this->responseAsserter->assertUnauthorizedResponse($response);
     }
@@ -158,7 +104,7 @@ class AddReadDeleteFileTest extends AbstractIntegrationTest
         $response = $this->client->makeReadFileRequest(
             $this->validToken,
             $source->getId(),
-            self::FILENAME
+            TestConstants::FILENAME
         );
 
         $this->responseAsserter->assertForbiddenResponse($response);
@@ -214,7 +160,7 @@ class AddReadDeleteFileTest extends AbstractIntegrationTest
         $response = $this->client->makeRemoveFileRequest(
             $this->invalidToken,
             $this->source->getId(),
-            self::FILENAME
+            TestConstants::FILENAME
         );
 
         $this->responseAsserter->assertUnauthorizedResponse($response);
@@ -225,7 +171,7 @@ class AddReadDeleteFileTest extends AbstractIntegrationTest
         $source = new FileSource(UserId::create(), '');
         $this->store->add($source);
 
-        $response = $this->client->makeRemoveFileRequest($this->validToken, $source->getId(), self::FILENAME);
+        $response = $this->client->makeRemoveFileRequest($this->validToken, $source->getId(), TestConstants::FILENAME);
 
         $this->responseAsserter->assertForbiddenResponse($response);
     }
@@ -252,7 +198,7 @@ class AddReadDeleteFileTest extends AbstractIntegrationTest
         $addResponse = $this->client->makeAddFileRequest(
             $this->validToken,
             $this->source->getId(),
-            self::FILENAME,
+            TestConstants::FILENAME,
             $initialContent
         );
 
@@ -261,7 +207,7 @@ class AddReadDeleteFileTest extends AbstractIntegrationTest
         $initialReadResponse = $this->client->makeReadFileRequest(
             $this->validToken,
             $this->source->getId(),
-            self::FILENAME
+            TestConstants::FILENAME
         );
 
         $this->responseAsserter->assertReadSourceSuccessResponse($initialReadResponse, $initialContent);
@@ -269,7 +215,7 @@ class AddReadDeleteFileTest extends AbstractIntegrationTest
         $updateResponse = $this->client->makeAddFileRequest(
             $this->validToken,
             $this->source->getId(),
-            self::FILENAME,
+            TestConstants::FILENAME,
             $updatedContent
         );
 
@@ -278,7 +224,7 @@ class AddReadDeleteFileTest extends AbstractIntegrationTest
         $updatedReadResponse = $this->client->makeReadFileRequest(
             $this->validToken,
             $this->source->getId(),
-            self::FILENAME
+            TestConstants::FILENAME
         );
 
         $this->responseAsserter->assertReadSourceSuccessResponse($updatedReadResponse, $updatedContent);
@@ -286,7 +232,7 @@ class AddReadDeleteFileTest extends AbstractIntegrationTest
         $removeResponse = $this->client->makeRemoveFileRequest(
             $this->validToken,
             $this->source->getId(),
-            self::FILENAME
+            TestConstants::FILENAME
         );
 
         $this->responseAsserter->assertSuccessfulResponseWithNoBody($removeResponse);
@@ -294,7 +240,7 @@ class AddReadDeleteFileTest extends AbstractIntegrationTest
         $notFoundReadResponse = $this->client->makeReadFileRequest(
             $this->validToken,
             $this->source->getId(),
-            self::FILENAME
+            TestConstants::FILENAME
         );
 
         $this->responseAsserter->assertNotFoundResponse($notFoundReadResponse);
