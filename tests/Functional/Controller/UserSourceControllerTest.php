@@ -13,7 +13,6 @@ use App\Enum\Source\Type;
 use App\Model\EntityId;
 use App\Repository\RunSourceRepository;
 use App\Repository\SourceRepository;
-use App\Request\FileSourceRequest;
 use App\Request\GitSourceRequest;
 use App\Request\SourceRequestInterface;
 use App\Services\RunSourceSerializer;
@@ -21,6 +20,7 @@ use App\Services\Source\Store;
 use App\Tests\DataProvider\DeleteSourceSuccessDataProviderTrait;
 use App\Tests\DataProvider\GetSourceSuccessDataProviderTrait;
 use App\Tests\DataProvider\TestConstants;
+use App\Tests\DataProvider\UpdateSourceSuccessDataProviderTrait;
 use App\Tests\Model\UserId;
 use App\Tests\Services\EntityRemover;
 use App\Tests\Services\FileStoreFixtureCreator;
@@ -30,6 +30,7 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
 {
     use DeleteSourceSuccessDataProviderTrait;
     use GetSourceSuccessDataProviderTrait;
+    use UpdateSourceSuccessDataProviderTrait;
 
     private SourceRepository $sourceRepository;
     private RunSourceRepository $runSourceRepository;
@@ -196,7 +197,7 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
     }
 
     /**
-     * @dataProvider updateDataProvider
+     * @dataProvider updateSourceSuccessDataProvider
      *
      * @param array<string, string> $payload
      * @param array<mixed>          $expectedResponseData
@@ -215,74 +216,6 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
 
         $this->responseAsserter->assertSuccessfulJsonResponse($response, $expectedResponseData);
         $this->requestAsserter->assertAuthorizationRequestIsMade();
-    }
-
-    /**
-     * @return array<mixed>
-     */
-    public function updateDataProvider(): array
-    {
-        $userId = TestConstants::AUTHENTICATED_USER_ID_PLACEHOLDER;
-        $hostUrl = 'https://example.com/repository.git';
-        $path = '/';
-        $credentials = md5((string) rand());
-        $newHostUrl = 'https://new.example.com/repository.git';
-        $newPath = '/new';
-
-        $label = 'file source label';
-        $newLabel = 'new file source label';
-
-        $fileSource = new FileSource($userId, $label);
-        $gitSource = new GitSource($userId, $hostUrl, $path, $credentials);
-
-        return [
-            Type::FILE->value => [
-                'source' => $fileSource,
-                'payload' => [
-                    SourceRequestInterface::PARAMETER_TYPE => Type::FILE->value,
-                    FileSourceRequest::PARAMETER_LABEL => $newLabel,
-                ],
-                'expectedResponseData' => [
-                    'id' => $fileSource->getId(),
-                    'user_id' => $fileSource->getUserId(),
-                    'type' => Type::FILE->value,
-                    'label' => $newLabel,
-                ],
-            ],
-            Type::GIT->value . ' credentials present and empty' => [
-                'source' => $gitSource,
-                'payload' => [
-                    SourceRequestInterface::PARAMETER_TYPE => Type::GIT->value,
-                    GitSourceRequest::PARAMETER_HOST_URL => $newHostUrl,
-                    GitSourceRequest::PARAMETER_PATH => $newPath,
-                    GitSourceRequest::PARAMETER_CREDENTIALS => null,
-                ],
-                'expectedResponseData' => [
-                    'id' => $gitSource->getId(),
-                    'user_id' => $gitSource->getUserId(),
-                    'type' => Type::GIT->value,
-                    'host_url' => $newHostUrl,
-                    'path' => $newPath,
-                    'has_credentials' => false,
-                ],
-            ],
-            Type::GIT->value . ' credentials not present' => [
-                'source' => $gitSource,
-                'payload' => [
-                    SourceRequestInterface::PARAMETER_TYPE => Type::GIT->value,
-                    GitSourceRequest::PARAMETER_HOST_URL => $newHostUrl,
-                    GitSourceRequest::PARAMETER_PATH => $newPath,
-                ],
-                'expectedResponseData' => [
-                    'id' => $gitSource->getId(),
-                    'user_id' => $gitSource->getUserId(),
-                    'type' => Type::GIT->value,
-                    'host_url' => $newHostUrl,
-                    'path' => $newPath,
-                    'has_credentials' => false,
-                ],
-            ],
-        ];
     }
 
     public function testDeleteUnauthorizedUser(): void
