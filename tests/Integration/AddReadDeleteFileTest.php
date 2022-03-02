@@ -116,17 +116,6 @@ class AddReadDeleteFileTest extends AbstractIntegrationTest
         $this->responseAsserter->assertInvalidRequestJsonResponse($response, $expectedResponseData);
     }
 
-    public function testRemoveFileUnauthorizedUser(): void
-    {
-        $response = $this->applicationClient->makeRemoveFileRequest(
-            $this->invalidToken,
-            $this->source->getId(),
-            TestConstants::FILENAME
-        );
-
-        $this->responseAsserter->assertUnauthorizedResponse($response);
-    }
-
     public function testRemoveFileInvalidSourceUser(): void
     {
         $source = new FileSource(UserId::create(), '');

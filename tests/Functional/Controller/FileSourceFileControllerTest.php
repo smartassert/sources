@@ -124,17 +124,6 @@ class FileSourceFileControllerTest extends AbstractSourceControllerTest
         self::assertSame($updatedContent, $this->fileSourceStorage->read($fileRelativePath));
     }
 
-    public function testRemoveFileUnauthorizedUser(): void
-    {
-        $response = $this->applicationClient->makeRemoveFileRequest(
-            $this->invalidToken,
-            $this->fileSource->getId(),
-            TestConstants::FILENAME
-        );
-
-        $this->responseAsserter->assertUnauthorizedResponse($response);
-    }
-
     public function testRemoveFileInvalidSourceUser(): void
     {
         $source = new FileSource(UserId::create(), '');
