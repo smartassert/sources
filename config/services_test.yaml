@@ -53,17 +53,21 @@ services:
         arguments:
             $httpClient: '@app.tests.integration.http.client'
 
+    App\Tests\Services\ApplicationClient\ClientFactory: ~
+
     app.tests.services.application.client.symfony:
         public: true
         class: App\Tests\Services\ApplicationClient\Client
+        factory: ['@App\Tests\Services\ApplicationClient\ClientFactory', 'create']
         arguments:
-            $client: '@App\Tests\Services\ApplicationClient\SymfonyAdapter'
+            $adapter: '@App\Tests\Services\ApplicationClient\SymfonyAdapter'
 
     app.tests.services.application.client.http:
         public: true
         class: App\Tests\Services\ApplicationClient\Client
+        factory: ['@App\Tests\Services\ApplicationClient\ClientFactory', 'create']
         arguments:
-            $client: '@App\Tests\Services\ApplicationClient\HttpAdapter'
+            $adapter: '@App\Tests\Services\ApplicationClient\HttpAdapter'
 
     GuzzleHttp\Psr7\HttpFactory:
 
