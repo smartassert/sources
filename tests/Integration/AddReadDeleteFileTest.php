@@ -9,14 +9,14 @@ use App\Model\EntityId;
 use App\Services\Source\Store;
 use App\Tests\DataProvider\AddFileInvalidRequestDataProviderTrait;
 use App\Tests\DataProvider\TestConstants;
+use App\Tests\DataProvider\YamlFileInvalidRequestDataProviderTrait;
 use App\Tests\Model\UserId;
 use App\Tests\Services\EntityRemover;
-use App\Tests\Services\InvalidFilenameResponseDataFactory;
-use App\Validator\YamlFilenameConstraint;
 
 class AddReadDeleteFileTest extends AbstractIntegrationTest
 {
     use AddFileInvalidRequestDataProviderTrait;
+    use YamlFileInvalidRequestDataProviderTrait;
 
     private FileSource $source;
     private Store $store;
@@ -126,33 +126,6 @@ class AddReadDeleteFileTest extends AbstractIntegrationTest
         );
 
         $this->responseAsserter->assertInvalidRequestJsonResponse($response, $expectedResponseData);
-    }
-
-    /**
-     * @return array<mixed>
-     */
-    public function yamlFileInvalidRequestDataProvider(): array
-    {
-        return [
-            'name empty with .yaml extension' => [
-                'filename' => '.yaml',
-                'expectedResponseData' => InvalidFilenameResponseDataFactory::createForMessage(
-                    YamlFilenameConstraint::MESSAGE_NAME_EMPTY
-                ),
-            ],
-            'name contains backslash characters' => [
-                'filename' => 'one-two-\\-three.yaml',
-                'expectedResponseData' => InvalidFilenameResponseDataFactory::createForMessage(
-                    YamlFilenameConstraint::MESSAGE_FILENAME_INVALID
-                ),
-            ],
-            'name contains space characters' => [
-                'filename' => 'one two three.yaml',
-                'expectedResponseData' => InvalidFilenameResponseDataFactory::createForMessage(
-                    YamlFilenameConstraint::MESSAGE_FILENAME_INVALID
-                ),
-            ],
-        ];
     }
 
     public function testRemoveFileUnauthorizedUser(): void

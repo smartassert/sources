@@ -9,14 +9,14 @@ use App\Model\EntityId;
 use App\Services\Source\Store;
 use App\Tests\DataProvider\AddFileInvalidRequestDataProviderTrait;
 use App\Tests\DataProvider\TestConstants;
+use App\Tests\DataProvider\YamlFileInvalidRequestDataProviderTrait;
 use App\Tests\Model\UserId;
-use App\Tests\Services\InvalidFilenameResponseDataFactory;
-use App\Validator\YamlFilenameConstraint;
 use League\Flysystem\FilesystemOperator;
 
 class FileSourceFileControllerTest extends AbstractSourceControllerTest
 {
     use AddFileInvalidRequestDataProviderTrait;
+    use YamlFileInvalidRequestDataProviderTrait;
 
     private FilesystemOperator $fileSourceStorage;
 
@@ -274,32 +274,5 @@ class FileSourceFileControllerTest extends AbstractSourceControllerTest
         );
 
         $this->responseAsserter->assertReadSourceSuccessResponse($response, $content);
-    }
-
-    /**
-     * @return array<mixed>
-     */
-    public function yamlFileInvalidRequestDataProvider(): array
-    {
-        return [
-            'name empty with .yaml extension' => [
-                'filename' => '.yaml',
-                'expectedResponseData' => InvalidFilenameResponseDataFactory::createForMessage(
-                    YamlFilenameConstraint::MESSAGE_NAME_EMPTY
-                ),
-            ],
-            'name contains backslash characters' => [
-                'filename' => 'one-two-\\-three.yaml',
-                'expectedResponseData' => InvalidFilenameResponseDataFactory::createForMessage(
-                    YamlFilenameConstraint::MESSAGE_FILENAME_INVALID
-                ),
-            ],
-            'name contains space characters' => [
-                'filename' => 'one two three.yaml',
-                'expectedResponseData' => InvalidFilenameResponseDataFactory::createForMessage(
-                    YamlFilenameConstraint::MESSAGE_FILENAME_INVALID
-                ),
-            ],
-        ];
     }
 }
