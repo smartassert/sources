@@ -12,8 +12,6 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 abstract class AbstractIntegrationTest extends WebTestCase
 {
-    protected const AUTHENTICATED_USER_ID_PLACEHOLDER = '{{ authenticated_user_id }}';
-
     protected Client $client;
     protected ResponseAsserter $responseAsserter;
     protected AuthenticationConfiguration $authenticationConfiguration;

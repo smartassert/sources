@@ -13,9 +13,9 @@ use App\Request\FileSourceRequest;
 use App\Request\GitSourceRequest;
 use App\Request\SourceRequestInterface;
 use App\Services\Source\Store;
+use App\Tests\DataProvider\TestConstants;
 use App\Tests\Model\UserId;
 use App\Tests\Services\EntityRemover;
-use App\Tests\Services\SourceUserIdMutator;
 
 class UpdateSourceTest extends AbstractIntegrationTest
 {
@@ -78,7 +78,7 @@ class UpdateSourceTest extends AbstractIntegrationTest
      */
     public function updateInvalidRequestDataProvider(): array
     {
-        $userId = SourceUserIdMutator::AUTHENTICATED_USER_ID_PLACEHOLDER;
+        $userId = TestConstants::AUTHENTICATED_USER_ID_PLACEHOLDER;
         $hostUrl = 'https://example.com/repository.git';
         $path = '/';
         $credentials = md5((string) rand());
@@ -134,7 +134,7 @@ class UpdateSourceTest extends AbstractIntegrationTest
      */
     public function updateDataProvider(): array
     {
-        $userId = SourceUserIdMutator::AUTHENTICATED_USER_ID_PLACEHOLDER;
+        $userId = TestConstants::AUTHENTICATED_USER_ID_PLACEHOLDER;
         $hostUrl = 'https://example.com/repository.git';
         $path = '/';
         $credentials = md5((string) rand());

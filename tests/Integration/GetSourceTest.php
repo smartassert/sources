@@ -13,9 +13,9 @@ use App\Enum\RunSource\State;
 use App\Enum\Source\Type;
 use App\Model\EntityId;
 use App\Services\Source\Store;
+use App\Tests\DataProvider\TestConstants;
 use App\Tests\Model\UserId;
 use App\Tests\Services\EntityRemover;
-use App\Tests\Services\SourceUserIdMutator;
 
 class GetSourceTest extends AbstractIntegrationTest
 {
@@ -81,7 +81,7 @@ class GetSourceTest extends AbstractIntegrationTest
      */
     public function getSuccessDataProvider(): array
     {
-        $userId = SourceUserIdMutator::AUTHENTICATED_USER_ID_PLACEHOLDER;
+        $userId = TestConstants::AUTHENTICATED_USER_ID_PLACEHOLDER;
 
         $gitSource = new GitSource($userId, 'https://example.com/repository.git', '/', md5((string) rand()));
         $fileSource = new FileSource($userId, 'file source label');

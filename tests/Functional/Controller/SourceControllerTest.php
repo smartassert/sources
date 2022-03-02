@@ -8,20 +8,18 @@ use App\Entity\FileSource;
 use App\Entity\GitSource;
 use App\Entity\RunSource;
 use App\Entity\SourceInterface;
-use App\Enum\Source\Type;
 use App\Repository\SourceRepository;
-use App\Request\FileSourceRequest;
-use App\Request\GitSourceRequest;
-use App\Request\SourceRequestInterface;
 use App\Services\Source\Store;
 use App\Tests\DataProvider\CreateSourceInvalidRequestDataProviderTrait;
+use App\Tests\DataProvider\CreateSourceSuccessDataProviderTrait;
+use App\Tests\DataProvider\TestConstants;
 use App\Tests\Model\UserId;
 use App\Tests\Services\EntityRemover;
-use App\Tests\Services\SourceUserIdMutator;
 
 class SourceControllerTest extends AbstractSourceControllerTest
 {
     use CreateSourceInvalidRequestDataProviderTrait;
+    use CreateSourceSuccessDataProviderTrait;
 
     private SourceRepository $sourceRepository;
     private Store $store;
@@ -66,7 +64,7 @@ class SourceControllerTest extends AbstractSourceControllerTest
     }
 
     /**
-     * @dataProvider createSuccessDataProvider
+     * @dataProvider createSourceSuccessDataProvider
      *
      * @param array<string, string> $requestParameters
      * @param array<mixed>          $expected
@@ -87,60 +85,6 @@ class SourceControllerTest extends AbstractSourceControllerTest
 
         $this->responseAsserter->assertSuccessfulJsonResponse($response, $expected);
         $this->requestAsserter->assertAuthorizationRequestIsMade();
-    }
-
-    /**
-     * @return array<mixed>
-     */
-    public function createSuccessDataProvider(): array
-    {
-        $hostUrl = 'https://example.com/repository.git';
-        $path = '/';
-        $credentials = md5((string) rand());
-        $label = 'file source label';
-
-        return [
-            'git source, credentials missing' => [
-                'requestParameters' => [
-                    SourceRequestInterface::PARAMETER_TYPE => Type::GIT->value,
-                    GitSourceRequest::PARAMETER_HOST_URL => $hostUrl,
-                    GitSourceRequest::PARAMETER_PATH => $path
-                ],
-                'expected' => [
-                    'user_id' => SourceUserIdMutator::AUTHENTICATED_USER_ID_PLACEHOLDER,
-                    'type' => Type::GIT->value,
-                    'host_url' => $hostUrl,
-                    'path' => $path,
-                    'has_credentials' => false,
-                ],
-            ],
-            'git source, credentials present' => [
-                'requestParameters' => [
-                    SourceRequestInterface::PARAMETER_TYPE => Type::GIT->value,
-                    GitSourceRequest::PARAMETER_HOST_URL => $hostUrl,
-                    GitSourceRequest::PARAMETER_PATH => $path,
-                    GitSourceRequest::PARAMETER_CREDENTIALS => $credentials,
-                ],
-                'expected' => [
-                    'user_id' => SourceUserIdMutator::AUTHENTICATED_USER_ID_PLACEHOLDER,
-                    'type' => Type::GIT->value,
-                    'host_url' => $hostUrl,
-                    'path' => $path,
-                    'has_credentials' => true,
-                ],
-            ],
-            'file source' => [
-                'requestParameters' => [
-                    SourceRequestInterface::PARAMETER_TYPE => Type::FILE->value,
-                    FileSourceRequest::PARAMETER_LABEL => $label
-                ],
-                'expected' => [
-                    'user_id' => SourceUserIdMutator::AUTHENTICATED_USER_ID_PLACEHOLDER,
-                    'type' => Type::FILE->value,
-                    'label' => $label,
-                ],
-            ],
-        ];
     }
 
     public function testListUnauthorizedUser(): void
@@ -178,11 +122,11 @@ class SourceControllerTest extends AbstractSourceControllerTest
     public function listSuccessDataProvider(): array
     {
         $userFileSources = [
-            new FileSource(SourceUserIdMutator::AUTHENTICATED_USER_ID_PLACEHOLDER, 'file source label'),
+            new FileSource(TestConstants::AUTHENTICATED_USER_ID_PLACEHOLDER, 'file source label'),
         ];
 
         $userGitSources = [
-            new GitSource(SourceUserIdMutator::AUTHENTICATED_USER_ID_PLACEHOLDER, 'https://example.com/repository.git'),
+            new GitSource(TestConstants::AUTHENTICATED_USER_ID_PLACEHOLDER, 'https://example.com/repository.git'),
         ];
 
         $userRunSources = [

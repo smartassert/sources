@@ -12,6 +12,7 @@ use App\Enum\Source\Type;
 use App\Model\EntityId;
 use App\Repository\SourceRepository;
 use App\Services\Source\Store;
+use App\Tests\DataProvider\TestConstants;
 use App\Tests\Model\UserId;
 use App\Tests\Services\EntityRemover;
 
@@ -78,19 +79,19 @@ class DeleteSourceTest extends AbstractIntegrationTest
     {
         return [
             Type::FILE->value => [
-                'source' => new FileSource(self::AUTHENTICATED_USER_ID_PLACEHOLDER, 'label'),
+                'source' => new FileSource(TestConstants::AUTHENTICATED_USER_ID_PLACEHOLDER, 'label'),
                 'expectedRepositoryCount' => 0,
             ],
             Type::GIT->value => [
                 'source' => new GitSource(
-                    self::AUTHENTICATED_USER_ID_PLACEHOLDER,
+                    TestConstants::AUTHENTICATED_USER_ID_PLACEHOLDER,
                     'https://example.com/repository.git'
                 ),
                 'expectedRepositoryCount' => 0,
             ],
             Type::RUN->value => [
                 'source' => new RunSource(
-                    new FileSource(self::AUTHENTICATED_USER_ID_PLACEHOLDER, 'label')
+                    new FileSource(TestConstants::AUTHENTICATED_USER_ID_PLACEHOLDER, 'label')
                 ),
                 'expectedRepositoryCount' => 1,
             ],
