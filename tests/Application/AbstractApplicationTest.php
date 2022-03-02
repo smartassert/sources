@@ -17,12 +17,18 @@ abstract class AbstractApplicationTest extends WebTestCase
     protected AuthenticationConfiguration $authenticationConfiguration;
     protected ResponseAsserter $responseAsserter;
     protected KernelBrowser $kernelBrowser;
+    protected Client $applicationClient;
 
     protected function setUp(): void
     {
         parent::setUp();
 
         $this->kernelBrowser = self::createClient();
+
+        $factory = self::getContainer()->get(ClientFactory::class);
+        \assert($factory instanceof ClientFactory);
+
+        $this->applicationClient = $factory->create($this->getClientAdapter());
 
         $authenticationConfiguration = self::getContainer()->get(AuthenticationConfiguration::class);
         \assert($authenticationConfiguration instanceof AuthenticationConfiguration);
@@ -31,14 +37,6 @@ abstract class AbstractApplicationTest extends WebTestCase
         $responseAsserter = self::getContainer()->get(ResponseAsserter::class);
         \assert($responseAsserter instanceof ResponseAsserter);
         $this->responseAsserter = $responseAsserter;
-    }
-
-    protected function getApplicationClient(): Client
-    {
-        $factory = self::getContainer()->get(ClientFactory::class);
-        \assert($factory instanceof ClientFactory);
-
-        return $factory->create($this->getClientAdapter());
     }
 
     abstract protected function getClientAdapter(): AdapterInterface;

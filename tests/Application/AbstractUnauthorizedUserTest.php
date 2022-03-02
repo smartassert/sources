@@ -11,7 +11,7 @@ abstract class AbstractUnauthorizedUserTest extends AbstractApplicationTest
 {
     public function testAddFileUnauthorizedUser(): void
     {
-        $response = $this->getApplicationClient()->makeAddFileRequest(
+        $response = $this->applicationClient->makeAddFileRequest(
             $this->authenticationConfiguration->invalidToken,
             EntityId::create(),
             TestConstants::FILENAME,
@@ -23,7 +23,7 @@ abstract class AbstractUnauthorizedUserTest extends AbstractApplicationTest
 
     public function testRemoveFileUnauthorizedUser(): void
     {
-        $response = $this->getApplicationClient()->makeRemoveFileRequest(
+        $response = $this->applicationClient->makeRemoveFileRequest(
             $this->authenticationConfiguration->invalidToken,
             EntityId::create(),
             TestConstants::FILENAME
@@ -34,7 +34,7 @@ abstract class AbstractUnauthorizedUserTest extends AbstractApplicationTest
 
     public function testReadFileUnauthorizedUser(): void
     {
-        $response = $this->getApplicationClient()->makeRemoveFileRequest(
+        $response = $this->applicationClient->makeRemoveFileRequest(
             $this->authenticationConfiguration->invalidToken,
             EntityId::create(),
             TestConstants::FILENAME
@@ -45,7 +45,7 @@ abstract class AbstractUnauthorizedUserTest extends AbstractApplicationTest
 
     public function testCreateSourceUnauthorizedUser(): void
     {
-        $response = $this->getApplicationClient()->makeCreateSourceRequest(
+        $response = $this->applicationClient->makeCreateSourceRequest(
             $this->authenticationConfiguration->invalidToken,
             []
         );
@@ -55,7 +55,7 @@ abstract class AbstractUnauthorizedUserTest extends AbstractApplicationTest
 
     public function testListUnauthorizedUser(): void
     {
-        $response = $this->getApplicationClient()->makeListSourcesRequest(
+        $response = $this->applicationClient->makeListSourcesRequest(
             $this->authenticationConfiguration->invalidToken
         );
 
