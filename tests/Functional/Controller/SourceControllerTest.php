@@ -42,13 +42,6 @@ class SourceControllerTest extends AbstractSourceControllerTest
         }
     }
 
-    public function testCreateUnauthorizedUser(): void
-    {
-        $response = $this->applicationClient->makeCreateSourceRequest($this->invalidToken, []);
-
-        $this->responseAsserter->assertUnauthorizedResponse($response);
-    }
-
     /**
      * @dataProvider createSourceInvalidRequestDataProvider
      *

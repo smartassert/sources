@@ -42,4 +42,14 @@ abstract class AbstractUnauthorizedUserTest extends AbstractApplicationTest
 
         $this->responseAsserter->assertUnauthorizedResponse($response);
     }
+
+    public function testCreateSourceUnauthorizedUser(): void
+    {
+        $response = $this->getApplicationClient()->makeCreateSourceRequest(
+            $this->authenticationConfiguration->invalidToken,
+            []
+        );
+
+        $this->responseAsserter->assertUnauthorizedResponse($response);
+    }
 }
