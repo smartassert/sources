@@ -26,7 +26,7 @@ abstract class AbstractSourceControllerTest extends WebTestCase
 
         $client = static::createClient();
 
-        $application = self::getContainer()->get('app.tests.services.application.client.functional');
+        $application = self::getContainer()->get('app.tests.services.application.client.symfony');
         \assert($application instanceof Client);
 
         $symfonyClient = self::getContainer()->get(SymfonyAdapter::class);

@@ -32,7 +32,7 @@ abstract class AbstractIntegrationTest extends WebTestCase
         $this->validToken = $authenticationConfiguration->validToken;
         $this->invalidToken = $authenticationConfiguration->invalidToken;
 
-        $application = self::getContainer()->get('app.tests.services.application.client.integration');
+        $application = self::getContainer()->get('app.tests.services.application.client.http');
         \assert($application instanceof Client);
         $this->applicationClient = $application;
 
