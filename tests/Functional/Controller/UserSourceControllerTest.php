@@ -83,7 +83,6 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
         $response = $this->application->makeGetSourceRequest($this->invalidToken, EntityId::create());
 
         $this->responseAsserter->assertUnauthorizedResponse($response);
-        $this->requestAsserter->assertAuthorizationRequestIsMade($this->invalidToken);
     }
 
     public function testGetSourceNotFound(): void
@@ -118,7 +117,6 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
         $expectedResponseData = $this->sourceUserIdMutator->setSourceDataUserId($expectedResponseData);
 
         $this->responseAsserter->assertSuccessfulJsonResponse($response, $expectedResponseData);
-        $this->requestAsserter->assertAuthorizationRequestIsMade();
     }
 
     public function testUpdateUnauthorizedUser(): void
@@ -126,7 +124,6 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
         $response = $this->application->makeUpdateSourceRequest($this->invalidToken, EntityId::create(), []);
 
         $this->responseAsserter->assertUnauthorizedResponse($response);
-        $this->requestAsserter->assertAuthorizationRequestIsMade($this->invalidToken);
     }
 
     public function testUpdateInvalidSourceUser(): void
@@ -158,7 +155,6 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
         $expectedResponseData = $this->sourceUserIdMutator->setSourceDataUserId($expectedResponseData);
 
         $this->responseAsserter->assertInvalidRequestJsonResponse($response, $expectedResponseData);
-        $this->requestAsserter->assertAuthorizationRequestIsMade();
     }
 
     /**
@@ -180,7 +176,6 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
         $expectedResponseData = $this->sourceUserIdMutator->setSourceDataUserId($expectedResponseData);
 
         $this->responseAsserter->assertSuccessfulJsonResponse($response, $expectedResponseData);
-        $this->requestAsserter->assertAuthorizationRequestIsMade();
     }
 
     public function testDeleteUnauthorizedUser(): void
@@ -188,7 +183,6 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
         $response = $this->application->makeDeleteSourceRequest($this->invalidToken, EntityId::create());
 
         $this->responseAsserter->assertUnauthorizedResponse($response);
-        $this->requestAsserter->assertAuthorizationRequestIsMade($this->invalidToken);
     }
 
     public function testDeleteInvalidSourceUser(): void
@@ -214,7 +208,6 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
         $response = $this->application->makeDeleteSourceRequest($this->validToken, $source->getId());
 
         $this->responseAsserter->assertSuccessfulResponseWithNoBody($response);
-        $this->requestAsserter->assertAuthorizationRequestIsMade();
         self::assertSame($expectedRepositoryCount, $this->sourceRepository->count([]));
     }
 
@@ -269,7 +262,6 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
         $response = $this->application->makePrepareSourceRequest($this->invalidToken, EntityId::create(), []);
 
         $this->responseAsserter->assertUnauthorizedResponse($response);
-        $this->requestAsserter->assertAuthorizationRequestIsMade($this->invalidToken);
     }
 
     public function testPrepareInvalidSourceUser(): void
@@ -292,7 +284,6 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
         $response = $this->application->makePrepareSourceRequest($this->validToken, $source->getId(), []);
 
         $this->responseAsserter->assertNotFoundResponse($response);
-        $this->requestAsserter->assertAuthorizationRequestIsMade();
     }
 
     /**
@@ -318,7 +309,6 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
         $expectedResponseData['id'] = $runSource->getId();
 
         $this->responseAsserter->assertPrepareSourceSuccessResponse($response, $expectedResponseData);
-        $this->requestAsserter->assertAuthorizationRequestIsMade();
     }
 
     /**

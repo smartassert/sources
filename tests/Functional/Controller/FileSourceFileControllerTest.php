@@ -55,7 +55,6 @@ class FileSourceFileControllerTest extends AbstractSourceControllerTest
         );
 
         $this->responseAsserter->assertUnauthorizedResponse($response);
-        $this->requestAsserter->assertAuthorizationRequestIsMade($this->invalidToken);
     }
 
     public function testAddFileInvalidSourceUser(): void
@@ -91,7 +90,6 @@ class FileSourceFileControllerTest extends AbstractSourceControllerTest
         );
 
         $this->responseAsserter->assertInvalidRequestJsonResponse($response, $expectedResponseData);
-        $this->requestAsserter->assertAuthorizationRequestIsMade();
     }
 
     public function testAddFileSuccess(): void
@@ -147,7 +145,6 @@ class FileSourceFileControllerTest extends AbstractSourceControllerTest
         );
 
         $this->responseAsserter->assertUnauthorizedResponse($response);
-        $this->requestAsserter->assertAuthorizationRequestIsMade($this->invalidToken);
     }
 
     public function testRemoveFileInvalidSourceUser(): void
@@ -176,7 +173,6 @@ class FileSourceFileControllerTest extends AbstractSourceControllerTest
         $response = $this->application->makeRemoveFileRequest($this->validToken, $this->fileSource->getId(), $filename);
 
         $this->responseAsserter->assertInvalidRequestJsonResponse($response, $expectedResponseData);
-        $this->requestAsserter->assertAuthorizationRequestIsMade();
     }
 
     public function testRemoveFileSuccess(): void
@@ -213,7 +209,6 @@ class FileSourceFileControllerTest extends AbstractSourceControllerTest
         );
 
         $this->responseAsserter->assertUnauthorizedResponse($response);
-        $this->requestAsserter->assertAuthorizationRequestIsMade($this->invalidToken);
     }
 
     public function testReadFileInvalidSourceUser(): void

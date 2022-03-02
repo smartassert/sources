@@ -47,7 +47,6 @@ class SourceControllerTest extends AbstractSourceControllerTest
         $response = $this->application->makeCreateSourceRequest($this->invalidToken, []);
 
         $this->responseAsserter->assertUnauthorizedResponse($response);
-        $this->requestAsserter->assertAuthorizationRequestIsMade($this->invalidToken);
     }
 
     /**
@@ -84,7 +83,6 @@ class SourceControllerTest extends AbstractSourceControllerTest
         $expected['user_id'] = $this->authenticationConfiguration->authenticatedUserId;
 
         $this->responseAsserter->assertSuccessfulJsonResponse($response, $expected);
-        $this->requestAsserter->assertAuthorizationRequestIsMade();
     }
 
     public function testListUnauthorizedUser(): void
@@ -92,7 +90,6 @@ class SourceControllerTest extends AbstractSourceControllerTest
         $response = $this->application->makeListSourcesRequest($this->invalidToken);
 
         $this->responseAsserter->assertUnauthorizedResponse($response);
-        $this->requestAsserter->assertAuthorizationRequestIsMade($this->invalidToken);
     }
 
     /**
@@ -113,7 +110,6 @@ class SourceControllerTest extends AbstractSourceControllerTest
         $expectedResponseData = $this->sourceUserIdMutator->setSourceDataCollectionUserId($expectedResponseData);
 
         $this->responseAsserter->assertSuccessfulJsonResponse($response, $expectedResponseData);
-        $this->requestAsserter->assertAuthorizationRequestIsMade();
     }
 
     /**
