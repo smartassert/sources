@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Tests\Integration;
 
 use App\Entity\FileSource;
-use App\Model\EntityId;
 use App\Services\Source\Store;
 use App\Tests\DataProvider\AddFileInvalidRequestDataProviderTrait;
 use App\Tests\DataProvider\TestConstants;
@@ -71,17 +70,6 @@ class AddReadDeleteFileTest extends AbstractIntegrationTest
         );
 
         $this->responseAsserter->assertInvalidRequestJsonResponse($response, $expectedResponseData);
-    }
-
-    public function testReadFileUnauthorizedUser(): void
-    {
-        $response = $this->applicationClient->makeRemoveFileRequest(
-            $this->invalidToken,
-            EntityId::create(),
-            TestConstants::FILENAME
-        );
-
-        $this->responseAsserter->assertUnauthorizedResponse($response);
     }
 
     public function testReadFileInvalidSourceUser(): void

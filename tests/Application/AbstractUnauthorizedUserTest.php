@@ -31,4 +31,15 @@ abstract class AbstractUnauthorizedUserTest extends AbstractApplicationTest
 
         $this->responseAsserter->assertUnauthorizedResponse($response);
     }
+
+    public function testReadFileUnauthorizedUser(): void
+    {
+        $response = $this->getApplicationClient()->makeRemoveFileRequest(
+            $this->authenticationConfiguration->invalidToken,
+            EntityId::create(),
+            TestConstants::FILENAME
+        );
+
+        $this->responseAsserter->assertUnauthorizedResponse($response);
+    }
 }
