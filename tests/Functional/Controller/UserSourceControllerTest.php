@@ -80,14 +80,14 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
 
     public function testGetUnauthorizedUser(): void
     {
-        $response = $this->application->makeGetSourceRequest($this->invalidToken, EntityId::create());
+        $response = $this->applicationClient->makeGetSourceRequest($this->invalidToken, EntityId::create());
 
         $this->responseAsserter->assertUnauthorizedResponse($response);
     }
 
     public function testGetSourceNotFound(): void
     {
-        $response = $this->application->makeGetSourceRequest($this->validToken, EntityId::create());
+        $response = $this->applicationClient->makeGetSourceRequest($this->validToken, EntityId::create());
 
         $this->responseAsserter->assertNotFoundResponse($response);
     }
@@ -97,7 +97,7 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
         $source = new FileSource(UserId::create(), '');
         $this->store->add($source);
 
-        $response = $this->application->makeGetSourceRequest($this->validToken, $source->getId());
+        $response = $this->applicationClient->makeGetSourceRequest($this->validToken, $source->getId());
 
         $this->responseAsserter->assertForbiddenResponse($response);
     }
@@ -112,7 +112,7 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
         $source = $this->sourceUserIdMutator->setSourceUserId($source);
         $this->store->add($source);
 
-        $response = $this->application->makeGetSourceRequest($this->validToken, $source->getId());
+        $response = $this->applicationClient->makeGetSourceRequest($this->validToken, $source->getId());
 
         $expectedResponseData = $this->sourceUserIdMutator->setSourceDataUserId($expectedResponseData);
 
@@ -121,7 +121,7 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
 
     public function testUpdateUnauthorizedUser(): void
     {
-        $response = $this->application->makeUpdateSourceRequest($this->invalidToken, EntityId::create(), []);
+        $response = $this->applicationClient->makeUpdateSourceRequest($this->invalidToken, EntityId::create(), []);
 
         $this->responseAsserter->assertUnauthorizedResponse($response);
     }
@@ -131,7 +131,7 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
         $source = new FileSource(UserId::create(), '');
         $this->store->add($source);
 
-        $response = $this->application->makeUpdateSourceRequest($this->validToken, $source->getId(), []);
+        $response = $this->applicationClient->makeUpdateSourceRequest($this->validToken, $source->getId(), []);
 
         $this->responseAsserter->assertForbiddenResponse($response);
     }
@@ -150,7 +150,7 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
         $this->sourceUserIdMutator->setSourceUserId($source);
         $this->store->add($source);
 
-        $response = $this->application->makeUpdateSourceRequest($this->validToken, $source->getId(), $payload);
+        $response = $this->applicationClient->makeUpdateSourceRequest($this->validToken, $source->getId(), $payload);
 
         $expectedResponseData = $this->sourceUserIdMutator->setSourceDataUserId($expectedResponseData);
 
@@ -171,7 +171,7 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
         $this->sourceUserIdMutator->setSourceUserId($source);
         $this->store->add($source);
 
-        $response = $this->application->makeUpdateSourceRequest($this->validToken, $source->getId(), $payload);
+        $response = $this->applicationClient->makeUpdateSourceRequest($this->validToken, $source->getId(), $payload);
 
         $expectedResponseData = $this->sourceUserIdMutator->setSourceDataUserId($expectedResponseData);
 
@@ -180,7 +180,7 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
 
     public function testDeleteUnauthorizedUser(): void
     {
-        $response = $this->application->makeDeleteSourceRequest($this->invalidToken, EntityId::create());
+        $response = $this->applicationClient->makeDeleteSourceRequest($this->invalidToken, EntityId::create());
 
         $this->responseAsserter->assertUnauthorizedResponse($response);
     }
@@ -190,7 +190,7 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
         $source = new FileSource(UserId::create(), '');
         $this->store->add($source);
 
-        $response = $this->application->makeDeleteSourceRequest($this->validToken, $source->getId());
+        $response = $this->applicationClient->makeDeleteSourceRequest($this->validToken, $source->getId());
 
         $this->responseAsserter->assertForbiddenResponse($response);
     }
@@ -205,7 +205,7 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
         $this->store->add($source);
         self::assertGreaterThan(0, $this->sourceRepository->count([]));
 
-        $response = $this->application->makeDeleteSourceRequest($this->validToken, $source->getId());
+        $response = $this->applicationClient->makeDeleteSourceRequest($this->validToken, $source->getId());
 
         $this->responseAsserter->assertSuccessfulResponseWithNoBody($response);
         self::assertSame($expectedRepositoryCount, $this->sourceRepository->count([]));
@@ -226,7 +226,7 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
         self::assertTrue($this->runSourceStorage->directoryExists($runSource->getDirectoryPath()));
         self::assertTrue($this->runSourceStorage->fileExists($serializedRunSourcePath));
 
-        $response = $this->application->makeDeleteSourceRequest($this->validToken, $runSource->getId());
+        $response = $this->applicationClient->makeDeleteSourceRequest($this->validToken, $runSource->getId());
 
         $this->responseAsserter->assertSuccessfulResponseWithNoBody($response);
         self::assertFalse($this->runSourceStorage->directoryExists($runSource->getDirectoryPath()));
@@ -248,7 +248,7 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
         self::assertTrue($this->fileSourceStorage->directoryExists($sourceRelativePath));
         self::assertTrue($this->fileSourceStorage->fileExists($fileRelativePath));
 
-        $response = $this->application->makeDeleteSourceRequest($this->validToken, $fileSource->getId());
+        $response = $this->applicationClient->makeDeleteSourceRequest($this->validToken, $fileSource->getId());
 
         $this->responseAsserter->assertSuccessfulResponseWithNoBody($response);
         self::assertSame(0, $this->sourceRepository->count([]));
@@ -259,7 +259,7 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
 
     public function testPrepareUnauthorizedUser(): void
     {
-        $response = $this->application->makePrepareSourceRequest($this->invalidToken, EntityId::create(), []);
+        $response = $this->applicationClient->makePrepareSourceRequest($this->invalidToken, EntityId::create(), []);
 
         $this->responseAsserter->assertUnauthorizedResponse($response);
     }
@@ -269,7 +269,7 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
         $source = new FileSource(UserId::create(), '');
         $this->store->add($source);
 
-        $response = $this->application->makePrepareSourceRequest($this->validToken, $source->getId(), []);
+        $response = $this->applicationClient->makePrepareSourceRequest($this->validToken, $source->getId(), []);
 
         $this->responseAsserter->assertForbiddenResponse($response);
     }
@@ -281,7 +281,7 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
 
         $this->store->add($source);
 
-        $response = $this->application->makePrepareSourceRequest($this->validToken, $source->getId(), []);
+        $response = $this->applicationClient->makePrepareSourceRequest($this->validToken, $source->getId(), []);
 
         $this->responseAsserter->assertNotFoundResponse($response);
     }
@@ -300,7 +300,7 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
         $this->sourceUserIdMutator->setSourceUserId($source);
         $this->store->add($source);
 
-        $response = $this->application->makePrepareSourceRequest($this->validToken, $source->getId(), $payload);
+        $response = $this->applicationClient->makePrepareSourceRequest($this->validToken, $source->getId(), $payload);
 
         $runSource = $this->runSourceRepository->findByParent($source);
         self::assertInstanceOf(RunSource::class, $runSource);
@@ -397,7 +397,7 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
             $runSource->getDirectoryPath() . '/' . RunSourceSerializer::SERIALIZED_FILENAME
         );
 
-        $response = $this->application->makeReadSourceRequest($this->validToken, $runSource->getId());
+        $response = $this->applicationClient->makeReadSourceRequest($this->validToken, $runSource->getId());
 
         $this->responseAsserter->assertReadSourceSuccessResponse(
             $response,

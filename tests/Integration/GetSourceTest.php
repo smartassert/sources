@@ -34,14 +34,14 @@ class GetSourceTest extends AbstractIntegrationTest
 
     public function testGetUnauthorizedUser(): void
     {
-        $response = $this->client->makeGetSourceRequest($this->invalidToken, EntityId::create());
+        $response = $this->applicationClient->makeGetSourceRequest($this->invalidToken, EntityId::create());
 
         $this->responseAsserter->assertUnauthorizedResponse($response);
     }
 
     public function testGetSourceNotFound(): void
     {
-        $response = $this->client->makeGetSourceRequest($this->validToken, EntityId::create());
+        $response = $this->applicationClient->makeGetSourceRequest($this->validToken, EntityId::create());
 
         $this->responseAsserter->assertNotFoundResponse($response);
     }
@@ -51,7 +51,7 @@ class GetSourceTest extends AbstractIntegrationTest
         $source = new FileSource(UserId::create(), '');
         $this->store->add($source);
 
-        $response = $this->client->makeGetSourceRequest($this->validToken, $source->getId());
+        $response = $this->applicationClient->makeGetSourceRequest($this->validToken, $source->getId());
 
         $this->responseAsserter->assertForbiddenResponse($response);
     }
@@ -66,7 +66,7 @@ class GetSourceTest extends AbstractIntegrationTest
         $source = $this->sourceUserIdMutator->setSourceUserId($source);
         $this->store->add($source);
 
-        $response = $this->client->makeGetSourceRequest($this->validToken, $source->getId());
+        $response = $this->applicationClient->makeGetSourceRequest($this->validToken, $source->getId());
 
         $expectedResponseData = $this->sourceUserIdMutator->setSourceDataUserId($expectedResponseData);
 
