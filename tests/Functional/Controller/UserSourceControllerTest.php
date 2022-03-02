@@ -12,10 +12,8 @@ use App\Enum\RunSource\State;
 use App\Enum\Source\Type;
 use App\Model\EntityId;
 use App\Repository\RunSourceRepository;
-use App\Repository\SourceRepository;
 use App\Services\RunSourceSerializer;
 use App\Services\Source\Store;
-use App\Tests\DataProvider\DeleteSourceSuccessDataProviderTrait;
 use App\Tests\DataProvider\GetSourceSuccessDataProviderTrait;
 use App\Tests\DataProvider\TestConstants;
 use App\Tests\DataProvider\UpdateSourceInvalidRequestDataProviderTrait;
@@ -26,17 +24,14 @@ use League\Flysystem\FilesystemOperator;
 
 class UserSourceControllerTest extends AbstractSourceControllerTest
 {
-    use DeleteSourceSuccessDataProviderTrait;
     use GetSourceSuccessDataProviderTrait;
     use UpdateSourceInvalidRequestDataProviderTrait;
     use UpdateSourceSuccessDataProviderTrait;
 
-    private SourceRepository $sourceRepository;
     private RunSourceRepository $runSourceRepository;
     private Store $store;
     private FileStoreFixtureCreator $fixtureCreator;
     private FilesystemOperator $runSourceStorage;
-    private FilesystemOperator $fileSourceStorage;
     private FilesystemOperator $fixtureStorage;
 
     protected function setUp(): void
@@ -46,10 +41,6 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
         $store = self::getContainer()->get(Store::class);
         \assert($store instanceof Store);
         $this->store = $store;
-
-        $sourceRepository = self::getContainer()->get(SourceRepository::class);
-        \assert($sourceRepository instanceof SourceRepository);
-        $this->sourceRepository = $sourceRepository;
 
         $runSourceRepository = self::getContainer()->get(RunSourceRepository::class);
         \assert($runSourceRepository instanceof RunSourceRepository);
@@ -62,10 +53,6 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
         $runSourceStorage = self::getContainer()->get('run_source.storage');
         \assert($runSourceStorage instanceof FilesystemOperator);
         $this->runSourceStorage = $runSourceStorage;
-
-        $fileSourceStorage = self::getContainer()->get('file_source.storage');
-        \assert($fileSourceStorage instanceof FilesystemOperator);
-        $this->fileSourceStorage = $fileSourceStorage;
 
         $fixtureStorage = self::getContainer()->get('test_fixtures.storage');
         \assert($fixtureStorage instanceof FilesystemOperator);
@@ -141,68 +128,6 @@ class UserSourceControllerTest extends AbstractSourceControllerTest
         $expectedResponseData = $this->sourceUserIdMutator->setSourceDataUserId($expectedResponseData);
 
         $this->responseAsserter->assertSuccessfulJsonResponse($response, $expectedResponseData);
-    }
-
-    /**
-     * @dataProvider deleteSourceSuccessDataProvider
-     */
-    public function testDeleteSuccess(SourceInterface $source, int $expectedRepositoryCount): void
-    {
-        $this->sourceUserIdMutator->setSourceUserId($source);
-
-        $this->store->add($source);
-        self::assertGreaterThan(0, $this->sourceRepository->count([]));
-
-        $response = $this->applicationClient->makeDeleteSourceRequest($this->validToken, $source->getId());
-
-        $this->responseAsserter->assertSuccessfulResponseWithNoBody($response);
-        self::assertSame($expectedRepositoryCount, $this->sourceRepository->count([]));
-    }
-
-    public function testDeleteRunSourceDeletesRunSourceFiles(): void
-    {
-        $fileSource = new FileSource($this->authenticationConfiguration->authenticatedUserId, 'file source label');
-        $runSource = new RunSource($fileSource);
-
-        $this->store->add($fileSource);
-        $this->store->add($runSource);
-
-        $serializedRunSourcePath = $runSource->getDirectoryPath() . '/' . RunSourceSerializer::SERIALIZED_FILENAME;
-
-        $this->runSourceStorage->write($serializedRunSourcePath, '- serialized content');
-
-        self::assertTrue($this->runSourceStorage->directoryExists($runSource->getDirectoryPath()));
-        self::assertTrue($this->runSourceStorage->fileExists($serializedRunSourcePath));
-
-        $response = $this->applicationClient->makeDeleteSourceRequest($this->validToken, $runSource->getId());
-
-        $this->responseAsserter->assertSuccessfulResponseWithNoBody($response);
-        self::assertFalse($this->runSourceStorage->directoryExists($runSource->getDirectoryPath()));
-        self::assertFalse($this->runSourceStorage->fileExists($serializedRunSourcePath));
-    }
-
-    public function testDeleteFileSourceDeletesFileSourceFiles(): void
-    {
-        $fileSource = new FileSource($this->authenticationConfiguration->authenticatedUserId, 'file source label');
-        $filename = 'file.yaml';
-
-        $this->store->add($fileSource);
-
-        $sourceRelativePath = $fileSource->getDirectoryPath();
-        $fileRelativePath = $sourceRelativePath . '/' . $filename;
-
-        $this->fileSourceStorage->write($fileRelativePath, '- content');
-
-        self::assertTrue($this->fileSourceStorage->directoryExists($sourceRelativePath));
-        self::assertTrue($this->fileSourceStorage->fileExists($fileRelativePath));
-
-        $response = $this->applicationClient->makeDeleteSourceRequest($this->validToken, $fileSource->getId());
-
-        $this->responseAsserter->assertSuccessfulResponseWithNoBody($response);
-        self::assertSame(0, $this->sourceRepository->count([]));
-
-        self::assertFalse($this->fileSourceStorage->directoryExists($sourceRelativePath));
-        self::assertFalse($this->fileSourceStorage->fileExists($fileRelativePath));
     }
 
     public function testPrepareRunSource(): void
