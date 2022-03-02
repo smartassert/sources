@@ -22,13 +22,6 @@ class ListSourcesTest extends AbstractIntegrationTest
         }
     }
 
-    public function testListUnauthorizedUser(): void
-    {
-        $response = $this->applicationClient->makeListSourcesRequest($this->invalidToken);
-
-        $this->responseAsserter->assertUnauthorizedResponse($response);
-    }
-
     public function testListSuccess(): void
     {
         $sourceIds = [];
