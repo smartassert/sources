@@ -53,13 +53,13 @@ services:
         arguments:
             $httpClient: '@app.tests.integration.http.client'
 
-    app.tests.services.application.client.functional:
+    app.tests.services.application.client.symfony:
         public: true
         class: App\Tests\Services\ApplicationClient\Client
         arguments:
             $client: '@App\Tests\Services\ApplicationClient\SymfonyAdapter'
 
-    app.tests.services.application.client.integration:
+    app.tests.services.application.client.http:
         public: true
         class: App\Tests\Services\ApplicationClient\Client
         arguments:
