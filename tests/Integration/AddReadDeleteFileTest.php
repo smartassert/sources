@@ -38,18 +38,6 @@ class AddReadDeleteFileTest extends AbstractIntegrationTest
         $this->store->add($this->source);
     }
 
-    public function testAddFileUnauthorizedUser(): void
-    {
-        $response = $this->applicationClient->makeAddFileRequest(
-            $this->invalidToken,
-            $this->source->getId(),
-            TestConstants::FILENAME,
-            '- content'
-        );
-
-        $this->responseAsserter->assertUnauthorizedResponse($response);
-    }
-
     public function testAddFileInvalidSourceUser(): void
     {
         $source = new FileSource(UserId::create(), '');

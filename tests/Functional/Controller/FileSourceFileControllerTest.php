@@ -45,18 +45,6 @@ class FileSourceFileControllerTest extends AbstractSourceControllerTest
         $store->add($this->fileSource);
     }
 
-    public function testAddFileUnauthorizedUser(): void
-    {
-        $response = $this->applicationClient->makeAddFileRequest(
-            $this->invalidToken,
-            $this->fileSource->getId(),
-            TestConstants::FILENAME,
-            '- content'
-        );
-
-        $this->responseAsserter->assertUnauthorizedResponse($response);
-    }
-
     public function testAddFileInvalidSourceUser(): void
     {
         $source = new FileSource(UserId::create(), '');
