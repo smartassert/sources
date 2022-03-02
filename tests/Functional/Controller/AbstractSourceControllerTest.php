@@ -7,14 +7,12 @@ namespace App\Tests\Functional\Controller;
 use App\Tests\Services\ApplicationClient\Client;
 use App\Tests\Services\ApplicationClient\SymfonyAdapter;
 use App\Tests\Services\AuthenticationConfiguration;
-use App\Tests\Services\RequestAsserter;
 use App\Tests\Services\ResponseAsserter;
 use App\Tests\Services\SourceUserIdMutator;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 abstract class AbstractSourceControllerTest extends WebTestCase
 {
-    protected RequestAsserter $requestAsserter;
     protected ResponseAsserter $responseAsserter;
     protected AuthenticationConfiguration $authenticationConfiguration;
     protected SourceUserIdMutator $sourceUserIdMutator;
@@ -36,10 +34,6 @@ abstract class AbstractSourceControllerTest extends WebTestCase
         $symfonyClient->setKernelBrowser($client);
 
         $this->application = $application;
-
-        $requestAsserter = self::getContainer()->get(RequestAsserter::class);
-        \assert($requestAsserter instanceof RequestAsserter);
-        $this->requestAsserter = $requestAsserter;
 
         $responseAsserter = self::getContainer()->get(ResponseAsserter::class);
         \assert($responseAsserter instanceof ResponseAsserter);
