@@ -5,16 +5,17 @@ declare(strict_types=1);
 namespace App\Tests\Application;
 
 use App\Model\EntityId;
-use App\Tests\DataProvider\TestConstants;
 
 abstract class AbstractUnauthorizedUserTest extends AbstractApplicationTest
 {
+    private const FILENAME = 'filename.yaml';
+
     public function testAddFileUnauthorizedUser(): void
     {
         $response = $this->applicationClient->makeAddFileRequest(
             $this->authenticationConfiguration->invalidToken,
             EntityId::create(),
-            TestConstants::FILENAME,
+            self::FILENAME,
             '- content'
         );
 
@@ -26,7 +27,7 @@ abstract class AbstractUnauthorizedUserTest extends AbstractApplicationTest
         $response = $this->applicationClient->makeRemoveFileRequest(
             $this->authenticationConfiguration->invalidToken,
             EntityId::create(),
-            TestConstants::FILENAME
+            self::FILENAME
         );
 
         $this->responseAsserter->assertUnauthorizedResponse($response);
@@ -37,7 +38,7 @@ abstract class AbstractUnauthorizedUserTest extends AbstractApplicationTest
         $response = $this->applicationClient->makeRemoveFileRequest(
             $this->authenticationConfiguration->invalidToken,
             EntityId::create(),
-            TestConstants::FILENAME
+            self::FILENAME
         );
 
         $this->responseAsserter->assertUnauthorizedResponse($response);

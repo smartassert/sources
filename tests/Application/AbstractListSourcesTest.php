@@ -8,7 +8,6 @@ use App\Entity\FileSource;
 use App\Entity\GitSource;
 use App\Entity\RunSource;
 use App\Entity\SourceInterface;
-use App\Tests\DataProvider\TestConstants;
 use App\Tests\Model\UserId;
 use App\Tests\Services\SourceUserIdMutator;
 
@@ -51,11 +50,11 @@ abstract class AbstractListSourcesTest extends AbstractApplicationTest
     public function listSuccessDataProvider(): array
     {
         $userFileSources = [
-            new FileSource(TestConstants::AUTHENTICATED_USER_ID_PLACEHOLDER, 'file source label'),
+            new FileSource(SourceUserIdMutator::AUTHENTICATED_USER_ID_PLACEHOLDER, 'file source label'),
         ];
 
         $userGitSources = [
-            new GitSource(TestConstants::AUTHENTICATED_USER_ID_PLACEHOLDER, 'https://example.com/repository.git'),
+            new GitSource(SourceUserIdMutator::AUTHENTICATED_USER_ID_PLACEHOLDER, 'https://example.com/repository.git'),
         ];
 
         $userRunSources = [
