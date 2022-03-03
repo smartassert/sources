@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "944843addfcaa65be59b708f90ade3cc",
+    "content-hash": "f34e5c1802d2af7caaa9787c1736ee71",
     "packages": [
         {
             "name": "async-aws/core",
@@ -2853,16 +2853,16 @@
         },
         {
             "name": "smartassert/users-security-bundle",
-            "version": "0.3",
+            "version": "0.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/smartassert/UsersSecurityBundle.git",
-                "reference": "a7f48f2f6cdaa37a1dc62f6d5d2e62fbbae4b4d1"
+                "reference": "f63333a868fa5e0169fbf313264cc58ccdb6fe53"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/smartassert/UsersSecurityBundle/zipball/a7f48f2f6cdaa37a1dc62f6d5d2e62fbbae4b4d1",
-                "reference": "a7f48f2f6cdaa37a1dc62f6d5d2e62fbbae4b4d1",
+                "url": "https://api.github.com/repos/smartassert/UsersSecurityBundle/zipball/f63333a868fa5e0169fbf313264cc58ccdb6fe53",
+                "reference": "f63333a868fa5e0169fbf313264cc58ccdb6fe53",
                 "shasum": ""
             },
             "require": {
@@ -2911,9 +2911,9 @@
             "homepage": "https://github.com/smartassert/UsersSecurityBundle",
             "support": {
                 "issues": "https://github.com/smartassert/UsersSecurityBundle/issues",
-                "source": "https://github.com/smartassert/UsersSecurityBundle/tree/0.3"
+                "source": "https://github.com/smartassert/UsersSecurityBundle/tree/0.4"
             },
-            "time": "2022-01-27T15:54:44+00:00"
+            "time": "2022-03-03T16:14:48+00:00"
         },
         {
             "name": "symfony/cache",
