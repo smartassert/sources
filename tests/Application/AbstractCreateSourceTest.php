@@ -8,7 +8,6 @@ use App\Entity\SourceInterface;
 use App\Repository\SourceRepository;
 use App\Tests\DataProvider\CreateSourceInvalidRequestDataProviderTrait;
 use App\Tests\DataProvider\CreateSourceSuccessDataProviderTrait;
-use App\Tests\Services\EntityRemover;
 
 abstract class AbstractCreateSourceTest extends AbstractApplicationTest
 {
@@ -39,11 +38,6 @@ abstract class AbstractCreateSourceTest extends AbstractApplicationTest
      */
     public function testCreateSuccess(array $requestParameters, array $expected): void
     {
-        $entityRemover = self::getContainer()->get(EntityRemover::class);
-        if ($entityRemover instanceof EntityRemover) {
-            $entityRemover->removeAll();
-        }
-
         $response = $this->applicationClient->makeCreateSourceRequest(
             $this->authenticationConfiguration->validToken,
             $requestParameters

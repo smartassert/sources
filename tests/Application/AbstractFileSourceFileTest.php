@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Tests\Application;
 
 use App\Entity\FileSource;
-use App\Services\Source\Store;
 use App\Tests\DataProvider\AddFileInvalidRequestDataProviderTrait;
 use App\Tests\DataProvider\TestConstants;
 use App\Tests\DataProvider\YamlFileInvalidRequestDataProviderTrait;
@@ -21,11 +20,8 @@ abstract class AbstractFileSourceFileTest extends AbstractApplicationTest
     {
         parent::setUp();
 
-        $store = self::getContainer()->get(Store::class);
-        \assert($store instanceof Store);
-
         $this->fileSource = new FileSource($this->authenticationConfiguration->authenticatedUserId, '');
-        $store->add($this->fileSource);
+        $this->store->add($this->fileSource);
     }
 
     /**

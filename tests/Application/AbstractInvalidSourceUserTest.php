@@ -6,25 +6,19 @@ namespace App\Tests\Application;
 
 use App\Entity\FileSource;
 use App\Entity\RunSource;
-use App\Services\Source\Store;
 use App\Tests\DataProvider\TestConstants;
 use App\Tests\Model\UserId;
 
 abstract class AbstractInvalidSourceUserTest extends AbstractApplicationTest
 {
     private FileSource $fileSource;
-    private Store $store;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $store = self::getContainer()->get(Store::class);
-        \assert($store instanceof Store);
-        $this->store = $store;
-
         $this->fileSource = new FileSource(UserId::create(), '');
-        $store->add($this->fileSource);
+        $this->store->add($this->fileSource);
     }
 
     public function testAddFileInvalidUser(): void

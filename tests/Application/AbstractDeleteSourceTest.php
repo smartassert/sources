@@ -9,9 +9,7 @@ use App\Entity\RunSource;
 use App\Entity\SourceInterface;
 use App\Repository\SourceRepository;
 use App\Services\RunSourceSerializer;
-use App\Services\Source\Store;
 use App\Tests\DataProvider\DeleteSourceSuccessDataProviderTrait;
-use App\Tests\Services\EntityRemover;
 use App\Tests\Services\SourceUserIdMutator;
 use League\Flysystem\FilesystemOperator;
 
@@ -19,25 +17,15 @@ abstract class AbstractDeleteSourceTest extends AbstractApplicationTest
 {
     use DeleteSourceSuccessDataProviderTrait;
 
-    private Store $store;
     private SourceRepository $sourceRepository;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $store = self::getContainer()->get(Store::class);
-        \assert($store instanceof Store);
-        $this->store = $store;
-
         $sourceRepository = self::getContainer()->get(SourceRepository::class);
         \assert($sourceRepository instanceof SourceRepository);
         $this->sourceRepository = $sourceRepository;
-
-        $entityRemover = self::getContainer()->get(EntityRemover::class);
-        if ($entityRemover instanceof EntityRemover) {
-            $entityRemover->removeAll();
-        }
     }
 
     /**

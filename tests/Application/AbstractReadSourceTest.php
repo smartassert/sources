@@ -7,14 +7,11 @@ namespace App\Tests\Application;
 use App\Entity\FileSource;
 use App\Entity\RunSource;
 use App\Services\RunSourceSerializer;
-use App\Services\Source\Store;
-use App\Tests\Services\EntityRemover;
 use App\Tests\Services\FileStoreFixtureCreator;
 use League\Flysystem\FilesystemOperator;
 
 abstract class AbstractReadSourceTest extends AbstractApplicationTest
 {
-    private Store $store;
     private FileStoreFixtureCreator $fixtureCreator;
     private FilesystemOperator $runSourceStorage;
     private FilesystemOperator $fixtureStorage;
@@ -22,10 +19,6 @@ abstract class AbstractReadSourceTest extends AbstractApplicationTest
     protected function setUp(): void
     {
         parent::setUp();
-
-        $store = self::getContainer()->get(Store::class);
-        \assert($store instanceof Store);
-        $this->store = $store;
 
         $fixtureCreator = self::getContainer()->get(FileStoreFixtureCreator::class);
         \assert($fixtureCreator instanceof FileStoreFixtureCreator);
@@ -38,11 +31,6 @@ abstract class AbstractReadSourceTest extends AbstractApplicationTest
         $fixtureStorage = self::getContainer()->get('test_fixtures.storage');
         \assert($fixtureStorage instanceof FilesystemOperator);
         $this->fixtureStorage = $fixtureStorage;
-
-        $entityRemover = self::getContainer()->get(EntityRemover::class);
-        if ($entityRemover instanceof EntityRemover) {
-            $entityRemover->removeAll();
-        }
     }
 
     public function testReadSuccess(): void
