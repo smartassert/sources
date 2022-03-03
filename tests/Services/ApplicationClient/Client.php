@@ -157,10 +157,7 @@ class Client
 
     public function makeGetStatusRequest(): ResponseInterface
     {
-        return $this->client->makeRequest(
-            'GET',
-            $this->router->generate('status')
-        );
+        return $this->client->makeRequest('GET', $this->router->generate('status'));
     }
 
     /**
