@@ -152,6 +152,11 @@ abstract class AbstractUnauthorizedUserTest extends AbstractApplicationTest
     public function unauthorizedUserDataProvider(): array
     {
         return [
+            'no token' => [
+                'tokenCreator' => function () {
+                    return null;
+                }
+            ],
             'empty token' => [
                 'tokenCreator' => function () {
                     return '';
