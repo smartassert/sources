@@ -5,15 +5,19 @@ declare(strict_types=1);
 namespace App\Tests\Application;
 
 use App\Model\EntityId;
+use App\Tests\Services\AuthenticationConfiguration;
 
 abstract class AbstractUnauthorizedUserTest extends AbstractApplicationTest
 {
     private const FILENAME = 'filename.yaml';
 
-    public function testAddFileUnauthorizedUser(): void
+    /**
+     * @dataProvider unauthorizedUserDataProvider
+     */
+    public function testAddFileUnauthorizedUser(callable $tokenCreator): void
     {
         $response = $this->applicationClient->makeAddFileRequest(
-            $this->authenticationConfiguration->invalidToken,
+            $tokenCreator($this->authenticationConfiguration),
             EntityId::create(),
             self::FILENAME,
             '- content'
@@ -22,10 +26,13 @@ abstract class AbstractUnauthorizedUserTest extends AbstractApplicationTest
         $this->responseAsserter->assertUnauthorizedResponse($response);
     }
 
-    public function testRemoveFileUnauthorizedUser(): void
+    /**
+     * @dataProvider unauthorizedUserDataProvider
+     */
+    public function testRemoveFileUnauthorizedUser(callable $tokenCreator): void
     {
         $response = $this->applicationClient->makeRemoveFileRequest(
-            $this->authenticationConfiguration->invalidToken,
+            $tokenCreator($this->authenticationConfiguration),
             EntityId::create(),
             self::FILENAME
         );
@@ -33,10 +40,13 @@ abstract class AbstractUnauthorizedUserTest extends AbstractApplicationTest
         $this->responseAsserter->assertUnauthorizedResponse($response);
     }
 
-    public function testReadFileUnauthorizedUser(): void
+    /**
+     * @dataProvider unauthorizedUserDataProvider
+     */
+    public function testReadFileUnauthorizedUser(callable $tokenCreator): void
     {
         $response = $this->applicationClient->makeRemoveFileRequest(
-            $this->authenticationConfiguration->invalidToken,
+            $tokenCreator($this->authenticationConfiguration),
             EntityId::create(),
             self::FILENAME
         );
@@ -44,39 +54,51 @@ abstract class AbstractUnauthorizedUserTest extends AbstractApplicationTest
         $this->responseAsserter->assertUnauthorizedResponse($response);
     }
 
-    public function testCreateSourceUnauthorizedUser(): void
+    /**
+     * @dataProvider unauthorizedUserDataProvider
+     */
+    public function testCreateSourceUnauthorizedUser(callable $tokenCreator): void
     {
         $response = $this->applicationClient->makeCreateSourceRequest(
-            $this->authenticationConfiguration->invalidToken,
+            $tokenCreator($this->authenticationConfiguration),
             []
         );
 
         $this->responseAsserter->assertUnauthorizedResponse($response);
     }
 
-    public function testListUnauthorizedUser(): void
+    /**
+     * @dataProvider unauthorizedUserDataProvider
+     */
+    public function testListUnauthorizedUser(callable $tokenCreator): void
     {
         $response = $this->applicationClient->makeListSourcesRequest(
-            $this->authenticationConfiguration->invalidToken
+            $tokenCreator($this->authenticationConfiguration),
         );
 
         $this->responseAsserter->assertUnauthorizedResponse($response);
     }
 
-    public function testGetSourceUnauthorizedUser(): void
+    /**
+     * @dataProvider unauthorizedUserDataProvider
+     */
+    public function testGetSourceUnauthorizedUser(callable $tokenCreator): void
     {
         $response = $this->applicationClient->makeGetSourceRequest(
-            $this->authenticationConfiguration->invalidToken,
+            $tokenCreator($this->authenticationConfiguration),
             EntityId::create()
         );
 
         $this->responseAsserter->assertUnauthorizedResponse($response);
     }
 
-    public function testUpdateSourceUnauthorizedUser(): void
+    /**
+     * @dataProvider unauthorizedUserDataProvider
+     */
+    public function testUpdateSourceUnauthorizedUser(callable $tokenCreator): void
     {
         $response = $this->applicationClient->makeUpdateSourceRequest(
-            $this->authenticationConfiguration->invalidToken,
+            $tokenCreator($this->authenticationConfiguration),
             EntityId::create(),
             []
         );
@@ -84,20 +106,26 @@ abstract class AbstractUnauthorizedUserTest extends AbstractApplicationTest
         $this->responseAsserter->assertUnauthorizedResponse($response);
     }
 
-    public function testDeleteSourceUnauthorizedUser(): void
+    /**
+     * @dataProvider unauthorizedUserDataProvider
+     */
+    public function testDeleteSourceUnauthorizedUser(callable $tokenCreator): void
     {
         $response = $this->applicationClient->makeDeleteSourceRequest(
-            $this->authenticationConfiguration->invalidToken,
+            $tokenCreator($this->authenticationConfiguration),
             EntityId::create()
         );
 
         $this->responseAsserter->assertUnauthorizedResponse($response);
     }
 
-    public function testPrepareSourceUnauthorizedUser(): void
+    /**
+     * @dataProvider unauthorizedUserDataProvider
+     */
+    public function testPrepareSourceUnauthorizedUser(callable $tokenCreator): void
     {
         $response = $this->applicationClient->makePrepareSourceRequest(
-            $this->authenticationConfiguration->invalidToken,
+            $tokenCreator($this->authenticationConfiguration),
             EntityId::create(),
             []
         );
@@ -105,13 +133,35 @@ abstract class AbstractUnauthorizedUserTest extends AbstractApplicationTest
         $this->responseAsserter->assertUnauthorizedResponse($response);
     }
 
-    public function testReadSourceUnauthorizedUser(): void
+    /**
+     * @dataProvider unauthorizedUserDataProvider
+     */
+    public function testReadSourceUnauthorizedUser(callable $tokenCreator): void
     {
         $response = $this->applicationClient->makeReadSourceRequest(
-            $this->authenticationConfiguration->invalidToken,
+            $tokenCreator($this->authenticationConfiguration),
             EntityId::create()
         );
 
         $this->responseAsserter->assertUnauthorizedResponse($response);
+    }
+
+    /**
+     * @return array<mixed>
+     */
+    public function unauthorizedUserDataProvider(): array
+    {
+        return [
+            'empty token' => [
+                'tokenCreator' => function () {
+                    return '';
+                }
+            ],
+            'non-empty invalid token' => [
+                'tokenCreator' => function (AuthenticationConfiguration $authenticationConfiguration) {
+                    return $authenticationConfiguration->invalidToken;
+                }
+            ],
+        ];
     }
 }
