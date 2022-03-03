@@ -6,30 +6,12 @@ namespace App\Tests\Application;
 
 use App\Entity\SourceInterface;
 use App\Model\EntityId;
-use App\Services\Source\Store;
 use App\Tests\DataProvider\GetSourceSuccessDataProviderTrait;
-use App\Tests\Services\EntityRemover;
 use App\Tests\Services\SourceUserIdMutator;
 
 abstract class AbstractGetSourceTest extends AbstractApplicationTest
 {
     use GetSourceSuccessDataProviderTrait;
-
-    private Store $store;
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        $store = self::getContainer()->get(Store::class);
-        \assert($store instanceof Store);
-        $this->store = $store;
-
-        $entityRemover = self::getContainer()->get(EntityRemover::class);
-        if ($entityRemover instanceof EntityRemover) {
-            $entityRemover->removeAll();
-        }
-    }
 
     public function testGetSourceNotFound(): void
     {
