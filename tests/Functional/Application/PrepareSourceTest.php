@@ -11,7 +11,6 @@ use App\Enum\RunSource\State;
 use App\Enum\Source\Type;
 use App\Repository\RunSourceRepository;
 use App\Tests\Application\AbstractPrepareSourceTest;
-use App\Tests\DataProvider\TestConstants;
 use App\Tests\Services\SourceUserIdMutator;
 
 class PrepareSourceTest extends AbstractPrepareSourceTest
@@ -68,7 +67,7 @@ class PrepareSourceTest extends AbstractPrepareSourceTest
      */
     public function prepareSuccessDataProvider(): array
     {
-        $userId = TestConstants::AUTHENTICATED_USER_ID_PLACEHOLDER;
+        $userId = SourceUserIdMutator::AUTHENTICATED_USER_ID_PLACEHOLDER;
 
         $fileSource = new FileSource($userId, 'file source label');
         $gitSource = new GitSource($userId, 'https://example.com/repository.git', '/', md5((string) rand()));

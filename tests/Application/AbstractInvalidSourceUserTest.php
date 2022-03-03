@@ -6,11 +6,12 @@ namespace App\Tests\Application;
 
 use App\Entity\FileSource;
 use App\Entity\RunSource;
-use App\Tests\DataProvider\TestConstants;
 use App\Tests\Model\UserId;
 
 abstract class AbstractInvalidSourceUserTest extends AbstractApplicationTest
 {
+    public const FILENAME = 'filename.yaml';
+
     private FileSource $fileSource;
 
     protected function setUp(): void
@@ -26,7 +27,7 @@ abstract class AbstractInvalidSourceUserTest extends AbstractApplicationTest
         $response = $this->applicationClient->makeAddFileRequest(
             $this->authenticationConfiguration->validToken,
             $this->fileSource->getId(),
-            TestConstants::FILENAME,
+            self::FILENAME,
             '- content'
         );
 
@@ -38,7 +39,7 @@ abstract class AbstractInvalidSourceUserTest extends AbstractApplicationTest
         $response = $this->applicationClient->makeRemoveFileRequest(
             $this->authenticationConfiguration->validToken,
             $this->fileSource->getId(),
-            TestConstants::FILENAME
+            self::FILENAME
         );
 
         $this->responseAsserter->assertForbiddenResponse($response);
@@ -49,7 +50,7 @@ abstract class AbstractInvalidSourceUserTest extends AbstractApplicationTest
         $response = $this->applicationClient->makeRemoveFileRequest(
             $this->authenticationConfiguration->validToken,
             $this->fileSource->getId(),
-            TestConstants::FILENAME
+            self::FILENAME
         );
 
         $this->responseAsserter->assertForbiddenResponse($response);

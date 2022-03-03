@@ -5,14 +5,12 @@ declare(strict_types=1);
 namespace App\Tests\Application;
 
 use App\Entity\FileSource;
-use App\Tests\DataProvider\AddFileInvalidRequestDataProviderTrait;
-use App\Tests\DataProvider\TestConstants;
-use App\Tests\DataProvider\YamlFileInvalidRequestDataProviderTrait;
+use App\Tests\Services\InvalidFilenameResponseDataFactory;
+use App\Validator\YamlFilenameConstraint;
 
 abstract class AbstractFileSourceFileTest extends AbstractApplicationTest
 {
-    use AddFileInvalidRequestDataProviderTrait;
-    use YamlFileInvalidRequestDataProviderTrait;
+    public const FILENAME = 'filename.yaml';
 
     private FileSource $fileSource;
 
@@ -42,6 +40,66 @@ abstract class AbstractFileSourceFileTest extends AbstractApplicationTest
         );
 
         $this->responseAsserter->assertInvalidRequestJsonResponse($response, $expectedResponseData);
+    }
+
+    /**
+     * @return array<mixed>
+     */
+    public function addFileInvalidRequestDataProvider(): array
+    {
+        return [
+            'name empty with .yaml extension, content non-empty' => [
+                'filename' => '.yaml',
+                'content' => 'non-empty value',
+                'expectedResponseData' => InvalidFilenameResponseDataFactory::createForMessage(
+                    YamlFilenameConstraint::MESSAGE_NAME_EMPTY
+                ),
+            ],
+            'name contains backslash characters, content non-empty' => [
+                'filename' => 'one-two-\\-three.yaml',
+                'content' => 'non-empty value',
+                'expectedResponseData' => InvalidFilenameResponseDataFactory::createForMessage(
+                    YamlFilenameConstraint::MESSAGE_FILENAME_INVALID
+                ),
+            ],
+            'name contains space characters, content non-empty' => [
+                'filename' => 'one two three.yaml',
+                'content' => 'non-empty value',
+                'expectedResponseData' => InvalidFilenameResponseDataFactory::createForMessage(
+                    YamlFilenameConstraint::MESSAGE_FILENAME_INVALID
+                ),
+            ],
+            'name valid, content empty' => [
+                'filename' => self::FILENAME,
+                'content' => '',
+                'expectedResponseData' => [
+                    'error' => [
+                        'type' => 'invalid_request',
+                        'payload' => [
+                            'content' => [
+                                'value' => '',
+                                'message' => 'File content must not be empty.',
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+            'name valid, content invalid yaml' => [
+                'filename' => self::FILENAME,
+                'content' => "- item\ncontent",
+                'expectedResponseData' => [
+                    'error' => [
+                        'type' => 'invalid_request',
+                        'payload' => [
+                            'content' => [
+                                'value' => '',
+                                'message' => 'Content must be valid YAML: Unable to parse at line 2 (near "content").',
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ];
     }
 
     /**
@@ -80,12 +138,39 @@ abstract class AbstractFileSourceFileTest extends AbstractApplicationTest
         $this->responseAsserter->assertInvalidRequestJsonResponse($response, $expectedResponseData);
     }
 
+    /**
+     * @return array<mixed>
+     */
+    public function yamlFileInvalidRequestDataProvider(): array
+    {
+        return [
+            'name empty with .yaml extension' => [
+                'filename' => '.yaml',
+                'expectedResponseData' => InvalidFilenameResponseDataFactory::createForMessage(
+                    YamlFilenameConstraint::MESSAGE_NAME_EMPTY
+                ),
+            ],
+            'name contains backslash characters' => [
+                'filename' => 'one-two-\\-three.yaml',
+                'expectedResponseData' => InvalidFilenameResponseDataFactory::createForMessage(
+                    YamlFilenameConstraint::MESSAGE_FILENAME_INVALID
+                ),
+            ],
+            'name contains space characters' => [
+                'filename' => 'one two three.yaml',
+                'expectedResponseData' => InvalidFilenameResponseDataFactory::createForMessage(
+                    YamlFilenameConstraint::MESSAGE_FILENAME_INVALID
+                ),
+            ],
+        ];
+    }
+
     public function testRemoveFileNotFound(): void
     {
         $response = $this->applicationClient->makeRemoveFileRequest(
             $this->authenticationConfiguration->validToken,
             $this->fileSource->getId(),
-            TestConstants::FILENAME
+            self::FILENAME
         );
 
         $this->responseAsserter->assertSuccessfulResponseWithNoBody($response);
@@ -96,7 +181,7 @@ abstract class AbstractFileSourceFileTest extends AbstractApplicationTest
         $response = $this->applicationClient->makeReadFileRequest(
             $this->authenticationConfiguration->validToken,
             $this->fileSource->getId(),
-            TestConstants::FILENAME
+            self::FILENAME
         );
 
         $this->responseAsserter->assertNotFoundResponse($response);
@@ -110,7 +195,7 @@ abstract class AbstractFileSourceFileTest extends AbstractApplicationTest
         $addResponse = $this->applicationClient->makeAddFileRequest(
             $this->authenticationConfiguration->validToken,
             $this->fileSource->getId(),
-            TestConstants::FILENAME,
+            self::FILENAME,
             $initialContent
         );
 
@@ -119,7 +204,7 @@ abstract class AbstractFileSourceFileTest extends AbstractApplicationTest
         $initialReadResponse = $this->applicationClient->makeReadFileRequest(
             $this->authenticationConfiguration->validToken,
             $this->fileSource->getId(),
-            TestConstants::FILENAME
+            self::FILENAME
         );
 
         $this->responseAsserter->assertReadSourceSuccessResponse($initialReadResponse, $initialContent);
@@ -127,7 +212,7 @@ abstract class AbstractFileSourceFileTest extends AbstractApplicationTest
         $updateResponse = $this->applicationClient->makeAddFileRequest(
             $this->authenticationConfiguration->validToken,
             $this->fileSource->getId(),
-            TestConstants::FILENAME,
+            self::FILENAME,
             $updatedContent
         );
 
@@ -136,7 +221,7 @@ abstract class AbstractFileSourceFileTest extends AbstractApplicationTest
         $updatedReadResponse = $this->applicationClient->makeReadFileRequest(
             $this->authenticationConfiguration->validToken,
             $this->fileSource->getId(),
-            TestConstants::FILENAME
+            self::FILENAME
         );
 
         $this->responseAsserter->assertReadSourceSuccessResponse($updatedReadResponse, $updatedContent);
@@ -144,7 +229,7 @@ abstract class AbstractFileSourceFileTest extends AbstractApplicationTest
         $removeResponse = $this->applicationClient->makeRemoveFileRequest(
             $this->authenticationConfiguration->validToken,
             $this->fileSource->getId(),
-            TestConstants::FILENAME
+            self::FILENAME
         );
 
         $this->responseAsserter->assertSuccessfulResponseWithNoBody($removeResponse);
@@ -152,7 +237,7 @@ abstract class AbstractFileSourceFileTest extends AbstractApplicationTest
         $notFoundReadResponse = $this->applicationClient->makeReadFileRequest(
             $this->authenticationConfiguration->validToken,
             $this->fileSource->getId(),
-            TestConstants::FILENAME
+            self::FILENAME
         );
 
         $this->responseAsserter->assertNotFoundResponse($notFoundReadResponse);

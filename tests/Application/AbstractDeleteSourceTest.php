@@ -5,18 +5,17 @@ declare(strict_types=1);
 namespace App\Tests\Application;
 
 use App\Entity\FileSource;
+use App\Entity\GitSource;
 use App\Entity\RunSource;
 use App\Entity\SourceInterface;
+use App\Enum\Source\Type;
 use App\Repository\SourceRepository;
 use App\Services\RunSourceSerializer;
-use App\Tests\DataProvider\DeleteSourceSuccessDataProviderTrait;
 use App\Tests\Services\SourceUserIdMutator;
 use League\Flysystem\FilesystemOperator;
 
 abstract class AbstractDeleteSourceTest extends AbstractApplicationTest
 {
-    use DeleteSourceSuccessDataProviderTrait;
-
     private SourceRepository $sourceRepository;
 
     protected function setUp(): void
@@ -48,6 +47,32 @@ abstract class AbstractDeleteSourceTest extends AbstractApplicationTest
 
         $this->responseAsserter->assertSuccessfulResponseWithNoBody($response);
         self::assertSame($expectedRepositoryCount, $this->sourceRepository->count([]));
+    }
+
+    /**
+     * @return array<mixed>
+     */
+    public function deleteSourceSuccessDataProvider(): array
+    {
+        return [
+            Type::FILE->value => [
+                'source' => new FileSource(SourceUserIdMutator::AUTHENTICATED_USER_ID_PLACEHOLDER, 'label'),
+                'expectedRepositoryCount' => 0,
+            ],
+            Type::GIT->value => [
+                'source' => new GitSource(
+                    SourceUserIdMutator::AUTHENTICATED_USER_ID_PLACEHOLDER,
+                    'https://example.com/repository.git'
+                ),
+                'expectedRepositoryCount' => 0,
+            ],
+            Type::RUN->value => [
+                'source' => new RunSource(
+                    new FileSource(SourceUserIdMutator::AUTHENTICATED_USER_ID_PLACEHOLDER, 'label')
+                ),
+                'expectedRepositoryCount' => 1,
+            ],
+        ];
     }
 
     public function testDeleteRunSourceDeletesRunSourceFiles(): void
