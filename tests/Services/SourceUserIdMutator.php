@@ -6,11 +6,12 @@ namespace App\Tests\Services;
 
 use App\Entity\AbstractSource;
 use App\Entity\SourceInterface;
-use App\Tests\DataProvider\TestConstants;
 use webignition\ObjectReflector\ObjectReflector;
 
 class SourceUserIdMutator
 {
+    public const AUTHENTICATED_USER_ID_PLACEHOLDER = '{{ authenticated_user_id }}';
+
     public function __construct(
         private readonly AuthenticationConfiguration $authenticationConfiguration,
     ) {
@@ -20,7 +21,7 @@ class SourceUserIdMutator
     {
         if (
             $source instanceof AbstractSource
-            && TestConstants::AUTHENTICATED_USER_ID_PLACEHOLDER == $source->getUserId()
+            && self::AUTHENTICATED_USER_ID_PLACEHOLDER == $source->getUserId()
         ) {
             ObjectReflector::setProperty(
                 $source,
@@ -56,7 +57,7 @@ class SourceUserIdMutator
     {
         if (
             array_key_exists('user_id', $sourceData)
-            && TestConstants::AUTHENTICATED_USER_ID_PLACEHOLDER == $sourceData['user_id']
+            && SourceUserIdMutator::AUTHENTICATED_USER_ID_PLACEHOLDER == $sourceData['user_id']
         ) {
             $sourceData['user_id'] = $this->authenticationConfiguration->authenticatedUserId;
         }

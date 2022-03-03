@@ -5,60 +5,13 @@ declare(strict_types=1);
 namespace App\Tests\Integration;
 
 use App\Entity\FileSource;
-use App\Entity\RunSource;
 use App\Enum\RunSource\State;
 use App\Enum\Source\Type;
-use App\Model\EntityId;
-use App\Services\Source\Store;
-use App\Tests\Model\UserId;
-use App\Tests\Services\EntityRemover;
+use App\Tests\Application\AbstractPrepareSourceTest;
 
-class PrepareSourceTest extends AbstractIntegrationTest
+class PrepareSourceTest extends AbstractPrepareSourceTest
 {
-    private Store $store;
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        $store = self::getContainer()->get(Store::class);
-        \assert($store instanceof Store);
-        $this->store = $store;
-
-        $entityRemover = self::getContainer()->get(EntityRemover::class);
-        if ($entityRemover instanceof EntityRemover) {
-            $entityRemover->removeAll();
-        }
-    }
-
-    public function testPrepareUnauthorizedUser(): void
-    {
-        $response = $this->client->makePrepareSourceRequest($this->invalidToken, EntityId::create(), []);
-
-        $this->responseAsserter->assertUnauthorizedResponse($response);
-    }
-
-    public function testPrepareInvalidSourceUser(): void
-    {
-        $source = new FileSource(UserId::create(), '');
-        $this->store->add($source);
-
-        $response = $this->client->makePrepareSourceRequest($this->validToken, $source->getId(), []);
-
-        $this->responseAsserter->assertForbiddenResponse($response);
-    }
-
-    public function testPrepareRunSource(): void
-    {
-        $fileSource = new FileSource($this->authenticationConfiguration->authenticatedUserId, 'file source label');
-        $source = new RunSource($fileSource);
-
-        $this->store->add($source);
-
-        $response = $this->client->makePrepareSourceRequest($this->validToken, $source->getId(), []);
-
-        $this->responseAsserter->assertNotFoundResponse($response);
-    }
+    use GetClientAdapterTrait;
 
     public function testPrepareFileSource(): void
     {
@@ -68,7 +21,7 @@ class PrepareSourceTest extends AbstractIntegrationTest
         $filename = 'filename.yaml';
         $content = '- file content';
 
-        $addFileResponse = $this->client->makeAddFileRequest(
+        $addFileResponse = $this->applicationClient->makeAddFileRequest(
             $this->authenticationConfiguration->validToken,
             $fileSource->getId(),
             $filename,
@@ -77,7 +30,7 @@ class PrepareSourceTest extends AbstractIntegrationTest
 
         $this->responseAsserter->assertSuccessfulResponseWithNoBody($addFileResponse);
 
-        $prepareResponse = $this->client->makePrepareSourceRequest(
+        $prepareResponse = $this->applicationClient->makePrepareSourceRequest(
             $this->authenticationConfiguration->validToken,
             $fileSource->getId(),
             []
@@ -102,7 +55,7 @@ class PrepareSourceTest extends AbstractIntegrationTest
 
         $this->waitUntilSourceIsPrepared($runSourceId);
 
-        $readResponse = $this->client->makeReadSourceRequest(
+        $readResponse = $this->applicationClient->makeReadSourceRequest(
             $this->authenticationConfiguration->validToken,
             $runSourceId
         );
@@ -129,7 +82,7 @@ class PrepareSourceTest extends AbstractIntegrationTest
         $state = null;
 
         while (State::PREPARED->value !== $state) {
-            $getResponse = $this->client->makeGetSourceRequest(
+            $getResponse = $this->applicationClient->makeGetSourceRequest(
                 $this->authenticationConfiguration->validToken,
                 $runSourceId
             );

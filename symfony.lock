@@ -568,9 +568,6 @@
     "webignition/encapsulating-request-resolver-bundle": {
         "version": "0.2"
     },
-    "webignition/http-history-container": {
-        "version": "2.4"
-    },
     "webignition/object-reflector": {
         "version": "1.0"
     },

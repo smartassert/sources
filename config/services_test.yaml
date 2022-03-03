@@ -6,9 +6,6 @@ services:
         autowire: true
         autoconfigure: true
 
-    webignition\HttpHistoryContainer\Container:
-        public: true
-
     App\Tests\Services\EntityRemover:
         public: true
 
@@ -26,26 +23,8 @@ services:
             $headerValuePrefix: !php/const SmartAssert\UsersSecurityBundle\Security\AuthorizationProperties::DEFAULT_VALUE_PREFIX
             $authenticatedUserId: '%env(AUTHENTICATED_USER_ID)%'
 
-    App\Tests\Services\RequestAsserter:
-        public: true
-        arguments:
-            $usersSecurityBundleBaseUrl: '%users_security_bundle_base_url%'
-
     App\Tests\Services\DirectoryLister:
         public: true
-
-    App\Tests\Services\ApplicationClient\Routes:
-        arguments:
-            $addFileUrl: '/{{ sourceId }}/{{ filename }}'
-            $removeFileUrl: '/{{ sourceId }}/{{ filename }}'
-            $createSourceUrl: '/'
-            $listSourcesUrl: '/list'
-            $getSourceUrl: '/{{ sourceId }}'
-            $updateSourceUrl: '/{{ sourceId }}'
-            $deleteSourceUrl: '/{{ sourceId }}'
-            $prepareSourceUrl: '/{{ sourceId }}/prepare'
-            $readSourceUrl: '/{{ sourceId }}/read'
-            $readFileUrl: '/{{ sourceId }}/{{ filename }}'
 
     App\Tests\Services\ApplicationClient\SymfonyAdapter:
 
@@ -61,17 +40,21 @@ services:
         arguments:
             $httpClient: '@app.tests.integration.http.client'
 
-    app.tests.services.application.client.functional:
-        public: true
-        class: App\Tests\Services\ApplicationClient\Client
-        arguments:
-            $client: '@App\Tests\Services\ApplicationClient\SymfonyAdapter'
+    App\Tests\Services\ApplicationClient\ClientFactory: ~
 
-    app.tests.services.application.client.integration:
+    app.tests.services.application.client.symfony:
         public: true
         class: App\Tests\Services\ApplicationClient\Client
+        factory: ['@App\Tests\Services\ApplicationClient\ClientFactory', 'create']
         arguments:
-            $client: '@App\Tests\Services\ApplicationClient\HttpAdapter'
+            $adapter: '@App\Tests\Services\ApplicationClient\SymfonyAdapter'
+
+    app.tests.services.application.client.http:
+        public: true
+        class: App\Tests\Services\ApplicationClient\Client
+        factory: ['@App\Tests\Services\ApplicationClient\ClientFactory', 'create']
+        arguments:
+            $adapter: '@App\Tests\Services\ApplicationClient\HttpAdapter'
 
     GuzzleHttp\Psr7\HttpFactory:
 
