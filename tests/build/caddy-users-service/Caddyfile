@@ -7,6 +7,10 @@ http://*:80, http://*:8080 {
         header Authorization "Bearer {$INVALID_TOKEN}"
     }
 
+    @empty-token-matcher {
+        header Authorization "Bearer"
+    }
+
     @no-authorization-matcher {
         header !Authorization
     }
@@ -16,6 +20,9 @@ http://*:80, http://*:8080 {
     }
 
     respond @invalid-token-matcher 401 {
+    }
+
+    respond @empty-token-matcher 401 {
     }
 
     respond @no-authorization-matcher 401 {
