@@ -5,41 +5,13 @@ declare(strict_types=1);
 namespace App\Tests\Integration;
 
 use App\Entity\FileSource;
-use App\Entity\RunSource;
 use App\Enum\RunSource\State;
 use App\Enum\Source\Type;
-use App\Services\Source\Store;
-use App\Tests\Services\EntityRemover;
+use App\Tests\Application\AbstractPrepareSourceTest;
 
-class PrepareSourceTest extends AbstractIntegrationTest
+class PrepareSourceTest extends AbstractPrepareSourceTest
 {
-    private Store $store;
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        $store = self::getContainer()->get(Store::class);
-        \assert($store instanceof Store);
-        $this->store = $store;
-
-        $entityRemover = self::getContainer()->get(EntityRemover::class);
-        if ($entityRemover instanceof EntityRemover) {
-            $entityRemover->removeAll();
-        }
-    }
-
-    public function testPrepareRunSource(): void
-    {
-        $fileSource = new FileSource($this->authenticationConfiguration->authenticatedUserId, 'file source label');
-        $source = new RunSource($fileSource);
-
-        $this->store->add($source);
-
-        $response = $this->applicationClient->makePrepareSourceRequest($this->validToken, $source->getId(), []);
-
-        $this->responseAsserter->assertNotFoundResponse($response);
-    }
+    use GetClientAdapterTrait;
 
     public function testPrepareFileSource(): void
     {
