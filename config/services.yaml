@@ -4,8 +4,9 @@
 # Put parameters here that don't need to change on each machine where the app is deployed
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
-    users_security_bundle_firewall_pattern: '^/'
-    users_security_bundle_access_control_pattern: '^/'
+    users_security_bundle_public_pattern: '$x'
+    users_security_bundle_secured_pattern: '^/'
+    users_security_bundle_access_control_path: '^/'
     git_repository_store_directory: '%env(resolve:GIT_REPOSITORY_STORE_DIRECTORY)%'
 
 services:
