@@ -18,7 +18,6 @@ class StatusController
     public function get(): JsonResponse
     {
         return new JsonResponse([
-            'idle' => true,
             'ready' => $this->isReady,
         ]);
     }

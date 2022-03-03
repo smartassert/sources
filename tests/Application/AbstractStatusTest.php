@@ -13,7 +13,6 @@ abstract class AbstractStatusTest extends AbstractApplicationTest
         $this->responseAsserter->assertSuccessfulJsonResponse(
             $response,
             [
-                'idle' => true,
                 'ready' => $this->getExpectedReadyValue(),
             ]
         );
