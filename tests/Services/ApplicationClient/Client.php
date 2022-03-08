@@ -160,6 +160,11 @@ class Client
         return $this->client->makeRequest('GET', $this->router->generate('status'));
     }
 
+    public function makeGetHealthCheckRequest(): ResponseInterface
+    {
+        return $this->client->makeRequest('GET', $this->router->generate('health-check'));
+    }
+
     /**
      * @return array<string, string>
      */
