@@ -65,3 +65,11 @@ jobs:
         with:
           push: true
           tags: ghcr.io/smartassert/sources:${{ steps.version.outputs.value }}
+
+      - name: Trigger dispatch.service-configure workflow
+        if: ${{ github.event_name == 'release' || github.event_name == 'workflow_dispatch' }}
+        env:
+          GH_TOKEN: ${{ secrets.PAT_TOKEN_SELF }}
+        run: |
+          gh workflow run dispatch.service-configure.yml \
+          -f version="${{ steps.version.outputs.value }}"
