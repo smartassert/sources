@@ -1,0 +1,50 @@
+name: dispatch.service-configure
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Release version
+        required: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Dispatch service-configure event to image builder
+        uses: peter-evans/repository-dispatch@v1
+        with:
+          token: ${{ secrets.IMAGE_BUILDER_TOKEN }}
+          repository: smartassert/image-builder
+          event-type: service-configure
+          client-payload: |
+            {
+              "service_id": "sources",
+              "build_configuration": "{\"version\": \"${{ github.event.inputs.version }}\"}"
+            }
+
+      - name: Dispatch service-configure event to instance manager
+        uses: peter-evans/repository-dispatch@v1
+        with:
+          token: ${{ secrets.INSTANCE_MANAGER_TOKEN }}
+          repository: smartassert/instance-manager
+          event-type: service-configure
+          client-payload: |
+            {
+              "service_id": "sources",
+              "state_url": "http://{{ host }}/status",
+              "health_check_url": "http://{{ host }}/health-check"
+            }
+
+      - name: Dispatch service-set-env event to instance manager
+        uses: peter-evans/repository-dispatch@v1
+        with:
+          token: ${{ secrets.INSTANCE_MANAGER_TOKEN }}
+          repository: smartassert/instance-manager
+          event-type: service-set-env
+          client-payload: |
+            {
+              "service_id": "sources",
+              "env_vars": "{\"IS_READY\": \"1\"}"
+            }
