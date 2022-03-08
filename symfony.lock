@@ -277,6 +277,15 @@
     "sebastian/version": {
         "version": "3.0.2"
     },
+    "smartassert/doctrine-inspectors": {
+        "version": "0.2"
+    },
+    "smartassert/invokable-exception-logger": {
+        "version": "0.3"
+    },
+    "smartassert/service-status-inspector": {
+        "version": "0.2"
+    },
     "smartassert/users-client": {
         "version": "0.1"
     },

@@ -4,7 +4,7 @@
 # Put parameters here that don't need to change on each machine where the app is deployed
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
-    users_security_bundle_public_pattern: '^/status'
+    users_security_bundle_public_pattern: '^/(status)|(health-check)'
     users_security_bundle_secured_pattern: '^/'
     users_security_bundle_access_control_path: '^/'
     git_repository_store_directory: '%env(resolve:GIT_REPOSITORY_STORE_DIRECTORY)%'
@@ -98,3 +98,24 @@ services:
             $readers:
                 - '@App\Services\SourceRepository\Reader\FileSourceReader'
                 - '@App\Services\SourceRepository\Reader\UserGitRepositoryReader'
+
+    SmartAssert\DoctrineInspectors\EntityMappingInspector:
+        arguments:
+            $entityClassNames:
+                - 'App\Entity\FileSource'
+                - 'App\Entity\GitSource'
+                - 'App\Entity\RunSource'
+
+    SmartAssert\InvokableLogger\ExceptionLogger:
+
+    SmartAssert\DoctrineInspectors\QueryInspector:
+
+    SmartAssert\ServiceStatusInspector\ServiceStatusInspectorInterface:
+        class: SmartAssert\ServiceStatusInspector\ServiceStatusInspector
+        arguments:
+            $componentInspectors:
+                database_connection: '@SmartAssert\DoctrineInspectors\QueryInspector'
+                database_entities: '@SmartAssert\DoctrineInspectors\EntityMappingInspector'
+                message_queue: '@App\Services\ServiceStatusInspector\MessageQueueInspector'
+            $exceptionHandlers:
+                - '@SmartAssert\InvokableLogger\ExceptionLogger'
