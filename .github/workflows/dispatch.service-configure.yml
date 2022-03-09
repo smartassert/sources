@@ -37,6 +37,14 @@ jobs:
               "health_check_url": "http://{{ host }}/health-check"
             }
 
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Prepare env_vars value for service-set-env event to instance manager
+        id: service_set_env_env_vars
+        run: |
+          echo "::set-output name=value::$(jq -R . < ./build/instance-manager/env.json | tr -d '\n' | sed 's/""//g')"
+
       - name: Dispatch service-set-env event to instance manager
         uses: peter-evans/repository-dispatch@v1
         with:
@@ -46,5 +54,5 @@ jobs:
           client-payload: |
             {
               "service_id": "sources",
-              "env_vars": "{\"IS_READY\": \"1\"}"
+              "env_vars": ${{ steps.service_set_env_env_vars.outputs.value }}
             }
