@@ -1,0 +1,10 @@
+"directory/file3.yaml": |
+  - "file 3 line 1"
+
+"file1.yaml": |
+  - "file 1 line 1"
+  - "file 1 line 2"
+
+"file2.yaml": |
+  - "file 2 line 1"
+  - "file 2 line 2"  

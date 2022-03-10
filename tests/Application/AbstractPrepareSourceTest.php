@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Tests\Application;
 
-use App\Entity\FileSource;
 use App\Entity\RunSource;
 use App\Entity\SourceOriginInterface;
 use App\Enum\RunSource\State;
@@ -14,8 +13,8 @@ use App\Tests\Services\SourceProvider;
 
 abstract class AbstractPrepareSourceTest extends AbstractApplicationTest
 {
+    protected SourceProvider $sourceProvider;
     private RunSourceRepository $runSourceRepository;
-    private SourceProvider $sourceProvider;
 
     protected function setUp(): void
     {
@@ -32,10 +31,10 @@ abstract class AbstractPrepareSourceTest extends AbstractApplicationTest
 
     public function testPrepareRunSource(): void
     {
-        $fileSource = new FileSource($this->authenticationConfiguration->authenticatedUserId, 'file source label');
-        $source = new RunSource($fileSource);
+        $sourceIdentifier = SourceProvider::RUN_WITHOUT_PARENT;
 
-        $this->store->add($source);
+        $this->sourceProvider->initialize([$sourceIdentifier]);
+        $source = $this->sourceProvider->get($sourceIdentifier);
 
         $response = $this->applicationClient->makePrepareSourceRequest(
             $this->authenticationConfiguration->validToken,
