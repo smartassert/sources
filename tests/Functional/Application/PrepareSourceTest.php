@@ -4,48 +4,48 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\Application;
 
-use App\Entity\FileSource;
-use App\Entity\GitSource;
 use App\Entity\RunSource;
+use App\Entity\SourceOriginInterface;
 use App\Enum\RunSource\State;
 use App\Enum\Source\Type;
 use App\Repository\RunSourceRepository;
 use App\Tests\Application\AbstractPrepareSourceTest;
-use App\Tests\Services\SourceUserIdMutator;
+use App\Tests\Services\SourceProvider;
 
 class PrepareSourceTest extends AbstractPrepareSourceTest
 {
     use GetClientAdapterTrait;
 
-    private SourceUserIdMutator $sourceUserIdMutator;
     private RunSourceRepository $runSourceRepository;
+    private SourceProvider $sourceProvider;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $sourceUserIdMutator = self::getContainer()->get(SourceUserIdMutator::class);
-        \assert($sourceUserIdMutator instanceof SourceUserIdMutator);
-        $this->sourceUserIdMutator = $sourceUserIdMutator;
-
         $runSourceRepository = self::getContainer()->get(RunSourceRepository::class);
         \assert($runSourceRepository instanceof RunSourceRepository);
         $this->runSourceRepository = $runSourceRepository;
+
+        $sourceProvider = self::getContainer()->get(SourceProvider::class);
+        \assert($sourceProvider instanceof SourceProvider);
+        $this->sourceProvider = $sourceProvider;
     }
 
     /**
      * @dataProvider prepareSuccessDataProvider
      *
      * @param array<string, string> $payload
-     * @param array<mixed>          $expectedResponseData
+     * @param array<string, string> $expectedResponseParameters
      */
     public function testPrepareSuccess(
-        FileSource|GitSource $source,
+        string $sourceIdentifier,
         array $payload,
-        array $expectedResponseData
+        array $expectedResponseParameters,
     ): void {
-        $this->sourceUserIdMutator->setSourceUserId($source);
-        $this->store->add($source);
+        $this->sourceProvider->initialize([$sourceIdentifier]);
+        $source = $this->sourceProvider->get($sourceIdentifier);
+        self::assertInstanceOf(SourceOriginInterface::class, $source);
 
         $response = $this->applicationClient->makePrepareSourceRequest(
             $this->authenticationConfiguration->validToken,
@@ -56,8 +56,14 @@ class PrepareSourceTest extends AbstractPrepareSourceTest
         $runSource = $this->runSourceRepository->findByParent($source);
         self::assertInstanceOf(RunSource::class, $runSource);
 
-        $expectedResponseData = $this->sourceUserIdMutator->setSourceDataUserId($expectedResponseData);
-        $expectedResponseData['id'] = $runSource->getId();
+        $expectedResponseData = [
+            'id' => $runSource->getId(),
+            'user_id' => $runSource->getUserId(),
+            'parent' => $source->getId(),
+            'type' => Type::RUN->value,
+            'parameters' => $expectedResponseParameters,
+            'state' => State::REQUESTED->value,
+        ];
 
         $this->responseAsserter->assertPrepareSourceSuccessResponse($response, $expectedResponseData);
     }
@@ -67,68 +73,35 @@ class PrepareSourceTest extends AbstractPrepareSourceTest
      */
     public function prepareSuccessDataProvider(): array
     {
-        $userId = SourceUserIdMutator::AUTHENTICATED_USER_ID_PLACEHOLDER;
-
-        $fileSource = new FileSource($userId, 'file source label');
-        $gitSource = new GitSource($userId, 'https://example.com/repository.git', '/', md5((string) rand()));
-
         return [
             Type::FILE->value => [
-                'source' => $fileSource,
+                'sourceIdentifier' => SourceProvider::FILE_WITHOUT_RUN_SOURCE,
                 'payload' => [],
-                'expectedResponseData' => [
-                    'id' => '{{ runSourceId }}',
-                    'user_id' => $gitSource->getUserId(),
-                    'type' => Type::RUN->value,
-                    'parent' => $fileSource->getId(),
-                    'parameters' => [],
-                    'state' => State::REQUESTED->value,
-                ],
+                'expectedResponseParameters' => [],
             ],
             Type::GIT->value => [
-                'source' => $gitSource,
+                'sourceIdentifier' => SourceProvider::GIT_WITHOUT_CREDENTIALS_WITHOUT_RUN_SOURCE,
                 'payload' => [],
-                'expectedResponseData' => [
-                    'id' => '{{ runSourceId }}',
-                    'user_id' => $gitSource->getUserId(),
-                    'type' => Type::RUN->value,
-                    'parent' => $gitSource->getId(),
-                    'parameters' => [],
-                    'state' => State::REQUESTED->value,
-                ],
+                'expectedResponseParameters' => [],
             ],
             Type::GIT->value . ' with ref request parameters' => [
-                'source' => $gitSource,
+                'sourceIdentifier' => SourceProvider::GIT_WITHOUT_CREDENTIALS_WITHOUT_RUN_SOURCE,
                 'payload' => [
                     'ref' => 'v1.1',
                 ],
-                'expectedResponseData' => [
-                    'id' => '{{ runSourceId }}',
-                    'user_id' => $gitSource->getUserId(),
-                    'type' => Type::RUN->value,
-                    'parent' => $gitSource->getId(),
-                    'parameters' => [
-                        'ref' => 'v1.1',
-                    ],
-                    'state' => State::REQUESTED->value,
+                'expectedResponseParameters' => [
+                    'ref' => 'v1.1',
                 ],
             ],
             Type::GIT->value . ' with request parameters including ref' => [
-                'source' => $gitSource,
+                'sourceIdentifier' => SourceProvider::GIT_WITHOUT_CREDENTIALS_WITHOUT_RUN_SOURCE,
                 'payload' => [
                     'ref' => 'v1.1',
                     'ignored1' => 'value',
                     'ignored2' => 'value',
                 ],
-                'expectedResponseData' => [
-                    'id' => '{{ runSourceId }}',
-                    'user_id' => $gitSource->getUserId(),
-                    'type' => Type::RUN->value,
-                    'parent' => $gitSource->getId(),
-                    'parameters' => [
-                        'ref' => 'v1.1',
-                    ],
-                    'state' => State::REQUESTED->value,
+                'expectedResponseParameters' => [
+                    'ref' => 'v1.1',
                 ],
             ],
         ];
