@@ -4,26 +4,23 @@ declare(strict_types=1);
 
 namespace App\Tests\Application;
 
-use App\Entity\FileSource;
-use App\Entity\GitSource;
-use App\Entity\SourceInterface;
 use App\Enum\Source\Type;
 use App\Request\FileSourceRequest;
 use App\Request\GitSourceRequest;
 use App\Request\SourceRequestInterface;
-use App\Tests\Services\SourceUserIdMutator;
+use App\Tests\Services\SourceProvider;
 
 abstract class AbstractUpdateSourceTest extends AbstractApplicationTest
 {
-    private SourceUserIdMutator $sourceUserIdMutator;
+    private SourceProvider $sourceProvider;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $sourceUserIdMutator = self::getContainer()->get(SourceUserIdMutator::class);
-        \assert($sourceUserIdMutator instanceof SourceUserIdMutator);
-        $this->sourceUserIdMutator = $sourceUserIdMutator;
+        $sourceProvider = self::getContainer()->get(SourceProvider::class);
+        \assert($sourceProvider instanceof SourceProvider);
+        $this->sourceProvider = $sourceProvider;
     }
 
     /**
@@ -33,20 +30,18 @@ abstract class AbstractUpdateSourceTest extends AbstractApplicationTest
      * @param array<mixed>          $expectedResponseData
      */
     public function testUpdateInvalidRequest(
-        SourceInterface $source,
+        string $sourceIdentifier,
         array $payload,
         array $expectedResponseData
     ): void {
-        $this->sourceUserIdMutator->setSourceUserId($source);
-        $this->store->add($source);
+        $this->sourceProvider->initialize([$sourceIdentifier]);
+        $source = $this->sourceProvider->get($sourceIdentifier);
 
         $response = $this->applicationClient->makeUpdateSourceRequest(
             $this->authenticationConfiguration->validToken,
             $source->getId(),
             $payload
         );
-
-        $expectedResponseData = $this->sourceUserIdMutator->setSourceDataUserId($expectedResponseData);
 
         $this->responseAsserter->assertInvalidRequestJsonResponse($response, $expectedResponseData);
     }
@@ -56,20 +51,13 @@ abstract class AbstractUpdateSourceTest extends AbstractApplicationTest
      */
     public function updateSourceInvalidRequestDataProvider(): array
     {
-        $userId = SourceUserIdMutator::AUTHENTICATED_USER_ID_PLACEHOLDER;
-        $hostUrl = 'https://example.com/repository.git';
-        $path = '/';
-        $credentials = md5((string) rand());
-
-        $gitSource = new GitSource($userId, $hostUrl, $path, $credentials);
-
         return [
             Type::GIT->value . ' missing host url' => [
-                'source' => $gitSource,
+                'sourceIdentifier' => SourceProvider::GIT_WITH_CREDENTIALS_WITH_RUN_SOURCE,
                 'payload' => [
                     SourceRequestInterface::PARAMETER_TYPE => Type::GIT->value,
                     GitSourceRequest::PARAMETER_HOST_URL => '',
-                    GitSourceRequest::PARAMETER_PATH => $path,
+                    GitSourceRequest::PARAMETER_PATH => '/',
                 ],
                 'expectedResponseData' => [
                     'error' => [
@@ -93,12 +81,12 @@ abstract class AbstractUpdateSourceTest extends AbstractApplicationTest
      * @param array<mixed>          $expectedResponseData
      */
     public function testUpdateSuccess(
-        SourceInterface $source,
+        string $sourceIdentifier,
         array $payload,
         array $expectedResponseData
     ): void {
-        $this->sourceUserIdMutator->setSourceUserId($source);
-        $this->store->add($source);
+        $this->sourceProvider->initialize([$sourceIdentifier]);
+        $source = $this->sourceProvider->get($sourceIdentifier);
 
         $response = $this->applicationClient->makeUpdateSourceRequest(
             $this->authenticationConfiguration->validToken,
@@ -106,7 +94,8 @@ abstract class AbstractUpdateSourceTest extends AbstractApplicationTest
             $payload
         );
 
-        $expectedResponseData = $this->sourceUserIdMutator->setSourceDataUserId($expectedResponseData);
+        $expectedResponseData['id'] = $source->getId();
+        $expectedResponseData['user_id'] = $source->getUserId();
 
         $this->responseAsserter->assertSuccessfulJsonResponse($response, $expectedResponseData);
     }
@@ -116,35 +105,24 @@ abstract class AbstractUpdateSourceTest extends AbstractApplicationTest
      */
     public function updateSourceSuccessDataProvider(): array
     {
-        $userId = SourceUserIdMutator::AUTHENTICATED_USER_ID_PLACEHOLDER;
-        $hostUrl = 'https://example.com/repository.git';
-        $path = '/';
-        $credentials = md5((string) rand());
         $newHostUrl = 'https://new.example.com/repository.git';
         $newPath = '/new';
-
-        $label = 'file source label';
         $newLabel = 'new file source label';
-
-        $fileSource = new FileSource($userId, $label);
-        $gitSource = new GitSource($userId, $hostUrl, $path, $credentials);
 
         return [
             Type::FILE->value => [
-                'source' => $fileSource,
+                'sourceIdentifier' => SourceProvider::FILE_WITHOUT_RUN_SOURCE,
                 'payload' => [
                     SourceRequestInterface::PARAMETER_TYPE => Type::FILE->value,
                     FileSourceRequest::PARAMETER_LABEL => $newLabel,
                 ],
                 'expectedResponseData' => [
-                    'id' => $fileSource->getId(),
-                    'user_id' => $fileSource->getUserId(),
                     'type' => Type::FILE->value,
                     'label' => $newLabel,
                 ],
             ],
             Type::GIT->value . ' credentials present and empty' => [
-                'source' => $gitSource,
+                'sourceIdentifier' => SourceProvider::GIT_WITH_CREDENTIALS_WITH_RUN_SOURCE,
                 'payload' => [
                     SourceRequestInterface::PARAMETER_TYPE => Type::GIT->value,
                     GitSourceRequest::PARAMETER_HOST_URL => $newHostUrl,
@@ -152,8 +130,6 @@ abstract class AbstractUpdateSourceTest extends AbstractApplicationTest
                     GitSourceRequest::PARAMETER_CREDENTIALS => null,
                 ],
                 'expectedResponseData' => [
-                    'id' => $gitSource->getId(),
-                    'user_id' => $gitSource->getUserId(),
                     'type' => Type::GIT->value,
                     'host_url' => $newHostUrl,
                     'path' => $newPath,
@@ -161,15 +137,13 @@ abstract class AbstractUpdateSourceTest extends AbstractApplicationTest
                 ],
             ],
             Type::GIT->value . ' credentials not present' => [
-                'source' => $gitSource,
+                'source' => SourceProvider::GIT_WITH_CREDENTIALS_WITH_RUN_SOURCE,
                 'payload' => [
                     SourceRequestInterface::PARAMETER_TYPE => Type::GIT->value,
                     GitSourceRequest::PARAMETER_HOST_URL => $newHostUrl,
                     GitSourceRequest::PARAMETER_PATH => $newPath,
                 ],
                 'expectedResponseData' => [
-                    'id' => $gitSource->getId(),
-                    'user_id' => $gitSource->getUserId(),
                     'type' => Type::GIT->value,
                     'host_url' => $newHostUrl,
                     'path' => $newPath,

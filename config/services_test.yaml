@@ -82,5 +82,5 @@ services:
     App\Tests\Services\ResponseAsserter:
         public: true
 
-    App\Tests\Services\SourceUserIdMutator:
+    App\Tests\Services\SourceProvider:
         public: true

@@ -11,7 +11,6 @@ use App\Request\FileSourceRequest;
 use App\Request\GitSourceRequest;
 use App\Request\InvalidSourceTypeRequest;
 use App\Request\SourceRequestInterface;
-use App\Tests\Services\SourceUserIdMutator;
 
 abstract class AbstractCreateSourceTest extends AbstractApplicationTest
 {
@@ -121,7 +120,6 @@ abstract class AbstractCreateSourceTest extends AbstractApplicationTest
                     GitSourceRequest::PARAMETER_PATH => $path
                 ],
                 'expected' => [
-                    'user_id' => SourceUserIdMutator::AUTHENTICATED_USER_ID_PLACEHOLDER,
                     'type' => Type::GIT->value,
                     'host_url' => $hostUrl,
                     'path' => $path,
@@ -136,7 +134,6 @@ abstract class AbstractCreateSourceTest extends AbstractApplicationTest
                     GitSourceRequest::PARAMETER_CREDENTIALS => $credentials,
                 ],
                 'expected' => [
-                    'user_id' => SourceUserIdMutator::AUTHENTICATED_USER_ID_PLACEHOLDER,
                     'type' => Type::GIT->value,
                     'host_url' => $hostUrl,
                     'path' => $path,
@@ -149,7 +146,6 @@ abstract class AbstractCreateSourceTest extends AbstractApplicationTest
                     FileSourceRequest::PARAMETER_LABEL => $label
                 ],
                 'expected' => [
-                    'user_id' => SourceUserIdMutator::AUTHENTICATED_USER_ID_PLACEHOLDER,
                     'type' => Type::FILE->value,
                     'label' => $label,
                 ],

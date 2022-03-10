@@ -4,15 +4,12 @@ declare(strict_types=1);
 
 namespace App\Tests\Application;
 
-use App\Entity\FileSource;
-use App\Entity\GitSource;
 use App\Entity\RunSource;
-use App\Entity\SourceInterface;
 use App\Enum\RunSource\FailureReason;
 use App\Enum\RunSource\State;
 use App\Enum\Source\Type;
 use App\Model\EntityId;
-use App\Tests\Services\SourceUserIdMutator;
+use App\Tests\Services\SourceProvider;
 
 abstract class AbstractGetSourceTest extends AbstractApplicationTest
 {
@@ -31,19 +28,25 @@ abstract class AbstractGetSourceTest extends AbstractApplicationTest
      *
      * @param array<mixed> $expectedResponseData
      */
-    public function testGetSuccess(SourceInterface $source, array $expectedResponseData): void
+    public function testGetSuccess(string $sourceIdentifier, array $expectedResponseData): void
     {
-        $sourceUserIdMutator = self::getContainer()->get(SourceUserIdMutator::class);
-        \assert($sourceUserIdMutator instanceof SourceUserIdMutator);
-        $source = $sourceUserIdMutator->setSourceUserId($source);
-        $this->store->add($source);
+        $sourceProvider = self::getContainer()->get(SourceProvider::class);
+        \assert($sourceProvider instanceof SourceProvider);
+        $sourceProvider->initialize();
+
+        $source = $sourceProvider->get($sourceIdentifier);
 
         $response = $this->applicationClient->makeGetSourceRequest(
             $this->authenticationConfiguration->validToken,
             $source->getId()
         );
 
-        $expectedResponseData = $sourceUserIdMutator->setSourceDataUserId($expectedResponseData);
+        $expectedResponseData['id'] = $source->getId();
+        $expectedResponseData['user_id'] = $source->getUserId();
+
+        if ($source instanceof RunSource) {
+            $expectedResponseData['parent'] = $source->getParent()?->getId();
+        }
 
         $this->responseAsserter->assertSuccessfulJsonResponse($response, $expectedResponseData);
     }
@@ -53,61 +56,48 @@ abstract class AbstractGetSourceTest extends AbstractApplicationTest
      */
     public function getSourceSuccessDataProvider(): array
     {
-        $userId = SourceUserIdMutator::AUTHENTICATED_USER_ID_PLACEHOLDER;
-
-        $gitSource = new GitSource($userId, 'https://example.com/repository.git', '/', md5((string) rand()));
-        $fileSource = new FileSource($userId, 'file source label');
-        $runSource = new RunSource($fileSource);
-
-        $failureMessage = 'fatal: repository \'http://example.com/repository.git\' not found';
-        $failedRunSource = (new RunSource($gitSource))->setPreparationFailed(
-            FailureReason::GIT_CLONE,
-            $failureMessage
-        );
-
         return [
-            Type::GIT->value => [
-                'source' => $gitSource,
+            'git source with credentials' => [
+                'sourceIdentifier' => SourceProvider::GIT_WITH_CREDENTIALS_WITH_RUN_SOURCE,
                 'expectedResponseData' => [
-                    'id' => $gitSource->getId(),
-                    'user_id' => $gitSource->getUserId(),
                     'type' => Type::GIT->value,
-                    'host_url' => $gitSource->getHostUrl(),
-                    'path' => $gitSource->getPath(),
+                    'host_url' => 'http://example.com/with-credentials.git',
+                    'path' => '/',
                     'has_credentials' => true,
                 ],
             ],
-            Type::FILE->value => [
-                'source' => $fileSource,
+            'git source without credentials' => [
+                'sourceIdentifier' => SourceProvider::GIT_WITHOUT_CREDENTIALS_WITHOUT_RUN_SOURCE,
                 'expectedResponseData' => [
-                    'id' => $fileSource->getId(),
-                    'user_id' => $fileSource->getUserId(),
-                    'type' => Type::FILE->value,
-                    'label' => $fileSource->getLabel(),
+                    'type' => Type::GIT->value,
+                    'host_url' => 'http://example.com/without-credentials.git',
+                    'path' => '/',
+                    'has_credentials' => false,
                 ],
             ],
-            Type::RUN->value => [
-                'source' => $runSource,
+            'file with run source' => [
+                'sourceIdentifier' => SourceProvider::FILE_WITH_RUN_SOURCE,
                 'expectedResponseData' => [
-                    'id' => $runSource->getId(),
-                    'user_id' => $userId,
+                    'type' => Type::FILE->value,
+                    'label' => 'with run source',
+                ],
+            ],
+            'run' => [
+                'sourceIdentifier' => SourceProvider::RUN_WITH_FILE_PARENT,
+                'expectedResponseData' => [
                     'type' => Type::RUN->value,
-                    'parent' => $runSource->getParent()?->getId(),
                     'parameters' => [],
                     'state' => State::REQUESTED->value,
                 ],
             ],
-            Type::RUN->value . ': preparation failed' => [
-                'source' => $failedRunSource,
+            'run: preparation failed' => [
+                'sourceIdentifier' => SourceProvider::RUN_FAILED,
                 'expectedResponseData' => [
-                    'id' => $failedRunSource->getId(),
-                    'user_id' => $userId,
                     'type' => Type::RUN->value,
-                    'parent' => $failedRunSource->getParent()?->getId(),
                     'parameters' => [],
                     'state' => State::FAILED->value,
                     'failure_reason' => FailureReason::GIT_CLONE->value,
-                    'failure_message' => $failureMessage,
+                    'failure_message' => 'fatal: repository \'http://example.com/with-credentials.git\' not found',
                 ],
             ],
         ];
