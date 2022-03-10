@@ -10,6 +10,7 @@ use App\Entity\RunSource;
 use App\Entity\SourceInterface;
 use App\Enum\RunSource\FailureReason;
 use App\Services\Source\Store;
+use App\Tests\Model\UserId;
 
 class SourceProvider
 {
@@ -23,6 +24,25 @@ class SourceProvider
     public const RUN_WITH_DIFFERENT_GIT_PARENT = 'run_with_different_git_parent';
     public const RUN_WITHOUT_PARENT = 'run_without_parent';
     public const RUN_FAILED = 'run_failed';
+    public const FILE_DIFFERENT_USER = 'file_different_user';
+    public const GIT_DIFFERENT_USER = 'git_different_user';
+    public const RUN_DIFFERENT_USER = 'run_different_user';
+
+    public const ALL = [
+        self::FILE_WITHOUT_RUN_SOURCE,
+        self::FILE_WITH_RUN_SOURCE,
+        self::GIT_WITH_CREDENTIALS_WITH_RUN_SOURCE,
+        self::GIT_WITHOUT_CREDENTIALS_WITHOUT_RUN_SOURCE,
+        self::RUN_WITH_FILE_PARENT,
+        self::RUN_WITH_DIFFERENT_FILE_PARENT,
+        self::RUN_WITH_GIT_PARENT,
+        self::RUN_WITH_DIFFERENT_GIT_PARENT,
+        self::RUN_WITHOUT_PARENT,
+        self::RUN_FAILED,
+        self::FILE_DIFFERENT_USER,
+        self::GIT_DIFFERENT_USER,
+        self::RUN_DIFFERENT_USER,
+    ];
 
     /**
      * @var array<string, SourceInterface>
@@ -35,7 +55,10 @@ class SourceProvider
     ) {
     }
 
-    public function initialize(): void
+    /**
+     * @param string[] $sourcesToInitialize
+     */
+    public function initialize(array $sourcesToInitialize = self::ALL): void
     {
         $userId = $this->authenticationConfiguration->authenticatedUserId;
 
@@ -72,14 +95,21 @@ class SourceProvider
             )
         ;
 
-        foreach ($this->sources as $source) {
-            $this->store->add($source);
+        $this->sources[self::FILE_DIFFERENT_USER] = new FileSource(UserId::create(), '');
+        $this->sources[self::GIT_DIFFERENT_USER] = new GitSource(UserId::create(), '');
+        $this->sources[self::RUN_DIFFERENT_USER] = new RunSource(new FileSource(UserId::create(), ''));
+
+        foreach ($sourcesToInitialize as $sourceIdentifier) {
+            $source = $this->sources[$sourceIdentifier] ?? null;
+            if ($source instanceof SourceInterface) {
+                $this->store->add($source);
+            }
         }
     }
 
     public function get(string $identifier): SourceInterface
     {
-        $source = $this->sources[$identifier];
+        $source = $this->sources[$identifier] ?? null;
         if (!$source instanceof SourceInterface) {
             throw new \RuntimeException('Source "' . $identifier . '" not found');
         }

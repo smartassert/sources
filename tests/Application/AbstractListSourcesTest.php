@@ -4,44 +4,42 @@ declare(strict_types=1);
 
 namespace App\Tests\Application;
 
-use App\Entity\FileSource;
-use App\Entity\GitSource;
-use App\Entity\RunSource;
 use App\Entity\SourceInterface;
-use App\Tests\Model\UserId;
-use App\Tests\Services\SourceUserIdMutator;
+use App\Enum\Source\Type;
+use App\Tests\Services\SourceProvider;
 
 abstract class AbstractListSourcesTest extends AbstractApplicationTest
 {
-    private SourceUserIdMutator $sourceUserIdMutator;
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        $sourceUserIdMutator = self::getContainer()->get(SourceUserIdMutator::class);
-        \assert($sourceUserIdMutator instanceof SourceUserIdMutator);
-        $this->sourceUserIdMutator = $sourceUserIdMutator;
-    }
-
     /**
      * @dataProvider listSuccessDataProvider
      *
-     * @param SourceInterface[]        $sources
-     * @param array<int, array<mixed>> $expectedResponseData
+     * @param string[]                    $sourceIdentifiers
+     * @param array<string, array<mixed>> $expectedResponseData
      */
-    public function testListSuccess(array $sources, array $expectedResponseData): void
+    public function testListSuccess(array $sourceIdentifiers, array $expectedResponseData): void
     {
-        foreach ($sources as $source) {
-            $source = $this->sourceUserIdMutator->setSourceUserId($source);
-            $this->store->add($source);
+        $sourceProvider = self::getContainer()->get(SourceProvider::class);
+        \assert($sourceProvider instanceof SourceProvider);
+        $sourceProvider->initialize($sourceIdentifiers);
+
+        $sources = [];
+        foreach ($sourceIdentifiers as $sourceIdentifier) {
+            $sources[$sourceIdentifier] = $sourceProvider->get($sourceIdentifier);
         }
 
         $response = $this->applicationClient->makeListSourcesRequest($this->authenticationConfiguration->validToken);
 
-        $expectedResponseData = $this->sourceUserIdMutator->setSourceDataCollectionUserId($expectedResponseData);
+        foreach ($expectedResponseData as $sourceIdentifier => $expectedSourceData) {
+            $source = $sources[$sourceIdentifier];
+            \assert($source instanceof SourceInterface);
 
-        $this->responseAsserter->assertSuccessfulJsonResponse($response, $expectedResponseData);
+            $expectedSourceData['id'] = $source->getId();
+            $expectedSourceData['user_id'] = $source->getUserId();
+
+            $expectedResponseData[$sourceIdentifier] = $expectedSourceData;
+        }
+
+        $this->responseAsserter->assertSuccessfulJsonResponse($response, array_values($expectedResponseData));
     }
 
     /**
@@ -49,74 +47,76 @@ abstract class AbstractListSourcesTest extends AbstractApplicationTest
      */
     public function listSuccessDataProvider(): array
     {
-        $userFileSources = [
-            new FileSource(SourceUserIdMutator::AUTHENTICATED_USER_ID_PLACEHOLDER, 'file source label'),
-        ];
-
-        $userGitSources = [
-            new GitSource(SourceUserIdMutator::AUTHENTICATED_USER_ID_PLACEHOLDER, 'https://example.com/repository.git'),
-        ];
-
-        $userRunSources = [
-            new RunSource($userFileSources[0]),
-            new RunSource($userGitSources[0]),
-        ];
-
         return [
             'no sources' => [
-                'sources' => [],
+                'sourceIdentifiers' => [],
                 'expectedResponseData' => [],
             ],
             'has file, git and run sources, no user match' => [
-                'sources' => [
-                    new FileSource(UserId::create(), 'file source label'),
-                    new GitSource(UserId::create(), 'https://example.com/repository.git'),
-                    new RunSource(
-                        new FileSource(UserId::create(), 'file source label'),
-                    ),
+                'sourceIdentifiers' => [
+                    SourceProvider::FILE_DIFFERENT_USER,
+                    SourceProvider::GIT_DIFFERENT_USER,
+                    SourceProvider::RUN_DIFFERENT_USER,
                 ],
                 'expectedResponseData' => [],
             ],
             'has file and git sources for correct user only' => [
-                'sources' => [
-                    $userFileSources[0],
-                    $userGitSources[0],
+                'sourceIdentifiers' => [
+                    SourceProvider::FILE_WITHOUT_RUN_SOURCE,
+                    SourceProvider::GIT_WITHOUT_CREDENTIALS_WITHOUT_RUN_SOURCE,
                 ],
                 'expectedResponseData' => [
-                    $userFileSources[0]->jsonSerialize(),
-                    $userGitSources[0]->jsonSerialize(),
+                    SourceProvider::FILE_WITHOUT_RUN_SOURCE => [
+                        'type' => Type::FILE->value,
+                        'label' => 'without run source',
+                    ],
+                    SourceProvider::GIT_WITHOUT_CREDENTIALS_WITHOUT_RUN_SOURCE => [
+                        'type' => Type::GIT->value,
+                        'host_url' => 'http://example.com/without-credentials.git',
+                        'path' => '/',
+                        'has_credentials' => false,
+                    ],
                 ],
             ],
             'has file, git and run sources for correct user only' => [
-                'sources' => [
-                    $userFileSources[0],
-                    $userGitSources[0],
-                    $userRunSources[0],
-                    $userRunSources[1],
+                'sourceIdentifiers' => [
+                    SourceProvider::FILE_WITH_RUN_SOURCE,
+                    SourceProvider::GIT_WITHOUT_CREDENTIALS_WITHOUT_RUN_SOURCE,
+                    SourceProvider::RUN_WITH_FILE_PARENT,
                 ],
                 'expectedResponseData' => [
-                    $userFileSources[0]->jsonSerialize(),
-                    $userGitSources[0]->jsonSerialize(),
+                    SourceProvider::FILE_WITH_RUN_SOURCE => [
+                        'type' => Type::FILE->value,
+                        'label' => 'with run source',
+                    ],
+                    SourceProvider::GIT_WITHOUT_CREDENTIALS_WITHOUT_RUN_SOURCE => [
+                        'type' => Type::GIT->value,
+                        'host_url' => 'http://example.com/without-credentials.git',
+                        'path' => '/',
+                        'has_credentials' => false,
+                    ],
                 ],
             ],
             'has file, git and run sources for mixed users' => [
-                'sources' => [
-                    $userFileSources[0],
-                    new FileSource(UserId::create(), 'file source label'),
-                    $userGitSources[0],
-                    new GitSource(UserId::create(), 'https://example.com/repository.git'),
-                    $userRunSources[0],
-                    $userRunSources[1],
-                    new RunSource(
-                        new FileSource(UserId::create(), 'file source label')
-                    ),
-                    new RunSource(
-                        new GitSource(UserId::create(), 'https://example.com/repository.git')
-                    )
+                'sourceIdentifiers' => [
+                    SourceProvider::FILE_DIFFERENT_USER,
+                    SourceProvider::GIT_DIFFERENT_USER,
+                    SourceProvider::FILE_WITH_RUN_SOURCE,
+                    SourceProvider::GIT_WITHOUT_CREDENTIALS_WITHOUT_RUN_SOURCE,
+                    SourceProvider::RUN_DIFFERENT_USER,
+                    SourceProvider::RUN_WITH_FILE_PARENT,
                 ],
                 'expectedResponseData' => [
-                    $userFileSources[0]->jsonSerialize(),
-                    $userGitSources[0]->jsonSerialize(),
+                    SourceProvider::FILE_WITH_RUN_SOURCE => [
+                        'type' => Type::FILE->value,
+                        'label' => 'with run source',
+                    ],
+                    SourceProvider::GIT_WITHOUT_CREDENTIALS_WITHOUT_RUN_SOURCE => [
+                        'type' => Type::GIT->value,
+                        'host_url' => 'http://example.com/without-credentials.git',
+                        'path' => '/',
+                        'has_credentials' => false,
+                    ],
                 ],
             ],
         ];
