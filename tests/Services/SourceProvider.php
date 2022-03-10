@@ -8,6 +8,7 @@ use App\Entity\FileSource;
 use App\Entity\GitSource;
 use App\Entity\RunSource;
 use App\Entity\SourceInterface;
+use App\Enum\RunSource\FailureReason;
 use App\Services\Source\Store;
 
 class SourceProvider
@@ -21,6 +22,7 @@ class SourceProvider
     public const RUN_WITH_GIT_PARENT = 'run_with_git_parent';
     public const RUN_WITH_DIFFERENT_GIT_PARENT = 'run_with_different_git_parent';
     public const RUN_WITHOUT_PARENT = 'run_without_parent';
+    public const RUN_FAILED = 'run_failed';
 
     /**
      * @var array<string, SourceInterface>
@@ -28,10 +30,14 @@ class SourceProvider
     private array $sources = [];
 
     public function __construct(
-        AuthenticationConfiguration $authenticationConfiguration,
-        Store $store,
+        private AuthenticationConfiguration $authenticationConfiguration,
+        private Store $store,
     ) {
-        $userId = $authenticationConfiguration->authenticatedUserId;
+    }
+
+    public function initialize(): void
+    {
+        $userId = $this->authenticationConfiguration->authenticatedUserId;
 
         $fileSourceWithoutRunSource = new FileSource($userId, 'without run source');
         $fileSourceWithRunSource = new FileSource($userId, 'with run source');
@@ -43,7 +49,7 @@ class SourceProvider
         );
 
         $this->sources[self::FILE_WITHOUT_RUN_SOURCE] = $fileSourceWithoutRunSource;
-        $this->sources[self::FILE_WITH_RUN_SOURCE] = $fileSourceWithoutRunSource;
+        $this->sources[self::FILE_WITH_RUN_SOURCE] = $fileSourceWithRunSource;
         $this->sources[self::GIT_WITH_CREDENTIALS_WITH_RUN_SOURCE] = $gitSourceWithCredentialsWithRunSource;
         $this->sources[self::GIT_WITHOUT_CREDENTIALS_WITHOUT_RUN_SOURCE] = new GitSource(
             $userId,
@@ -59,9 +65,15 @@ class SourceProvider
         );
 
         $this->sources[self::RUN_WITHOUT_PARENT] = (new RunSource(new FileSource($userId, '')))->unsetParent();
+        $this->sources[self::RUN_FAILED] = (new RunSource($gitSourceWithCredentialsWithRunSource))
+            ->setPreparationFailed(
+                FailureReason::GIT_CLONE,
+                'fatal: repository \'http://example.com/with-credentials.git\' not found'
+            )
+        ;
 
         foreach ($this->sources as $source) {
-            $store->add($source);
+            $this->store->add($source);
         }
     }
 
