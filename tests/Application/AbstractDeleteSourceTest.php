@@ -5,22 +5,17 @@ declare(strict_types=1);
 namespace App\Tests\Application;
 
 use App\Entity\FileSource;
-use App\Entity\GitSource;
 use App\Entity\RunSource;
 use App\Entity\SourceInterface;
-use App\Enum\Source\Type;
 use App\Repository\SourceRepository;
 use App\Services\RunSourceSerializer;
+use App\Tests\Services\SourceProvider;
 use League\Flysystem\FilesystemOperator;
 
 abstract class AbstractDeleteSourceTest extends AbstractApplicationTest
 {
     private SourceRepository $sourceRepository;
-
-    /**
-     * @var array<string, SourceInterface>
-     */
-    private array $sources = [];
+    private SourceProvider $sourceProvider;
 
     protected function setUp(): void
     {
@@ -30,25 +25,17 @@ abstract class AbstractDeleteSourceTest extends AbstractApplicationTest
         \assert($sourceRepository instanceof SourceRepository);
         $this->sourceRepository = $sourceRepository;
 
-        $userId = $this->authenticationConfiguration->authenticatedUserId;
-
-        $fileSource = new FileSource($userId, '');
-
-        $this->sources[Type::FILE->value] = $fileSource;
-        $this->sources[Type::GIT->value] = new GitSource($userId, 'https://example.com/repository.git');
-        $this->sources[Type::RUN->value] = new RunSource(new FileSource($userId, ''));
-
-        foreach ($this->sources as $source) {
-            $this->store->add($source);
-        }
+        $sourceProvider = self::getContainer()->get(SourceProvider::class);
+        \assert($sourceProvider instanceof SourceProvider);
+        $this->sourceProvider = $sourceProvider;
     }
 
     /**
      * @dataProvider deleteSourceSuccessDataProvider
      */
-    public function testDeleteSuccess(string $sourceKey): void
+    public function testDeleteSuccess(string $sourceIdentifier): void
     {
-        $source = $this->sources[$sourceKey];
+        $source = $this->sourceProvider->get($sourceIdentifier);
 
         self::assertSame(1, $this->sourceRepository->count(['id' => $source->getId()]));
         if ($source instanceof RunSource && $source->getParent() instanceof SourceInterface) {
@@ -74,14 +61,17 @@ abstract class AbstractDeleteSourceTest extends AbstractApplicationTest
     public function deleteSourceSuccessDataProvider(): array
     {
         return [
-            Type::FILE->value => [
-                'sourceKey' => Type::FILE->value,
+            'file source without run source' => [
+                'sourceIdentifier' => SourceProvider::FILE_WITHOUT_RUN_SOURCE,
             ],
-            Type::GIT->value => [
-                'sourceKey' => Type::GIT->value,
+            'git source without run source' => [
+                'sourceIdentifier' => SourceProvider::GIT_WITHOUT_CREDENTIALS_WITHOUT_RUN_SOURCE,
             ],
-            Type::RUN->value => [
-                'sourceKey' => Type::RUN->value,
+            'run source with different file parent' => [
+                'sourceIdentifier' => SourceProvider::RUN_WITH_DIFFERENT_FILE_PARENT,
+            ],
+            'run source with different git parent' => [
+                'sourceIdentifier' => SourceProvider::RUN_WITH_DIFFERENT_GIT_PARENT,
             ],
         ];
     }
@@ -91,11 +81,11 @@ abstract class AbstractDeleteSourceTest extends AbstractApplicationTest
         $runSourceStorage = self::getContainer()->get('run_source.storage');
         \assert($runSourceStorage instanceof FilesystemOperator);
 
-        $fileSource = new FileSource($this->authenticationConfiguration->authenticatedUserId, 'file source label');
-        $runSource = new RunSource($fileSource);
+        $runSource = $this->sourceProvider->get(SourceProvider::RUN_WITH_FILE_PARENT);
+        self::assertInstanceOf(RunSource::class, $runSource);
 
-        $this->store->add($fileSource);
-        $this->store->add($runSource);
+        $fileSource = $runSource->getParent();
+        self::assertInstanceOf(FileSource::class, $fileSource);
 
         $serializedRunSourcePath = $runSource->getDirectoryPath() . '/' . RunSourceSerializer::SERIALIZED_FILENAME;
 
@@ -120,13 +110,11 @@ abstract class AbstractDeleteSourceTest extends AbstractApplicationTest
         $fileSourceStorage = self::getContainer()->get('file_source.storage');
         \assert($fileSourceStorage instanceof FilesystemOperator);
 
-        $fileSource = new FileSource($this->authenticationConfiguration->authenticatedUserId, 'file source label');
-        $filename = 'file.yaml';
-
-        $this->store->add($fileSource);
+        $fileSource = $this->sourceProvider->get(SourceProvider::FILE_WITHOUT_RUN_SOURCE);
+        self::assertInstanceOf(FileSource::class, $fileSource);
 
         $sourceRelativePath = $fileSource->getDirectoryPath();
-        $fileRelativePath = $sourceRelativePath . '/' . $filename;
+        $fileRelativePath = $sourceRelativePath . '/file.yaml';
 
         $fileSourceStorage->write($fileRelativePath, '- content');
 
