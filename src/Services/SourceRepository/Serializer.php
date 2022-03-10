@@ -6,7 +6,6 @@ namespace App\Services\SourceRepository;
 
 use App\Exception\SourceRepositoryReaderNotFoundException;
 use App\Exception\UnparseableSourceFileException;
-use App\Model\FilePathIdentifier;
 use App\Model\SourceRepositoryInterface;
 use App\Services\FileLister;
 use App\Services\SourceRepository\Reader\Provider;
@@ -16,7 +15,7 @@ use Symfony\Component\Yaml\Parser as YamlParser;
 
 class Serializer
 {
-    private const DOCUMENT_TEMPLATE = '---' . "\n" . '%s' . "\n" . '...';
+    private const FOO_TEMPLATE = '"%s": |' . "\n" . '%s';
 
     public function __construct(
         private Provider $readerProvider,
@@ -38,7 +37,9 @@ class Serializer
         $files = $this->fileLister->list($reader, $listPath, ['yml', 'yaml']);
 
         $directoryPath = $sourceRepository->getDirectoryPath();
-        $documents = [];
+
+        $serializedFiles = [];
+
         foreach ($files as $file) {
             $content = $reader->read($listPath . '/' . $file);
 
@@ -49,11 +50,15 @@ class Serializer
             }
 
             $filePath = $this->removePathPrefix($directoryPath, $file);
-            $documents[] = sprintf(self::DOCUMENT_TEMPLATE, new FilePathIdentifier($filePath, md5($content)));
-            $documents[] = sprintf(self::DOCUMENT_TEMPLATE, trim($content));
+
+            $serializedFiles[] = sprintf(
+                self::FOO_TEMPLATE,
+                addcslashes($filePath, '"'),
+                $this->createFileContentPayload($content)
+            );
         }
 
-        return implode("\n", $documents);
+        return implode("\n\n", $serializedFiles);
     }
 
     private function removePathPrefix(string $prefix, string $path): string
@@ -63,5 +68,16 @@ class Serializer
         return str_starts_with($path, $prefix)
             ? substr($path, strlen($prefix))
             : $path;
+    }
+
+    private function createFileContentPayload(string $content): string
+    {
+        $lines = explode("\n", trim($content));
+
+        array_walk($lines, function (&$line) {
+            $line = '  ' . $line;
+        });
+
+        return implode("\n", $lines);
     }
 }

@@ -1,23 +1,10 @@
----
-path: "directory/file3.yml"
-content_hash: "3e4280d968d34f0ba48296049cf9c88f"
-...
----
-- "file 3 line 1"
-...
----
-path: "file1.yaml"
-content_hash: "602226b0406e64e590352b2909029802"
-...
----
-- "file 1 line 1"
-- "file 1 line 2"
-...
----
-path: "file2.yml"
-content_hash: "6c8ab92eb84c36b79607cb1d0d3f5037"
-...
----
-- "file 2 line 1"
-- "file 2 line 2"
-...
+"directory/file3.yml": |
+  - "file 3 line 1"
+
+"file1.yaml": |
+  - "file 1 line 1"
+  - "file 1 line 2"
+
+"file2.yml": |
+  - "file 2 line 1"
+  - "file 2 line 2"  
