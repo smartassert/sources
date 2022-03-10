@@ -60,15 +60,9 @@ class PrepareSourceTest extends AbstractPrepareSourceTest
             $runSourceId
         );
 
-        $expectedContentHash = md5($content);
-        $expectedReadResponseBody = <<< EOF
-            ---
-            path: "{$filename}"
-            content_hash: "{$expectedContentHash}"
-            ...
-            ---
-            {$content}
-            ...
+        $expectedReadResponseBody = <<< 'EOF'
+            "filename.yaml": |
+              - file content
             EOF;
 
         $this->responseAsserter->assertReadSourceSuccessResponse($readResponse, $expectedReadResponseBody);
