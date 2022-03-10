@@ -11,12 +11,16 @@ use App\Entity\SourceInterface;
 use App\Enum\Source\Type;
 use App\Repository\SourceRepository;
 use App\Services\RunSourceSerializer;
-use App\Tests\Services\SourceUserIdMutator;
 use League\Flysystem\FilesystemOperator;
 
 abstract class AbstractDeleteSourceTest extends AbstractApplicationTest
 {
     private SourceRepository $sourceRepository;
+
+    /**
+     * @var array<string, SourceInterface>
+     */
+    private array $sources = [];
 
     protected function setUp(): void
     {
@@ -25,20 +29,31 @@ abstract class AbstractDeleteSourceTest extends AbstractApplicationTest
         $sourceRepository = self::getContainer()->get(SourceRepository::class);
         \assert($sourceRepository instanceof SourceRepository);
         $this->sourceRepository = $sourceRepository;
+
+        $userId = $this->authenticationConfiguration->authenticatedUserId;
+
+        $fileSource = new FileSource($userId, '');
+
+        $this->sources[Type::FILE->value] = $fileSource;
+        $this->sources[Type::GIT->value] = new GitSource($userId, 'https://example.com/repository.git');
+        $this->sources[Type::RUN->value] = new RunSource(new FileSource($userId, ''));
+
+        foreach ($this->sources as $source) {
+            $this->store->add($source);
+        }
     }
 
     /**
      * @dataProvider deleteSourceSuccessDataProvider
      */
-    public function testDeleteSuccess(SourceInterface $source, int $expectedRepositoryCount): void
+    public function testDeleteSuccess(string $sourceKey): void
     {
-        $sourceUserIdMutator = self::getContainer()->get(SourceUserIdMutator::class);
-        \assert($sourceUserIdMutator instanceof SourceUserIdMutator);
-        $sourceUserIdMutator->setSourceUserId($source);
+        $source = $this->sources[$sourceKey];
 
-        $this->store->add($source);
-
-        self::assertGreaterThan(0, $this->sourceRepository->count([]));
+        self::assertSame(1, $this->sourceRepository->count(['id' => $source->getId()]));
+        if ($source instanceof RunSource && $source->getParent() instanceof SourceInterface) {
+            self::assertSame(1, $this->sourceRepository->count(['id' => $source->getParent()->getId()]));
+        }
 
         $response = $this->applicationClient->makeDeleteSourceRequest(
             $this->authenticationConfiguration->validToken,
@@ -46,7 +61,11 @@ abstract class AbstractDeleteSourceTest extends AbstractApplicationTest
         );
 
         $this->responseAsserter->assertSuccessfulResponseWithNoBody($response);
-        self::assertSame($expectedRepositoryCount, $this->sourceRepository->count([]));
+
+        self::assertSame(0, $this->sourceRepository->count(['id' => $source->getId()]));
+        if ($source instanceof RunSource && $source->getParent() instanceof SourceInterface) {
+            self::assertSame(1, $this->sourceRepository->count(['id' => $source->getParent()->getId()]));
+        }
     }
 
     /**
@@ -56,21 +75,13 @@ abstract class AbstractDeleteSourceTest extends AbstractApplicationTest
     {
         return [
             Type::FILE->value => [
-                'source' => new FileSource(SourceUserIdMutator::AUTHENTICATED_USER_ID_PLACEHOLDER, 'label'),
-                'expectedRepositoryCount' => 0,
+                'sourceKey' => Type::FILE->value,
             ],
             Type::GIT->value => [
-                'source' => new GitSource(
-                    SourceUserIdMutator::AUTHENTICATED_USER_ID_PLACEHOLDER,
-                    'https://example.com/repository.git'
-                ),
-                'expectedRepositoryCount' => 0,
+                'sourceKey' => Type::GIT->value,
             ],
             Type::RUN->value => [
-                'source' => new RunSource(
-                    new FileSource(SourceUserIdMutator::AUTHENTICATED_USER_ID_PLACEHOLDER, 'label')
-                ),
-                'expectedRepositoryCount' => 1,
+                'sourceKey' => Type::RUN->value,
             ],
         ];
     }
@@ -99,9 +110,9 @@ abstract class AbstractDeleteSourceTest extends AbstractApplicationTest
         );
 
         $this->responseAsserter->assertSuccessfulResponseWithNoBody($response);
-        self::assertSame(1, $this->sourceRepository->count([]));
         self::assertFalse($runSourceStorage->directoryExists($runSource->getDirectoryPath()));
         self::assertFalse($runSourceStorage->fileExists($serializedRunSourcePath));
+        self::assertSame(1, $this->sourceRepository->count(['id' => $fileSource->getId()]));
     }
 
     public function testDeleteFileSourceDeletesFileSourceFiles(): void
@@ -128,7 +139,7 @@ abstract class AbstractDeleteSourceTest extends AbstractApplicationTest
         );
 
         $this->responseAsserter->assertSuccessfulResponseWithNoBody($response);
-        self::assertSame(0, $this->sourceRepository->count([]));
+        self::assertSame(0, $this->sourceRepository->count(['id' => $fileSource->getId()]));
         self::assertFalse($fileSourceStorage->directoryExists($sourceRelativePath));
         self::assertFalse($fileSourceStorage->fileExists($fileRelativePath));
     }
