@@ -6,7 +6,7 @@ namespace App\Tests\Integration;
 
 use App\Enum\RunSource\State;
 use App\Enum\Source\Type;
-use App\Services\FileLister;
+use App\Services\DirectoryListingFilter;
 use App\Tests\Application\AbstractPrepareSourceTest;
 use App\Tests\Services\SourceProvider;
 use League\Flysystem\FilesystemOperator;
@@ -16,7 +16,7 @@ class PrepareSourceTest extends AbstractPrepareSourceTest
     use GetClientAdapterTrait;
 
     private FilesystemOperator $fixtureStorage;
-    private FileLister $fileLister;
+    private DirectoryListingFilter $listingFilter;
 
     protected function setUp(): void
     {
@@ -26,9 +26,9 @@ class PrepareSourceTest extends AbstractPrepareSourceTest
         \assert($fixtureStorage instanceof FilesystemOperator);
         $this->fixtureStorage = $fixtureStorage;
 
-        $fileLister = self::getContainer()->get(FileLister::class);
-        \assert($fileLister instanceof FileLister);
-        $this->fileLister = $fileLister;
+        $listingFilter = self::getContainer()->get(DirectoryListingFilter::class);
+        \assert($listingFilter instanceof DirectoryListingFilter);
+        $this->listingFilter = $listingFilter;
     }
 
     public function testPrepareFileSource(): void
@@ -37,7 +37,11 @@ class PrepareSourceTest extends AbstractPrepareSourceTest
         $fileSource = $this->sourceProvider->get(SourceProvider::FILE_WITHOUT_RUN_SOURCE);
 
         $sourceIdentifier = 'Source/yaml_valid';
-        $sourceFiles = $this->fileLister->list($this->fixtureStorage, $sourceIdentifier);
+
+        $sourceFiles = $this->listingFilter->filter(
+            $this->fixtureStorage->listContents($sourceIdentifier, true),
+            $sourceIdentifier
+        );
 
         foreach ($sourceFiles as $sourceFilePath) {
             $addFileResponse = $this->applicationClient->makeAddFileRequest(

@@ -7,7 +7,7 @@ namespace App\Services\SourceRepository;
 use App\Exception\SourceRepositoryReaderNotFoundException;
 use App\Exception\UnparseableSourceFileException;
 use App\Model\SourceRepositoryInterface;
-use App\Services\FileLister;
+use App\Services\DirectoryListingFilter;
 use App\Services\SourceRepository\Reader\Provider;
 use League\Flysystem\FilesystemException;
 use Symfony\Component\Yaml\Exception\ParseException;
@@ -19,8 +19,8 @@ class Serializer
 
     public function __construct(
         private Provider $readerProvider,
-        private FileLister $fileLister,
         private YamlParser $yamlParser,
+        private DirectoryListingFilter $listingFilter,
     ) {
     }
 
@@ -34,7 +34,9 @@ class Serializer
         $reader = $this->readerProvider->find($sourceRepository);
 
         $listPath = rtrim(ltrim($sourceRepository->getRepositoryPath(), '/'), '/');
-        $files = $this->fileLister->list($reader, $listPath, ['yml', 'yaml']);
+
+        $sourceRepositoryDirectoryListing = $reader->listContents($listPath, true);
+        $files = $this->listingFilter->filter($sourceRepositoryDirectoryListing, $listPath, ['yaml', 'yml']);
 
         $directoryPath = $sourceRepository->getDirectoryPath();
 
