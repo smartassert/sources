@@ -6,7 +6,6 @@ namespace App\Services\YamlFileProvider;
 
 use App\Services\DirectoryListingFilter;
 use League\Flysystem\FilesystemReader;
-use SmartAssert\YamlFile\Provider\ProviderInterface;
 use Symfony\Component\Yaml\Parser;
 
 class Factory
@@ -17,7 +16,7 @@ class Factory
     ) {
     }
 
-    public function create(FilesystemReader $reader, string $listPath): ProviderInterface
+    public function create(FilesystemReader $reader, string $listPath): Provider
     {
         return new Provider($this->yamlParser, $this->listingFilter, $reader, $listPath);
     }

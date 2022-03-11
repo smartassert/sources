@@ -7,11 +7,9 @@ namespace App\Services\SourceRepository;
 use App\Exception\SourceRepositoryReaderNotFoundException;
 use App\Exception\UnparseableSourceFileException;
 use App\Model\SourceRepositoryInterface;
-use App\Services\DirectoryListingFilter;
 use App\Services\SourceRepository\Reader\Provider;
+use App\Services\YamlFileProvider\Factory as YamlFileProviderFactory;
 use League\Flysystem\FilesystemException;
-use Symfony\Component\Yaml\Exception\ParseException;
-use Symfony\Component\Yaml\Parser as YamlParser;
 
 class Serializer
 {
@@ -19,8 +17,7 @@ class Serializer
 
     public function __construct(
         private Provider $readerProvider,
-        private YamlParser $yamlParser,
-        private DirectoryListingFilter $listingFilter,
+        private YamlFileProviderFactory $yamlFileProviderFactory,
     ) {
     }
 
@@ -32,44 +29,21 @@ class Serializer
     public function serialize(SourceRepositoryInterface $sourceRepository): string
     {
         $reader = $this->readerProvider->find($sourceRepository);
-
         $listPath = rtrim(ltrim($sourceRepository->getRepositoryPath(), '/'), '/');
-
-        $sourceRepositoryDirectoryListing = $reader->listContents($listPath, true);
-        $files = $this->listingFilter->filter($sourceRepositoryDirectoryListing, $listPath, ['yaml', 'yml']);
-
-        $directoryPath = $sourceRepository->getDirectoryPath();
+        $fooProvider = $this->yamlFileProviderFactory->create($reader, $listPath);
 
         $serializedFiles = [];
 
-        foreach ($files as $file) {
-            $content = $reader->read($listPath . '/' . $file);
-
-            try {
-                $this->yamlParser->parse($content);
-            } catch (ParseException $parseException) {
-                throw new UnparseableSourceFileException($file, $parseException);
-            }
-
-            $filePath = $this->removePathPrefix($directoryPath, $file);
-
+        foreach ($fooProvider->provide() as $yamlFile) {
+            $content = $yamlFile->content;
             $serializedFiles[] = sprintf(
                 self::FOO_TEMPLATE,
-                addcslashes($filePath, '"'),
+                addcslashes((string) $yamlFile->name, '"'),
                 $this->createFileContentPayload($content)
             );
         }
 
         return implode("\n\n", $serializedFiles);
-    }
-
-    private function removePathPrefix(string $prefix, string $path): string
-    {
-        $prefix = rtrim($prefix, '/') . '/';
-
-        return str_starts_with($path, $prefix)
-            ? substr($path, strlen($prefix))
-            : $path;
     }
 
     private function createFileContentPayload(string $content): string
