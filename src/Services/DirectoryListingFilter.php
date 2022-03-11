@@ -4,23 +4,23 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use League\Flysystem\FilesystemException;
-use League\Flysystem\FilesystemReader;
+use League\Flysystem\DirectoryListing;
 use League\Flysystem\StorageAttributes;
 
-class FileLister
+class DirectoryListingFilter
 {
     /**
-     * @param string[] $extensions
+     * @param DirectoryListing<StorageAttributes> $directoryListing
+     * @param string[]                            $extensions
      *
-     * @throws FilesystemException
-     *
-     * @return string[]
+     * @return DirectoryListing<string>
      */
-    public function list(FilesystemReader $reader, string $relativePath, array $extensions = []): array
-    {
-        $directoryListing = $reader
-            ->listContents($relativePath, true)
+    public function filter(
+        DirectoryListing $directoryListing,
+        string $relativePath,
+        array $extensions = []
+    ): DirectoryListing {
+        return $directoryListing
             ->filter(function (StorageAttributes $item) {
                 return !$item->isDir();
             })
@@ -48,7 +48,5 @@ class FileLister
                 return $itemPath;
             })
         ;
-
-        return $directoryListing->toArray();
     }
 }

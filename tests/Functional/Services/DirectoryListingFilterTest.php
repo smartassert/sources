@@ -5,13 +5,13 @@ declare(strict_types=1);
 namespace App\Tests\Functional\Services;
 
 use App\Entity\FileSource;
-use App\Services\FileLister;
+use App\Services\DirectoryListingFilter;
 use App\Tests\Model\UserId;
 use App\Tests\Services\FileStoreFixtureCreator;
 use League\Flysystem\FilesystemOperator;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
-class FileListerTest extends WebTestCase
+class DirectoryListingFilterTest extends WebTestCase
 {
     private FileStoreFixtureCreator $fixtureCreator;
 
@@ -37,10 +37,10 @@ class FileListerTest extends WebTestCase
         array $expectedRelativePathNames
     ): void {
         $storage = self::getContainer()->get('file_source.storage');
-        self::assertInstanceOf(FilesystemOperator::class, $storage);
+        \assert($storage instanceof FilesystemOperator);
 
-        $lister = self::getContainer()->get(FileLister::class);
-        self::assertInstanceOf(FileLister::class, $lister);
+        $listingFilter = self::getContainer()->get(DirectoryListingFilter::class);
+        \assert($listingFilter instanceof DirectoryListingFilter);
 
         $fileSourceStorage = self::getContainer()->get('file_source.storage');
         \assert($fileSourceStorage instanceof FilesystemOperator);
@@ -48,7 +48,11 @@ class FileListerTest extends WebTestCase
 
         $this->fixtureCreator->copySetTo('Source/' . $fixtureSet, $storage, $relativePath);
 
-        $files = $lister->list($storage, $relativePath, $extensions);
+        $files = $listingFilter->filter(
+            $storage->listContents($relativePath, true),
+            $relativePath,
+            $extensions
+        )->toArray();
 
         self::assertCount(count($expectedRelativePathNames), $files);
         self::assertSame($expectedRelativePathNames, $files);

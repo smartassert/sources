@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 namespace App\Tests\Services;
 
-use App\Services\FileLister;
+use App\Services\DirectoryListingFilter;
 use League\Flysystem\FilesystemReader;
 use League\Flysystem\FilesystemWriter;
 
 class FileStoreFixtureCreator
 {
     public function __construct(
-        private FileLister $fileLister,
         private FilesystemReader $fixturesReader,
+        private DirectoryListingFilter $listingFilter,
     ) {
     }
 
@@ -21,7 +21,10 @@ class FileStoreFixtureCreator
         FilesystemWriter $storage,
         string $targetRelativeDirectory
     ): void {
-        $originFiles = $this->fileLister->list($this->fixturesReader, $originRelativePath);
+        $originFiles = $this->listingFilter->filter(
+            $this->fixturesReader->listContents($originRelativePath, true),
+            $originRelativePath
+        );
 
         foreach ($originFiles as $fileRelativePath) {
             $this->copyTo(

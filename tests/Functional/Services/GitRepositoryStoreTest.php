@@ -11,7 +11,7 @@ use App\Exception\GitRepositoryException as RepositoryException;
 use App\Exception\ProcessExecutorException;
 use App\Model\ProcessOutput;
 use App\Model\UserGitRepository;
-use App\Services\FileLister;
+use App\Services\DirectoryListingFilter;
 use App\Services\GitRepositoryCheckoutHandler;
 use App\Services\GitRepositoryCloner;
 use App\Services\GitRepositoryStore;
@@ -40,8 +40,8 @@ class GitRepositoryStoreTest extends WebTestCase
     private UserGitRepository $gitRepository;
     private FilesystemOperator $gitRepositoryStorage;
     private FilesystemOperator $fixturesStorage;
-    private FileLister $fileLister;
     private string $gitRepositoryAbsolutePath;
+    private DirectoryListingFilter $listingFilter;
 
     protected function setUp(): void
     {
@@ -63,9 +63,9 @@ class GitRepositoryStoreTest extends WebTestCase
         \assert($fixturesStorage instanceof FilesystemOperator);
         $this->fixturesStorage = $fixturesStorage;
 
-        $fileLister = self::getContainer()->get(FileLister::class);
-        \assert($fileLister instanceof FileLister);
-        $this->fileLister = $fileLister;
+        $listingFilter = self::getContainer()->get(DirectoryListingFilter::class);
+        \assert($listingFilter instanceof DirectoryListingFilter);
+        $this->listingFilter = $listingFilter;
 
         $entityRemover = self::getContainer()->get(EntityRemover::class);
         if ($entityRemover instanceof EntityRemover) {
@@ -234,11 +234,18 @@ class GitRepositoryStoreTest extends WebTestCase
 
         $this->gitRepositoryStore->initialize($this->source, self::REF);
 
-        self::assertTrue($this->gitRepositoryStorage->directoryExists($this->gitRepository->getDirectoryPath()));
-        self::assertSame(
-            $this->fileLister->list($this->fixturesStorage, $fixtureSetIdentifier),
-            $this->fileLister->list($this->gitRepositoryStorage, $this->gitRepository->getDirectoryPath())
+        $expectedListing = $this->listingFilter->filter(
+            $this->fixturesStorage->listContents($fixtureSetIdentifier, true),
+            $fixtureSetIdentifier
         );
+
+        $actualListing = $this->listingFilter->filter(
+            $this->gitRepositoryStorage->listContents($this->gitRepository->getDirectoryPath(), true),
+            $this->gitRepository->getDirectoryPath()
+        );
+
+        self::assertTrue($this->gitRepositoryStorage->directoryExists($this->gitRepository->getDirectoryPath()));
+        self::assertSame($expectedListing->toArray(), $actualListing->toArray());
     }
 
     private function setGitRepositoryClonerOutcome(ProcessOutput|\Exception $outcome): void
