@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "b6d80ce2991c43b6039875156dd55bb5",
+    "content-hash": "61ea8d7fdb0f8683c9f86e8f9f2561a2",
     "packages": [
         {
             "name": "async-aws/core",
@@ -3062,6 +3062,81 @@
                 "source": "https://github.com/smartassert/UsersSecurityBundle/tree/0.4"
             },
             "time": "2022-03-03T16:14:48+00:00"
+        },
+        {
+            "name": "smartassert/yaml-file",
+            "version": "dev-main",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/smartassert/yaml-file.git",
+                "reference": "475583932d6a14b6e951c80632d609b53b3f6403"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/smartassert/yaml-file/zipball/475583932d6a14b6e951c80632d609b53b3f6403",
+                "reference": "475583932d6a14b6e951c80632d609b53b3f6403",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^8.1",
+                "symfony/yaml": "^6.0"
+            },
+            "require-dev": {
+                "phpstan/extension-installer": "^1.1",
+                "phpstan/phpstan": "^1.4",
+                "phpstan/phpstan-phpunit": "^1.0",
+                "phpunit/phpunit": "^9.5",
+                "squizlabs/php_codesniffer": "dev-master#51335eb46b2b940b6c429643fe96f514d4a4e4a1"
+            },
+            "default-branch": true,
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "SmartAssert\\YamlFile\\": "src/",
+                    "SmartAssert\\Tests\\YamlFile\\": "tests/"
+                }
+            },
+            "scripts": {
+                "cs-fixer-dry-run": [
+                    "docker run --rm $(if [ ! -z \"${NO_TTY}\" ]; then echo \"\"; else echo \"-t\"; fi) -w=/app -v ${PWD}:/app oskarstark/php-cs-fixer-ga:latest --allow-risky=yes --dry-run --verbose --show-progress none"
+                ],
+                "cs-fixer-fix": [
+                    "docker run --rm $(if [ ! -z \"${NO_TTY}\" ]; then echo \"\"; else echo \"-t\"; fi) -w=/app -v ${PWD}:/app oskarstark/php-cs-fixer-ga:latest --allow-risky=yes --diff"
+                ],
+                "cs-phpcs": [
+                    "./vendor/bin/phpcs"
+                ],
+                "cs": [
+                    "@cs-fixer-dry-run",
+                    "@cs-phpcs"
+                ],
+                "static-analysis": [
+                    "./vendor/bin/phpstan"
+                ],
+                "test": [
+                    "./vendor/bin/phpunit --colors=always"
+                ],
+                "ci": [
+                    "@composer cs",
+                    "@composer static-analysis",
+                    "@composer test"
+                ]
+            },
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Jon Cram",
+                    "email": "webignition@gmail.com"
+                }
+            ],
+            "homepage": "https://github.com/smartassert/yaml-file",
+            "support": {
+                "source": "https://github.com/smartassert/yaml-file/tree/main",
+                "issues": "https://github.com/smartassert/yaml-file/issues"
+            },
+            "time": "2022-03-11T13:03:29+00:00"
         },
         {
             "name": "symfony/cache",
@@ -10115,6 +10190,7 @@
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
+        "smartassert/yaml-file": 20,
         "squizlabs/php_codesniffer": 20
     },
     "prefer-stable": true,
