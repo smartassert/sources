@@ -3069,12 +3069,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/smartassert/yaml-file.git",
-                "reference": "475583932d6a14b6e951c80632d609b53b3f6403"
+                "reference": "05c37c10ec97638f6120ba35a554cb53eb6d5537"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/smartassert/yaml-file/zipball/475583932d6a14b6e951c80632d609b53b3f6403",
-                "reference": "475583932d6a14b6e951c80632d609b53b3f6403",
+                "url": "https://api.github.com/repos/smartassert/yaml-file/zipball/05c37c10ec97638f6120ba35a554cb53eb6d5537",
+                "reference": "05c37c10ec97638f6120ba35a554cb53eb6d5537",
                 "shasum": ""
             },
             "require": {
@@ -3136,7 +3136,7 @@
                 "source": "https://github.com/smartassert/yaml-file/tree/main",
                 "issues": "https://github.com/smartassert/yaml-file/issues"
             },
-            "time": "2022-03-11T13:03:29+00:00"
+            "time": "2022-03-11T18:24:00+00:00"
         },
         {
             "name": "symfony/cache",

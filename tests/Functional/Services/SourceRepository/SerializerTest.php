@@ -14,6 +14,7 @@ use App\Tests\Model\UserId;
 use App\Tests\Services\FileStoreFixtureCreator;
 use League\Flysystem\FilesystemOperator;
 use League\Flysystem\FilesystemWriter;
+use SmartAssert\YamlFile\Exception\ProvisionException;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 class SerializerTest extends WebTestCase
@@ -71,11 +72,13 @@ class SerializerTest extends WebTestCase
         try {
             $this->serializer->serialize($source);
             self::fail(UnparseableSourceFileException::class . ' not thrown');
-        } catch (UnparseableSourceFileException $exception) {
-            self::assertSame('file2.yml', $exception->getPath());
+        } catch (ProvisionException $exception) {
+            $previous = $exception->getPrevious();
+            self::assertInstanceOf(UnparseableSourceFileException::class, $previous);
+            self::assertSame('file2.yml', $previous->getPath());
             self::assertSame(
                 'Unable to parse at line 1 (near "  invalid").',
-                $exception->getParseException()->getMessage()
+                $previous->getParseException()->getMessage()
             );
         }
     }
