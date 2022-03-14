@@ -8,6 +8,7 @@ use App\Exception\UnparseableSourceFileException;
 use App\Services\DirectoryListingFilter;
 use League\Flysystem\FilesystemException;
 use League\Flysystem\FilesystemReader;
+use SmartAssert\YamlFile\Exception\ProvisionException;
 use SmartAssert\YamlFile\Model\YamlFile;
 use SmartAssert\YamlFile\Provider\ProviderInterface;
 use Symfony\Component\Yaml\Exception\ParseException;
@@ -26,22 +27,33 @@ class Provider implements ProviderInterface
         $this->path = rtrim(ltrim($path, '/'), '/');
     }
 
-    /**
-     * @throws UnparseableSourceFileException
-     * @throws FilesystemException
-     */
     public function provide(): \Generator
     {
-        $sourceRepositoryDirectoryListing = $this->reader->listContents($this->path, true);
+        try {
+            $sourceRepositoryDirectoryListing = $this->reader->listContents($this->path, true);
+        } catch (FilesystemException $e) {
+            throw new ProvisionException(sprintf('Listing contents failed for "%s"', $this->path), 0, $e);
+        }
+
         $files = $this->listingFilter->filter($sourceRepositoryDirectoryListing, $this->path, ['yaml', 'yml']);
 
         foreach ($files as $file) {
-            $content = $this->reader->read($this->path . '/' . $file);
+            $readPath = $this->path . '/' . $file;
+
+            try {
+                $content = rtrim($this->reader->read($readPath));
+            } catch (FilesystemException $e) {
+                throw new ProvisionException(sprintf('File read failed for "%s"', $readPath), 0, $e);
+            }
 
             try {
                 $this->yamlParser->parse($content);
             } catch (ParseException $parseException) {
-                throw new UnparseableSourceFileException($file, $parseException);
+                throw new ProvisionException(
+                    sprintf('Unable to parse content for "%s"', $readPath),
+                    0,
+                    new UnparseableSourceFileException($file, $parseException)
+                );
             }
 
             $filePath = $this->removePathPrefix($this->path, $file);

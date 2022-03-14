@@ -80,17 +80,17 @@ class ProviderTest extends WebTestCase
                 'fixtureSet' => 'yml_yaml_valid',
                 'relativePath' => $basePath,
                 'expectedYamlFiles' => [
-                    YamlFile::create('directory/file3.yml', '- "file 3 line 1"' . "\n"),
-                    YamlFile::create('file1.yaml', '- "file 1 line 1"' . "\n" . '- "file 1 line 2"' . "\n"),
-                    YamlFile::create('file2.yml', '- "file 2 line 1"' . "\n" . '- "file 2 line 2"' . "\n"),
+                    YamlFile::create('directory/file3.yml', '- "file 3 line 1"'),
+                    YamlFile::create('file1.yaml', '- "file 1 line 1"' . "\n" . '- "file 1 line 2"'),
+                    YamlFile::create('file2.yml', '- "file 2 line 1"' . "\n" . '- "file 2 line 2"'),
                 ],
             ],
             'source: mixed' => [
                 'fixtureSet' => 'mixed',
                 'relativePath' => $basePath,
                 'expectedYamlFiles' => [
-                    YamlFile::create('directory/file3.yaml', 'File Three' . "\n"),
-                    YamlFile::create('file1.yaml', 'File One' . "\n"),
+                    YamlFile::create('directory/file3.yaml', 'File Three'),
+                    YamlFile::create('file1.yaml', 'File One'),
                 ],
             ],
         ];
