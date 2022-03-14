@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace App\Validator;
 
-use App\Model\YamlFilename;
+use SmartAssert\YamlFile\Model\Filename;
+use SmartAssert\YamlFile\Validator\YamlFilenameValidator;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
@@ -13,8 +14,7 @@ use Symfony\Component\Validator\Exception\UnexpectedValueException;
 class YamlFilenameConstraintValidator extends ConstraintValidator
 {
     public function __construct(
-        private readonly FilenameValidator $filenameValidator,
-        private readonly YamlFilenameValidator $yamlFilenameValidator,
+        private readonly YamlFilenameValidator $validator,
     ) {
     }
 
@@ -28,26 +28,13 @@ class YamlFilenameConstraintValidator extends ConstraintValidator
             return;
         }
 
-        if (!$value instanceof YamlFilename) {
-            throw new UnexpectedValueException($value, YamlFilename::class);
+        if (!$value instanceof Filename) {
+            throw new UnexpectedValueException($value, Filename::class);
         }
 
-        if (false === $this->filenameValidator->isValid($value->getValue())) {
-            $this->context->buildViolation($constraint::MESSAGE_FILENAME_INVALID)
-                ->atPath('name')
-                ->addViolation()
-            ;
-        }
-
-        if (false === $this->yamlFilenameValidator->isNameValid($value->getName())) {
-            $this->context->buildViolation($constraint::MESSAGE_NAME_EMPTY)
-                ->atPath('name')
-                ->addViolation()
-            ;
-        }
-
-        if (false === $this->yamlFilenameValidator->isExtensionValid($value->getExtension())) {
-            $this->context->buildViolation($constraint::MESSAGE_EXTENSION_INVALID)
+        $filenameValidation = $this->validator->validate($value);
+        if (false === $filenameValidation->isValid()) {
+            $this->context->buildViolation($constraint::MESSAGE_NAME_INVALID)
                 ->atPath('name')
                 ->addViolation()
             ;

@@ -121,3 +121,9 @@ services:
                 - '@SmartAssert\InvokableLogger\ExceptionLogger'
 
     SmartAssert\YamlFile\Collection\Serializer: ~
+
+    SmartAssert\YamlFile\Validator\YamlFilenameValidator: ~
+
+    SmartAssert\YamlFile\Validator\ContentValidator: ~
+
+    SmartAssert\YamlFile\Validator\YamlFileValidator: ~
