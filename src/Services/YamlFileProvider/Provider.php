@@ -6,6 +6,7 @@ namespace App\Services\YamlFileProvider;
 
 use App\Exception\UnparseableSourceFileException;
 use App\Services\DirectoryListingFilter;
+use League\Flysystem\FilesystemException;
 use League\Flysystem\FilesystemReader;
 use SmartAssert\YamlFile\Model\YamlFile;
 use SmartAssert\YamlFile\Provider\ProviderInterface;
@@ -25,6 +26,10 @@ class Provider implements ProviderInterface
         $this->path = rtrim(ltrim($path, '/'), '/');
     }
 
+    /**
+     * @throws UnparseableSourceFileException
+     * @throws FilesystemException
+     */
     public function provide(): \Generator
     {
         $sourceRepositoryDirectoryListing = $this->reader->listContents($this->path, true);

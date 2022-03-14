@@ -84,6 +84,3 @@ services:
 
     App\Tests\Services\SourceProvider:
         public: true
-
-    App\Services\YamlFileProvider\Factory:
-        public: true
