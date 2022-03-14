@@ -292,6 +292,9 @@
     "smartassert/users-security-bundle": {
         "version": "0.1"
     },
+    "smartassert/yaml-file": {
+        "version": "dev-main"
+    },
     "squizlabs/php_codesniffer": {
         "version": "3.6",
         "recipe": {

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "b6d80ce2991c43b6039875156dd55bb5",
+    "content-hash": "5512bc7ba73736e1de7724b2de3079eb",
     "packages": [
         {
             "name": "async-aws/core",
@@ -3062,6 +3062,55 @@
                 "source": "https://github.com/smartassert/UsersSecurityBundle/tree/0.4"
             },
             "time": "2022-03-03T16:14:48+00:00"
+        },
+        {
+            "name": "smartassert/yaml-file",
+            "version": "0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/smartassert/yaml-file.git",
+                "reference": "bd49606673da3bc0174013167e2e7ef69579128b"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/smartassert/yaml-file/zipball/bd49606673da3bc0174013167e2e7ef69579128b",
+                "reference": "bd49606673da3bc0174013167e2e7ef69579128b",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^8.1",
+                "symfony/yaml": "^6.0"
+            },
+            "require-dev": {
+                "phpstan/extension-installer": "^1.1",
+                "phpstan/phpstan": "^1.4",
+                "phpstan/phpstan-phpunit": "^1.0",
+                "phpunit/phpunit": "^9.5",
+                "squizlabs/php_codesniffer": "dev-master#51335eb46b2b940b6c429643fe96f514d4a4e4a1"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "SmartAssert\\YamlFile\\": "src/",
+                    "SmartAssert\\Tests\\YamlFile\\": "tests/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Jon Cram",
+                    "email": "webignition@gmail.com"
+                }
+            ],
+            "homepage": "https://github.com/smartassert/yaml-file",
+            "support": {
+                "issues": "https://github.com/smartassert/yaml-file/issues",
+                "source": "https://github.com/smartassert/yaml-file/tree/0.1"
+            },
+            "time": "2022-03-14T14:39:05+00:00"
         },
         {
             "name": "symfony/cache",
