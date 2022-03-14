@@ -4,18 +4,19 @@ declare(strict_types=1);
 
 namespace App\Validator;
 
-use App\Model\YamlFile;
+use SmartAssert\YamlFile\Model\Validation\ContentContext;
+use SmartAssert\YamlFile\Model\Validation\YamlFileContext;
+use SmartAssert\YamlFile\Model\YamlFile;
+use SmartAssert\YamlFile\Validator\YamlFileValidator;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 use Symfony\Component\Validator\Exception\UnexpectedValueException;
-use Symfony\Component\Yaml\Exception\ParseException;
-use Symfony\Component\Yaml\Parser;
 
 class YamlFileConstraintValidator extends ConstraintValidator
 {
     public function __construct(
-        private Parser $yamlParser,
+        private YamlFileValidator $validator,
     ) {
     }
 
@@ -33,21 +34,29 @@ class YamlFileConstraintValidator extends ConstraintValidator
             throw new UnexpectedValueException($value, YamlFile::class);
         }
 
-        if ('' === $value->content) {
-            $this->context->buildViolation($constraint::MESSAGE_CONTENT_EMPTY)
-                ->atPath('content')
-                ->addViolation()
-            ;
-        }
+        $yamlFileValidation = $this->validator->validate($value);
+        if (false === $yamlFileValidation->isValid()) {
+            if (YamlFileContext::CONTENT === $yamlFileValidation->getContext()) {
+                $previousContext = $yamlFileValidation->getPrevious()?->getContext();
 
-        try {
-            $this->yamlParser->parse($value->content);
-        } catch (ParseException $yamlParseException) {
-            $this->context->buildViolation($constraint::MESSAGE_CONTENT_PARSE_ERROR)
-                ->setParameter('{{ exception }}', $yamlParseException->getMessage())
-                ->atPath('content')
-                ->addViolation()
-            ;
+                if (ContentContext::NOT_EMPTY === $previousContext) {
+                    $this->context->buildViolation($constraint::MESSAGE_CONTENT_EMPTY)
+                        ->atPath('content')
+                        ->addViolation()
+                    ;
+                }
+
+                if (ContentContext::IS_YAML === $previousContext) {
+                    $this->context->buildViolation($constraint::MESSAGE_CONTENT_PARSE_ERROR)
+                        ->setParameter(
+                            '{{ exception }}',
+                            (string) $yamlFileValidation->getPrevious()?->getErrorMessage()
+                        )
+                        ->atPath('content')
+                        ->addViolation()
+                    ;
+                }
+            }
         }
     }
 }

@@ -52,21 +52,21 @@ abstract class AbstractFileSourceFileTest extends AbstractApplicationTest
                 'filename' => '.yaml',
                 'content' => 'non-empty value',
                 'expectedResponseData' => InvalidFilenameResponseDataFactory::createForMessage(
-                    YamlFilenameConstraint::MESSAGE_NAME_EMPTY
+                    YamlFilenameConstraint::MESSAGE_NAME_INVALID,
                 ),
             ],
             'name contains backslash characters, content non-empty' => [
                 'filename' => 'one-two-\\-three.yaml',
                 'content' => 'non-empty value',
                 'expectedResponseData' => InvalidFilenameResponseDataFactory::createForMessage(
-                    YamlFilenameConstraint::MESSAGE_FILENAME_INVALID
+                    YamlFilenameConstraint::MESSAGE_NAME_INVALID,
                 ),
             ],
             'name contains space characters, content non-empty' => [
                 'filename' => 'one two three.yaml',
                 'content' => 'non-empty value',
                 'expectedResponseData' => InvalidFilenameResponseDataFactory::createForMessage(
-                    YamlFilenameConstraint::MESSAGE_FILENAME_INVALID
+                    YamlFilenameConstraint::MESSAGE_NAME_INVALID,
                 ),
             ],
             'name valid, content empty' => [
@@ -147,19 +147,19 @@ abstract class AbstractFileSourceFileTest extends AbstractApplicationTest
             'name empty with .yaml extension' => [
                 'filename' => '.yaml',
                 'expectedResponseData' => InvalidFilenameResponseDataFactory::createForMessage(
-                    YamlFilenameConstraint::MESSAGE_NAME_EMPTY
+                    YamlFilenameConstraint::MESSAGE_NAME_INVALID,
                 ),
             ],
             'name contains backslash characters' => [
                 'filename' => 'one-two-\\-three.yaml',
                 'expectedResponseData' => InvalidFilenameResponseDataFactory::createForMessage(
-                    YamlFilenameConstraint::MESSAGE_FILENAME_INVALID
+                    YamlFilenameConstraint::MESSAGE_NAME_INVALID,
                 ),
             ],
             'name contains space characters' => [
                 'filename' => 'one two three.yaml',
                 'expectedResponseData' => InvalidFilenameResponseDataFactory::createForMessage(
-                    YamlFilenameConstraint::MESSAGE_FILENAME_INVALID
+                    YamlFilenameConstraint::MESSAGE_NAME_INVALID,
                 ),
             ],
         ];
