@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Request;
 
 use App\Validator\YamlFileConstraint;
-use SmartAssert\YamlFile\Model\YamlFile;
+use SmartAssert\YamlFile\YamlFile;
 use Symfony\Component\HttpFoundation\Request;
 use webignition\EncapsulatingRequestResolverBundle\Model\EncapsulatingRequestInterface;
 

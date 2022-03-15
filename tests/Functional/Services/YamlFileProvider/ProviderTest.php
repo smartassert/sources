@@ -9,7 +9,7 @@ use App\Services\YamlFileProvider\Factory;
 use App\Tests\Model\UserId;
 use App\Tests\Services\FileStoreFixtureCreator;
 use League\Flysystem\FilesystemOperator;
-use SmartAssert\YamlFile\Model\YamlFile;
+use SmartAssert\YamlFile\YamlFile;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 class ProviderTest extends WebTestCase
@@ -31,11 +31,11 @@ class ProviderTest extends WebTestCase
     }
 
     /**
-     * @dataProvider provideSuccessDataProvider
+     * @dataProvider getYamlFilesSuccessDataProvider
      *
      * @param YamlFile[] $expectedYamlFiles
      */
-    public function testProvideSuccess(
+    public function testGetYamlFilesSuccess(
         string $fixtureSet,
         string $relativePath,
         array $expectedYamlFiles
@@ -49,7 +49,7 @@ class ProviderTest extends WebTestCase
         $provider = $this->factory->create($storage, $relativePath);
         $count = 0;
 
-        foreach ($provider->provide() as $index => $yamlFile) {
+        foreach ($provider->getYamlFiles() as $index => $yamlFile) {
             ++$count;
 
             self::assertInstanceOf(YamlFile::class, $yamlFile);
@@ -66,7 +66,7 @@ class ProviderTest extends WebTestCase
     /**
      * @return array<mixed>
      */
-    public function provideSuccessDataProvider(): array
+    public function getYamlFilesSuccessDataProvider(): array
     {
         $basePath = (new FileSource(UserId::create(), ''))->getDirectoryPath();
 

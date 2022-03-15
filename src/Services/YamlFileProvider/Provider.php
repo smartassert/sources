@@ -8,9 +8,9 @@ use App\Exception\UnparseableSourceFileException;
 use App\Services\DirectoryListingFilter;
 use League\Flysystem\FilesystemException;
 use League\Flysystem\FilesystemReader;
+use SmartAssert\YamlFile\Collection\ProviderInterface;
 use SmartAssert\YamlFile\Exception\ProvisionException;
-use SmartAssert\YamlFile\Model\YamlFile;
-use SmartAssert\YamlFile\Provider\ProviderInterface;
+use SmartAssert\YamlFile\YamlFile;
 use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Parser;
 
@@ -27,7 +27,7 @@ class Provider implements ProviderInterface
         $this->path = rtrim(ltrim($path, '/'), '/');
     }
 
-    public function provide(): \Generator
+    public function getYamlFiles(): \Generator
     {
         try {
             $sourceRepositoryDirectoryListing = $this->reader->listContents($this->path, true);

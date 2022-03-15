@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "5512bc7ba73736e1de7724b2de3079eb",
+    "content-hash": "c8d5dac84f00f2e00f6e43d89ba17615",
     "packages": [
         {
             "name": "async-aws/core",
@@ -3065,16 +3065,16 @@
         },
         {
             "name": "smartassert/yaml-file",
-            "version": "0.1",
+            "version": "1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/smartassert/yaml-file.git",
-                "reference": "bd49606673da3bc0174013167e2e7ef69579128b"
+                "reference": "8ac57730a003be8475c55acd24adce539ea25dec"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/smartassert/yaml-file/zipball/bd49606673da3bc0174013167e2e7ef69579128b",
-                "reference": "bd49606673da3bc0174013167e2e7ef69579128b",
+                "url": "https://api.github.com/repos/smartassert/yaml-file/zipball/8ac57730a003be8475c55acd24adce539ea25dec",
+                "reference": "8ac57730a003be8475c55acd24adce539ea25dec",
                 "shasum": ""
             },
             "require": {
@@ -3108,9 +3108,9 @@
             "homepage": "https://github.com/smartassert/yaml-file",
             "support": {
                 "issues": "https://github.com/smartassert/yaml-file/issues",
-                "source": "https://github.com/smartassert/yaml-file/tree/0.1"
+                "source": "https://github.com/smartassert/yaml-file/tree/1.0"
             },
-            "time": "2022-03-14T14:39:05+00:00"
+            "time": "2022-03-15T10:56:09+00:00"
         },
         {
             "name": "symfony/cache",

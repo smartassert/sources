@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace App\Validator;
 
-use SmartAssert\YamlFile\Model\Validation\ContentContext;
-use SmartAssert\YamlFile\Model\Validation\YamlFileContext;
-use SmartAssert\YamlFile\Model\YamlFile;
+use SmartAssert\YamlFile\Validation\ContentContext;
+use SmartAssert\YamlFile\Validation\YamlFileContext;
 use SmartAssert\YamlFile\Validator\YamlFileValidator;
+use SmartAssert\YamlFile\YamlFile;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;

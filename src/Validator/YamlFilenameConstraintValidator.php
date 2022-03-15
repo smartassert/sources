@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Validator;
 
-use SmartAssert\YamlFile\Model\Filename;
+use SmartAssert\YamlFile\Filename;
 use SmartAssert\YamlFile\Validator\YamlFilenameValidator;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
