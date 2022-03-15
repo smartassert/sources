@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Services\YamlFileProvider;
+namespace App\Services\YamlFileCollection;
 
 use App\Exception\UnparseableSourceFileException;
 use App\Services\DirectoryListingFilter;

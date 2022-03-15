@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Functional\Services\YamlFileProvider;
+namespace App\Tests\Functional\Services\YamlFileCollection;
 
 use App\Entity\FileSource;
-use App\Services\YamlFileProvider\Factory;
+use App\Services\YamlFileCollection\Factory;
 use App\Tests\Model\UserId;
 use App\Tests\Services\FileStoreFixtureCreator;
 use League\Flysystem\FilesystemOperator;

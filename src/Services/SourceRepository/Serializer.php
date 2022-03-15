@@ -7,7 +7,7 @@ namespace App\Services\SourceRepository;
 use App\Exception\SourceRepositoryReaderNotFoundException;
 use App\Model\SourceRepositoryInterface;
 use App\Services\SourceRepository\Reader\Provider;
-use App\Services\YamlFileProvider\Factory as YamlFileProviderFactory;
+use App\Services\YamlFileCollection\Factory as YamlFileProviderFactory;
 use SmartAssert\YamlFile\Collection\Serializer as YamlFileCollectionSerializer;
 use SmartAssert\YamlFile\Exception\ProvisionException;
 
