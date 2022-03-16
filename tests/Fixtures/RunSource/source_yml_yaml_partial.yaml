@@ -1,2 +1,5 @@
-"file3.yml": |
+---
+"path": "file3.yml"
+"content": |
   - "file 3 line 1"
+...
