@@ -62,8 +62,9 @@ services:
         tags:
             - { name: controller.argument_value_resolver, priority: 50 }
 
-    Symfony\Component\Yaml\Parser:
-        class: Symfony\Component\Yaml\Parser
+    Symfony\Component\Yaml\Parser: ~
+
+    Symfony\Component\Yaml\Dumper: ~
 
     League\Flysystem\PathNormalizer:
         class: League\Flysystem\WhitespacePathNormalizer
@@ -119,6 +120,8 @@ services:
                 message_queue: '@App\Services\ServiceStatusInspector\MessageQueueInspector'
             $exceptionHandlers:
                 - '@SmartAssert\InvokableLogger\ExceptionLogger'
+
+    SmartAssert\YamlFile\FileHashes\Serializer: ~
 
     SmartAssert\YamlFile\Collection\Serializer: ~
 
