@@ -8,13 +8,13 @@ use App\Exception\UnparseableSourceFileException;
 use App\Services\DirectoryListingFilter;
 use League\Flysystem\FilesystemException;
 use League\Flysystem\FilesystemReader;
-use SmartAssert\YamlFile\Collection\ProviderInterface;
+use SmartAssert\YamlFile\Collection\UnreliableProviderInterface;
 use SmartAssert\YamlFile\Exception\ProvisionException;
 use SmartAssert\YamlFile\YamlFile;
 use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Parser;
 
-class Provider implements ProviderInterface
+class Provider implements UnreliableProviderInterface
 {
     private string $path;
 
@@ -27,6 +27,11 @@ class Provider implements ProviderInterface
         $this->path = rtrim(ltrim($path, '/'), '/');
     }
 
+    /**
+     * @throws ProvisionException
+     *
+     * @return \Generator<YamlFile>
+     */
     public function getYamlFiles(): \Generator
     {
         try {
