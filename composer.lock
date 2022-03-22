@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "65f118fc093c49aec67ceba9cf360019",
+    "content-hash": "4bfeca0e4c436a2c40c8d2e8f64c119a",
     "packages": [
         {
             "name": "async-aws/core",
@@ -3065,22 +3065,22 @@
         },
         {
             "name": "smartassert/yaml-file",
-            "version": "3.0",
+            "version": "3.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/smartassert/yaml-file.git",
-                "reference": "da09392b8fbe7c62dfe40851af747daf15cd7c66"
+                "reference": "73c0c7052d0e43a0d8716ce1b5ce5921e247f76e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/smartassert/yaml-file/zipball/da09392b8fbe7c62dfe40851af747daf15cd7c66",
-                "reference": "da09392b8fbe7c62dfe40851af747daf15cd7c66",
+                "url": "https://api.github.com/repos/smartassert/yaml-file/zipball/73c0c7052d0e43a0d8716ce1b5ce5921e247f76e",
+                "reference": "73c0c7052d0e43a0d8716ce1b5ce5921e247f76e",
                 "shasum": ""
             },
             "require": {
                 "php": "^8.1",
                 "symfony/yaml": "^6.0",
-                "webignition/yaml-document-set-parser": ">=1.0,<2"
+                "webignition/yaml-document-set-parser": ">=2.0,<3"
             },
             "require-dev": {
                 "phpstan/extension-installer": "^1.1",
@@ -3109,9 +3109,9 @@
             "homepage": "https://github.com/smartassert/yaml-file",
             "support": {
                 "issues": "https://github.com/smartassert/yaml-file/issues",
-                "source": "https://github.com/smartassert/yaml-file/tree/3.0"
+                "source": "https://github.com/smartassert/yaml-file/tree/3.2"
             },
-            "time": "2022-03-18T12:09:56+00:00"
+            "time": "2022-03-22T11:04:21+00:00"
         },
         {
             "name": "symfony/cache",
@@ -7164,16 +7164,16 @@
         },
         {
             "name": "webignition/yaml-document-set-parser",
-            "version": "1.0.1",
+            "version": "2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webignition/yaml-document-set-parser.git",
-                "reference": "4ce842f90ddabdc08873e5acd40421a02f7e7854"
+                "reference": "2ef99fb12f9d608659a3d161971f6ef287ee4dea"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webignition/yaml-document-set-parser/zipball/4ce842f90ddabdc08873e5acd40421a02f7e7854",
-                "reference": "4ce842f90ddabdc08873e5acd40421a02f7e7854",
+                "url": "https://api.github.com/repos/webignition/yaml-document-set-parser/zipball/2ef99fb12f9d608659a3d161971f6ef287ee4dea",
+                "reference": "2ef99fb12f9d608659a3d161971f6ef287ee4dea",
                 "shasum": ""
             },
             "require": {
@@ -7210,9 +7210,9 @@
             ],
             "support": {
                 "issues": "https://github.com/webignition/yaml-document-set-parser/issues",
-                "source": "https://github.com/webignition/yaml-document-set-parser/tree/1.0.1"
+                "source": "https://github.com/webignition/yaml-document-set-parser/tree/2.0"
             },
-            "time": "2022-03-17T16:27:16+00:00"
+            "time": "2022-03-18T16:55:27+00:00"
         }
     ],
     "packages-dev": [
