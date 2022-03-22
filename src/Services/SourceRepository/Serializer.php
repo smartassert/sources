@@ -9,7 +9,7 @@ use App\Model\SourceRepositoryInterface;
 use App\Services\SourceRepository\Reader\Provider;
 use App\Services\YamlFileCollection\Factory as YamlFileProviderFactory;
 use SmartAssert\YamlFile\Collection\Serializer as YamlFileCollectionSerializer;
-use SmartAssert\YamlFile\Exception\ProvisionException;
+use SmartAssert\YamlFile\Exception\Collection\SerializeException;
 
 class Serializer
 {
@@ -22,11 +22,11 @@ class Serializer
 
     /**
      * @throws SourceRepositoryReaderNotFoundException
-     * @throws ProvisionException
+     * @throws SerializeException
      */
     public function serialize(SourceRepositoryInterface $sourceRepository): string
     {
-        return $this->yamlFileCollectionSerializer->serialize(
+        return $this->yamlFileCollectionSerializer->serializeUnreliableProvider(
             $this->yamlFileProviderFactory->create(
                 $this->readerProvider->find($sourceRepository),
                 $sourceRepository->getRepositoryPath()

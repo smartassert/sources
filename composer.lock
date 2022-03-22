@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "4bfeca0e4c436a2c40c8d2e8f64c119a",
+    "content-hash": "791ef1023c7b4c8dfcf50b6b2037444a",
     "packages": [
         {
             "name": "async-aws/core",
@@ -3065,16 +3065,16 @@
         },
         {
             "name": "smartassert/yaml-file",
-            "version": "3.2",
+            "version": "4.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/smartassert/yaml-file.git",
-                "reference": "73c0c7052d0e43a0d8716ce1b5ce5921e247f76e"
+                "reference": "759dc10f11bde192d82601c22185636167e04e30"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/smartassert/yaml-file/zipball/73c0c7052d0e43a0d8716ce1b5ce5921e247f76e",
-                "reference": "73c0c7052d0e43a0d8716ce1b5ce5921e247f76e",
+                "url": "https://api.github.com/repos/smartassert/yaml-file/zipball/759dc10f11bde192d82601c22185636167e04e30",
+                "reference": "759dc10f11bde192d82601c22185636167e04e30",
                 "shasum": ""
             },
             "require": {
@@ -3083,8 +3083,10 @@
                 "webignition/yaml-document-set-parser": ">=2.0,<3"
             },
             "require-dev": {
+                "mockery/mockery": "^1.5",
                 "phpstan/extension-installer": "^1.1",
                 "phpstan/phpstan": "^1.4",
+                "phpstan/phpstan-mockery": "^1.0",
                 "phpstan/phpstan-phpunit": "^1.0",
                 "phpunit/phpunit": "^9.5",
                 "squizlabs/php_codesniffer": "dev-master#51335eb46b2b940b6c429643fe96f514d4a4e4a1"
@@ -3109,9 +3111,9 @@
             "homepage": "https://github.com/smartassert/yaml-file",
             "support": {
                 "issues": "https://github.com/smartassert/yaml-file/issues",
-                "source": "https://github.com/smartassert/yaml-file/tree/3.2"
+                "source": "https://github.com/smartassert/yaml-file/tree/4.0"
             },
-            "time": "2022-03-22T11:04:21+00:00"
+            "time": "2022-03-22T18:18:48+00:00"
         },
         {
             "name": "symfony/cache",

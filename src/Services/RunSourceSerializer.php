@@ -7,13 +7,13 @@ namespace App\Services;
 use App\Entity\RunSource;
 use App\Exception\SourceRepositoryCreationException;
 use App\Exception\SourceRepositoryReaderNotFoundException;
-use App\Exception\UnparseableSourceFileException;
 use App\Exception\UnserializableSourceException;
 use App\Services\SourceRepository\Factory\Factory;
 use App\Services\SourceRepository\Serializer;
 use League\Flysystem\FilesystemException;
 use League\Flysystem\FilesystemReader;
 use League\Flysystem\FilesystemWriter;
+use SmartAssert\YamlFile\Exception\Collection\SerializeException;
 
 class RunSourceSerializer
 {
@@ -31,8 +31,8 @@ class RunSourceSerializer
      * @throws FilesystemException
      * @throws UnserializableSourceException
      * @throws SourceRepositoryCreationException
-     * @throws UnparseableSourceFileException
      * @throws SourceRepositoryReaderNotFoundException
+     * @throws SerializeException
      */
     public function write(RunSource $target): ?string
     {
