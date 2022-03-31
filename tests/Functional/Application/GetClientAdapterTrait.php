@@ -4,18 +4,18 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\Application;
 
-use App\Tests\Services\ApplicationClient\ClientInterface;
-use App\Tests\Services\ApplicationClient\SymfonyClient;
+use SmartAssert\SymfonyTestClient\ClientInterface;
+use SmartAssert\SymfonyTestClient\SymfonyClient;
 
 trait GetClientAdapterTrait
 {
     protected function getClientAdapter(): ClientInterface
     {
-        $adapter = self::getContainer()->get(SymfonyClient::class);
-        \assert($adapter instanceof SymfonyClient);
+        $client = self::getContainer()->get(SymfonyClient::class);
+        \assert($client instanceof SymfonyClient);
 
-        $adapter->setKernelBrowser($this->kernelBrowser);
+        $client->setKernelBrowser($this->kernelBrowser);
 
-        return $adapter;
+        return $client;
     }
 }

@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Tests\Integration;
 
-use App\Tests\Services\ApplicationClient\ClientInterface;
-use App\Tests\Services\ApplicationClient\HttpClient;
+use SmartAssert\SymfonyTestClient\ClientInterface;
+use SmartAssert\SymfonyTestClient\HttpClient;
 
 trait GetClientAdapterTrait
 {
