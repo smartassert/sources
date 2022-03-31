@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 namespace App\Tests\Integration;
 
-use App\Tests\Services\ApplicationClient\AdapterInterface;
-use App\Tests\Services\ApplicationClient\HttpAdapter;
+use SmartAssert\SymfonyTestClient\ClientInterface;
+use SmartAssert\SymfonyTestClient\HttpClient;
 
 trait GetClientAdapterTrait
 {
-    protected function getClientAdapter(): AdapterInterface
+    protected function getClientAdapter(): ClientInterface
     {
-        $adapter = self::getContainer()->get(HttpAdapter::class);
-        \assert($adapter instanceof AdapterInterface);
+        $adapter = self::getContainer()->get(HttpClient::class);
+        \assert($adapter instanceof ClientInterface);
 
         return $adapter;
     }

@@ -286,6 +286,9 @@
     "smartassert/service-status-inspector": {
         "version": "0.2"
     },
+    "smartassert/symfony-test-client": {
+        "version": "0.1"
+    },
     "smartassert/users-client": {
         "version": "0.1"
     },

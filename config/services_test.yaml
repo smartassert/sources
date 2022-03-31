@@ -26,7 +26,7 @@ services:
     App\Tests\Services\DirectoryLister:
         public: true
 
-    App\Tests\Services\ApplicationClient\SymfonyAdapter:
+    SmartAssert\SymfonyTestClient\SymfonyClient:
 
     app.tests.integration.http.client:
         public: true
@@ -36,7 +36,7 @@ services:
                 base_uri: "https://localhost/"
                 verify: false
 
-    App\Tests\Services\ApplicationClient\HttpAdapter:
+    SmartAssert\SymfonyTestClient\HttpClient:
         arguments:
             $httpClient: '@app.tests.integration.http.client'
 
@@ -47,14 +47,14 @@ services:
         class: App\Tests\Services\ApplicationClient\Client
         factory: ['@App\Tests\Services\ApplicationClient\ClientFactory', 'create']
         arguments:
-            $adapter: '@App\Tests\Services\ApplicationClient\SymfonyAdapter'
+            $client: '@SmartAssert\SymfonyTestClient\SymfonyClient'
 
     app.tests.services.application.client.http:
         public: true
         class: App\Tests\Services\ApplicationClient\Client
         factory: ['@App\Tests\Services\ApplicationClient\ClientFactory', 'create']
         arguments:
-            $adapter: '@App\Tests\Services\ApplicationClient\HttpAdapter'
+            $client: '@SmartAssert\SymfonyTestClient\HttpClient'
 
     GuzzleHttp\Psr7\HttpFactory:
 

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Services\ApplicationClient;
 
+use SmartAssert\SymfonyTestClient\ClientInterface;
 use Symfony\Component\Routing\RouterInterface;
 
 class ClientFactory
@@ -13,8 +14,8 @@ class ClientFactory
     ) {
     }
 
-    public function create(AdapterInterface $adapter): Client
+    public function create(ClientInterface $client): Client
     {
-        return new Client($adapter, $this->router);
+        return new Client($client, $this->router);
     }
 }
