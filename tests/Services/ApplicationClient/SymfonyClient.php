@@ -8,7 +8,7 @@ use Psr\Http\Message\ResponseInterface;
 use Symfony\Bridge\PsrHttpMessage\HttpMessageFactoryInterface;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 
-class SymfonyAdapter implements ClientInterface
+class SymfonyClient implements ClientInterface
 {
     private KernelBrowser $kernelBrowser;
 
