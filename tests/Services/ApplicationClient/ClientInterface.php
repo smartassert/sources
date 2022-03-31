@@ -6,7 +6,7 @@ namespace App\Tests\Services\ApplicationClient;
 
 use Psr\Http\Message\ResponseInterface;
 
-interface AdapterInterface
+interface ClientInterface
 {
     /**
      * @param array<string, string> $headers

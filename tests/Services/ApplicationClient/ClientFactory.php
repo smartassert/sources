@@ -13,7 +13,7 @@ class ClientFactory
     ) {
     }
 
-    public function create(AdapterInterface $adapter): Client
+    public function create(ClientInterface $adapter): Client
     {
         return new Client($adapter, $this->router);
     }

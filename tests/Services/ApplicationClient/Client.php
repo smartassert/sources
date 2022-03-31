@@ -10,7 +10,7 @@ use Symfony\Component\Routing\RouterInterface;
 class Client
 {
     public function __construct(
-        private AdapterInterface $client,
+        private ClientInterface $client,
         private RouterInterface $router,
     ) {
     }

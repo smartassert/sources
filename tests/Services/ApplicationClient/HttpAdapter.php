@@ -10,7 +10,7 @@ use Psr\Http\Message\RequestFactoryInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 
-class HttpAdapter implements AdapterInterface
+class HttpAdapter implements ClientInterface
 {
     public function __construct(
         private RequestFactoryInterface $requestFactory,

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Application;
 
 use App\Services\Source\Store;
-use App\Tests\Services\ApplicationClient\AdapterInterface;
+use App\Tests\Services\ApplicationClient\ClientInterface;
 use App\Tests\Services\ApplicationClient\Client;
 use App\Tests\Services\ApplicationClient\ClientFactory;
 use App\Tests\Services\AuthenticationConfiguration;
@@ -51,5 +51,5 @@ abstract class AbstractApplicationTest extends WebTestCase
         }
     }
 
-    abstract protected function getClientAdapter(): AdapterInterface;
+    abstract protected function getClientAdapter(): ClientInterface;
 }
