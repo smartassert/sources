@@ -100,26 +100,17 @@ services:
                 - '@App\Services\SourceRepository\Reader\FileSourceReader'
                 - '@App\Services\SourceRepository\Reader\UserGitRepositoryReader'
 
-    SmartAssert\DoctrineInspectors\EntityMappingInspector:
-        arguments:
-            $entityClassNames:
-                - 'App\Entity\FileSource'
-                - 'App\Entity\GitSource'
-                - 'App\Entity\RunSource'
-
+    SmartAssert\DoctrineInspectors\EntityMappingInspector: ~
     SmartAssert\InvokableLogger\ExceptionLogger:
-
     SmartAssert\DoctrineInspectors\QueryInspector:
 
     SmartAssert\ServiceStatusInspector\ServiceStatusInspectorInterface:
         class: SmartAssert\ServiceStatusInspector\ServiceStatusInspector
-        arguments:
-            $componentInspectors:
-                database_connection: '@SmartAssert\DoctrineInspectors\QueryInspector'
-                database_entities: '@SmartAssert\DoctrineInspectors\EntityMappingInspector'
-                message_queue: '@App\Services\ServiceStatusInspector\MessageQueueInspector'
-            $exceptionHandlers:
-                - '@SmartAssert\InvokableLogger\ExceptionLogger'
+        calls:
+            - addExceptionHandler: ['@SmartAssert\InvokableLogger\ExceptionLogger']
+            - setComponentInspector: ['database_connection', '@SmartAssert\DoctrineInspectors\QueryInspector']
+            - setComponentInspector: ['database_entities', '@SmartAssert\DoctrineInspectors\EntityMappingInspector']
+            - setComponentInspector: ['message_queue', '@App\Services\ServiceStatusInspector\MessageQueueInspector']
 
     SmartAssert\YamlFile\FileHashes\Serializer: ~
 

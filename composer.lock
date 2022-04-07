@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "2d68d0dad08ad3d7a589fa36ce79436a",
+    "content-hash": "19de0e3afaef52841bfa8e08fae002c6",
     "packages": [
         {
             "name": "async-aws/core",
@@ -2799,22 +2799,22 @@
         },
         {
             "name": "smartassert/doctrine-inspectors",
-            "version": "0.2",
+            "version": "1.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/smartassert/doctrine-inspectors.git",
-                "reference": "a1fa04428a881d75e40c91235c2561d6aeff69ed"
+                "reference": "cbb31f490a689ca94b43fdf4853079ab4d3d95b3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/smartassert/doctrine-inspectors/zipball/a1fa04428a881d75e40c91235c2561d6aeff69ed",
-                "reference": "a1fa04428a881d75e40c91235c2561d6aeff69ed",
+                "url": "https://api.github.com/repos/smartassert/doctrine-inspectors/zipball/cbb31f490a689ca94b43fdf4853079ab4d3d95b3",
+                "reference": "cbb31f490a689ca94b43fdf4853079ab4d3d95b3",
                 "shasum": ""
             },
             "require": {
                 "doctrine/dbal": "*",
                 "doctrine/orm": "*",
-                "php": "^8.0|^8.1"
+                "php": "^8.1"
             },
             "require-dev": {
                 "mockery/mockery": "^1.4",
@@ -2844,9 +2844,9 @@
             "homepage": "https://github.com/smartassert/doctrine-inspectors",
             "support": {
                 "issues": "https://github.com/smartassert/doctrine-inspectors/issues",
-                "source": "https://github.com/smartassert/doctrine-inspectors/tree/0.2"
+                "source": "https://github.com/smartassert/doctrine-inspectors/tree/1.1"
             },
-            "time": "2022-01-27T10:25:49+00:00"
+            "time": "2022-04-07T10:35:24+00:00"
         },
         {
             "name": "smartassert/invokable-exception-logger",
@@ -2901,20 +2901,20 @@
         },
         {
             "name": "smartassert/service-status-inspector",
-            "version": "0.2",
+            "version": "2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/smartassert/service-status-inspector.git",
-                "reference": "5a3a7e9007cc7ce51860d84152df6cf8e1533b95"
+                "reference": "46936d356fd3a38f7aad9f184b0e4ebe95af0953"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/smartassert/service-status-inspector/zipball/5a3a7e9007cc7ce51860d84152df6cf8e1533b95",
-                "reference": "5a3a7e9007cc7ce51860d84152df6cf8e1533b95",
+                "url": "https://api.github.com/repos/smartassert/service-status-inspector/zipball/46936d356fd3a38f7aad9f184b0e4ebe95af0953",
+                "reference": "46936d356fd3a38f7aad9f184b0e4ebe95af0953",
                 "shasum": ""
             },
             "require": {
-                "php": "^8.0|^8.1"
+                "php": "^8.1"
             },
             "require-dev": {
                 "phpstan/phpstan": "^1.4",
@@ -2941,9 +2941,9 @@
             "homepage": "https://github.com/smartassert/service-status-inspector",
             "support": {
                 "issues": "https://github.com/smartassert/service-status-inspector/issues",
-                "source": "https://github.com/smartassert/service-status-inspector/tree/0.2"
+                "source": "https://github.com/smartassert/service-status-inspector/tree/2.0"
             },
-            "time": "2022-01-27T11:14:24+00:00"
+            "time": "2022-04-07T13:19:03+00:00"
         },
         {
             "name": "smartassert/users-client",
