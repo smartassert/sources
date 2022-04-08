@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "19de0e3afaef52841bfa8e08fae002c6",
+    "content-hash": "3c0577c341de616b1c988f5606638345",
     "packages": [
         {
             "name": "async-aws/core",
@@ -2799,16 +2799,16 @@
         },
         {
             "name": "smartassert/doctrine-inspectors",
-            "version": "1.1",
+            "version": "1.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/smartassert/doctrine-inspectors.git",
-                "reference": "cbb31f490a689ca94b43fdf4853079ab4d3d95b3"
+                "reference": "d1b56562c5ae0971b1cb4a389df1937509627ce8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/smartassert/doctrine-inspectors/zipball/cbb31f490a689ca94b43fdf4853079ab4d3d95b3",
-                "reference": "cbb31f490a689ca94b43fdf4853079ab4d3d95b3",
+                "url": "https://api.github.com/repos/smartassert/doctrine-inspectors/zipball/d1b56562c5ae0971b1cb4a389df1937509627ce8",
+                "reference": "d1b56562c5ae0971b1cb4a389df1937509627ce8",
                 "shasum": ""
             },
             "require": {
@@ -2844,12 +2844,79 @@
             "homepage": "https://github.com/smartassert/doctrine-inspectors",
             "support": {
                 "issues": "https://github.com/smartassert/doctrine-inspectors/issues",
-                "source": "https://github.com/smartassert/doctrine-inspectors/tree/1.1"
+                "source": "https://github.com/smartassert/doctrine-inspectors/tree/1.2"
             },
-            "time": "2022-04-07T10:35:24+00:00"
+            "time": "2022-04-07T12:49:04+00:00"
         },
         {
-            "name": "smartassert/invokable-exception-logger",
+            "name": "smartassert/health-check-bundle",
+            "version": "0.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/smartassert/HealthCheckBundle.git",
+                "reference": "42b68bab02e206442e10129669d3d96d1a13b4b2"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/smartassert/HealthCheckBundle/zipball/42b68bab02e206442e10129669d3d96d1a13b4b2",
+                "reference": "42b68bab02e206442e10129669d3d96d1a13b4b2",
+                "shasum": ""
+            },
+            "require": {
+                "doctrine/orm": "^2.11",
+                "ext-json": "*",
+                "php": "^8.1",
+                "smartassert/doctrine-inspectors": "^1.2",
+                "smartassert/invokable-logger": "^0.3.0",
+                "smartassert/service-status-inspector": "^3.0",
+                "symfony/config": "^6.0",
+                "symfony/dependency-injection": "^6.0",
+                "symfony/http-foundation": "^6.0",
+                "symfony/http-kernel": "^6.0",
+                "symfony/yaml": "^6.0"
+            },
+            "require-dev": {
+                "mockery/mockery": "^1.5",
+                "phpstan/extension-installer": "^1.1",
+                "phpstan/phpstan": "^1.5",
+                "phpstan/phpstan-mockery": "^1.0",
+                "phpstan/phpstan-phpunit": "^1.1",
+                "phpunit/phpunit": "^9.5",
+                "squizlabs/php_codesniffer": "^3.6",
+                "symfony/browser-kit": "^6.0",
+                "symfony/framework-bundle": "^6.0",
+                "symfony/monolog-bundle": "^3.7",
+                "symfony/routing": "^6.0",
+                "webignition/object-reflector": "^1.0"
+            },
+            "type": "symfony-bundle",
+            "autoload": {
+                "psr-4": {
+                    "SmartAssert\\HealthCheckBundle\\": ""
+                },
+                "exclude-from-classmap": [
+                    "/Tests/"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Jon Cram",
+                    "email": "webignition@gmail.com"
+                }
+            ],
+            "homepage": "https://github.com/smartassert/HealthCheckBundle",
+            "support": {
+                "issues": "https://github.com/smartassert/HealthCheckBundle/issues",
+                "source": "https://github.com/smartassert/HealthCheckBundle/tree/0.2"
+            },
+            "time": "2022-04-08T13:26:52+00:00"
+        },
+        {
+            "name": "smartassert/invokable-logger",
             "version": "0.3",
             "source": {
                 "type": "git",
@@ -2901,16 +2968,16 @@
         },
         {
             "name": "smartassert/service-status-inspector",
-            "version": "2.0",
+            "version": "3.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/smartassert/service-status-inspector.git",
-                "reference": "46936d356fd3a38f7aad9f184b0e4ebe95af0953"
+                "reference": "cce871440c44cc11140fd4f1db97f4582fb31cf0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/smartassert/service-status-inspector/zipball/46936d356fd3a38f7aad9f184b0e4ebe95af0953",
-                "reference": "46936d356fd3a38f7aad9f184b0e4ebe95af0953",
+                "url": "https://api.github.com/repos/smartassert/service-status-inspector/zipball/cce871440c44cc11140fd4f1db97f4582fb31cf0",
+                "reference": "cce871440c44cc11140fd4f1db97f4582fb31cf0",
                 "shasum": ""
             },
             "require": {
@@ -2941,9 +3008,9 @@
             "homepage": "https://github.com/smartassert/service-status-inspector",
             "support": {
                 "issues": "https://github.com/smartassert/service-status-inspector/issues",
-                "source": "https://github.com/smartassert/service-status-inspector/tree/2.0"
+                "source": "https://github.com/smartassert/service-status-inspector/tree/3.0"
             },
-            "time": "2022-04-07T13:19:03+00:00"
+            "time": "2022-04-07T16:56:44+00:00"
         },
         {
             "name": "smartassert/users-client",
