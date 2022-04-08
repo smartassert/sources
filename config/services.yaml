@@ -100,17 +100,9 @@ services:
                 - '@App\Services\SourceRepository\Reader\FileSourceReader'
                 - '@App\Services\SourceRepository\Reader\UserGitRepositoryReader'
 
-    SmartAssert\DoctrineInspectors\EntityMappingInspector: ~
-    SmartAssert\InvokableLogger\ExceptionLogger:
-    SmartAssert\DoctrineInspectors\QueryInspector:
-
-    SmartAssert\ServiceStatusInspector\ServiceStatusInspectorInterface:
-        class: SmartAssert\ServiceStatusInspector\ServiceStatusInspector
-        calls:
-            - addExceptionHandler: ['@SmartAssert\InvokableLogger\ExceptionLogger']
-            - setComponentInspector: ['database_connection', '@SmartAssert\DoctrineInspectors\QueryInspector']
-            - setComponentInspector: ['database_entities', '@SmartAssert\DoctrineInspectors\EntityMappingInspector']
-            - setComponentInspector: ['message_queue', '@App\Services\ServiceStatusInspector\MessageQueueInspector']
+    App\Services\ServiceStatusInspector\MessageQueueInspector:
+        tags:
+            - { name: 'health_check_bundle.component_inspector', key: 'message_queue' }
 
     SmartAssert\YamlFile\FileHashes\Serializer: ~
 

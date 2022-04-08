@@ -10,4 +10,5 @@ return [
     SmartAssert\UsersSecurityBundle\UsersSecurityBundle::class => ['all' => true],
     Symfony\Bundle\MonologBundle\MonologBundle::class => ['all' => true],
     League\FlysystemBundle\FlysystemBundle::class => ['all' => true],
+    SmartAssert\HealthCheckBundle\HealthCheckBundle::class => ['all' => true],
 ];

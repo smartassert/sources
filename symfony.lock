@@ -278,13 +278,16 @@
         "version": "3.0.2"
     },
     "smartassert/doctrine-inspectors": {
+        "version": "1.2"
+    },
+    "smartassert/health-check-bundle": {
         "version": "0.2"
     },
-    "smartassert/invokable-exception-logger": {
+    "smartassert/invokable-logger": {
         "version": "0.3"
     },
     "smartassert/service-status-inspector": {
-        "version": "0.2"
+        "version": "3.0"
     },
     "smartassert/symfony-test-client": {
         "version": "0.1"
