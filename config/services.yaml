@@ -40,11 +40,6 @@ services:
         resource: '../src/Controller/'
         tags: ['controller.service_arguments']
 
-    App\Controller\StatusController:
-        tags: ['controller.service_arguments']
-        arguments:
-            $isReady: '%env(bool:IS_READY)%'
-
     Psr\Http\Message\RequestFactoryInterface:
         class: GuzzleHttp\Psr7\HttpFactory
 
@@ -102,7 +97,15 @@ services:
 
     App\Services\ServiceStatusInspector\MessageQueueInspector:
         tags:
-            - { name: 'health_check_bundle.component_inspector' }
+            - { name: 'health_check_bundle.component_inspector.health_check' }
+
+    app.service_status_inspector.status.ready:
+        class: SmartAssert\ServiceStatusInspector\ComponentInspector
+        arguments:
+            $identifier: 'ready'
+            $isAvailable: '%env(bool:IS_READY)%'
+        tags:
+            - { name: 'health_check_bundle.component_inspector.status' }
 
     SmartAssert\YamlFile\FileHashes\Serializer: ~
 
