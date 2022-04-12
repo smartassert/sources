@@ -102,7 +102,7 @@ services:
 
     App\Services\ServiceStatusInspector\MessageQueueInspector:
         tags:
-            - { name: 'health_check_bundle.component_inspector', key: 'message_queue' }
+            - { name: 'health_check_bundle.component_inspector' }
 
     SmartAssert\YamlFile\FileHashes\Serializer: ~
 

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "3c0577c341de616b1c988f5606638345",
+    "content-hash": "ec9832aa7018a45da2d3be20321f7edc",
     "packages": [
         {
             "name": "async-aws/core",
@@ -2850,16 +2850,16 @@
         },
         {
             "name": "smartassert/health-check-bundle",
-            "version": "0.2",
+            "version": "0.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/smartassert/HealthCheckBundle.git",
-                "reference": "42b68bab02e206442e10129669d3d96d1a13b4b2"
+                "reference": "9873754d3b2739a8818e45f2a30632ad232ce7ed"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/smartassert/HealthCheckBundle/zipball/42b68bab02e206442e10129669d3d96d1a13b4b2",
-                "reference": "42b68bab02e206442e10129669d3d96d1a13b4b2",
+                "url": "https://api.github.com/repos/smartassert/HealthCheckBundle/zipball/9873754d3b2739a8818e45f2a30632ad232ce7ed",
+                "reference": "9873754d3b2739a8818e45f2a30632ad232ce7ed",
                 "shasum": ""
             },
             "require": {
@@ -2868,7 +2868,7 @@
                 "php": "^8.1",
                 "smartassert/doctrine-inspectors": "^1.2",
                 "smartassert/invokable-logger": "^0.3.0",
-                "smartassert/service-status-inspector": "^3.0",
+                "smartassert/service-status-inspector": "^4.0",
                 "symfony/config": "^6.0",
                 "symfony/dependency-injection": "^6.0",
                 "symfony/http-foundation": "^6.0",
@@ -2911,9 +2911,9 @@
             "homepage": "https://github.com/smartassert/HealthCheckBundle",
             "support": {
                 "issues": "https://github.com/smartassert/HealthCheckBundle/issues",
-                "source": "https://github.com/smartassert/HealthCheckBundle/tree/0.2"
+                "source": "https://github.com/smartassert/HealthCheckBundle/tree/0.3"
             },
-            "time": "2022-04-08T13:26:52+00:00"
+            "time": "2022-04-12T09:21:27+00:00"
         },
         {
             "name": "smartassert/invokable-logger",
@@ -2968,16 +2968,16 @@
         },
         {
             "name": "smartassert/service-status-inspector",
-            "version": "3.0",
+            "version": "4.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/smartassert/service-status-inspector.git",
-                "reference": "cce871440c44cc11140fd4f1db97f4582fb31cf0"
+                "reference": "a49fbdf8e4a85b549d61ce3d2845c1701601ad0d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/smartassert/service-status-inspector/zipball/cce871440c44cc11140fd4f1db97f4582fb31cf0",
-                "reference": "cce871440c44cc11140fd4f1db97f4582fb31cf0",
+                "url": "https://api.github.com/repos/smartassert/service-status-inspector/zipball/a49fbdf8e4a85b549d61ce3d2845c1701601ad0d",
+                "reference": "a49fbdf8e4a85b549d61ce3d2845c1701601ad0d",
                 "shasum": ""
             },
             "require": {
@@ -3008,9 +3008,9 @@
             "homepage": "https://github.com/smartassert/service-status-inspector",
             "support": {
                 "issues": "https://github.com/smartassert/service-status-inspector/issues",
-                "source": "https://github.com/smartassert/service-status-inspector/tree/3.0"
+                "source": "https://github.com/smartassert/service-status-inspector/tree/4.0"
             },
-            "time": "2022-04-07T16:56:44+00:00"
+            "time": "2022-04-11T14:23:13+00:00"
         },
         {
             "name": "smartassert/users-client",
