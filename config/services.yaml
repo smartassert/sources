@@ -8,6 +8,8 @@ parameters:
     users_security_bundle_secured_pattern: '^/'
     users_security_bundle_access_control_path: '^/'
     git_repository_store_directory: '%env(resolve:GIT_REPOSITORY_STORE_DIRECTORY)%'
+    health_check_bundle_enable_status_readiness_inspector: true
+    health_check_bundle_status_is_ready: '%env(bool:IS_READY)%'
 
 services:
     # default configuration for services in *this* file
@@ -98,14 +100,6 @@ services:
     App\Services\ServiceStatusInspector\MessageQueueInspector:
         tags:
             - { name: 'health_check_bundle.component_inspector.health_check' }
-
-    app.service_status_inspector.status.ready:
-        class: SmartAssert\ServiceStatusInspector\ComponentInspector
-        arguments:
-            $identifier: 'ready'
-            $isAvailable: '%env(bool:IS_READY)%'
-        tags:
-            - { name: 'health_check_bundle.component_inspector.status' }
 
     SmartAssert\YamlFile\FileHashes\Serializer: ~
 

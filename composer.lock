@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "b06f62882402c079a51c08176ed78c5e",
+    "content-hash": "39031212910f748441fd6e3391a493d3",
     "packages": [
         {
             "name": "async-aws/core",
@@ -2850,16 +2850,16 @@
         },
         {
             "name": "smartassert/health-check-bundle",
-            "version": "1.0",
+            "version": "1.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/smartassert/HealthCheckBundle.git",
-                "reference": "c94d267b4f5706b58463d36eb3bc1df0a8f4d6c4"
+                "reference": "03530c72c5c423eedc752c1f4646c7a94f8411d6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/smartassert/HealthCheckBundle/zipball/c94d267b4f5706b58463d36eb3bc1df0a8f4d6c4",
-                "reference": "c94d267b4f5706b58463d36eb3bc1df0a8f4d6c4",
+                "url": "https://api.github.com/repos/smartassert/HealthCheckBundle/zipball/03530c72c5c423eedc752c1f4646c7a94f8411d6",
+                "reference": "03530c72c5c423eedc752c1f4646c7a94f8411d6",
                 "shasum": ""
             },
             "require": {
@@ -2911,9 +2911,9 @@
             "homepage": "https://github.com/smartassert/HealthCheckBundle",
             "support": {
                 "issues": "https://github.com/smartassert/HealthCheckBundle/issues",
-                "source": "https://github.com/smartassert/HealthCheckBundle/tree/1.0"
+                "source": "https://github.com/smartassert/HealthCheckBundle/tree/1.1"
             },
-            "time": "2022-04-12T10:30:12+00:00"
+            "time": "2022-04-13T15:14:25+00:00"
         },
         {
             "name": "smartassert/invokable-logger",
