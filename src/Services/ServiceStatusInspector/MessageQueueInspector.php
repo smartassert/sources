@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace App\Services\ServiceStatusInspector;
 
 use App\Message\Prepare;
-use SmartAssert\ServiceStatusInspector\ComponentInspectorInterface;
+use SmartAssert\ServiceStatusInspector\ComponentStatusInspectorInterface;
 use Symfony\Component\Messenger\MessageBusInterface;
 
-class MessageQueueInspector implements ComponentInspectorInterface
+class MessageQueueInspector implements ComponentStatusInspectorInterface
 {
     public const INVALID_MACHINE_ID = 'intentionally invalid';
     public const DEFAULT_IDENTIFIER = 'message_queue';
@@ -19,7 +19,7 @@ class MessageQueueInspector implements ComponentInspectorInterface
     ) {
     }
 
-    public function isAvailable(): bool
+    public function getStatus(): bool
     {
         $this->messageBus->dispatch(new Prepare('invalid', []));
 
