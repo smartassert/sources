@@ -25,10 +25,10 @@ abstract class AbstractSourceResolver implements ArgumentValueResolverInterface
     }
 
     /**
+     * @return \Generator<SourceInterface>
+     *
      * @throws SourceNotFoundException
      * @throws UnexpectedSourceTypeException
-     *
-     * @return \Generator<SourceInterface>
      */
     public function resolve(Request $request, ArgumentMetadata $argument): \Generator
     {

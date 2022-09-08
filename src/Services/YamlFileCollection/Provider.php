@@ -28,9 +28,9 @@ class Provider implements UnreliableProviderInterface
     }
 
     /**
-     * @throws ProvisionException
-     *
      * @return \Generator<YamlFile>
+     *
+     * @throws ProvisionException
      */
     public function getYamlFiles(): \Generator
     {
