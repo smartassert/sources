@@ -23,7 +23,7 @@ abstract class AbstractCreateSourceTest extends AbstractApplicationTest
     public function testCreateInvalidSourceRequest(array $requestParameters, array $expectedResponseData): void
     {
         $response = $this->applicationClient->makeCreateSourceRequest(
-            $this->authenticationConfiguration->validToken,
+            $this->authenticationConfiguration->getValidApiToken(),
             $requestParameters
         );
 
@@ -80,7 +80,7 @@ abstract class AbstractCreateSourceTest extends AbstractApplicationTest
     public function testCreateSuccess(array $requestParameters, array $expected): void
     {
         $response = $this->applicationClient->makeCreateSourceRequest(
-            $this->authenticationConfiguration->validToken,
+            $this->authenticationConfiguration->getValidApiToken(),
             $requestParameters
         );
 
@@ -97,7 +97,7 @@ abstract class AbstractCreateSourceTest extends AbstractApplicationTest
         self::assertInstanceOf(SourceInterface::class, $source);
 
         $expected['id'] = $source->getId();
-        $expected['user_id'] = $this->authenticationConfiguration->authenticatedUserId;
+        $expected['user_id'] = $this->authenticationConfiguration->getUser()->id;
 
         $this->responseAsserter->assertSuccessfulJsonResponse($response, $expected);
     }

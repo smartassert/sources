@@ -60,7 +60,7 @@ class SourceProvider
      */
     public function initialize(array $sourcesToInitialize = self::ALL): void
     {
-        $userId = $this->authenticationConfiguration->authenticatedUserId;
+        $userId = $this->authenticationConfiguration->getUser()->id;
 
         $fileSourceWithoutRunSource = new FileSource($userId, 'without run source');
         $fileSourceWithRunSource = new FileSource($userId, 'with run source');

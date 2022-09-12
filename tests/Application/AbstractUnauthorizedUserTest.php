@@ -164,7 +164,7 @@ abstract class AbstractUnauthorizedUserTest extends AbstractApplicationTest
             ],
             'non-empty invalid token' => [
                 'tokenCreator' => function (AuthenticationConfiguration $authenticationConfiguration) {
-                    return $authenticationConfiguration->invalidToken;
+                    return $authenticationConfiguration->getInvalidApiToken();
                 }
             ],
         ];

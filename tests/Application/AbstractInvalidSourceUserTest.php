@@ -25,7 +25,7 @@ abstract class AbstractInvalidSourceUserTest extends AbstractApplicationTest
     public function testAddFileInvalidUser(): void
     {
         $response = $this->applicationClient->makeAddFileRequest(
-            $this->authenticationConfiguration->validToken,
+            $this->authenticationConfiguration->getValidApiToken(),
             $this->fileSource->getId(),
             self::FILENAME,
             '- content'
@@ -37,7 +37,7 @@ abstract class AbstractInvalidSourceUserTest extends AbstractApplicationTest
     public function testRemoveFileInvalidUser(): void
     {
         $response = $this->applicationClient->makeRemoveFileRequest(
-            $this->authenticationConfiguration->validToken,
+            $this->authenticationConfiguration->getValidApiToken(),
             $this->fileSource->getId(),
             self::FILENAME
         );
@@ -48,7 +48,7 @@ abstract class AbstractInvalidSourceUserTest extends AbstractApplicationTest
     public function testReadFileInvalidUser(): void
     {
         $response = $this->applicationClient->makeRemoveFileRequest(
-            $this->authenticationConfiguration->validToken,
+            $this->authenticationConfiguration->getValidApiToken(),
             $this->fileSource->getId(),
             self::FILENAME
         );
@@ -59,7 +59,7 @@ abstract class AbstractInvalidSourceUserTest extends AbstractApplicationTest
     public function testGetSourceInvalidUser(): void
     {
         $response = $this->applicationClient->makeGetSourceRequest(
-            $this->authenticationConfiguration->validToken,
+            $this->authenticationConfiguration->getValidApiToken(),
             $this->fileSource->getId()
         );
 
@@ -69,7 +69,7 @@ abstract class AbstractInvalidSourceUserTest extends AbstractApplicationTest
     public function testUpdateSourceInvalidUser(): void
     {
         $response = $this->applicationClient->makeUpdateSourceRequest(
-            $this->authenticationConfiguration->validToken,
+            $this->authenticationConfiguration->getValidApiToken(),
             $this->fileSource->getId(),
             []
         );
@@ -80,7 +80,7 @@ abstract class AbstractInvalidSourceUserTest extends AbstractApplicationTest
     public function testDeleteSourceInvalidUser(): void
     {
         $response = $this->applicationClient->makeDeleteSourceRequest(
-            $this->authenticationConfiguration->validToken,
+            $this->authenticationConfiguration->getValidApiToken(),
             $this->fileSource->getId()
         );
 
@@ -90,7 +90,7 @@ abstract class AbstractInvalidSourceUserTest extends AbstractApplicationTest
     public function testPrepareSourceInvalidUser(): void
     {
         $response = $this->applicationClient->makePrepareSourceRequest(
-            $this->authenticationConfiguration->validToken,
+            $this->authenticationConfiguration->getValidApiToken(),
             $this->fileSource->getId(),
             []
         );
@@ -104,7 +104,7 @@ abstract class AbstractInvalidSourceUserTest extends AbstractApplicationTest
         $this->store->add($runSource);
 
         $response = $this->applicationClient->makeReadSourceRequest(
-            $this->authenticationConfiguration->validToken,
+            $this->authenticationConfiguration->getValidApiToken(),
             $runSource->getId()
         );
 

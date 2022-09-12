@@ -38,7 +38,7 @@ abstract class AbstractUpdateSourceTest extends AbstractApplicationTest
         $source = $this->sourceProvider->get($sourceIdentifier);
 
         $response = $this->applicationClient->makeUpdateSourceRequest(
-            $this->authenticationConfiguration->validToken,
+            $this->authenticationConfiguration->getValidApiToken(),
             $source->getId(),
             $payload
         );
@@ -89,7 +89,7 @@ abstract class AbstractUpdateSourceTest extends AbstractApplicationTest
         $source = $this->sourceProvider->get($sourceIdentifier);
 
         $response = $this->applicationClient->makeUpdateSourceRequest(
-            $this->authenticationConfiguration->validToken,
+            $this->authenticationConfiguration->getValidApiToken(),
             $source->getId(),
             $payload
         );
