@@ -27,6 +27,7 @@ abstract class AbstractDeleteSourceTest extends AbstractApplicationTest
 
         $sourceProvider = self::getContainer()->get(SourceProvider::class);
         \assert($sourceProvider instanceof SourceProvider);
+        $sourceProvider->setUserId($this->authenticationConfiguration->getUser()->id);
         $sourceProvider->initialize();
         $this->sourceProvider = $sourceProvider;
     }

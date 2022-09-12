@@ -20,6 +20,7 @@ abstract class AbstractUpdateSourceTest extends AbstractApplicationTest
 
         $sourceProvider = self::getContainer()->get(SourceProvider::class);
         \assert($sourceProvider instanceof SourceProvider);
+        $sourceProvider->setUserId($this->authenticationConfiguration->getUser()->id);
         $this->sourceProvider = $sourceProvider;
     }
 
