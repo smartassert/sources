@@ -37,7 +37,7 @@ abstract class AbstractReadSourceTest extends AbstractApplicationTest
     {
         $serializedRunSourceFixturePath = 'RunSource/source_yml_yaml_entire.yaml';
 
-        $fileSource = new FileSource($this->authenticationConfiguration->authenticatedUserId, 'file source label');
+        $fileSource = new FileSource(self::$authenticationConfiguration->getUser()->id, 'file source label');
         $runSource = new RunSource($fileSource);
         $this->store->add($runSource);
 
@@ -48,7 +48,7 @@ abstract class AbstractReadSourceTest extends AbstractApplicationTest
         );
 
         $response = $this->applicationClient->makeReadSourceRequest(
-            $this->authenticationConfiguration->validToken,
+            self::$authenticationConfiguration->getValidApiToken(),
             $runSource->getId()
         );
 

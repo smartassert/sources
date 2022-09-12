@@ -20,6 +20,7 @@ abstract class AbstractListSourcesTest extends AbstractApplicationTest
     {
         $sourceProvider = self::getContainer()->get(SourceProvider::class);
         \assert($sourceProvider instanceof SourceProvider);
+        $sourceProvider->setUserId(self::$authenticationConfiguration->getUser()->id);
         $sourceProvider->initialize($sourceIdentifiers);
 
         $sources = [];
@@ -27,7 +28,9 @@ abstract class AbstractListSourcesTest extends AbstractApplicationTest
             $sources[$sourceIdentifier] = $sourceProvider->get($sourceIdentifier);
         }
 
-        $response = $this->applicationClient->makeListSourcesRequest($this->authenticationConfiguration->validToken);
+        $response = $this->applicationClient->makeListSourcesRequest(
+            self::$authenticationConfiguration->getValidApiToken()
+        );
 
         foreach ($expectedResponseData as $sourceIdentifier => $expectedSourceData) {
             $source = $sources[$sourceIdentifier];

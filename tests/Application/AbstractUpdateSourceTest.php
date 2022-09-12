@@ -20,6 +20,7 @@ abstract class AbstractUpdateSourceTest extends AbstractApplicationTest
 
         $sourceProvider = self::getContainer()->get(SourceProvider::class);
         \assert($sourceProvider instanceof SourceProvider);
+        $sourceProvider->setUserId(self::$authenticationConfiguration->getUser()->id);
         $this->sourceProvider = $sourceProvider;
     }
 
@@ -38,7 +39,7 @@ abstract class AbstractUpdateSourceTest extends AbstractApplicationTest
         $source = $this->sourceProvider->get($sourceIdentifier);
 
         $response = $this->applicationClient->makeUpdateSourceRequest(
-            $this->authenticationConfiguration->validToken,
+            self::$authenticationConfiguration->getValidApiToken(),
             $source->getId(),
             $payload
         );
@@ -89,7 +90,7 @@ abstract class AbstractUpdateSourceTest extends AbstractApplicationTest
         $source = $this->sourceProvider->get($sourceIdentifier);
 
         $response = $this->applicationClient->makeUpdateSourceRequest(
-            $this->authenticationConfiguration->validToken,
+            self::$authenticationConfiguration->getValidApiToken(),
             $source->getId(),
             $payload
         );

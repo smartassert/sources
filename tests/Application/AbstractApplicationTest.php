@@ -16,26 +16,31 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 abstract class AbstractApplicationTest extends WebTestCase
 {
-    protected AuthenticationConfiguration $authenticationConfiguration;
+    protected static AuthenticationConfiguration $authenticationConfiguration;
     protected ResponseAsserter $responseAsserter;
-    protected KernelBrowser $kernelBrowser;
+    protected static KernelBrowser $kernelBrowser;
     protected Client $applicationClient;
     protected Store $store;
+
+    public static function setUpBeforeClass(): void
+    {
+        parent::setUpBeforeClass();
+
+        self::$kernelBrowser = self::createClient();
+
+        $authenticationConfiguration = self::getContainer()->get(AuthenticationConfiguration::class);
+        \assert($authenticationConfiguration instanceof AuthenticationConfiguration);
+        self::$authenticationConfiguration = $authenticationConfiguration;
+    }
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->kernelBrowser = self::createClient();
-
         $factory = self::getContainer()->get(ClientFactory::class);
         \assert($factory instanceof ClientFactory);
 
         $this->applicationClient = $factory->create($this->getClientAdapter());
-
-        $authenticationConfiguration = self::getContainer()->get(AuthenticationConfiguration::class);
-        \assert($authenticationConfiguration instanceof AuthenticationConfiguration);
-        $this->authenticationConfiguration = $authenticationConfiguration;
 
         $responseAsserter = self::getContainer()->get(ResponseAsserter::class);
         \assert($responseAsserter instanceof ResponseAsserter);

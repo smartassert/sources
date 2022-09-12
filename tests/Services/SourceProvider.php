@@ -49,9 +49,10 @@ class SourceProvider
      */
     private array $sources = [];
 
+    private string $userId;
+
     public function __construct(
-        private AuthenticationConfiguration $authenticationConfiguration,
-        private Store $store,
+        private readonly Store $store,
     ) {
     }
 
@@ -60,12 +61,10 @@ class SourceProvider
      */
     public function initialize(array $sourcesToInitialize = self::ALL): void
     {
-        $userId = $this->authenticationConfiguration->authenticatedUserId;
-
-        $fileSourceWithoutRunSource = new FileSource($userId, 'without run source');
-        $fileSourceWithRunSource = new FileSource($userId, 'with run source');
+        $fileSourceWithoutRunSource = new FileSource($this->userId, 'without run source');
+        $fileSourceWithRunSource = new FileSource($this->userId, 'with run source');
         $gitSourceWithCredentialsWithRunSource = new GitSource(
-            $userId,
+            $this->userId,
             'http://example.com/with-credentials.git',
             '/',
             md5((string) rand())
@@ -75,19 +74,19 @@ class SourceProvider
         $this->sources[self::FILE_WITH_RUN_SOURCE] = $fileSourceWithRunSource;
         $this->sources[self::GIT_WITH_CREDENTIALS_WITH_RUN_SOURCE] = $gitSourceWithCredentialsWithRunSource;
         $this->sources[self::GIT_WITHOUT_CREDENTIALS_WITHOUT_RUN_SOURCE] = new GitSource(
-            $userId,
+            $this->userId,
             'http://example.com/without-credentials.git'
         );
         $this->sources[self::RUN_WITH_FILE_PARENT] = new RunSource($fileSourceWithRunSource);
         $this->sources[self::RUN_WITH_DIFFERENT_FILE_PARENT] = new RunSource(
-            new FileSource($userId, 'file source label two')
+            new FileSource($this->userId, 'file source label two')
         );
         $this->sources[self::RUN_WITH_GIT_PARENT] = new RunSource($gitSourceWithCredentialsWithRunSource);
         $this->sources[self::RUN_WITH_DIFFERENT_GIT_PARENT] = new RunSource(
-            new GitSource($userId, 'http://example.com/')
+            new GitSource($this->userId, 'http://example.com/')
         );
 
-        $this->sources[self::RUN_WITHOUT_PARENT] = (new RunSource(new FileSource($userId, '')))->unsetParent();
+        $this->sources[self::RUN_WITHOUT_PARENT] = (new RunSource(new FileSource($this->userId, '')))->unsetParent();
         $this->sources[self::RUN_FAILED] = (new RunSource($gitSourceWithCredentialsWithRunSource))
             ->setPreparationFailed(
                 FailureReason::GIT_CLONE,
@@ -115,5 +114,10 @@ class SourceProvider
         }
 
         return $source;
+    }
+
+    public function setUserId(string $userId): void
+    {
+        $this->userId = $userId;
     }
 }

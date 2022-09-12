@@ -17,7 +17,7 @@
         "psr/http-client": "^1.0",
         "psr/http-message": "^1.0",
         "smartassert/health-check-bundle": "^2.0",
-        "smartassert/users-security-bundle": "^0.4.0",
+        "smartassert/users-security-bundle": "~1.1",
         "smartassert/yaml-file": "^4.0",
         "symfony/console": "6.0.*",
         "symfony/doctrine-messenger": "6.0.*",
@@ -115,15 +115,27 @@
             "@test-unit",
             "@test-functional"
         ],
-        "functional-start": "docker-compose -f ./tests/build/docker-compose.yml up -d postgres users-service s3-mock",
-        "functional-status": "docker-compose -f ./tests/build/docker-compose.yml ps postgres users-service s3-mock",
+        "functional-start": "docker-compose -f ./tests/build/docker-compose.yml up -d postgres users-service caddy-users-service s3-mock",
+        "functional-status": "docker-compose -f ./tests/build/docker-compose.yml ps postgres users-service caddy-users-service s3-mock",
         "functional-teardown": [
             "docker-compose -f ./tests/build/docker-compose.yml down"
         ],
         "functional-setup": [
             "@functional-start",
             "sleep 2",
-            "@db-setup"
+            "@db-setup",
+            "@users-setup"
+        ],
+        "users-db-setup": [
+            "docker-compose -f tests/build/docker-compose.yml exec -T users-service php bin/console doctrine:database:create --if-not-exists",
+            "docker-compose -f tests/build/docker-compose.yml exec -T users-service php bin/console doctrine:migrations:migrate --no-interaction --allow-no-migration"
+        ],
+        "users-generate-jwt-keys": "docker-compose -f tests/build/docker-compose.yml exec -T users-service php bin/console lexik:jwt:generate-keypair --overwrite --no-interaction",
+        "users-create-user": "curl --header 'Authorization: primary_admin_token' --data 'email=user@example.com&password=password' http://localhost:9080/admin/user/create",
+        "users-setup": [
+            "@users-db-setup",
+            "@users-generate-jwt-keys",
+            "@users-create-user"
         ],
         "integration-build": "docker-compose -f tests/build/docker-compose.yml build app",
         "integration-pull": "docker-compose -f tests/build/docker-compose.yml pull",
@@ -135,7 +147,8 @@
             "@integration-build",
             "@integration-up",
             "sleep 2",
-            "@db-setup"
+            "@db-setup",
+            "@users-setup"
         ]
     },
     "conflict": {
