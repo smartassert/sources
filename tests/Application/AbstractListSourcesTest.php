@@ -27,7 +27,9 @@ abstract class AbstractListSourcesTest extends AbstractApplicationTest
             $sources[$sourceIdentifier] = $sourceProvider->get($sourceIdentifier);
         }
 
-        $response = $this->applicationClient->makeListSourcesRequest($this->authenticationConfiguration->getValidApiToken());
+        $response = $this->applicationClient->makeListSourcesRequest(
+            $this->authenticationConfiguration->getValidApiToken()
+        );
 
         foreach ($expectedResponseData as $sourceIdentifier => $expectedSourceData) {
             $source = $sources[$sourceIdentifier];
