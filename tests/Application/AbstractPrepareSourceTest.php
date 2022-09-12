@@ -26,7 +26,7 @@ abstract class AbstractPrepareSourceTest extends AbstractApplicationTest
 
         $sourceProvider = self::getContainer()->get(SourceProvider::class);
         \assert($sourceProvider instanceof SourceProvider);
-        $sourceProvider->setUserId($this->authenticationConfiguration->getUser()->id);
+        $sourceProvider->setUserId(self::$authenticationConfiguration->getUser()->id);
         $this->sourceProvider = $sourceProvider;
     }
 
@@ -38,7 +38,7 @@ abstract class AbstractPrepareSourceTest extends AbstractApplicationTest
         $source = $this->sourceProvider->get($sourceIdentifier);
 
         $response = $this->applicationClient->makePrepareSourceRequest(
-            $this->authenticationConfiguration->getValidApiToken(),
+            self::$authenticationConfiguration->getValidApiToken(),
             $source->getId(),
             []
         );
@@ -62,7 +62,7 @@ abstract class AbstractPrepareSourceTest extends AbstractApplicationTest
         self::assertInstanceOf(SourceOriginInterface::class, $source);
 
         $response = $this->applicationClient->makePrepareSourceRequest(
-            $this->authenticationConfiguration->getValidApiToken(),
+            self::$authenticationConfiguration->getValidApiToken(),
             $source->getId(),
             $payload
         );

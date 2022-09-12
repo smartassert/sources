@@ -17,7 +17,7 @@ abstract class AbstractUnauthorizedUserTest extends AbstractApplicationTest
     public function testAddFileUnauthorizedUser(callable $tokenCreator): void
     {
         $response = $this->applicationClient->makeAddFileRequest(
-            $tokenCreator($this->authenticationConfiguration),
+            $tokenCreator(self::$authenticationConfiguration),
             EntityId::create(),
             self::FILENAME,
             '- content'
@@ -32,7 +32,7 @@ abstract class AbstractUnauthorizedUserTest extends AbstractApplicationTest
     public function testRemoveFileUnauthorizedUser(callable $tokenCreator): void
     {
         $response = $this->applicationClient->makeRemoveFileRequest(
-            $tokenCreator($this->authenticationConfiguration),
+            $tokenCreator(self::$authenticationConfiguration),
             EntityId::create(),
             self::FILENAME
         );
@@ -46,7 +46,7 @@ abstract class AbstractUnauthorizedUserTest extends AbstractApplicationTest
     public function testReadFileUnauthorizedUser(callable $tokenCreator): void
     {
         $response = $this->applicationClient->makeRemoveFileRequest(
-            $tokenCreator($this->authenticationConfiguration),
+            $tokenCreator(self::$authenticationConfiguration),
             EntityId::create(),
             self::FILENAME
         );
@@ -60,7 +60,7 @@ abstract class AbstractUnauthorizedUserTest extends AbstractApplicationTest
     public function testCreateSourceUnauthorizedUser(callable $tokenCreator): void
     {
         $response = $this->applicationClient->makeCreateSourceRequest(
-            $tokenCreator($this->authenticationConfiguration),
+            $tokenCreator(self::$authenticationConfiguration),
             []
         );
 
@@ -73,7 +73,7 @@ abstract class AbstractUnauthorizedUserTest extends AbstractApplicationTest
     public function testListUnauthorizedUser(callable $tokenCreator): void
     {
         $response = $this->applicationClient->makeListSourcesRequest(
-            $tokenCreator($this->authenticationConfiguration),
+            $tokenCreator(self::$authenticationConfiguration),
         );
 
         $this->responseAsserter->assertUnauthorizedResponse($response);
@@ -85,7 +85,7 @@ abstract class AbstractUnauthorizedUserTest extends AbstractApplicationTest
     public function testGetSourceUnauthorizedUser(callable $tokenCreator): void
     {
         $response = $this->applicationClient->makeGetSourceRequest(
-            $tokenCreator($this->authenticationConfiguration),
+            $tokenCreator(self::$authenticationConfiguration),
             EntityId::create()
         );
 
@@ -98,7 +98,7 @@ abstract class AbstractUnauthorizedUserTest extends AbstractApplicationTest
     public function testUpdateSourceUnauthorizedUser(callable $tokenCreator): void
     {
         $response = $this->applicationClient->makeUpdateSourceRequest(
-            $tokenCreator($this->authenticationConfiguration),
+            $tokenCreator(self::$authenticationConfiguration),
             EntityId::create(),
             []
         );
@@ -112,7 +112,7 @@ abstract class AbstractUnauthorizedUserTest extends AbstractApplicationTest
     public function testDeleteSourceUnauthorizedUser(callable $tokenCreator): void
     {
         $response = $this->applicationClient->makeDeleteSourceRequest(
-            $tokenCreator($this->authenticationConfiguration),
+            $tokenCreator(self::$authenticationConfiguration),
             EntityId::create()
         );
 
@@ -125,7 +125,7 @@ abstract class AbstractUnauthorizedUserTest extends AbstractApplicationTest
     public function testPrepareSourceUnauthorizedUser(callable $tokenCreator): void
     {
         $response = $this->applicationClient->makePrepareSourceRequest(
-            $tokenCreator($this->authenticationConfiguration),
+            $tokenCreator(self::$authenticationConfiguration),
             EntityId::create(),
             []
         );
@@ -139,7 +139,7 @@ abstract class AbstractUnauthorizedUserTest extends AbstractApplicationTest
     public function testReadSourceUnauthorizedUser(callable $tokenCreator): void
     {
         $response = $this->applicationClient->makeReadSourceRequest(
-            $tokenCreator($this->authenticationConfiguration),
+            $tokenCreator(self::$authenticationConfiguration),
             EntityId::create()
         );
 
