@@ -8,51 +8,69 @@ on:
         required: true
 
 jobs:
-  deploy:
+  setup:
+    name: Set service id
+    runs-on: ubuntu-latest
+    outputs:
+      service_id: ${{ env.service_id }}
+
+    steps:
+      - name: Set env.service_id
+        run: echo "service_id=sources" >> "$GITHUB_ENV"
+
+  image-builder-service-configure:
+    needs: setup
+    name: Dispatch service-configure event to image builder
     runs-on: ubuntu-latest
 
     steps:
-      - name: Dispatch service-configure event to image builder
-        uses: peter-evans/repository-dispatch@v1
+      - uses: peter-evans/repository-dispatch@v1
         with:
           token: ${{ secrets.IMAGE_BUILDER_TOKEN }}
           repository: smartassert/image-builder
           event-type: service-configure
           client-payload: |
             {
-              "service_id": "sources",
+              "service_id": "${{ needs.setup.outputs.service_id }}",
               "build_configuration": "{\"version\": \"${{ github.event.inputs.version }}\"}"
             }
 
-      - name: Dispatch service-configure event to instance manager
-        uses: peter-evans/repository-dispatch@v1
+  instance-manager-service-configure:
+    needs: setup
+    name: Dispatch service-configure event to instance manager
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: peter-evans/repository-dispatch@v1
         with:
           token: ${{ secrets.INSTANCE_MANAGER_TOKEN }}
           repository: smartassert/instance-manager
           event-type: service-configure
           client-payload: |
             {
-              "service_id": "sources",
+              "service_id": "${{ needs.setup.outputs.service_id }}",
               "state_url": "http://{{ host }}/status",
               "health_check_url": "http://{{ host }}/health-check"
-            }
+            }        
 
-      - name: Checkout
-        uses: actions/checkout@v2
+  instance-manager-service-set-env:
+    needs: setup
+    name: Dispatch service-set-env event to instance manager
+    runs-on: ubuntu-latest
 
-      - name: Prepare env_vars value for service-set-env event to instance manager
-        id: service_set_env_env_vars
-        run: |
-          echo "::set-output name=value::$(jq -R . < ./build/instance-manager/env.json | tr -d '\n' | sed 's/""//g')"
+    steps:
+      - uses: actions/checkout@v2
 
-      - name: Dispatch service-set-env event to instance manager
-        uses: peter-evans/repository-dispatch@v1
+      - name: Set env.service_env_vars
+        run: echo "service_env_vars=$(jq -R . < ./build/instance-manager/env.json | tr -d '\n' | sed 's/""//g')" >> "$GITHUB_ENV"
+
+      - uses: peter-evans/repository-dispatch@v1
         with:
           token: ${{ secrets.INSTANCE_MANAGER_TOKEN }}
           repository: smartassert/instance-manager
           event-type: service-set-env
           client-payload: |
             {
-              "service_id": "sources",
-              "env_vars": ${{ steps.service_set_env_env_vars.outputs.value }}
-            }
+              "service_id": "${{ needs.setup.outputs.service_id }}",
+              "env_vars": ${{ env.service_env_vars }}
+            }  
