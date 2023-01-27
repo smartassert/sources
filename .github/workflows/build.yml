@@ -43,7 +43,7 @@ jobs:
         env:
           RELEASE_TAG_NAME: ${{ github.event.release.tag_name }}
         run: |
-          [[ -n "$RELEASE_TAG_NAME" ]] && echo "service_version=$RELEASE_TAG_NAME" >> "$GITHUB_ENV" || echo "service_version=master" >> "$GITHUB_ENV"          
+          [[ -n "$RELEASE_TAG_NAME" ]] && echo "service_version=$RELEASE_TAG_NAME" >> "$GITHUB_ENV" || echo "service_version=master" >> "$GITHUB_ENV"
 
       - name: Examine build config
         run: |
