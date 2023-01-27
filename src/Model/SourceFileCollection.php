@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Model;
 
-use Traversable;
-
 /**
  * @implements \IteratorAggregate<int|string, string>
  */
@@ -21,9 +19,9 @@ class SourceFileCollection implements \IteratorAggregate
     }
 
     /**
-     * @return Traversable<int|string, string>
+     * @return \Traversable<int|string, string>
      */
-    public function getIterator(): Traversable
+    public function getIterator(): \Traversable
     {
         return new \ArrayIterator($this->paths);
     }
