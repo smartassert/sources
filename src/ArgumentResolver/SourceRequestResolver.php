@@ -21,27 +21,30 @@ class SourceRequestResolver implements ArgumentValueResolverInterface
     }
 
     /**
-     * @return iterable<?SourceRequestInterface>
+     * @return SourceRequestInterface[]
      */
     public function resolve(Request $request, ArgumentMetadata $argument): iterable
     {
+        if (!$this->supports($request, $argument)) {
+            return [];
+        }
+
         $sourceTypeParameter = $request->request->get('type');
         $sourceTypeParameter = is_string($sourceTypeParameter) ? trim($sourceTypeParameter) : '';
-
-        $type = Type::FILE;
 
         try {
             $type = Type::from($sourceTypeParameter);
         } catch (\ValueError) {
-            yield new InvalidSourceTypeRequest($sourceTypeParameter);
+            return [new InvalidSourceTypeRequest($sourceTypeParameter)];
         }
 
         if (Type::FILE === $type) {
-            yield new FileSourceRequest($request);
-        } elseif (Type::GIT === $type) {
-            yield new GitSourceRequest($request);
-        } else {
-            yield null;
+            return [new FileSourceRequest($request)];
         }
+        if (Type::GIT === $type) {
+            return [new GitSourceRequest($request)];
+        }
+
+        return [];
     }
 }
