@@ -42,7 +42,6 @@ abstract class AbstractSourceResolver implements ArgumentValueResolverInterface
                 }
 
                 $sourceImplementedClasses = class_implements($source);
-                $sourceImplementedClasses = is_array($sourceImplementedClasses) ? $sourceImplementedClasses : [];
                 $sourceImplementedClasses[$source::class] = $source::class;
 
                 $expectedInstanceClassName = $this->getExpectedInstanceClassName();
