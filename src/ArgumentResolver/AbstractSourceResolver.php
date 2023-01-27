@@ -25,34 +25,37 @@ abstract class AbstractSourceResolver implements ArgumentValueResolverInterface
     }
 
     /**
-     * @return \Generator<SourceInterface>
+     * @return SourceInterface[]
      *
      * @throws SourceNotFoundException
      * @throws UnexpectedSourceTypeException
      */
-    public function resolve(Request $request, ArgumentMetadata $argument): \Generator
+    public function resolve(Request $request, ArgumentMetadata $argument): iterable
     {
-        if ($this->supports($request, $argument)) {
-            $sourceId = $request->attributes->get('sourceId');
-
-            if (is_string($sourceId)) {
-                $source = $this->repository->find($sourceId);
-                if (null === $source) {
-                    throw new SourceNotFoundException($sourceId);
-                }
-
-                $sourceImplementedClasses = class_implements($source);
-                $sourceImplementedClasses[$source::class] = $source::class;
-
-                $expectedInstanceClassName = $this->getExpectedInstanceClassName();
-
-                if (false === in_array($expectedInstanceClassName, $sourceImplementedClasses)) {
-                    throw new UnexpectedSourceTypeException($source, $expectedInstanceClassName);
-                }
-
-                yield $source;
-            }
+        if (!$this->supports($request, $argument)) {
+            return [];
         }
+
+        $sourceId = $request->attributes->get('sourceId');
+        if (!is_string($sourceId)) {
+            return [];
+        }
+
+        $source = $this->repository->find($sourceId);
+        if (null === $source) {
+            throw new SourceNotFoundException($sourceId);
+        }
+
+        $sourceImplementedClasses = class_implements($source);
+        $sourceImplementedClasses[$source::class] = $source::class;
+
+        $expectedInstanceClassName = $this->getExpectedInstanceClassName();
+
+        if (false === in_array($expectedInstanceClassName, $sourceImplementedClasses)) {
+            throw new UnexpectedSourceTypeException($source, $expectedInstanceClassName);
+        }
+
+        return [$source];
     }
 
     abstract protected function supportsArgumentType(string $type): bool;
