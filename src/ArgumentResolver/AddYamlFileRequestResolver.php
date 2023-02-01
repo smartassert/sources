@@ -26,13 +26,11 @@ class AddYamlFileRequestResolver extends AbstractYamlFileRequestResolver impleme
             return [];
         }
 
-        $request = new AddYamlFileRequest(
+        return [new AddYamlFileRequest(
             new YamlFile(
                 $this->createFilenameFromRequest($request),
                 trim($request->getContent())
             )
-        );
-
-        return [$request];
+        )];
     }
 }

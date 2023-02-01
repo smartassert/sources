@@ -25,10 +25,6 @@ class YamlFileRequestResolver extends AbstractYamlFileRequestResolver implements
             return [];
         }
 
-        $request = new YamlFileRequest(
-            $this->createFilenameFromRequest($request)
-        );
-
-        return [$request];
+        return [new YamlFileRequest($this->createFilenameFromRequest($request))];
     }
 }
