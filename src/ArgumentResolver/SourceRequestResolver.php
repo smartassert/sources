@@ -10,22 +10,17 @@ use App\Request\GitSourceRequest;
 use App\Request\InvalidSourceTypeRequest;
 use App\Request\SourceRequestInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Controller\ArgumentValueResolverInterface;
+use Symfony\Component\HttpKernel\Controller\ValueResolverInterface;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 
-class SourceRequestResolver implements ArgumentValueResolverInterface
+class SourceRequestResolver implements ValueResolverInterface
 {
-    public function supports(Request $request, ArgumentMetadata $argument): bool
-    {
-        return SourceRequestInterface::class === $argument->getType();
-    }
-
     /**
      * @return SourceRequestInterface[]
      */
     public function resolve(Request $request, ArgumentMetadata $argument): iterable
     {
-        if (!$this->supports($request, $argument)) {
+        if (SourceRequestInterface::class !== $argument->getType()) {
             return [];
         }
 

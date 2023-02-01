@@ -86,7 +86,8 @@ class FactoryTest extends WebTestCase
     public function createFromSourceRequestDataProvider(): array
     {
         $userId = UserId::create();
-        $user = new User($userId);
+        \assert('' !== $userId);
+        $user = new User($userId, 'non-empty string');
         $gitSourceHostUrl = 'https://example.com/repository.git';
         $gitSourcePath = '/';
 

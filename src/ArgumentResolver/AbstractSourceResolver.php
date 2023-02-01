@@ -9,19 +9,14 @@ use App\Exception\SourceNotFoundException;
 use App\Exception\UnexpectedSourceTypeException;
 use App\Repository\SourceRepository;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Controller\ArgumentValueResolverInterface;
+use Symfony\Component\HttpKernel\Controller\ValueResolverInterface;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 
-abstract class AbstractSourceResolver implements ArgumentValueResolverInterface
+abstract class AbstractSourceResolver implements ValueResolverInterface
 {
     public function __construct(
         private SourceRepository $repository,
     ) {
-    }
-
-    public function supports(Request $request, ArgumentMetadata $argument): bool
-    {
-        return $this->supportsArgumentType((string) $argument->getType());
     }
 
     /**
@@ -32,7 +27,7 @@ abstract class AbstractSourceResolver implements ArgumentValueResolverInterface
      */
     public function resolve(Request $request, ArgumentMetadata $argument): iterable
     {
-        if (!$this->supports($request, $argument)) {
+        if (!$this->supportsArgumentType((string) $argument->getType())) {
             return [];
         }
 
