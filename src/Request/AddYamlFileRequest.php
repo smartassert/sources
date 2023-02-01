@@ -7,7 +7,7 @@ namespace App\Request;
 use App\Validator\YamlFileConstraint;
 use SmartAssert\YamlFile\YamlFile;
 
-class AddYamlFileRequest extends AbstractYamlFileRequest
+class AddYamlFileRequest extends YamlFileRequest
 {
     public function __construct(
         #[YamlFileConstraint]

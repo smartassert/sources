@@ -4,6 +4,19 @@ declare(strict_types=1);
 
 namespace App\Request;
 
-class YamlFileRequest extends AbstractYamlFileRequest
+use App\Validator\YamlFilenameConstraint;
+use SmartAssert\YamlFile\Filename;
+
+class YamlFileRequest
 {
+    public function __construct(
+        #[YamlFilenameConstraint]
+        private Filename $filename,
+    ) {
+    }
+
+    public function getFilename(): Filename
+    {
+        return $this->filename;
+    }
 }
