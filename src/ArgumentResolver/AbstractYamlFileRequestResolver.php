@@ -6,9 +6,9 @@ namespace App\ArgumentResolver;
 
 use SmartAssert\YamlFile\Filename;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Controller\ArgumentValueResolverInterface;
+use Symfony\Component\HttpKernel\Controller\ValueResolverInterface;
 
-abstract class AbstractYamlFileRequestResolver implements ArgumentValueResolverInterface
+abstract class AbstractYamlFileRequestResolver implements ValueResolverInterface
 {
     public const KEY_ATTRIBUTE_FILENAME = 'filename';
 
