@@ -4,13 +4,19 @@ declare(strict_types=1);
 
 namespace App\Request;
 
-use Symfony\Component\HttpFoundation\Request;
-use webignition\EncapsulatingRequestResolverBundle\Model\EncapsulatingRequestInterface;
+use App\Validator\YamlFilenameConstraint;
+use SmartAssert\YamlFile\Filename;
 
-class YamlFileRequest extends AbstractYamlFileRequest implements EncapsulatingRequestInterface
+class YamlFileRequest
 {
-    public static function create(Request $request): self
+    public function __construct(
+        #[YamlFilenameConstraint]
+        private Filename $filename,
+    ) {
+    }
+
+    public function getFilename(): Filename
     {
-        return new self(self::createFilenameFromRequest($request));
+        return $this->filename;
     }
 }
