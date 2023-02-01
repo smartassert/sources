@@ -19,6 +19,9 @@ class GitSource extends AbstractSource implements SourceOriginInterface, \JsonSe
     #[ORM\Column(type: 'string', length: 255)]
     private string $credentials;
 
+    /**
+     * @param non-empty-string $userId
+     */
     public function __construct(string $userId, string $hostUrl, string $path = '/', string $credentials = '')
     {
         parent::__construct($userId);
@@ -73,7 +76,7 @@ class GitSource extends AbstractSource implements SourceOriginInterface, \JsonSe
     /**
      * @return array{
      *     "id": string,
-     *     "user_id": string,
+     *     "user_id": non-empty-string,
      *     "type": 'git',
      *     "host_url": string,
      *     "path": string,

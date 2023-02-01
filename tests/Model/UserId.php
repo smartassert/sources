@@ -8,8 +8,17 @@ use Symfony\Component\Uid\Ulid;
 
 class UserId
 {
+    /**
+     * @return non-empty-string
+     */
     public static function create(): string
     {
-        return (string) new Ulid();
+        $userId = (string) new Ulid();
+
+        if ('' === $userId) {
+            throw new \RuntimeException('Empty user id generated');
+        }
+
+        return $userId;
     }
 }

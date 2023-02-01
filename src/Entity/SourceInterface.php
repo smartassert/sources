@@ -8,5 +8,8 @@ interface SourceInterface
 {
     public function getId(): string;
 
+    /**
+     * @return non-empty-string
+     */
     public function getUserId(): string;
 }

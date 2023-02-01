@@ -27,9 +27,15 @@ abstract class AbstractSource implements SourceInterface
     #[ORM\Column(type: 'string', length: self::ID_LENGTH, unique: true)]
     protected string $id;
 
+    /**
+     * @var non-empty-string
+     */
     #[ORM\Column(type: 'string', length: 32)]
     private string $userId;
 
+    /**
+     * @param non-empty-string $userId
+     */
     public function __construct(string $userId)
     {
         $this->id = EntityId::create();
@@ -41,6 +47,9 @@ abstract class AbstractSource implements SourceInterface
         return $this->id;
     }
 
+    /**
+     * @return non-empty-string
+     */
     public function getUserId(): string
     {
         return $this->userId;

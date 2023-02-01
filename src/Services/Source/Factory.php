@@ -10,7 +10,7 @@ use App\Entity\SourceInterface;
 use App\Request\FileSourceRequest;
 use App\Request\GitSourceRequest;
 use App\Request\SourceRequestInterface;
-use Symfony\Component\Security\Core\User\UserInterface;
+use SmartAssert\UsersSecurityBundle\Security\User;
 
 class Factory
 {
@@ -21,7 +21,7 @@ class Factory
     }
 
     public function createFromSourceRequest(
-        UserInterface $user,
+        User $user,
         SourceRequestInterface $request
     ): ?SourceInterface {
         $source = null;
