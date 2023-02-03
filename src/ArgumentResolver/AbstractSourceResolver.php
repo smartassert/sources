@@ -45,6 +45,7 @@ abstract class AbstractSourceResolver implements ValueResolverInterface
         $sourceImplementedClasses[$source::class] = $source::class;
 
         $expectedInstanceClassName = $this->getExpectedInstanceClassName();
+
         if (false === in_array($expectedInstanceClassName, $sourceImplementedClasses)) {
             throw new UnexpectedSourceTypeException($source, $expectedInstanceClassName);
         }
