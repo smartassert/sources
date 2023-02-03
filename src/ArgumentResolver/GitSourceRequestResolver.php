@@ -21,9 +21,6 @@ class GitSourceRequestResolver implements ValueResolverInterface
             return [];
         }
 
-//        var_dump($request->request);
-//        exit();
-
         return [new GitSourceRequest($request)];
     }
 }

@@ -115,7 +115,7 @@ class Client
     /**
      * @param array<string, string> $payload
      */
-    public function makeUpdateSourceRequest(
+    public function makeUpdateFileSourceRequest(
         ?string $authenticationToken,
         string $sourceId,
         array $payload
@@ -129,7 +129,30 @@ class Client
 
         return $this->client->makeRequest(
             'PUT',
-            $this->router->generate('user_source_update', ['sourceId' => $sourceId]),
+            $this->router->generate('user_file_source_update', ['sourceId' => $sourceId]),
+            $headers,
+            http_build_query($payload)
+        );
+    }
+
+    /**
+     * @param array<string, string> $payload
+     */
+    public function makeUpdateGitSourceRequest(
+        ?string $authenticationToken,
+        string $sourceId,
+        array $payload
+    ): ResponseInterface {
+        $headers = array_merge(
+            $this->createAuthorizationHeader($authenticationToken),
+            [
+                'content-type' => 'application/x-www-form-urlencoded',
+            ]
+        );
+
+        return $this->client->makeRequest(
+            'PUT',
+            $this->router->generate('user_git_source_update', ['sourceId' => $sourceId]),
             $headers,
             http_build_query($payload)
         );
