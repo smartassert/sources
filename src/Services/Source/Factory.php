@@ -6,40 +6,39 @@ namespace App\Services\Source;
 
 use App\Entity\FileSource;
 use App\Entity\GitSource;
-use App\Entity\SourceInterface;
 use App\Request\FileSourceRequest;
 use App\Request\GitSourceRequest;
-use App\Request\SourceRequestInterface;
 use SmartAssert\UsersSecurityBundle\Security\User;
 
 class Factory
 {
     public function __construct(
-        private Store $store,
-        private Finder $finder,
+        private readonly Store $store,
+        private readonly Finder $finder,
     ) {
     }
 
-    public function createFromSourceRequest(
-        User $user,
-        SourceRequestInterface $request
-    ): ?SourceInterface {
-        $source = null;
+    public function createFromGitSourceRequest(User $user, GitSourceRequest $request): GitSource
+    {
+        $source = new GitSource(
+            $user->getUserIdentifier(),
+            $request->getHostUrl(),
+            $request->getPath(),
+            $request->getCredentials(),
+        );
 
-        if ($request instanceof FileSourceRequest) {
-            $source = new FileSource($user->getUserIdentifier(), $request->getLabel());
+        if (null === $this->finder->find($source)) {
+            $this->store->add($source);
         }
 
-        if ($request instanceof GitSourceRequest) {
-            $source = new GitSource(
-                $user->getUserIdentifier(),
-                $request->getHostUrl(),
-                $request->getPath(),
-                $request->getCredentials(),
-            );
-        }
+        return $source;
+    }
 
-        if ($source instanceof SourceInterface && null === $this->finder->find($source)) {
+    public function createFromFileSourceRequest(User $user, FileSourceRequest $request): FileSource
+    {
+        $source = new FileSource($user->getUserIdentifier(), $request->getLabel());
+
+        if (null === $this->finder->find($source)) {
             $this->store->add($source);
         }
 

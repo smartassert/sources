@@ -11,7 +11,6 @@ use App\Entity\SourceInterface;
 use App\Repository\SourceRepository;
 use App\Request\FileSourceRequest;
 use App\Request\GitSourceRequest;
-use App\Request\InvalidSourceTypeRequest;
 use App\Services\Source\Factory;
 use App\Tests\Model\UserId;
 use App\Tests\Services\EntityRemover;
@@ -43,30 +42,19 @@ class FactoryTest extends WebTestCase
         }
     }
 
-    public function testCreateFromInvalidSourceRequest(): void
-    {
-        self::assertNull($this->factory->createFromSourceRequest(
-            \Mockery::mock(User::class),
-            new InvalidSourceTypeRequest('invalid')
-        ));
-    }
-
     /**
-     * @dataProvider createFromSourceRequestDataProvider
+     * @dataProvider createFromGitSourceRequestDataProvider
      */
-    public function testCreateFromSourceRequest(
-        User $user,
-        FileSourceRequest|GitSourceRequest $request,
-        SourceInterface $expected
-    ): void {
+    public function testCreateFromGitSourceRequest(User $user, GitSourceRequest $request, GitSource $expected): void
+    {
         self::assertCount(0, $this->repository->findAll());
 
-        $source = $this->factory->createFromSourceRequest($user, $request);
+        $source = $this->factory->createFromGitSourceRequest($user, $request);
         self::assertInstanceOf(SourceInterface::class, $source);
 
         self::assertCount(1, $this->repository->findAll());
-        $this->factory->createFromSourceRequest($user, $request);
-        $this->factory->createFromSourceRequest($user, $request);
+        $this->factory->createFromGitSourceRequest($user, $request);
+        $this->factory->createFromGitSourceRequest($user, $request);
         self::assertCount(1, $this->repository->findAll());
 
         ObjectReflector::setProperty(
@@ -82,7 +70,7 @@ class FactoryTest extends WebTestCase
     /**
      * @return array<mixed>
      */
-    public function createFromSourceRequestDataProvider(): array
+    public function createFromGitSourceRequestDataProvider(): array
     {
         $userId = UserId::create();
         \assert('' !== $userId);
@@ -113,6 +101,44 @@ class FactoryTest extends WebTestCase
                 )),
                 'expected' => new GitSource($userId, $gitSourceHostUrl, $gitSourcePath, 'credentials'),
             ],
+        ];
+    }
+
+    /**
+     * @dataProvider createFromFileSourceRequestDataProvider
+     */
+    public function testCreateFromFileSourceRequest(User $user, FileSourceRequest $request, FileSource $expected): void
+    {
+        self::assertCount(0, $this->repository->findAll());
+
+        $source = $this->factory->createFromFileSourceRequest($user, $request);
+        self::assertInstanceOf(SourceInterface::class, $source);
+
+        self::assertCount(1, $this->repository->findAll());
+        $this->factory->createFromFileSourceRequest($user, $request);
+        $this->factory->createFromFileSourceRequest($user, $request);
+        self::assertCount(1, $this->repository->findAll());
+
+        ObjectReflector::setProperty(
+            $expected,
+            AbstractSource::class,
+            'id',
+            $source->getId()
+        );
+
+        self::assertEquals($expected, $source);
+    }
+
+    /**
+     * @return array<mixed>
+     */
+    public function createFromFileSourceRequestDataProvider(): array
+    {
+        $userId = UserId::create();
+        \assert('' !== $userId);
+        $user = new User($userId, 'non-empty string');
+
+        return [
             'file' => [
                 'user' => $user,
                 'request' => new FileSourceRequest(new Request(
