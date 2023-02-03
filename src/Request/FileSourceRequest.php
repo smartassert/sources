@@ -6,11 +6,13 @@ namespace App\Request;
 
 use App\Enum\Source\Type;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Validator\Constraints as Assert;
 
 class FileSourceRequest implements SourceRequestInterface
 {
     public const PARAMETER_LABEL = 'label';
 
+    #[Assert\NotBlank]
     private string $label;
 
     public function __construct(Request $request)
