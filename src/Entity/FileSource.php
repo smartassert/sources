@@ -19,6 +19,9 @@ class FileSource extends AbstractSource implements
     #[ORM\Column(type: 'string', length: 255)]
     private string $label;
 
+    /**
+     * @param non-empty-string $userId
+     */
     public function __construct(string $userId, string $label)
     {
         parent::__construct($userId);
@@ -56,7 +59,7 @@ class FileSource extends AbstractSource implements
     /**
      * @return array{
      *     "id": string,
-     *     "user_id": string,
+     *     "user_id": non-empty-string,
      *     "type": 'file',
      *     "label": string
      * }

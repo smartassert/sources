@@ -18,7 +18,6 @@ use App\Tests\Services\EntityRemover;
 use SmartAssert\UsersSecurityBundle\Security\User;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Security\Core\User\UserInterface;
 use webignition\ObjectReflector\ObjectReflector;
 
 class FactoryTest extends WebTestCase
@@ -47,7 +46,7 @@ class FactoryTest extends WebTestCase
     public function testCreateFromInvalidSourceRequest(): void
     {
         self::assertNull($this->factory->createFromSourceRequest(
-            \Mockery::mock(UserInterface::class),
+            \Mockery::mock(User::class),
             new InvalidSourceTypeRequest('invalid')
         ));
     }
@@ -56,7 +55,7 @@ class FactoryTest extends WebTestCase
      * @dataProvider createFromSourceRequestDataProvider
      */
     public function testCreateFromSourceRequest(
-        UserInterface $user,
+        User $user,
         FileSourceRequest|GitSourceRequest $request,
         SourceInterface $expected
     ): void {

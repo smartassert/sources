@@ -10,6 +10,7 @@ use App\Repository\SourceRepository;
 use App\Request\SourceRequestInterface;
 use App\Services\RequestValidator;
 use App\Services\Source\Factory;
+use SmartAssert\UsersSecurityBundle\Security\User;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -22,7 +23,7 @@ class SourceController
     #[Route('/', name: 'source_create', methods: ['POST'])]
     public function create(
         RequestValidator $requestValidator,
-        UserInterface $user,
+        User $user,
         Factory $factory,
         SourceRequestInterface $request
     ): JsonResponse {

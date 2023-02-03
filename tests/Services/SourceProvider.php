@@ -49,6 +49,9 @@ class SourceProvider
      */
     private array $sources = [];
 
+    /**
+     * @var non-empty-string
+     */
     private string $userId;
 
     public function __construct(
@@ -116,6 +119,9 @@ class SourceProvider
         return $source;
     }
 
+    /**
+     * @param non-empty-string $userId
+     */
     public function setUserId(string $userId): void
     {
         $this->userId = $userId;
