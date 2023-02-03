@@ -72,6 +72,23 @@ abstract class AbstractUpdateSourceTest extends AbstractApplicationTest
                     ],
                 ],
             ],
+            Type::FILE->value . ' missing label' => [
+                'sourceIdentifier' => SourceProvider::GIT_WITH_CREDENTIALS_WITH_RUN_SOURCE,
+                'payload' => [
+                    SourceRequestInterface::PARAMETER_TYPE => Type::FILE->value,
+                ],
+                'expectedResponseData' => [
+                    'error' => [
+                        'type' => 'invalid_request',
+                        'payload' => [
+                            'label' => [
+                                'value' => '',
+                                'message' => 'This value should not be blank.',
+                            ],
+                        ],
+                    ],
+                ],
+            ],
         ];
     }
 

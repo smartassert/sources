@@ -68,6 +68,22 @@ abstract class AbstractCreateSourceTest extends AbstractApplicationTest
                     ],
                 ],
             ],
+            'file source missing label' => [
+                'requestParameters' => [
+                    SourceRequestInterface::PARAMETER_TYPE => Type::FILE->value,
+                ],
+                'expectedResponseData' => [
+                    'error' => [
+                        'type' => 'invalid_request',
+                        'payload' => [
+                            'label' => [
+                                'value' => '',
+                                'message' => 'This value should not be blank.',
+                            ],
+                        ],
+                    ],
+                ],
+            ],
         ];
     }
 
