@@ -8,7 +8,6 @@ use App\Entity\SourceInterface;
 use App\Enum\Source\Type;
 use App\Repository\SourceRepository;
 use App\Request\FileSourceRequest;
-use App\Request\SourceRequestInterface;
 
 abstract class AbstractCreateFileSourceTest extends AbstractApplicationTest
 {
@@ -35,9 +34,7 @@ abstract class AbstractCreateFileSourceTest extends AbstractApplicationTest
     {
         return [
             'file source missing label' => [
-                'requestParameters' => [
-                    SourceRequestInterface::PARAMETER_TYPE => Type::FILE->value,
-                ],
+                'requestParameters' => [],
                 'expectedResponseData' => [
                     'error' => [
                         'type' => 'invalid_request',
@@ -94,7 +91,6 @@ abstract class AbstractCreateFileSourceTest extends AbstractApplicationTest
         return [
             'file source' => [
                 'requestParameters' => [
-                    SourceRequestInterface::PARAMETER_TYPE => Type::FILE->value,
                     FileSourceRequest::PARAMETER_LABEL => $label
                 ],
                 'expected' => [

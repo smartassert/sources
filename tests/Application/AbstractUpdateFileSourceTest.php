@@ -6,7 +6,6 @@ namespace App\Tests\Application;
 
 use App\Enum\Source\Type;
 use App\Request\FileSourceRequest;
-use App\Request\SourceRequestInterface;
 use App\Tests\Services\SourceProvider;
 
 abstract class AbstractUpdateFileSourceTest extends AbstractApplicationTest
@@ -21,6 +20,22 @@ abstract class AbstractUpdateFileSourceTest extends AbstractApplicationTest
         \assert($sourceProvider instanceof SourceProvider);
         $sourceProvider->setUserId(self::$authenticationConfiguration->getUser()->id);
         $this->sourceProvider = $sourceProvider;
+    }
+
+    public function testUpdateInvalidSourceType(): void
+    {
+        $sourceIdentifier = SourceProvider::GIT_WITHOUT_CREDENTIALS_WITHOUT_RUN_SOURCE;
+
+        $this->sourceProvider->initialize([$sourceIdentifier]);
+        $source = $this->sourceProvider->get($sourceIdentifier);
+
+        $response = $this->applicationClient->makeUpdateFileSourceRequest(
+            self::$authenticationConfiguration->getValidApiToken(),
+            $source->getId(),
+            []
+        );
+
+        $this->responseAsserter->assertNotFoundResponse($response);
     }
 
     /**
@@ -53,10 +68,8 @@ abstract class AbstractUpdateFileSourceTest extends AbstractApplicationTest
     {
         return [
             Type::FILE->value . ' missing label' => [
-                'sourceIdentifier' => SourceProvider::GIT_WITH_CREDENTIALS_WITH_RUN_SOURCE,
-                'payload' => [
-                    SourceRequestInterface::PARAMETER_TYPE => Type::FILE->value,
-                ],
+                'sourceIdentifier' => SourceProvider::FILE_WITHOUT_RUN_SOURCE,
+                'payload' => [],
                 'expectedResponseData' => [
                     'error' => [
                         'type' => 'invalid_request',
@@ -109,7 +122,6 @@ abstract class AbstractUpdateFileSourceTest extends AbstractApplicationTest
             Type::FILE->value => [
                 'sourceIdentifier' => SourceProvider::FILE_WITHOUT_RUN_SOURCE,
                 'payload' => [
-                    SourceRequestInterface::PARAMETER_TYPE => Type::FILE->value,
                     FileSourceRequest::PARAMETER_LABEL => $newLabel,
                 ],
                 'expectedResponseData' => [

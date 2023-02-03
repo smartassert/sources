@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace App\ArgumentResolver;
 
-use App\Entity\FileSource;
+use App\Entity\GitSource;
 
-class FileSourceResolver extends AbstractSingleSourceTypeResolver
+class GitSourceResolver extends AbstractSingleSourceTypeResolver
 {
     protected function getSourceClassName(): string
     {
-        return FileSource::class;
+        return GitSource::class;
     }
 }

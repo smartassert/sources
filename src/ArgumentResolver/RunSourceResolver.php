@@ -6,14 +6,9 @@ namespace App\ArgumentResolver;
 
 use App\Entity\RunSource;
 
-class RunSourceResolver extends AbstractSourceResolver
+class RunSourceResolver extends AbstractSingleSourceTypeResolver
 {
-    protected function supportsArgumentType(string $type): bool
-    {
-        return RunSource::class === $type;
-    }
-
-    protected function getExpectedInstanceClassName(): string
+    protected function getSourceClassName(): string
     {
         return RunSource::class;
     }

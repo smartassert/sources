@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use App\Entity\FileSource;
+use App\Entity\GitSource;
 use App\Entity\RunSource;
 use App\Entity\SourceInterface;
 use App\Entity\SourceOriginInterface;
@@ -31,7 +32,7 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 class UserSourceController
 {
     public function __construct(
-        private UserSourceAccessChecker $userSourceAccessChecker,
+        private readonly UserSourceAccessChecker $userSourceAccessChecker,
     ) {
     }
 
@@ -54,10 +55,13 @@ class UserSourceController
     public function updateFile(
         RequestValidator $requestValidator,
         Mutator $mutator,
-        SourceOriginInterface $source,
+        FileSource $source,
         FileSourceRequest $request,
     ): Response {
-        return $this->foo($requestValidator, $mutator, $source, $request);
+        $this->userSourceAccessChecker->denyAccessUnlessGranted($source);
+        $requestValidator->validate($request);
+
+        return new JsonResponse($mutator->updateFile($source, $request));
     }
 
     /**
@@ -68,10 +72,13 @@ class UserSourceController
     public function updateGit(
         RequestValidator $requestValidator,
         Mutator $mutator,
-        SourceOriginInterface $source,
+        GitSource $source,
         GitSourceRequest $request,
     ): Response {
-        return $this->foo($requestValidator, $mutator, $source, $request);
+        $this->userSourceAccessChecker->denyAccessUnlessGranted($source);
+        $requestValidator->validate($request);
+
+        return new JsonResponse($mutator->updateGit($source, $request));
     }
 
     /**
@@ -128,17 +135,5 @@ class UserSourceController
         $this->userSourceAccessChecker->denyAccessUnlessGranted($source);
 
         return new YamlResponse($runSourceSerializer->read($source));
-    }
-
-    private function foo(
-        RequestValidator $requestValidator,
-        Mutator $mutator,
-        SourceOriginInterface $source,
-        FileSourceRequest|GitSourceRequest $request,
-    ): Response {
-        $this->userSourceAccessChecker->denyAccessUnlessGranted($source);
-        $requestValidator->validate($request);
-
-        return new JsonResponse($mutator->update($source, $request));
     }
 }

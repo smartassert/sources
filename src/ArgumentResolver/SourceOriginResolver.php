@@ -6,7 +6,7 @@ namespace App\ArgumentResolver;
 
 use App\Entity\SourceOriginInterface;
 
-class OriginSourceResolver extends AbstractSourceResolver
+class SourceOriginResolver extends AbstractSourceResolver
 {
     protected function supportsArgumentType(string $type): bool
     {

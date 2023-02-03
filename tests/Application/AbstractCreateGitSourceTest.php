@@ -8,7 +8,6 @@ use App\Entity\SourceInterface;
 use App\Enum\Source\Type;
 use App\Repository\SourceRepository;
 use App\Request\GitSourceRequest;
-use App\Request\SourceRequestInterface;
 
 abstract class AbstractCreateGitSourceTest extends AbstractApplicationTest
 {
@@ -35,9 +34,7 @@ abstract class AbstractCreateGitSourceTest extends AbstractApplicationTest
     {
         return [
             'git source missing host url' => [
-                'requestParameters' => [
-                    SourceRequestInterface::PARAMETER_TYPE => Type::GIT->value,
-                ],
+                'requestParameters' => [],
                 'expectedResponseData' => [
                     'error' => [
                         'type' => 'invalid_request',
@@ -97,7 +94,6 @@ abstract class AbstractCreateGitSourceTest extends AbstractApplicationTest
         return [
             'git source, credentials missing' => [
                 'requestParameters' => [
-                    SourceRequestInterface::PARAMETER_TYPE => Type::GIT->value,
                     GitSourceRequest::PARAMETER_HOST_URL => $hostUrl,
                     GitSourceRequest::PARAMETER_PATH => $path
                 ],
@@ -110,7 +106,6 @@ abstract class AbstractCreateGitSourceTest extends AbstractApplicationTest
             ],
             'git source, credentials present' => [
                 'requestParameters' => [
-                    SourceRequestInterface::PARAMETER_TYPE => Type::GIT->value,
                     GitSourceRequest::PARAMETER_HOST_URL => $hostUrl,
                     GitSourceRequest::PARAMETER_PATH => $path,
                     GitSourceRequest::PARAMETER_CREDENTIALS => $credentials,
