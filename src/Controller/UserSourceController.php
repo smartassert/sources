@@ -5,12 +5,14 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use App\Entity\FileSource;
+use App\Entity\GitSource;
 use App\Entity\RunSource;
 use App\Entity\SourceInterface;
 use App\Entity\SourceOriginInterface;
 use App\Exception\InvalidRequestException;
 use App\Message\Prepare;
-use App\Request\SourceRequestInterface;
+use App\Request\FileSourceRequest;
+use App\Request\GitSourceRequest;
 use App\Response\YamlResponse;
 use App\Security\UserSourceAccessChecker;
 use App\Services\RequestValidator;
@@ -30,7 +32,7 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 class UserSourceController
 {
     public function __construct(
-        private UserSourceAccessChecker $userSourceAccessChecker,
+        private readonly UserSourceAccessChecker $userSourceAccessChecker,
     ) {
     }
 
@@ -49,17 +51,34 @@ class UserSourceController
      * @throws AccessDeniedException
      * @throws InvalidRequestException
      */
-    #[Route(SourceRoutes::ROUTE_SOURCE, name: 'user_source_update', methods: ['PUT'])]
-    public function update(
+    #[Route(SourceRoutes::ROUTE_SOURCE . '/file', name: 'user_file_source_update', methods: ['PUT'])]
+    public function updateFile(
         RequestValidator $requestValidator,
         Mutator $mutator,
-        SourceOriginInterface $source,
-        SourceRequestInterface $request,
+        FileSource $source,
+        FileSourceRequest $request,
     ): Response {
         $this->userSourceAccessChecker->denyAccessUnlessGranted($source);
         $requestValidator->validate($request);
 
-        return new JsonResponse($mutator->update($source, $request));
+        return new JsonResponse($mutator->updateFile($source, $request));
+    }
+
+    /**
+     * @throws AccessDeniedException
+     * @throws InvalidRequestException
+     */
+    #[Route(SourceRoutes::ROUTE_SOURCE . '/git', name: 'user_git_source_update', methods: ['PUT'])]
+    public function updateGit(
+        RequestValidator $requestValidator,
+        Mutator $mutator,
+        GitSource $source,
+        GitSourceRequest $request,
+    ): Response {
+        $this->userSourceAccessChecker->denyAccessUnlessGranted($source);
+        $requestValidator->validate($request);
+
+        return new JsonResponse($mutator->updateGit($source, $request));
     }
 
     /**

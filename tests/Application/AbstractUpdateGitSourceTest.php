@@ -5,12 +5,10 @@ declare(strict_types=1);
 namespace App\Tests\Application;
 
 use App\Enum\Source\Type;
-use App\Request\FileSourceRequest;
 use App\Request\GitSourceRequest;
-use App\Request\SourceRequestInterface;
 use App\Tests\Services\SourceProvider;
 
-abstract class AbstractUpdateSourceTest extends AbstractApplicationTest
+abstract class AbstractUpdateGitSourceTest extends AbstractApplicationTest
 {
     private SourceProvider $sourceProvider;
 
@@ -22,6 +20,22 @@ abstract class AbstractUpdateSourceTest extends AbstractApplicationTest
         \assert($sourceProvider instanceof SourceProvider);
         $sourceProvider->setUserId(self::$authenticationConfiguration->getUser()->id);
         $this->sourceProvider = $sourceProvider;
+    }
+
+    public function testUpdateInvalidSourceType(): void
+    {
+        $sourceIdentifier = SourceProvider::FILE_WITHOUT_RUN_SOURCE;
+
+        $this->sourceProvider->initialize([$sourceIdentifier]);
+        $source = $this->sourceProvider->get($sourceIdentifier);
+
+        $response = $this->applicationClient->makeUpdateGitSourceRequest(
+            self::$authenticationConfiguration->getValidApiToken(),
+            $source->getId(),
+            []
+        );
+
+        $this->responseAsserter->assertNotFoundResponse($response);
     }
 
     /**
@@ -38,7 +52,7 @@ abstract class AbstractUpdateSourceTest extends AbstractApplicationTest
         $this->sourceProvider->initialize([$sourceIdentifier]);
         $source = $this->sourceProvider->get($sourceIdentifier);
 
-        $response = $this->applicationClient->makeUpdateSourceRequest(
+        $response = $this->applicationClient->makeUpdateGitSourceRequest(
             self::$authenticationConfiguration->getValidApiToken(),
             $source->getId(),
             $payload
@@ -56,7 +70,6 @@ abstract class AbstractUpdateSourceTest extends AbstractApplicationTest
             Type::GIT->value . ' missing host url' => [
                 'sourceIdentifier' => SourceProvider::GIT_WITH_CREDENTIALS_WITH_RUN_SOURCE,
                 'payload' => [
-                    SourceRequestInterface::PARAMETER_TYPE => Type::GIT->value,
                     GitSourceRequest::PARAMETER_HOST_URL => '',
                     GitSourceRequest::PARAMETER_PATH => '/',
                 ],
@@ -65,23 +78,6 @@ abstract class AbstractUpdateSourceTest extends AbstractApplicationTest
                         'type' => 'invalid_request',
                         'payload' => [
                             'host-url' => [
-                                'value' => '',
-                                'message' => 'This value should not be blank.',
-                            ],
-                        ],
-                    ],
-                ],
-            ],
-            Type::FILE->value . ' missing label' => [
-                'sourceIdentifier' => SourceProvider::GIT_WITH_CREDENTIALS_WITH_RUN_SOURCE,
-                'payload' => [
-                    SourceRequestInterface::PARAMETER_TYPE => Type::FILE->value,
-                ],
-                'expectedResponseData' => [
-                    'error' => [
-                        'type' => 'invalid_request',
-                        'payload' => [
-                            'label' => [
                                 'value' => '',
                                 'message' => 'This value should not be blank.',
                             ],
@@ -106,7 +102,7 @@ abstract class AbstractUpdateSourceTest extends AbstractApplicationTest
         $this->sourceProvider->initialize([$sourceIdentifier]);
         $source = $this->sourceProvider->get($sourceIdentifier);
 
-        $response = $this->applicationClient->makeUpdateSourceRequest(
+        $response = $this->applicationClient->makeUpdateGitSourceRequest(
             self::$authenticationConfiguration->getValidApiToken(),
             $source->getId(),
             $payload
@@ -128,21 +124,9 @@ abstract class AbstractUpdateSourceTest extends AbstractApplicationTest
         $newLabel = 'new file source label';
 
         return [
-            Type::FILE->value => [
-                'sourceIdentifier' => SourceProvider::FILE_WITHOUT_RUN_SOURCE,
-                'payload' => [
-                    SourceRequestInterface::PARAMETER_TYPE => Type::FILE->value,
-                    FileSourceRequest::PARAMETER_LABEL => $newLabel,
-                ],
-                'expectedResponseData' => [
-                    'type' => Type::FILE->value,
-                    'label' => $newLabel,
-                ],
-            ],
             Type::GIT->value . ' credentials present and empty' => [
                 'sourceIdentifier' => SourceProvider::GIT_WITH_CREDENTIALS_WITH_RUN_SOURCE,
                 'payload' => [
-                    SourceRequestInterface::PARAMETER_TYPE => Type::GIT->value,
                     GitSourceRequest::PARAMETER_HOST_URL => $newHostUrl,
                     GitSourceRequest::PARAMETER_PATH => $newPath,
                     GitSourceRequest::PARAMETER_CREDENTIALS => null,
@@ -157,7 +141,6 @@ abstract class AbstractUpdateSourceTest extends AbstractApplicationTest
             Type::GIT->value . ' credentials not present' => [
                 'source' => SourceProvider::GIT_WITH_CREDENTIALS_WITH_RUN_SOURCE,
                 'payload' => [
-                    SourceRequestInterface::PARAMETER_TYPE => Type::GIT->value,
                     GitSourceRequest::PARAMETER_HOST_URL => $newHostUrl,
                     GitSourceRequest::PARAMETER_PATH => $newPath,
                 ],

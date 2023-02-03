@@ -8,7 +8,7 @@ use App\Enum\Source\Type;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Validator\Constraints as Assert;
 
-class FileSourceRequest implements SourceRequestInterface
+class FileSourceRequest
 {
     public const PARAMETER_LABEL = 'label';
 

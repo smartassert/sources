@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Application;
 
 use App\Entity\FileSource;
+use App\Entity\GitSource;
 use App\Entity\RunSource;
 use App\Tests\Model\UserId;
 
@@ -13,13 +14,17 @@ abstract class AbstractInvalidSourceUserTest extends AbstractApplicationTest
     public const FILENAME = 'filename.yaml';
 
     private FileSource $fileSource;
+    private GitSource $gitSource;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->fileSource = new FileSource(UserId::create(), '');
+        $this->fileSource = new FileSource(UserId::create(), 'non-empty string');
         $this->store->add($this->fileSource);
+
+        $this->gitSource = new GitSource(UserId::create(), 'http://example.com/repo.git', '/');
+        $this->store->add($this->gitSource);
     }
 
     public function testAddFileInvalidUser(): void
@@ -66,11 +71,22 @@ abstract class AbstractInvalidSourceUserTest extends AbstractApplicationTest
         $this->responseAsserter->assertForbiddenResponse($response);
     }
 
-    public function testUpdateSourceInvalidUser(): void
+    public function testUpdateFileSourceInvalidUser(): void
     {
-        $response = $this->applicationClient->makeUpdateSourceRequest(
+        $response = $this->applicationClient->makeUpdateFileSourceRequest(
             self::$authenticationConfiguration->getValidApiToken(),
             $this->fileSource->getId(),
+            []
+        );
+
+        $this->responseAsserter->assertForbiddenResponse($response);
+    }
+
+    public function testUpdateGitSourceInvalidUser(): void
+    {
+        $response = $this->applicationClient->makeUpdateGitSourceRequest(
+            self::$authenticationConfiguration->getValidApiToken(),
+            $this->gitSource->getId(),
             []
         );
 

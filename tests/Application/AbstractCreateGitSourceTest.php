@@ -7,12 +7,9 @@ namespace App\Tests\Application;
 use App\Entity\SourceInterface;
 use App\Enum\Source\Type;
 use App\Repository\SourceRepository;
-use App\Request\FileSourceRequest;
 use App\Request\GitSourceRequest;
-use App\Request\InvalidSourceTypeRequest;
-use App\Request\SourceRequestInterface;
 
-abstract class AbstractCreateSourceTest extends AbstractApplicationTest
+abstract class AbstractCreateGitSourceTest extends AbstractApplicationTest
 {
     /**
      * @dataProvider createSourceInvalidRequestDataProvider
@@ -22,7 +19,7 @@ abstract class AbstractCreateSourceTest extends AbstractApplicationTest
      */
     public function testCreateInvalidSourceRequest(array $requestParameters, array $expectedResponseData): void
     {
-        $response = $this->applicationClient->makeCreateSourceRequest(
+        $response = $this->applicationClient->makeCreateGitSourceRequest(
             self::$authenticationConfiguration->getValidApiToken(),
             $requestParameters
         );
@@ -36,47 +33,13 @@ abstract class AbstractCreateSourceTest extends AbstractApplicationTest
     public function createSourceInvalidRequestDataProvider(): array
     {
         return [
-            'invalid source type' => [
-                'requestParameters' => [
-                    SourceRequestInterface::PARAMETER_TYPE => 'invalid',
-                ],
-                'expectedResponseData' => [
-                    'error' => [
-                        'type' => 'invalid_request',
-                        'payload' => [
-                            'type' => [
-                                'value' => 'invalid',
-                                'message' => InvalidSourceTypeRequest::ERROR_MESSAGE,
-                            ],
-                        ],
-                    ],
-                ],
-            ],
             'git source missing host url' => [
-                'requestParameters' => [
-                    SourceRequestInterface::PARAMETER_TYPE => Type::GIT->value,
-                ],
+                'requestParameters' => [],
                 'expectedResponseData' => [
                     'error' => [
                         'type' => 'invalid_request',
                         'payload' => [
                             'host-url' => [
-                                'value' => '',
-                                'message' => 'This value should not be blank.',
-                            ],
-                        ],
-                    ],
-                ],
-            ],
-            'file source missing label' => [
-                'requestParameters' => [
-                    SourceRequestInterface::PARAMETER_TYPE => Type::FILE->value,
-                ],
-                'expectedResponseData' => [
-                    'error' => [
-                        'type' => 'invalid_request',
-                        'payload' => [
-                            'label' => [
                                 'value' => '',
                                 'message' => 'This value should not be blank.',
                             ],
@@ -95,7 +58,7 @@ abstract class AbstractCreateSourceTest extends AbstractApplicationTest
      */
     public function testCreateSuccess(array $requestParameters, array $expected): void
     {
-        $response = $this->applicationClient->makeCreateSourceRequest(
+        $response = $this->applicationClient->makeCreateGitSourceRequest(
             self::$authenticationConfiguration->getValidApiToken(),
             $requestParameters
         );
@@ -131,7 +94,6 @@ abstract class AbstractCreateSourceTest extends AbstractApplicationTest
         return [
             'git source, credentials missing' => [
                 'requestParameters' => [
-                    SourceRequestInterface::PARAMETER_TYPE => Type::GIT->value,
                     GitSourceRequest::PARAMETER_HOST_URL => $hostUrl,
                     GitSourceRequest::PARAMETER_PATH => $path
                 ],
@@ -144,7 +106,6 @@ abstract class AbstractCreateSourceTest extends AbstractApplicationTest
             ],
             'git source, credentials present' => [
                 'requestParameters' => [
-                    SourceRequestInterface::PARAMETER_TYPE => Type::GIT->value,
                     GitSourceRequest::PARAMETER_HOST_URL => $hostUrl,
                     GitSourceRequest::PARAMETER_PATH => $path,
                     GitSourceRequest::PARAMETER_CREDENTIALS => $credentials,
@@ -154,16 +115,6 @@ abstract class AbstractCreateSourceTest extends AbstractApplicationTest
                     'host_url' => $hostUrl,
                     'path' => $path,
                     'has_credentials' => true,
-                ],
-            ],
-            'file source' => [
-                'requestParameters' => [
-                    SourceRequestInterface::PARAMETER_TYPE => Type::FILE->value,
-                    FileSourceRequest::PARAMETER_LABEL => $label
-                ],
-                'expected' => [
-                    'type' => Type::FILE->value,
-                    'label' => $label,
                 ],
             ],
         ];

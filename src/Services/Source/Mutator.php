@@ -7,36 +7,31 @@ namespace App\Services\Source;
 use App\Entity\FileSource;
 use App\Entity\GitSource;
 use App\Entity\SourceInterface;
-use App\Entity\SourceOriginInterface;
 use App\Request\FileSourceRequest;
 use App\Request\GitSourceRequest;
-use App\Request\SourceRequestInterface;
 
 class Mutator
 {
     public function __construct(
-        private Store $store,
+        private readonly Store $store,
     ) {
     }
 
-    public function update(SourceOriginInterface $source, SourceRequestInterface $request): SourceInterface
+    public function updateFile(FileSource $source, FileSourceRequest $request): SourceInterface
     {
-        $isMutated = false;
-        if ($source instanceof FileSource && $request instanceof FileSourceRequest) {
-            $source->setLabel($request->getLabel());
-            $isMutated = true;
-        }
+        $source->setLabel($request->getLabel());
+        $this->store->add($source);
 
-        if ($source instanceof GitSource && $request instanceof GitSourceRequest) {
-            $source->setHostUrl($request->getHostUrl());
-            $source->setPath($request->getPath());
-            $source->setCredentials($request->getCredentials());
-            $isMutated = true;
-        }
+        return $source;
+    }
 
-        if (true === $isMutated) {
-            $this->store->add($source);
-        }
+    public function updateGit(GitSource $source, GitSourceRequest $request): SourceInterface
+    {
+        $source->setHostUrl($request->getHostUrl());
+        $source->setPath($request->getPath());
+        $source->setCredentials($request->getCredentials());
+
+        $this->store->add($source);
 
         return $source;
     }
