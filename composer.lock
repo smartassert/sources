@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "9d9871540637138e16b4970bc1f6ab7d",
+    "content-hash": "7fe28b379294b1e9ed5480fb3a90d370",
     "packages": [
         {
             "name": "async-aws/core",
@@ -3140,16 +3140,16 @@
         },
         {
             "name": "smartassert/users-client",
-            "version": "3.0",
+            "version": "3.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/smartassert/users-client.git",
-                "reference": "311e66c31bcb31f5e6d7bc081dd334ac96d78efc"
+                "reference": "9f2044000ce22e50e34ad8884cd170a9a8b657e0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/smartassert/users-client/zipball/311e66c31bcb31f5e6d7bc081dd334ac96d78efc",
-                "reference": "311e66c31bcb31f5e6d7bc081dd334ac96d78efc",
+                "url": "https://api.github.com/repos/smartassert/users-client/zipball/9f2044000ce22e50e34ad8884cd170a9a8b657e0",
+                "reference": "9f2044000ce22e50e34ad8884cd170a9a8b657e0",
                 "shasum": ""
             },
             "require": {
@@ -3190,22 +3190,22 @@
             "homepage": "https://github.com/smartassert/users-client",
             "support": {
                 "issues": "https://github.com/smartassert/users-client/issues",
-                "source": "https://github.com/smartassert/users-client/tree/3.0"
+                "source": "https://github.com/smartassert/users-client/tree/3.1"
             },
-            "time": "2022-11-28T12:13:01+00:00"
+            "time": "2023-02-03T09:36:41+00:00"
         },
         {
             "name": "smartassert/users-security-bundle",
-            "version": "5.2",
+            "version": "5.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/smartassert/UsersSecurityBundle.git",
-                "reference": "0220ca492b74365e6710604870a7b2199359e9b2"
+                "reference": "1f037575e175013c72ad1c6377c2b7b3f78cdaeb"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/smartassert/UsersSecurityBundle/zipball/0220ca492b74365e6710604870a7b2199359e9b2",
-                "reference": "0220ca492b74365e6710604870a7b2199359e9b2",
+                "url": "https://api.github.com/repos/smartassert/UsersSecurityBundle/zipball/1f037575e175013c72ad1c6377c2b7b3f78cdaeb",
+                "reference": "1f037575e175013c72ad1c6377c2b7b3f78cdaeb",
                 "shasum": ""
             },
             "require": {
@@ -3213,7 +3213,7 @@
                 "php": "^8.1",
                 "psr/http-factory": "^1.0",
                 "smartassert/security-token-extractor": ">=0.2,<1",
-                "smartassert/users-client": ">=3.0,<4",
+                "smartassert/users-client": ">=3.1,<4",
                 "symfony/config": "6.2.*",
                 "symfony/dependency-injection": "6.2.*",
                 "symfony/http-foundation": "6.2.*",
@@ -3256,9 +3256,9 @@
             "homepage": "https://github.com/smartassert/UsersSecurityBundle",
             "support": {
                 "issues": "https://github.com/smartassert/UsersSecurityBundle/issues",
-                "source": "https://github.com/smartassert/UsersSecurityBundle/tree/5.2"
+                "source": "https://github.com/smartassert/UsersSecurityBundle/tree/5.3"
             },
-            "time": "2023-01-10T18:00:02+00:00"
+            "time": "2023-02-03T09:41:44+00:00"
         },
         {
             "name": "smartassert/yaml-file",
