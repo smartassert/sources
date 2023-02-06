@@ -16,6 +16,7 @@ trait CreateUpdateGitSourceDataProviderTrait
     {
         $hostUrlTooLong = str_repeat('.', GitSource::HOST_URL_MAX_LENGTH + 1);
         $pathTooLong = str_repeat('a', GitSource::HOST_URL_MAX_LENGTH + 1);
+        $credentialsTooLong = str_repeat('a', GitSource::CREDENTIALS_MAX_LENGTH + 1);
 
         return [
             'missing host url' => [
@@ -78,6 +79,24 @@ trait CreateUpdateGitSourceDataProviderTrait
                         'payload' => [
                             'path' => [
                                 'value' => $pathTooLong,
+                                'message' => 'This value is too long. It should have 255 characters or less.',
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+            'credentials too long' => [
+                'requestParameters' => [
+                    GitSourceRequest::PARAMETER_HOST_URL => 'https://example.com/repo.git',
+                    GitSourceRequest::PARAMETER_PATH => '/',
+                    GitSourceRequest::PARAMETER_CREDENTIALS => $credentialsTooLong,
+                ],
+                'expectedResponseData' => [
+                    'error' => [
+                        'type' => 'invalid_request',
+                        'payload' => [
+                            'credentials' => [
+                                'value' => $credentialsTooLong,
                                 'message' => 'This value is too long. It should have 255 characters or less.',
                             ],
                         ],
