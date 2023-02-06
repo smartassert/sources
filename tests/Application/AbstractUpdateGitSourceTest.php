@@ -6,10 +6,13 @@ namespace App\Tests\Application;
 
 use App\Enum\Source\Type;
 use App\Request\GitSourceRequest;
+use App\Tests\DataProvider\CreateUpdateGitSourceDataProviderTrait;
 use App\Tests\Services\SourceProvider;
 
 abstract class AbstractUpdateGitSourceTest extends AbstractApplicationTest
 {
+    use CreateUpdateGitSourceDataProviderTrait;
+
     private SourceProvider $sourceProvider;
 
     protected function setUp(): void
@@ -39,16 +42,17 @@ abstract class AbstractUpdateGitSourceTest extends AbstractApplicationTest
     }
 
     /**
-     * @dataProvider updateSourceInvalidRequestDataProvider
+     * @dataProvider createUpdateGitSourceInvalidRequestDataProvider
      *
      * @param array<string, string> $payload
      * @param array<mixed>          $expectedResponseData
      */
     public function testUpdateInvalidRequest(
-        string $sourceIdentifier,
         array $payload,
         array $expectedResponseData
     ): void {
+        $sourceIdentifier = SourceProvider::GIT_WITH_CREDENTIALS_WITH_RUN_SOURCE;
+
         $this->sourceProvider->initialize([$sourceIdentifier]);
         $source = $this->sourceProvider->get($sourceIdentifier);
 
@@ -59,33 +63,6 @@ abstract class AbstractUpdateGitSourceTest extends AbstractApplicationTest
         );
 
         $this->responseAsserter->assertInvalidRequestJsonResponse($response, $expectedResponseData);
-    }
-
-    /**
-     * @return array<mixed>
-     */
-    public function updateSourceInvalidRequestDataProvider(): array
-    {
-        return [
-            Type::GIT->value . ' missing host url' => [
-                'sourceIdentifier' => SourceProvider::GIT_WITH_CREDENTIALS_WITH_RUN_SOURCE,
-                'payload' => [
-                    GitSourceRequest::PARAMETER_HOST_URL => '',
-                    GitSourceRequest::PARAMETER_PATH => '/',
-                ],
-                'expectedResponseData' => [
-                    'error' => [
-                        'type' => 'invalid_request',
-                        'payload' => [
-                            'host-url' => [
-                                'value' => '',
-                                'message' => 'This value should not be blank.',
-                            ],
-                        ],
-                    ],
-                ],
-            ],
-        ];
     }
 
     /**

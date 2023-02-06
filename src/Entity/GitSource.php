@@ -10,7 +10,9 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Entity]
 class GitSource extends AbstractSource implements SourceOriginInterface, \JsonSerializable
 {
-    #[ORM\Column(type: 'string', length: 255)]
+    public const HOST_URL_MAX_LENGTH = 255;
+
+    #[ORM\Column(type: 'string', length: self::HOST_URL_MAX_LENGTH)]
     private string $hostUrl;
 
     #[ORM\Column(type: 'string', length: 255)]
