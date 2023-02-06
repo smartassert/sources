@@ -25,9 +25,6 @@ class FileSourceRepository extends ServiceEntityRepository
         parent::__construct($registry, FileSource::class);
     }
 
-    /**
-     * @param non-empty-string $label
-     */
     public function findOneFileSourceByUserAndLabel(UserInterface $user, string $label): ?FileSource
     {
         $queryBuilder = $this->createQueryBuilder('FileSource')
