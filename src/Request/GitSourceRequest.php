@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Request;
 
+use App\Entity\GitSource;
 use App\Enum\Source\Type;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -14,9 +15,11 @@ class GitSourceRequest
     public const PARAMETER_PATH = 'path';
     public const PARAMETER_CREDENTIALS = 'credentials';
 
-    #[Assert\NotBlank]
+    #[Assert\Length(null, 1, GitSource::HOST_URL_MAX_LENGTH)]
     private string $hostUrl;
+    #[Assert\Length(null, 1, GitSource::PATH_MAX_LENGTH)]
     private string $path;
+    #[Assert\Length(null, 0, GitSource::CREDENTIALS_MAX_LENGTH)]
     private string $credentials;
 
     public function __construct(Request $request)

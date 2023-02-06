@@ -8,11 +8,14 @@ use App\Entity\SourceInterface;
 use App\Enum\Source\Type;
 use App\Repository\SourceRepository;
 use App\Request\FileSourceRequest;
+use App\Tests\DataProvider\CreateUpdateFileSourceDataProviderTrait;
 
 abstract class AbstractCreateFileSourceTest extends AbstractApplicationTest
 {
+    use CreateUpdateFileSourceDataProviderTrait;
+
     /**
-     * @dataProvider createSourceInvalidRequestDataProvider
+     * @dataProvider createUpdateFileSourceInvalidRequestDataProvider
      *
      * @param array<string, string> $requestParameters
      * @param array<string, string> $expectedResponseData
@@ -25,29 +28,6 @@ abstract class AbstractCreateFileSourceTest extends AbstractApplicationTest
         );
 
         $this->responseAsserter->assertInvalidRequestJsonResponse($response, $expectedResponseData);
-    }
-
-    /**
-     * @return array<mixed>
-     */
-    public function createSourceInvalidRequestDataProvider(): array
-    {
-        return [
-            'file source missing label' => [
-                'requestParameters' => [],
-                'expectedResponseData' => [
-                    'error' => [
-                        'type' => 'invalid_request',
-                        'payload' => [
-                            'label' => [
-                                'value' => '',
-                                'message' => 'This value should not be blank.',
-                            ],
-                        ],
-                    ],
-                ],
-            ],
-        ];
     }
 
     /**

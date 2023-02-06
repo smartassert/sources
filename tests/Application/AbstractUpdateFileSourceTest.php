@@ -6,10 +6,13 @@ namespace App\Tests\Application;
 
 use App\Enum\Source\Type;
 use App\Request\FileSourceRequest;
+use App\Tests\DataProvider\CreateUpdateFileSourceDataProviderTrait;
 use App\Tests\Services\SourceProvider;
 
 abstract class AbstractUpdateFileSourceTest extends AbstractApplicationTest
 {
+    use CreateUpdateFileSourceDataProviderTrait;
+
     private SourceProvider $sourceProvider;
 
     protected function setUp(): void
@@ -39,16 +42,17 @@ abstract class AbstractUpdateFileSourceTest extends AbstractApplicationTest
     }
 
     /**
-     * @dataProvider updateSourceInvalidRequestDataProvider
+     * @dataProvider createUpdateFileSourceInvalidRequestDataProvider
      *
      * @param array<string, string> $payload
      * @param array<mixed>          $expectedResponseData
      */
     public function testUpdateInvalidRequest(
-        string $sourceIdentifier,
         array $payload,
         array $expectedResponseData
     ): void {
+        $sourceIdentifier = SourceProvider::FILE_WITHOUT_RUN_SOURCE;
+
         $this->sourceProvider->initialize([$sourceIdentifier]);
         $source = $this->sourceProvider->get($sourceIdentifier);
 
@@ -59,30 +63,6 @@ abstract class AbstractUpdateFileSourceTest extends AbstractApplicationTest
         );
 
         $this->responseAsserter->assertInvalidRequestJsonResponse($response, $expectedResponseData);
-    }
-
-    /**
-     * @return array<mixed>
-     */
-    public function updateSourceInvalidRequestDataProvider(): array
-    {
-        return [
-            Type::FILE->value . ' missing label' => [
-                'sourceIdentifier' => SourceProvider::FILE_WITHOUT_RUN_SOURCE,
-                'payload' => [],
-                'expectedResponseData' => [
-                    'error' => [
-                        'type' => 'invalid_request',
-                        'payload' => [
-                            'label' => [
-                                'value' => '',
-                                'message' => 'This value should not be blank.',
-                            ],
-                        ],
-                    ],
-                ],
-            ],
-        ];
     }
 
     /**

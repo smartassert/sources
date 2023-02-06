@@ -8,11 +8,14 @@ use App\Entity\SourceInterface;
 use App\Enum\Source\Type;
 use App\Repository\SourceRepository;
 use App\Request\GitSourceRequest;
+use App\Tests\DataProvider\CreateUpdateGitSourceDataProviderTrait;
 
 abstract class AbstractCreateGitSourceTest extends AbstractApplicationTest
 {
+    use CreateUpdateGitSourceDataProviderTrait;
+
     /**
-     * @dataProvider createSourceInvalidRequestDataProvider
+     * @dataProvider createUpdateGitSourceInvalidRequestDataProvider
      *
      * @param array<string, string> $requestParameters
      * @param array<string, string> $expectedResponseData
@@ -25,29 +28,6 @@ abstract class AbstractCreateGitSourceTest extends AbstractApplicationTest
         );
 
         $this->responseAsserter->assertInvalidRequestJsonResponse($response, $expectedResponseData);
-    }
-
-    /**
-     * @return array<mixed>
-     */
-    public function createSourceInvalidRequestDataProvider(): array
-    {
-        return [
-            'git source missing host url' => [
-                'requestParameters' => [],
-                'expectedResponseData' => [
-                    'error' => [
-                        'type' => 'invalid_request',
-                        'payload' => [
-                            'host-url' => [
-                                'value' => '',
-                                'message' => 'This value should not be blank.',
-                            ],
-                        ],
-                    ],
-                ],
-            ],
-        ];
     }
 
     /**

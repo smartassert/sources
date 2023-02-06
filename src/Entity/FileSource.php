@@ -16,7 +16,9 @@ class FileSource extends AbstractSource implements
     SourceRepositoryInterface,
     \JsonSerializable
 {
-    #[ORM\Column(type: 'string', length: 255)]
+    public const LABEL_MAX_LENGTH = 255;
+
+    #[ORM\Column(type: 'string', length: self::LABEL_MAX_LENGTH)]
     private string $label;
 
     /**
