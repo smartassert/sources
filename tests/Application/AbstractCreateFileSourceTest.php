@@ -30,6 +30,41 @@ abstract class AbstractCreateFileSourceTest extends AbstractApplicationTest
         $this->responseAsserter->assertInvalidRequestJsonResponse($response, $expectedResponseData);
     }
 
+    public function testCreateInvalidSourceRequestNonUniqueLabel(): void
+    {
+        $label = 'file source label';
+        $requestParameters = [
+            FileSourceRequest::PARAMETER_LABEL => $label,
+        ];
+
+        $successResponse = $this->applicationClient->makeCreateFileSourceRequest(
+            self::$authenticationConfiguration->getValidApiToken(),
+            $requestParameters
+        );
+
+        self::assertSame(200, $successResponse->getStatusCode());
+
+        $invalidRequestResponse = $this->applicationClient->makeCreateFileSourceRequest(
+            self::$authenticationConfiguration->getValidApiToken(),
+            $requestParameters
+        );
+
+        $this->responseAsserter->assertInvalidRequestJsonResponse(
+            $invalidRequestResponse,
+            [
+                'error' => [
+                    'type' => 'invalid_request',
+                    'payload' => [
+                        'label' => [
+                            'value' => $label,
+                            'message' => 'The label must be unique to this user.',
+                        ],
+                    ],
+                ],
+            ]
+        );
+    }
+
     /**
      * @dataProvider createSourceSuccessDataProvider
      *
