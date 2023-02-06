@@ -17,6 +17,7 @@ class GitSourceRequest
 
     #[Assert\Length(null, 1, GitSource::HOST_URL_MAX_LENGTH)]
     private string $hostUrl;
+    #[Assert\Length(null, 1, GitSource::PATH_MAX_LENGTH)]
     private string $path;
     private string $credentials;
 
