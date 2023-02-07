@@ -96,20 +96,22 @@ abstract class AbstractUpdateGitSourceTest extends AbstractApplicationTest
      */
     public function updateSourceSuccessDataProvider(): array
     {
+        $newLabel = 'new git source label';
         $newHostUrl = 'https://new.example.com/repository.git';
         $newPath = '/new';
-        $newLabel = 'new file source label';
 
         return [
             Type::GIT->value . ' credentials present and empty' => [
                 'sourceIdentifier' => SourceProvider::GIT_WITH_CREDENTIALS_WITH_RUN_SOURCE,
                 'payload' => [
+                    GitSourceRequest::PARAMETER_LABEL => $newLabel,
                     GitSourceRequest::PARAMETER_HOST_URL => $newHostUrl,
                     GitSourceRequest::PARAMETER_PATH => $newPath,
                     GitSourceRequest::PARAMETER_CREDENTIALS => null,
                 ],
                 'expectedResponseData' => [
                     'type' => Type::GIT->value,
+                    'label' => $newLabel,
                     'host_url' => $newHostUrl,
                     'path' => $newPath,
                     'has_credentials' => false,
@@ -118,11 +120,13 @@ abstract class AbstractUpdateGitSourceTest extends AbstractApplicationTest
             Type::GIT->value . ' credentials not present' => [
                 'source' => SourceProvider::GIT_WITH_CREDENTIALS_WITH_RUN_SOURCE,
                 'payload' => [
+                    GitSourceRequest::PARAMETER_LABEL => $newLabel,
                     GitSourceRequest::PARAMETER_HOST_URL => $newHostUrl,
                     GitSourceRequest::PARAMETER_PATH => $newPath,
                 ],
                 'expectedResponseData' => [
                     'type' => Type::GIT->value,
+                    'label' => $newLabel,
                     'host_url' => $newHostUrl,
                     'path' => $newPath,
                     'has_credentials' => false,

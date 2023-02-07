@@ -124,7 +124,7 @@ class SerializerTest extends WebTestCase
                 'fixtureSetIdentifier' => 'Source/yml_yaml_valid',
                 'sourceStorageId' => 'git_repository.storage',
                 'source' => new UserGitRepository(
-                    new GitSource(UserId::create(), 'http://example.com/repository.git', '/')
+                    new GitSource(UserId::create(), 'label', 'http://example.com/repository.git', '/')
                 ),
                 'expectedFixturePath' => 'RunSource/source_yml_yaml_entire.yaml',
             ],
@@ -132,7 +132,7 @@ class SerializerTest extends WebTestCase
                 'fixtureSetIdentifier' => 'Source/yml_yaml_valid',
                 'sourceStorageId' => 'git_repository.storage',
                 'source' => new UserGitRepository(
-                    new GitSource(UserId::create(), 'http://example.com/repository.git', '/directory')
+                    new GitSource(UserId::create(), 'label', 'http://example.com/repository.git', '/directory')
                 ),
                 'expectedFixturePath' => 'RunSource/source_yml_yaml_partial.yaml',
             ],

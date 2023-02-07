@@ -62,7 +62,7 @@ class FinderTest extends WebTestCase
         $userId = UserId::create();
 
         $fileSource = new FileSource($userId, 'file source label');
-        $gitSource = new GitSource($userId, 'https://example.com/repository.git', '/');
+        $gitSource = new GitSource($userId, 'git source label', 'https://example.com/repository.git', '/');
         $fileRunSourceWithoutParameters = new RunSource($fileSource);
         $fileRunSourceWithParameters = new RunSource($fileSource, ['key1' => 'value1']);
         $gitRunSourceWithoutParameters = new RunSource($gitSource);

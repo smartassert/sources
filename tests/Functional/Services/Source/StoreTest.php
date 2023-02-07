@@ -69,7 +69,7 @@ class StoreTest extends WebTestCase
             ],
             GitSource::class => [
                 'sourceCreator' => function (Store $store): SourceInterface {
-                    $source = new GitSource(UserId::create(), 'https://example.com/repository.git');
+                    $source = new GitSource(UserId::create(), 'label', 'https://example.com/repository.git');
                     $store->add($source);
 
                     return $source;

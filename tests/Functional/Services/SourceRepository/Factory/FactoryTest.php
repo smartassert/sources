@@ -160,7 +160,7 @@ class FactoryTest extends WebTestCase
         \assert($gitRepositoryStorage instanceof FilesystemOperator);
 
         $userGitRepository = new UserGitRepository(
-            new GitSource(UserId::create(), 'https://example.com/repository.git')
+            new GitSource(UserId::create(), 'label', 'https://example.com/repository.git')
         );
 
         $fixtureCreator->copySetTo('Source/mixed', $gitRepositoryStorage, $userGitRepository->getDirectoryPath());

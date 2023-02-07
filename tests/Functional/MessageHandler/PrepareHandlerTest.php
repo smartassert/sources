@@ -96,7 +96,7 @@ class PrepareHandlerTest extends WebTestCase
         $fileSource = new FileSource(UserId::create(), 'file source label');
         $fileRunSource = new RunSource($fileSource, []);
 
-        $gitSource = new GitSource(UserId::create(), 'http://example.com/repository.git');
+        $gitSource = new GitSource(UserId::create(), 'label', 'http://example.com/repository.git');
         $gitRunSource = new RunSource($gitSource, []);
 
         $runSourceWithoutParent = $fileRunSource->unsetParent();
@@ -186,7 +186,7 @@ class PrepareHandlerTest extends WebTestCase
     public function invokeDoesPrepareDataProvider(): array
     {
         $fileSource = new FileSource(UserId::create(), 'file source label');
-        $gitSource = new GitSource(UserId::create(), 'http://example.com/repository.git');
+        $gitSource = new GitSource(UserId::create(), 'label', 'http://example.com/repository.git');
 
         $fileRunSource = new RunSource($fileSource);
         $gitRunSource = new RunSource($gitSource);

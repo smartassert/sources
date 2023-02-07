@@ -14,7 +14,7 @@ class UserGitRepositoryFactoryTest extends WebTestCase
 {
     public function testCreate(): void
     {
-        $source = new GitSource(UserId::create(), 'http://example.com/repository.git');
+        $source = new GitSource(UserId::create(), 'label', 'http://example.com/repository.git');
 
         $userGitRepository = (new UserGitRepositoryFactory())->create($source);
 

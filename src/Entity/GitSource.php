@@ -10,9 +10,14 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Entity]
 class GitSource extends AbstractSource implements SourceOriginInterface, \JsonSerializable
 {
+    public const LABEL_MAX_LENGTH = 255;
+
     public const HOST_URL_MAX_LENGTH = 255;
     public const PATH_MAX_LENGTH = 255;
     public const CREDENTIALS_MAX_LENGTH = 255;
+
+    #[ORM\Column(type: 'string', length: self::LABEL_MAX_LENGTH)]
+    private string $label;
 
     #[ORM\Column(type: 'string', length: self::HOST_URL_MAX_LENGTH)]
     private string $hostUrl;
@@ -26,13 +31,29 @@ class GitSource extends AbstractSource implements SourceOriginInterface, \JsonSe
     /**
      * @param non-empty-string $userId
      */
-    public function __construct(string $userId, string $hostUrl, string $path = '/', string $credentials = '')
-    {
+    public function __construct(
+        string $userId,
+        string $label,
+        string $hostUrl,
+        string $path = '/',
+        string $credentials = ''
+    ) {
         parent::__construct($userId);
 
+        $this->label = $label;
         $this->hostUrl = $hostUrl;
         $this->path = $path;
         $this->credentials = $credentials;
+    }
+
+    public function getLabel(): string
+    {
+        return $this->label;
+    }
+
+    public function setLabel(string $label): void
+    {
+        $this->label = $label;
     }
 
     public function getHostUrl(): string
@@ -93,6 +114,7 @@ class GitSource extends AbstractSource implements SourceOriginInterface, \JsonSe
             'id' => $this->id,
             'user_id' => $this->getUserId(),
             'type' => Type::GIT->value,
+            'label' => $this->label,
             'host_url' => $this->hostUrl,
             'path' => $this->path,
             'has_credentials' => '' !== $this->credentials
