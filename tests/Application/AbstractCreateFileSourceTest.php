@@ -30,41 +30,6 @@ abstract class AbstractCreateFileSourceTest extends AbstractApplicationTest
         $this->responseAsserter->assertInvalidRequestJsonResponse($response, $expectedResponseData);
     }
 
-    public function testCreateInvalidSourceRequestNonUniqueLabel(): void
-    {
-        $label = 'file source label';
-        $requestParameters = [
-            FileSourceRequest::PARAMETER_LABEL => $label,
-        ];
-
-        $successResponse = $this->applicationClient->makeCreateFileSourceRequest(
-            self::$authenticationConfiguration->getValidApiToken(),
-            $requestParameters
-        );
-
-        self::assertSame(200, $successResponse->getStatusCode());
-
-        $invalidRequestResponse = $this->applicationClient->makeCreateFileSourceRequest(
-            self::$authenticationConfiguration->getValidApiToken(),
-            $requestParameters
-        );
-
-        $this->responseAsserter->assertInvalidRequestJsonResponse(
-            $invalidRequestResponse,
-            [
-                'error' => [
-                    'type' => 'invalid_request',
-                    'payload' => [
-                        'label' => [
-                            'value' => $label,
-                            'message' => 'The label must be unique to this user.',
-                        ],
-                    ],
-                ],
-            ]
-        );
-    }
-
     /**
      * @dataProvider createSourceSuccessDataProvider
      *
@@ -114,5 +79,28 @@ abstract class AbstractCreateFileSourceTest extends AbstractApplicationTest
                 ],
             ],
         ];
+    }
+
+    public function testCreateIsIdempotent(): void
+    {
+        $label = 'file source label';
+        $requestParameters = [
+            FileSourceRequest::PARAMETER_LABEL => $label,
+        ];
+
+        $firstResponse = $this->applicationClient->makeCreateFileSourceRequest(
+            self::$authenticationConfiguration->getValidApiToken(),
+            $requestParameters
+        );
+
+        self::assertSame(200, $firstResponse->getStatusCode());
+
+        $secondResponse = $this->applicationClient->makeCreateFileSourceRequest(
+            self::$authenticationConfiguration->getValidApiToken(),
+            $requestParameters
+        );
+
+        self::assertSame(200, $secondResponse->getStatusCode());
+        self::assertSame($firstResponse->getBody()->getContents(), $secondResponse->getBody()->getContents());
     }
 }
