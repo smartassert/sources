@@ -27,9 +27,12 @@ class Factory
             $request->getCredentials(),
         );
 
-        if (null === $this->finder->find($source)) {
-            $this->store->add($source);
+        $foundSource = $this->finder->find($source);
+        if ($foundSource instanceof GitSource) {
+            return $foundSource;
         }
+
+        $this->store->add($source);
 
         return $source;
     }
@@ -38,9 +41,12 @@ class Factory
     {
         $source = new FileSource($user->getUserIdentifier(), $request->getLabel());
 
-        if (null === $this->finder->find($source)) {
-            $this->store->add($source);
+        $foundSource = $this->finder->find($source);
+        if ($foundSource instanceof FileSource) {
+            return $foundSource;
         }
+
+        $this->store->add($source);
 
         return $source;
     }

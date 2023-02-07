@@ -99,4 +99,33 @@ abstract class AbstractCreateGitSourceTest extends AbstractApplicationTest
             ],
         ];
     }
+
+    public function testCreateIsIdempotent(): void
+    {
+        $hostUrl = 'https://example.com/repository.git';
+        $path = '/';
+        $credentials = md5((string) rand());
+
+        $firstResponse = $this->applicationClient->makeCreateGitSourceRequest(
+            self::$authenticationConfiguration->getValidApiToken(),
+            [
+                GitSourceRequest::PARAMETER_HOST_URL => $hostUrl,
+                GitSourceRequest::PARAMETER_PATH => $path,
+            ]
+        );
+
+        self::assertSame(200, $firstResponse->getStatusCode());
+
+        $secondResponse = $this->applicationClient->makeCreateGitSourceRequest(
+            self::$authenticationConfiguration->getValidApiToken(),
+            [
+                GitSourceRequest::PARAMETER_HOST_URL => $hostUrl,
+                GitSourceRequest::PARAMETER_PATH => $path,
+                GitSourceRequest::PARAMETER_CREDENTIALS => $credentials,
+            ]
+        );
+
+        self::assertSame(200, $secondResponse->getStatusCode());
+        self::assertSame($firstResponse->getBody()->getContents(), $secondResponse->getBody()->getContents());
+    }
 }
