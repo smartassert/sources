@@ -68,6 +68,7 @@ class SourceProvider
         $fileSourceWithRunSource = new FileSource($this->userId, 'with run source');
         $gitSourceWithCredentialsWithRunSource = new GitSource(
             $this->userId,
+            'git source with credentials with run source',
             'http://example.com/with-credentials.git',
             '/',
             md5((string) rand())
@@ -78,6 +79,7 @@ class SourceProvider
         $this->sources[self::GIT_WITH_CREDENTIALS_WITH_RUN_SOURCE] = $gitSourceWithCredentialsWithRunSource;
         $this->sources[self::GIT_WITHOUT_CREDENTIALS_WITHOUT_RUN_SOURCE] = new GitSource(
             $this->userId,
+            'git source without credentials without run source',
             'http://example.com/without-credentials.git'
         );
         $this->sources[self::RUN_WITH_FILE_PARENT] = new RunSource($fileSourceWithRunSource);
@@ -86,7 +88,11 @@ class SourceProvider
         );
         $this->sources[self::RUN_WITH_GIT_PARENT] = new RunSource($gitSourceWithCredentialsWithRunSource);
         $this->sources[self::RUN_WITH_DIFFERENT_GIT_PARENT] = new RunSource(
-            new GitSource($this->userId, 'http://example.com/')
+            new GitSource(
+                $this->userId,
+                'git source as different parent',
+                'http://example.com/'
+            )
         );
 
         $this->sources[self::RUN_WITHOUT_PARENT] = (new RunSource(new FileSource($this->userId, '')))->unsetParent();
@@ -98,7 +104,11 @@ class SourceProvider
         ;
 
         $this->sources[self::FILE_DIFFERENT_USER] = new FileSource(UserId::create(), '');
-        $this->sources[self::GIT_DIFFERENT_USER] = new GitSource(UserId::create(), '');
+        $this->sources[self::GIT_DIFFERENT_USER] = new GitSource(
+            UserId::create(),
+            'git source different user',
+            ''
+        );
         $this->sources[self::RUN_DIFFERENT_USER] = new RunSource(new FileSource(UserId::create(), ''));
 
         foreach ($sourcesToInitialize as $sourceIdentifier) {

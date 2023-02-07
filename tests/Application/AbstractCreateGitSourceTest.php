@@ -66,19 +66,21 @@ abstract class AbstractCreateGitSourceTest extends AbstractApplicationTest
      */
     public function createSourceSuccessDataProvider(): array
     {
+        $label = 'git source label';
         $hostUrl = 'https://example.com/repository.git';
         $path = '/';
         $credentials = md5((string) rand());
-        $label = 'file source label';
 
         return [
             'git source, credentials missing' => [
                 'requestParameters' => [
+                    GitSourceRequest::PARAMETER_LABEL => $label,
                     GitSourceRequest::PARAMETER_HOST_URL => $hostUrl,
                     GitSourceRequest::PARAMETER_PATH => $path
                 ],
                 'expected' => [
                     'type' => Type::GIT->value,
+                    'label' => $label,
                     'host_url' => $hostUrl,
                     'path' => $path,
                     'has_credentials' => false,
@@ -86,12 +88,14 @@ abstract class AbstractCreateGitSourceTest extends AbstractApplicationTest
             ],
             'git source, credentials present' => [
                 'requestParameters' => [
+                    GitSourceRequest::PARAMETER_LABEL => $label,
                     GitSourceRequest::PARAMETER_HOST_URL => $hostUrl,
                     GitSourceRequest::PARAMETER_PATH => $path,
                     GitSourceRequest::PARAMETER_CREDENTIALS => $credentials,
                 ],
                 'expected' => [
                     'type' => Type::GIT->value,
+                    'label' => $label,
                     'host_url' => $hostUrl,
                     'path' => $path,
                     'has_credentials' => true,
@@ -102,6 +106,7 @@ abstract class AbstractCreateGitSourceTest extends AbstractApplicationTest
 
     public function testCreateIsIdempotent(): void
     {
+        $label = 'git source label';
         $hostUrl = 'https://example.com/repository.git';
         $path = '/';
         $credentials = md5((string) rand());
@@ -109,6 +114,7 @@ abstract class AbstractCreateGitSourceTest extends AbstractApplicationTest
         $firstResponse = $this->applicationClient->makeCreateGitSourceRequest(
             self::$authenticationConfiguration->getValidApiToken(),
             [
+                GitSourceRequest::PARAMETER_LABEL => $label,
                 GitSourceRequest::PARAMETER_HOST_URL => $hostUrl,
                 GitSourceRequest::PARAMETER_PATH => $path,
             ]
@@ -119,6 +125,7 @@ abstract class AbstractCreateGitSourceTest extends AbstractApplicationTest
         $secondResponse = $this->applicationClient->makeCreateGitSourceRequest(
             self::$authenticationConfiguration->getValidApiToken(),
             [
+                GitSourceRequest::PARAMETER_LABEL => $label,
                 GitSourceRequest::PARAMETER_HOST_URL => $hostUrl,
                 GitSourceRequest::PARAMETER_PATH => $path,
                 GitSourceRequest::PARAMETER_CREDENTIALS => $credentials,

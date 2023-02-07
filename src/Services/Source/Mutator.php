@@ -27,6 +27,7 @@ class Mutator
 
     public function updateGit(GitSource $source, GitSourceRequest $request): SourceInterface
     {
+        $source->setLabel($request->getLabel());
         $source->setHostUrl($request->getHostUrl());
         $source->setPath($request->getPath());
         $source->setCredentials($request->getCredentials());

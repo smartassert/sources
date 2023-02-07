@@ -59,7 +59,7 @@ class RunSourceRepositoryTest extends WebTestCase
     public function findByParentDataProvider(): array
     {
         $fileSource = new FileSource(UserId::create(), 'label');
-        $gitSource = new GitSource(UserId::create(), 'http://example.com/repository.git');
+        $gitSource = new GitSource(UserId::create(), 'label', 'http://example.com/repository.git');
 
         $fileRunSource = new RunSource($fileSource);
         $gitRunSource = new RunSource($gitSource);
@@ -74,7 +74,7 @@ class RunSourceRepositoryTest extends WebTestCase
                 'runSources' => [
                     new RunSource(new FileSource(UserId::create(), 'label')),
                     new RunSource(new FileSource(UserId::create(), '')),
-                    new RunSource(new GitSource(UserId::create(), 'http://example.com/repository.git')),
+                    new RunSource(new GitSource(UserId::create(), 'label', 'http://example.com/repository.git')),
                 ],
                 'parent' => $fileSource,
                 'expected' => null,
@@ -83,7 +83,7 @@ class RunSourceRepositoryTest extends WebTestCase
                 'runSources' => [
                     new RunSource(new FileSource(UserId::create(), 'label')),
                     new RunSource(new FileSource(UserId::create(), '')),
-                    new RunSource(new GitSource(UserId::create(), 'http://example.com/repository.git')),
+                    new RunSource(new GitSource(UserId::create(), 'label', 'http://example.com/repository.git')),
                 ],
                 'parent' => $gitSource,
                 'expected' => null,
@@ -93,7 +93,7 @@ class RunSourceRepositoryTest extends WebTestCase
                     new RunSource(new FileSource(UserId::create(), 'label')),
                     new RunSource(new FileSource(UserId::create(), '')),
                     $fileRunSource,
-                    new RunSource(new GitSource(UserId::create(), 'http://example.com/repository.git')),
+                    new RunSource(new GitSource(UserId::create(), 'label', 'http://example.com/repository.git')),
                     $gitRunSource,
                 ],
                 'parent' => $fileSource,
@@ -104,7 +104,7 @@ class RunSourceRepositoryTest extends WebTestCase
                     new RunSource(new FileSource(UserId::create(), 'label')),
                     new RunSource(new FileSource(UserId::create(), '')),
                     $fileRunSource,
-                    new RunSource(new GitSource(UserId::create(), 'http://example.com/repository.git')),
+                    new RunSource(new GitSource(UserId::create(), 'label', 'http://example.com/repository.git')),
                     $gitRunSource,
                 ],
                 'parent' => $gitSource,

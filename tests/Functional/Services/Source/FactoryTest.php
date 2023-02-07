@@ -75,31 +75,34 @@ class FactoryTest extends WebTestCase
         $userId = UserId::create();
         \assert('' !== $userId);
         $user = new User($userId, 'non-empty string');
-        $gitSourceHostUrl = 'https://example.com/repository.git';
-        $gitSourcePath = '/';
+        $label = 'git source label';
+        $hostUrl = 'https://example.com/repository.git';
+        $path = '/';
 
         return [
             'git, empty credentials' => [
                 'user' => $user,
                 'request' => new GitSourceRequest(new Request(
                     request: [
-                        GitSourceRequest::PARAMETER_HOST_URL => $gitSourceHostUrl,
-                        GitSourceRequest::PARAMETER_PATH => $gitSourcePath,
+                        GitSourceRequest::PARAMETER_LABEL => $label,
+                        GitSourceRequest::PARAMETER_HOST_URL => $hostUrl,
+                        GitSourceRequest::PARAMETER_PATH => $path,
                         GitSourceRequest::PARAMETER_CREDENTIALS => '',
                     ]
                 )),
-                'expected' => new GitSource($userId, $gitSourceHostUrl, $gitSourcePath, ''),
+                'expected' => new GitSource($userId, $label, $hostUrl, $path, ''),
             ],
             'git, non-empty credentials' => [
                 'user' => $user,
                 'request' => new GitSourceRequest(new Request(
                     request: [
-                        GitSourceRequest::PARAMETER_HOST_URL => $gitSourceHostUrl,
-                        GitSourceRequest::PARAMETER_PATH => $gitSourcePath,
+                        GitSourceRequest::PARAMETER_LABEL => $label,
+                        GitSourceRequest::PARAMETER_HOST_URL => $hostUrl,
+                        GitSourceRequest::PARAMETER_PATH => $path,
                         GitSourceRequest::PARAMETER_CREDENTIALS => 'credentials',
                     ]
                 )),
-                'expected' => new GitSource($userId, $gitSourceHostUrl, $gitSourcePath, 'credentials'),
+                'expected' => new GitSource($userId, $label, $hostUrl, $path, 'credentials'),
             ],
         ];
     }

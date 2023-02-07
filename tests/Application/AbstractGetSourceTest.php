@@ -62,6 +62,7 @@ abstract class AbstractGetSourceTest extends AbstractApplicationTest
                 'sourceIdentifier' => SourceProvider::GIT_WITH_CREDENTIALS_WITH_RUN_SOURCE,
                 'expectedResponseData' => [
                     'type' => Type::GIT->value,
+                    'label' => 'git source with credentials with run source',
                     'host_url' => 'http://example.com/with-credentials.git',
                     'path' => '/',
                     'has_credentials' => true,
@@ -71,6 +72,7 @@ abstract class AbstractGetSourceTest extends AbstractApplicationTest
                 'sourceIdentifier' => SourceProvider::GIT_WITHOUT_CREDENTIALS_WITHOUT_RUN_SOURCE,
                 'expectedResponseData' => [
                     'type' => Type::GIT->value,
+                    'label' => 'git source without credentials without run source',
                     'host_url' => 'http://example.com/without-credentials.git',
                     'path' => '/',
                     'has_credentials' => false,

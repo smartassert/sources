@@ -119,7 +119,7 @@ class SourceRepositoryTest extends WebTestCase
         ];
 
         $userGitSources = [
-            new GitSource($userId, 'https://example.com/repository.git'),
+            new GitSource($userId, 'label', 'https://example.com/repository.git'),
         ];
 
         $userRunSources = [
@@ -141,7 +141,7 @@ class SourceRepositoryTest extends WebTestCase
             'has file, git and run sources, no user match' => [
                 'sources' => [
                     new FileSource(UserId::create(), 'file source label'),
-                    new GitSource(UserId::create(), 'https://example.com/repository.git'),
+                    new GitSource(UserId::create(), 'label', 'https://example.com/repository.git'),
                     new RunSource(
                         new FileSource(UserId::create(), 'file source label'),
                     ),
@@ -191,14 +191,14 @@ class SourceRepositoryTest extends WebTestCase
                     $userFileSources[0],
                     new FileSource(UserId::create(), 'file source label'),
                     $userGitSources[0],
-                    new GitSource(UserId::create(), 'https://example.com/repository.git'),
+                    new GitSource(UserId::create(), 'label', 'https://example.com/repository.git'),
                     $userRunSources[0],
                     $userRunSources[1],
                     new RunSource(
                         new FileSource(UserId::create(), 'file source label')
                     ),
                     new RunSource(
-                        new GitSource(UserId::create(), 'https://example.com/repository.git')
+                        new GitSource(UserId::create(), 'label', 'https://example.com/repository.git')
                     )
                 ],
                 'user' => $user,

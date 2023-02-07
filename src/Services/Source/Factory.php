@@ -22,6 +22,7 @@ class Factory
     {
         $source = new GitSource(
             $user->getUserIdentifier(),
+            $request->getLabel(),
             $request->getHostUrl(),
             $request->getPath(),
             $request->getCredentials(),

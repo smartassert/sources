@@ -11,9 +11,14 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 class GitSourceRequest
 {
+    public const PARAMETER_LABEL = 'label';
+
     public const PARAMETER_HOST_URL = 'host-url';
     public const PARAMETER_PATH = 'path';
     public const PARAMETER_CREDENTIALS = 'credentials';
+
+    #[Assert\Length(null, 1, GitSource::LABEL_MAX_LENGTH)]
+    private string $label;
 
     #[Assert\Length(null, 1, GitSource::HOST_URL_MAX_LENGTH)]
     private string $hostUrl;
@@ -26,6 +31,7 @@ class GitSourceRequest
     {
         $payload = $request->request;
 
+        $this->label = trim((string) $payload->get(self::PARAMETER_LABEL));
         $this->hostUrl = trim((string) $payload->get(self::PARAMETER_HOST_URL));
         $this->path = trim((string) $payload->get(self::PARAMETER_PATH));
         $this->credentials = trim((string) $payload->get(self::PARAMETER_CREDENTIALS));
@@ -34,6 +40,11 @@ class GitSourceRequest
     public function getType(): string
     {
         return Type::GIT->value;
+    }
+
+    public function getLabel(): string
+    {
+        return $this->label;
     }
 
     public function getHostUrl(): string

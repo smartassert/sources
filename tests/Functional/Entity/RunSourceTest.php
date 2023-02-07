@@ -79,7 +79,11 @@ class RunSourceTest extends WebTestCase
                 'parent' => new FileSource(UserId::create(), 'label'),
             ],
             Type::GIT->value => [
-                'parent' => new GitSource(UserId::create(), 'https://example.com/repository.git'),
+                'parent' => new GitSource(
+                    UserId::create(),
+                    'label',
+                    'https://example.com/repository.git',
+                ),
             ],
         ];
     }

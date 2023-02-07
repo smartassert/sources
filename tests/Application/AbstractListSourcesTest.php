@@ -75,6 +75,7 @@ abstract class AbstractListSourcesTest extends AbstractApplicationTest
                     ],
                     SourceProvider::GIT_WITHOUT_CREDENTIALS_WITHOUT_RUN_SOURCE => [
                         'type' => Type::GIT->value,
+                        'label' => 'git source without credentials without run source',
                         'host_url' => 'http://example.com/without-credentials.git',
                         'path' => '/',
                         'has_credentials' => false,
@@ -94,6 +95,7 @@ abstract class AbstractListSourcesTest extends AbstractApplicationTest
                     ],
                     SourceProvider::GIT_WITHOUT_CREDENTIALS_WITHOUT_RUN_SOURCE => [
                         'type' => Type::GIT->value,
+                        'label' => 'git source without credentials without run source',
                         'host_url' => 'http://example.com/without-credentials.git',
                         'path' => '/',
                         'has_credentials' => false,
@@ -116,6 +118,7 @@ abstract class AbstractListSourcesTest extends AbstractApplicationTest
                     ],
                     SourceProvider::GIT_WITHOUT_CREDENTIALS_WITHOUT_RUN_SOURCE => [
                         'type' => Type::GIT->value,
+                        'label' => 'git source without credentials without run source',
                         'host_url' => 'http://example.com/without-credentials.git',
                         'path' => '/',
                         'has_credentials' => false,

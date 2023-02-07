@@ -79,17 +79,19 @@ class MutatorTest extends WebTestCase
     public function updateGitNoChangesDataProvider(): array
     {
         $userId = UserId::create();
+        $label = 'git source label';
         $hostUrl = 'https://example.com/repository.git';
         $path = '/path';
         $credentials = 'credentials';
-        $gitSourceNoCredentials = new GitSource($userId, $hostUrl, $path, '');
-        $gitSourceHasCredentials = new GitSource($userId, $hostUrl, $path, $credentials);
+        $gitSourceNoCredentials = new GitSource($userId, $label, $hostUrl, $path, '');
+        $gitSourceHasCredentials = new GitSource($userId, $label, $hostUrl, $path, $credentials);
 
         return [
             'git source, no credentials, no changes' => [
                 'source' => $gitSourceNoCredentials,
                 'request' => new GitSourceRequest(new Request(
                     request: [
+                        GitSourceRequest::PARAMETER_LABEL => $label,
                         GitSourceRequest::PARAMETER_HOST_URL => $hostUrl,
                         GitSourceRequest::PARAMETER_PATH => $path,
                         GitSourceRequest::PARAMETER_CREDENTIALS => '',
@@ -100,6 +102,7 @@ class MutatorTest extends WebTestCase
                 'source' => $gitSourceHasCredentials,
                 'request' => new GitSourceRequest(new Request(
                     request: [
+                        GitSourceRequest::PARAMETER_LABEL => $label,
                         GitSourceRequest::PARAMETER_HOST_URL => $hostUrl,
                         GitSourceRequest::PARAMETER_PATH => $path,
                         GitSourceRequest::PARAMETER_CREDENTIALS => $credentials,
@@ -169,17 +172,20 @@ class MutatorTest extends WebTestCase
     public function updateGitDataProvider(): array
     {
         $userId = UserId::create();
+        $label = 'label';
         $hostUrl = 'https://example.com/repository.git';
         $path = '/path';
         $credentials = 'credentials';
+        $newLabel = 'new label';
         $newHostUrl = 'https://new.example.com/repository.git';
         $newPath = '/path/new';
         $newCredentials = 'new credentials';
-        $originalGitSourceWithoutCredentials = new GitSource($userId, $hostUrl, $path, '');
-        $originalGitSourceWithCredentials = new GitSource($userId, $hostUrl, $path, $credentials);
+        $originalGitSourceWithoutCredentials = new GitSource($userId, $label, $hostUrl, $path, '');
+        $originalGitSourceWithCredentials = new GitSource($userId, $label, $hostUrl, $path, $credentials);
         $originalGitSourceWithNullifiedCredentials = clone $originalGitSourceWithCredentials;
         $originalGitSourceWithNullifiedCredentials->setCredentials('');
         $updatedGitSource = clone $originalGitSourceWithCredentials;
+        $updatedGitSource->setLabel($newLabel);
         $updatedGitSource->setHostUrl($newHostUrl);
         $updatedGitSource->setPath($newPath);
         $updatedGitSource->setCredentials($newCredentials);
@@ -189,6 +195,7 @@ class MutatorTest extends WebTestCase
                 'source' => $originalGitSourceWithoutCredentials,
                 'request' => new GitSourceRequest(new Request(
                     request: [
+                        GitSourceRequest::PARAMETER_LABEL => $label,
                         GitSourceRequest::PARAMETER_HOST_URL => $hostUrl,
                         GitSourceRequest::PARAMETER_PATH => $path,
                         GitSourceRequest::PARAMETER_CREDENTIALS => '',
@@ -200,6 +207,7 @@ class MutatorTest extends WebTestCase
                 'source' => $originalGitSourceWithCredentials,
                 'request' => new GitSourceRequest(new Request(
                     request: [
+                        GitSourceRequest::PARAMETER_LABEL => $label,
                         GitSourceRequest::PARAMETER_HOST_URL => $hostUrl,
                         GitSourceRequest::PARAMETER_PATH => $path,
                         GitSourceRequest::PARAMETER_CREDENTIALS => $credentials,
@@ -211,6 +219,7 @@ class MutatorTest extends WebTestCase
                 'source' => $originalGitSourceWithCredentials,
                 'request' => new GitSourceRequest(new Request(
                     request: [
+                        GitSourceRequest::PARAMETER_LABEL => $newLabel,
                         GitSourceRequest::PARAMETER_HOST_URL => $newHostUrl,
                         GitSourceRequest::PARAMETER_PATH => $newPath,
                         GitSourceRequest::PARAMETER_CREDENTIALS => $newCredentials,
@@ -222,6 +231,7 @@ class MutatorTest extends WebTestCase
                 'source' => $originalGitSourceWithCredentials,
                 'request' => new GitSourceRequest(new Request(
                     request: [
+                        GitSourceRequest::PARAMETER_LABEL => $label,
                         GitSourceRequest::PARAMETER_HOST_URL => $hostUrl,
                         GitSourceRequest::PARAMETER_PATH => $path,
                         GitSourceRequest::PARAMETER_CREDENTIALS => '',
