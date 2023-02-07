@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Request;
 
 use App\Entity\GitSource;
-use App\Enum\Source\Type;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -35,11 +34,6 @@ class GitSourceRequest
         $this->hostUrl = trim((string) $payload->get(self::PARAMETER_HOST_URL));
         $this->path = trim((string) $payload->get(self::PARAMETER_PATH));
         $this->credentials = trim((string) $payload->get(self::PARAMETER_CREDENTIALS));
-    }
-
-    public function getType(): string
-    {
-        return Type::GIT->value;
     }
 
     public function getLabel(): string
