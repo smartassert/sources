@@ -209,6 +209,15 @@ class Client
         return $this->client->makeRequest('GET', $this->router->generate('health-check'));
     }
 
+    public function makeGetFileSourceFilenamesRequest(?string $authenticationToken, string $sourceId): ResponseInterface
+    {
+        return $this->client->makeRequest(
+            'GET',
+            $this->router->generate('file_source_list_filenames', ['sourceId' => $sourceId]),
+            $this->createAuthorizationHeader($authenticationToken),
+        );
+    }
+
     /**
      * @return array<string, string>
      */
