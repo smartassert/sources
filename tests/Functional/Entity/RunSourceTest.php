@@ -87,4 +87,19 @@ class RunSourceTest extends WebTestCase
             ],
         ];
     }
+
+    public function testParametersKeysArePersisted(): void
+    {
+        $parent = new FileSource(UserId::create(), 'label');
+        $this->store->add($parent);
+
+        $parameters = ['param_key_1' => 'param_value_1', 'param_key_2' => 'param_value_2'];
+        $runSource = new RunSource($parent, $parameters);
+        $this->store->add($runSource);
+        $this->entityManager->detach($runSource);
+
+        $retrievedRunSource = $this->repository->find($runSource->getId());
+        self::assertInstanceOf(RunSource::class, $retrievedRunSource);
+        self::assertSame($parameters, $retrievedRunSource->getParameters());
+    }
 }

@@ -20,7 +20,7 @@ class RunSource extends AbstractSource implements DirectoryLocatorInterface, \Js
     /**
      * @var array<string, string>
      */
-    #[ORM\Column(type: 'simple_array', nullable: true)]
+    #[ORM\Column(type: 'json', nullable: true)]
     private array $parameters;
 
     #[ORM\Column(type: 'string', enumType: State::class)]
