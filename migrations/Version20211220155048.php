@@ -21,14 +21,13 @@ final class Version20211220155048 extends AbstractMigration
             CREATE TABLE run_source (
                 id VARCHAR(32) NOT NULL, 
                 parent_id VARCHAR(32), 
-                parameters TEXT DEFAULT NULL,
+                parameters JSON DEFAULT NULL,
                 state VARCHAR(255) NOT NULL, 
                 failure_reason VARCHAR(255) DEFAULT NULL, 
                 failure_message TEXT DEFAULT NULL,                 
                 PRIMARY KEY(id)
             )
         ');
-        $this->addSql('COMMENT ON COLUMN run_source.parameters IS \'(DC2Type:simple_array)\'');
         $this->addSql('CREATE INDEX IDX_55B64E4E727ACA70 ON run_source (parent_id)');
         $this->addSql('
             ALTER TABLE run_source 
