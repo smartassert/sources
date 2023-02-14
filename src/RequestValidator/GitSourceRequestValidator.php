@@ -12,30 +12,23 @@ use App\ResponseBody\InvalidField;
 
 class GitSourceRequestValidator
 {
+    public function __construct(
+        private readonly ValueLengthValidator $valueLengthValidator,
+    ) {
+    }
+
     /**
      * @throws InvalidRequestException
      */
     public function validate(GitSourceRequest $request): void
     {
-        $label = $request->getLabel();
-        $labelLength = mb_strlen($label);
-        $minimumLabelLength = 1;
-        $maximumLabelLength = AbstractOriginSource::LABEL_MAX_LENGTH;
-
-        if ($labelLength <= $minimumLabelLength || $labelLength > $maximumLabelLength) {
-            throw new InvalidRequestException(
-                $request,
-                new InvalidField(
-                    'label',
-                    $label,
-                    sprintf(
-                        'This value should be between %d and %d characters long.',
-                        $minimumLabelLength,
-                        $maximumLabelLength
-                    ),
-                ),
-            );
-        }
+        $this->valueLengthValidator->validate(
+            $request,
+            'label',
+            $request->getLabel(),
+            1,
+            AbstractOriginSource::LABEL_MAX_LENGTH
+        );
 
         $hostUrl = $request->getHostUrl();
         $hostUrlLength = strlen($hostUrl);
