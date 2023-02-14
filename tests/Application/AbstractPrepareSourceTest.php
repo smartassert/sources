@@ -67,7 +67,7 @@ abstract class AbstractPrepareSourceTest extends AbstractApplicationTest
             $payload
         );
 
-        $runSource = $this->runSourceRepository->findByParent($source);
+        $runSource = $this->runSourceRepository->findOneBy(['parent' => $source]);
         self::assertInstanceOf(RunSource::class, $runSource);
 
         $expectedResponseData = [
