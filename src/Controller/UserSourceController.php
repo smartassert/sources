@@ -13,6 +13,7 @@ use App\Exception\InvalidRequestException;
 use App\Message\Prepare;
 use App\Request\FileSourceRequest;
 use App\Request\GitSourceRequest;
+use App\RequestValidator\FileSourceRequestValidator;
 use App\Response\YamlResponse;
 use App\Security\UserSourceAccessChecker;
 use App\Services\RequestValidator;
@@ -53,7 +54,7 @@ class UserSourceController
      */
     #[Route(SourceRoutes::ROUTE_SOURCE . '/file', name: 'user_file_source_update', methods: ['PUT'])]
     public function updateFile(
-        RequestValidator $requestValidator,
+        FileSourceRequestValidator $requestValidator,
         Mutator $mutator,
         FileSource $source,
         FileSourceRequest $request,

@@ -9,6 +9,7 @@ use App\Exception\InvalidRequestException;
 use App\Repository\SourceRepository;
 use App\Request\FileSourceRequest;
 use App\Request\GitSourceRequest;
+use App\RequestValidator\FileSourceRequestValidator;
 use App\Services\RequestValidator;
 use App\Services\Source\Factory;
 use SmartAssert\UsersSecurityBundle\Security\User;
@@ -38,7 +39,7 @@ class SourceController
      */
     #[Route('/file', name: 'file_source_create', methods: ['POST'])]
     public function createFileSource(
-        RequestValidator $requestValidator,
+        FileSourceRequestValidator $requestValidator,
         User $user,
         Factory $factory,
         FileSourceRequest $request
