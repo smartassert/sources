@@ -8,9 +8,10 @@ use App\Entity\FileSource;
 use App\Exception\InvalidRequestException;
 use App\Request\AddYamlFileRequest;
 use App\Request\YamlFileRequest;
+use App\RequestValidator\AddYamlFileRequestValidator;
+use App\RequestValidator\YamlFileRequestValidator;
 use App\Response\YamlResponse;
 use App\Security\UserSourceAccessChecker;
-use App\Services\RequestValidator;
 use App\Services\SourceRepository\Reader\FileSourceDirectoryLister;
 use League\Flysystem\FilesystemException;
 use League\Flysystem\FilesystemReader;
@@ -27,7 +28,6 @@ class FileSourceFileController
 
     public function __construct(
         private UserSourceAccessChecker $userSourceAccessChecker,
-        private RequestValidator $requestValidator,
         private FilesystemWriter $fileSourceWriter,
         private FilesystemReader $fileSourceReader,
     ) {
@@ -39,10 +39,13 @@ class FileSourceFileController
      * @throws FilesystemException
      */
     #[Route(self::ROUTE_SOURCE_FILE, name: 'file_source_file_add', methods: ['POST'])]
-    public function add(FileSource $source, AddYamlFileRequest $request): Response
-    {
+    public function add(
+        AddYamlFileRequestValidator $requestValidator,
+        FileSource $source,
+        AddYamlFileRequest $request,
+    ): Response {
         $this->userSourceAccessChecker->denyAccessUnlessGranted($source);
-        $this->requestValidator->validate($request, ['filename.', 'file.']);
+        $requestValidator->validate($request);
 
         $yamlFile = $request->getYamlFile();
 
@@ -57,10 +60,13 @@ class FileSourceFileController
      * @throws FilesystemException
      */
     #[Route(self::ROUTE_SOURCE_FILE, name: 'file_source_file_read', methods: ['GET'])]
-    public function read(FileSource $source, YamlFileRequest $request): Response
-    {
+    public function read(
+        YamlFileRequestValidator $requestValidator,
+        FileSource $source,
+        YamlFileRequest $request
+    ): Response {
         $this->userSourceAccessChecker->denyAccessUnlessGranted($source);
-        $this->requestValidator->validate($request, ['filename.']);
+        $requestValidator->validate($request);
 
         $location = $source->getDirectoryPath() . '/' . $request->getFilename();
 
@@ -77,10 +83,14 @@ class FileSourceFileController
      * @throws FilesystemException
      */
     #[Route(self::ROUTE_SOURCE_FILE, name: 'file_source_file_remove', methods: ['DELETE'])]
-    public function remove(FileSource $source, YamlFileRequest $request): Response
-    {
+    public function remove(
+        YamlFileRequestValidator $requestValidator,
+        FileSource $source,
+        YamlFileRequest $request,
+    ): Response {
         $this->userSourceAccessChecker->denyAccessUnlessGranted($source);
-        $this->requestValidator->validate($request, ['filename.']);
+        $requestValidator->validate($request);
+
         $this->fileSourceWriter->delete($source->getDirectoryPath() . '/' . $request->getFilename());
 
         return new Response();
