@@ -19,26 +19,20 @@ class GitSourceRequestValidator
     {
         $label = $request->getLabel();
         $labelLength = mb_strlen($label);
+        $minimumLabelLength = 1;
+        $maximumLabelLength = AbstractOriginSource::LABEL_MAX_LENGTH;
 
-        if (0 === $labelLength) {
+        if ($labelLength <= $minimumLabelLength || $labelLength > $maximumLabelLength) {
             throw new InvalidRequestException(
                 $request,
                 new InvalidField(
                     'label',
                     $label,
-                    'This value is too short. It should have 1 character or more.',
-                ),
-            );
-        }
-
-        $maxLabelLength = AbstractOriginSource::LABEL_MAX_LENGTH;
-        if ($labelLength > $maxLabelLength) {
-            throw new InvalidRequestException(
-                $request,
-                new InvalidField(
-                    'label',
-                    $label,
-                    'This value is too long. It should have ' . $maxLabelLength . ' characters or less.',
+                    sprintf(
+                        'This value should be between %d and %d characters long.',
+                        $minimumLabelLength,
+                        $maximumLabelLength
+                    ),
                 ),
             );
         }
