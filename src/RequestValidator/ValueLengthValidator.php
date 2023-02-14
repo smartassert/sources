@@ -16,7 +16,7 @@ class ValueLengthValidator
     {
         $length = mb_strlen($value);
 
-        if ($length <= $minimumLength || $length > $maximumLength) {
+        if ($length < $minimumLength || $length > $maximumLength) {
             throw new InvalidRequestException(
                 $request,
                 new InvalidField(

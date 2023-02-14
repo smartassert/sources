@@ -38,31 +38,13 @@ class GitSourceRequestValidator
             GitSource::HOST_URL_MAX_LENGTH
         );
 
-        $path = $request->getPath();
-        $pathLength = strlen($path);
-
-        if (0 === $pathLength) {
-            throw new InvalidRequestException(
-                $request,
-                new InvalidField(
-                    'path',
-                    $path,
-                    'This value is too short. It should have 1 character or more.',
-                ),
-            );
-        }
-
-        $pathMaxLength = GitSource::PATH_MAX_LENGTH;
-        if ($pathLength > $pathMaxLength) {
-            throw new InvalidRequestException(
-                $request,
-                new InvalidField(
-                    'path',
-                    $path,
-                    'This value is too long. It should have ' . $pathMaxLength . ' characters or less.',
-                ),
-            );
-        }
+        $this->valueLengthValidator->validate(
+            $request,
+            'path',
+            $request->getPath(),
+            1,
+            GitSource::PATH_MAX_LENGTH
+        );
 
         $credentials = $request->getCredentials();
         $credentialsLength = strlen($credentials);
