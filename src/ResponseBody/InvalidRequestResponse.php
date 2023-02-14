@@ -23,16 +23,12 @@ class InvalidRequestResponse implements ErrorInterface
 
     public function getPayload(): array
     {
-        $payload = [];
+        $invalidField = $this->invalidFields[0];
 
-        foreach (array_slice($this->invalidFields, 0, 1) as $invalidField) {
-            $payload[$invalidField->name] = [
-                'name' => $invalidField->name,
-                'value' => $invalidField->value,
-                'message' => $invalidField->message,
-            ];
-        }
-
-        return $payload;
+        return [
+            'name' => $invalidField->name,
+            'value' => $invalidField->value,
+            'message' => $invalidField->message,
+        ];
     }
 }

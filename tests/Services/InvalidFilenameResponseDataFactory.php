@@ -15,11 +15,9 @@ class InvalidFilenameResponseDataFactory
             'error' => [
                 'type' => 'invalid_request',
                 'payload' => [
-                    'name' => [
-                        'name' => 'name',
-                        'value' => '',
-                        'message' => $message,
-                    ],
+                    'name' => 'name',
+                    'value' => '',
+                    'message' => $message,
                 ],
             ],
         ];
