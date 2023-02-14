@@ -4,15 +4,12 @@ declare(strict_types=1);
 
 namespace App\Request;
 
-use App\Entity\AbstractOriginSource;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Validator\Constraints as Assert;
 
 class FileSourceRequest
 {
     public const PARAMETER_LABEL = 'label';
 
-    #[Assert\Length(null, 1, AbstractOriginSource::LABEL_MAX_LENGTH)]
     private string $label;
 
     public function __construct(Request $request)
