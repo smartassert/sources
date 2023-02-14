@@ -35,6 +35,6 @@ class InvalidRequestResponseFactory
             $invalidFields[] = new InvalidField($requestField, $invalidValue, (string) $error->getMessage());
         }
 
-        return new InvalidRequestResponse($invalidFields);
+        return new InvalidRequestResponse($invalidFields[0]);
     }
 }

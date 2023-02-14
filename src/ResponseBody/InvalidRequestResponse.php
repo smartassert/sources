@@ -8,11 +8,8 @@ class InvalidRequestResponse implements ErrorInterface
 {
     private const TYPE = 'invalid_request';
 
-    /**
-     * @param InvalidField[] $invalidFields
-     */
     public function __construct(
-        private array $invalidFields,
+        private readonly InvalidField $invalidField,
     ) {
     }
 
@@ -23,12 +20,10 @@ class InvalidRequestResponse implements ErrorInterface
 
     public function getPayload(): array
     {
-        $invalidField = $this->invalidFields[0];
-
         return [
-            'name' => $invalidField->name,
-            'value' => $invalidField->value,
-            'message' => $invalidField->message,
+            'name' => $this->invalidField->name,
+            'value' => $this->invalidField->value,
+            'message' => $this->invalidField->message,
         ];
     }
 }
