@@ -8,12 +8,8 @@ use SmartAssert\YamlFile\Filename;
 
 class YamlFileRequest
 {
-    public function __construct(private Filename $filename)
-    {
-    }
-
-    public function getFilename(): Filename
-    {
-        return $this->filename;
+    public function __construct(
+        public readonly Filename $filename,
+    ) {
     }
 }
