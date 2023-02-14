@@ -23,7 +23,7 @@ class RequestValidator
     {
         $errors = $this->validator->validate($request);
         if (0 !== count($errors)) {
-            throw new InvalidRequestException($request, $errors, $propertyNamePrefixesToRemove);
+            throw new InvalidRequestException($request, $errors->get(0), $propertyNamePrefixesToRemove);
         }
     }
 }
