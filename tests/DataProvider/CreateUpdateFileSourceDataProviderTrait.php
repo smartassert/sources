@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\DataProvider;
 
-use App\Entity\FileSource;
+use App\Entity\AbstractOriginSource;
 use App\Request\FileSourceRequest;
 
 trait CreateUpdateFileSourceDataProviderTrait
@@ -14,7 +14,7 @@ trait CreateUpdateFileSourceDataProviderTrait
      */
     public function createUpdateFileSourceInvalidRequestDataProvider(): array
     {
-        $labelTooLong = str_repeat('.', FileSource::LABEL_MAX_LENGTH + 1);
+        $labelTooLong = str_repeat('.', AbstractOriginSource::LABEL_MAX_LENGTH + 1);
 
         return [
             'missing label' => [

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\DataProvider;
 
+use App\Entity\AbstractOriginSource;
 use App\Entity\GitSource;
 use App\Request\GitSourceRequest;
 
@@ -17,7 +18,7 @@ trait CreateUpdateGitSourceDataProviderTrait
         $label = 'label value';
         $hostUrl = 'https://example.com/repository.git';
         $path = '/';
-        $labelTooLong = str_repeat('.', GitSource::LABEL_MAX_LENGTH + 1);
+        $labelTooLong = str_repeat('.', AbstractOriginSource::LABEL_MAX_LENGTH + 1);
         $hostUrlTooLong = str_repeat('.', GitSource::HOST_URL_MAX_LENGTH + 1);
         $pathTooLong = str_repeat('a', GitSource::HOST_URL_MAX_LENGTH + 1);
         $credentialsTooLong = str_repeat('a', GitSource::CREDENTIALS_MAX_LENGTH + 1);

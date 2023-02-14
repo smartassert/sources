@@ -10,39 +10,12 @@ use App\Model\SourceRepositoryInterface;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity]
-class FileSource extends AbstractSource implements
+class FileSource extends AbstractOriginSource implements
     SourceOriginInterface,
     DirectoryLocatorInterface,
     SourceRepositoryInterface,
     \JsonSerializable
 {
-    public const LABEL_MAX_LENGTH = 255;
-
-    #[ORM\Column(type: 'string', length: self::LABEL_MAX_LENGTH)]
-    private string $label;
-
-    /**
-     * @param non-empty-string $userId
-     */
-    public function __construct(string $userId, string $label)
-    {
-        parent::__construct($userId);
-
-        $this->label = $label;
-    }
-
-    public function getLabel(): string
-    {
-        return $this->label;
-    }
-
-    public function setLabel(string $label): self
-    {
-        $this->label = $label;
-
-        return $this;
-    }
-
     public function getType(): Type
     {
         return Type::FILE;
@@ -72,7 +45,7 @@ class FileSource extends AbstractSource implements
             'id' => $this->id,
             'user_id' => $this->getUserId(),
             'type' => Type::FILE->value,
-            'label' => $this->label
+            'label' => $this->getLabel()
         ];
     }
 
