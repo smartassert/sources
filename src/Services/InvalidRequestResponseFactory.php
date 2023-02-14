@@ -23,18 +23,16 @@ class InvalidRequestResponseFactory
         ConstraintViolationListInterface $errors,
         array $propertyNamePrefixesToRemove = []
     ): InvalidRequestResponse {
-        $invalidFields = [];
+        $error = $errors->get(0);
 
-        foreach ($errors as $error) {
-            $invalidValue = $error->getInvalidValue();
-            $invalidValue = is_scalar($invalidValue) ? (string) $invalidValue : '';
+        $invalidValue = $error->getInvalidValue();
+        $invalidValue = is_scalar($invalidValue) ? (string) $invalidValue : '';
 
-            $requestField = $this->stringCaseConverter->convertCamelCaseToKebabCase($error->getPropertyPath());
-            $requestField = (string) (new UnicodeString($requestField))->trimPrefix($propertyNamePrefixesToRemove);
+        $requestField = $this->stringCaseConverter->convertCamelCaseToKebabCase($error->getPropertyPath());
+        $requestField = (string) (new UnicodeString($requestField))->trimPrefix($propertyNamePrefixesToRemove);
 
-            $invalidFields[] = new InvalidField($requestField, $invalidValue, (string) $error->getMessage());
-        }
+        $invalidField = new InvalidField($requestField, $invalidValue, (string) $error->getMessage());
 
-        return new InvalidRequestResponse($invalidFields[0]);
+        return new InvalidRequestResponse($invalidField);
     }
 }
