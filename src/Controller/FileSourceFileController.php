@@ -47,7 +47,7 @@ class FileSourceFileController
         $this->userSourceAccessChecker->denyAccessUnlessGranted($source);
         $requestValidator->validate($request);
 
-        $yamlFile = $request->getYamlFile();
+        $yamlFile = $request->file;
 
         $this->fileSourceWriter->write($source->getDirectoryPath() . '/' . $yamlFile->name, $yamlFile->content);
 
@@ -68,7 +68,7 @@ class FileSourceFileController
         $this->userSourceAccessChecker->denyAccessUnlessGranted($source);
         $requestValidator->validate($request);
 
-        $location = $source->getDirectoryPath() . '/' . $request->getFilename();
+        $location = $source->getDirectoryPath() . '/' . $request->filename;
 
         if (false === $this->fileSourceReader->fileExists($location)) {
             return new Response('', 404);
@@ -91,7 +91,7 @@ class FileSourceFileController
         $this->userSourceAccessChecker->denyAccessUnlessGranted($source);
         $requestValidator->validate($request);
 
-        $this->fileSourceWriter->delete($source->getDirectoryPath() . '/' . $request->getFilename());
+        $this->fileSourceWriter->delete($source->getDirectoryPath() . '/' . $request->filename);
 
         return new Response();
     }

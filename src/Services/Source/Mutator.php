@@ -19,7 +19,7 @@ class Mutator
 
     public function updateFile(FileSource $source, FileSourceRequest $request): SourceInterface
     {
-        $source->setLabel($request->getLabel());
+        $source->setLabel($request->label);
         $this->store->add($source);
 
         return $source;
@@ -27,10 +27,10 @@ class Mutator
 
     public function updateGit(GitSource $source, GitSourceRequest $request): SourceInterface
     {
-        $source->setLabel($request->getLabel());
-        $source->setHostUrl($request->getHostUrl());
-        $source->setPath($request->getPath());
-        $source->setCredentials($request->getCredentials());
+        $source->setLabel($request->label);
+        $source->setHostUrl($request->hostUrl);
+        $source->setPath($request->path);
+        $source->setCredentials($request->credentials);
 
         $this->store->add($source);
 

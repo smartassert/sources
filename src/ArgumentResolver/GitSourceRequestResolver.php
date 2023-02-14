@@ -20,6 +20,11 @@ class GitSourceRequestResolver implements ValueResolverInterface
             return [];
         }
 
-        return [new GitSourceRequest($request)];
+        return [new GitSourceRequest(
+            trim((string) $request->request->get(GitSourceRequest::PARAMETER_LABEL)),
+            trim((string) $request->request->get(GitSourceRequest::PARAMETER_HOST_URL)),
+            trim((string) $request->request->get(GitSourceRequest::PARAMETER_PATH)),
+            trim((string) $request->request->get(GitSourceRequest::PARAMETER_CREDENTIALS)),
+        )];
     }
 }

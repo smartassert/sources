@@ -12,7 +12,6 @@ use App\Services\Source\Mutator;
 use App\Tests\Model\UserId;
 use App\Tests\Services\EntityRemover;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-use Symfony\Component\HttpFoundation\Request;
 
 class MutatorTest extends WebTestCase
 {
@@ -54,11 +53,7 @@ class MutatorTest extends WebTestCase
         return [
             'file source, no changes' => [
                 'source' => $fileSource,
-                'request' => new FileSourceRequest(new Request(
-                    request: [
-                        FileSourceRequest::PARAMETER_LABEL => $label,
-                    ]
-                )),
+                'request' => new FileSourceRequest($label),
             ],
         ];
     }
@@ -89,25 +84,11 @@ class MutatorTest extends WebTestCase
         return [
             'git source, no credentials, no changes' => [
                 'source' => $gitSourceNoCredentials,
-                'request' => new GitSourceRequest(new Request(
-                    request: [
-                        GitSourceRequest::PARAMETER_LABEL => $label,
-                        GitSourceRequest::PARAMETER_HOST_URL => $hostUrl,
-                        GitSourceRequest::PARAMETER_PATH => $path,
-                        GitSourceRequest::PARAMETER_CREDENTIALS => '',
-                    ]
-                )),
+                'request' => new GitSourceRequest($label, $hostUrl, $path, ''),
             ],
             'git source, has credentials, no changes' => [
                 'source' => $gitSourceHasCredentials,
-                'request' => new GitSourceRequest(new Request(
-                    request: [
-                        GitSourceRequest::PARAMETER_LABEL => $label,
-                        GitSourceRequest::PARAMETER_HOST_URL => $hostUrl,
-                        GitSourceRequest::PARAMETER_PATH => $path,
-                        GitSourceRequest::PARAMETER_CREDENTIALS => $credentials,
-                    ]
-                )),
+                'request' => new GitSourceRequest($label, $hostUrl, $path, $credentials),
             ],
         ];
     }
@@ -137,20 +118,12 @@ class MutatorTest extends WebTestCase
         return [
             'file source, no changes' => [
                 'source' => $originalFileSource,
-                'request' => new FileSourceRequest(new Request(
-                    request: [
-                        FileSourceRequest::PARAMETER_LABEL => $label,
-                    ]
-                )),
+                'request' => new FileSourceRequest($label),
                 'expected' => $originalFileSource,
             ],
             'file source, update label' => [
                 'source' => $originalFileSource,
-                'request' => new FileSourceRequest(new Request(
-                    request: [
-                        FileSourceRequest::PARAMETER_LABEL => $newLabel,
-                    ]
-                )),
+                'request' => new FileSourceRequest($newLabel),
                 'expected' => $updatedFileSource,
             ],
         ];
@@ -193,50 +166,22 @@ class MutatorTest extends WebTestCase
         return [
             'git source, no credentials, no changes' => [
                 'source' => $originalGitSourceWithoutCredentials,
-                'request' => new GitSourceRequest(new Request(
-                    request: [
-                        GitSourceRequest::PARAMETER_LABEL => $label,
-                        GitSourceRequest::PARAMETER_HOST_URL => $hostUrl,
-                        GitSourceRequest::PARAMETER_PATH => $path,
-                        GitSourceRequest::PARAMETER_CREDENTIALS => '',
-                    ]
-                )),
+                'request' => new GitSourceRequest($label, $hostUrl, $path, ''),
                 'expected' => $originalGitSourceWithoutCredentials,
             ],
             'git source, has credentials, no changes' => [
                 'source' => $originalGitSourceWithCredentials,
-                'request' => new GitSourceRequest(new Request(
-                    request: [
-                        GitSourceRequest::PARAMETER_LABEL => $label,
-                        GitSourceRequest::PARAMETER_HOST_URL => $hostUrl,
-                        GitSourceRequest::PARAMETER_PATH => $path,
-                        GitSourceRequest::PARAMETER_CREDENTIALS => $credentials,
-                    ]
-                )),
+                'request' => new GitSourceRequest($label, $hostUrl, $path, $credentials),
                 'expected' => $originalGitSourceWithCredentials,
             ],
             'git source, update all' => [
                 'source' => $originalGitSourceWithCredentials,
-                'request' => new GitSourceRequest(new Request(
-                    request: [
-                        GitSourceRequest::PARAMETER_LABEL => $newLabel,
-                        GitSourceRequest::PARAMETER_HOST_URL => $newHostUrl,
-                        GitSourceRequest::PARAMETER_PATH => $newPath,
-                        GitSourceRequest::PARAMETER_CREDENTIALS => $newCredentials,
-                    ]
-                )),
+                'request' => new GitSourceRequest($newLabel, $newHostUrl, $newPath, $newCredentials),
                 'expected' => $updatedGitSource,
             ],
             'git source, nullify credentials' => [
                 'source' => $originalGitSourceWithCredentials,
-                'request' => new GitSourceRequest(new Request(
-                    request: [
-                        GitSourceRequest::PARAMETER_LABEL => $label,
-                        GitSourceRequest::PARAMETER_HOST_URL => $hostUrl,
-                        GitSourceRequest::PARAMETER_PATH => $path,
-                        GitSourceRequest::PARAMETER_CREDENTIALS => '',
-                    ]
-                )),
+                'request' => new GitSourceRequest($label, $hostUrl, $path, ''),
                 'expected' => $originalGitSourceWithNullifiedCredentials,
             ],
         ];

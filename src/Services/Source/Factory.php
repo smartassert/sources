@@ -22,10 +22,10 @@ class Factory
     {
         $source = new GitSource(
             $user->getUserIdentifier(),
-            $request->getLabel(),
-            $request->getHostUrl(),
-            $request->getPath(),
-            $request->getCredentials(),
+            $request->label,
+            $request->hostUrl,
+            $request->path,
+            $request->credentials,
         );
 
         $foundSource = $this->finder->find($source);
@@ -40,7 +40,7 @@ class Factory
 
     public function createFromFileSourceRequest(User $user, FileSourceRequest $request): FileSource
     {
-        $source = new FileSource($user->getUserIdentifier(), $request->getLabel());
+        $source = new FileSource($user->getUserIdentifier(), $request->label);
 
         $foundSource = $this->finder->find($source);
         if ($foundSource instanceof FileSource) {

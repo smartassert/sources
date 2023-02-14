@@ -26,7 +26,7 @@ class AddYamlFileRequestValidator
     {
         $this->yamlFileRequestValidator->validate($request);
 
-        $validation = $this->yamlFileValidator->validate($request->getYamlFile());
+        $validation = $this->yamlFileValidator->validate($request->file);
 
         if (!$validation->isValid() && YamlFileContext::CONTENT === $validation->getContext()) {
             $previousContext = $validation->getPrevious()?->getContext();

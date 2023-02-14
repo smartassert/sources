@@ -24,7 +24,7 @@ class GitSourceRequestValidator
         $this->valueLengthValidator->validate(
             $request,
             'label',
-            $request->getLabel(),
+            $request->label,
             1,
             AbstractOriginSource::LABEL_MAX_LENGTH
         );
@@ -32,7 +32,7 @@ class GitSourceRequestValidator
         $this->valueLengthValidator->validate(
             $request,
             'host-url',
-            $request->getHostUrl(),
+            $request->hostUrl,
             1,
             GitSource::HOST_URL_MAX_LENGTH
         );
@@ -40,7 +40,7 @@ class GitSourceRequestValidator
         $this->valueLengthValidator->validate(
             $request,
             'path',
-            $request->getPath(),
+            $request->path,
             1,
             GitSource::PATH_MAX_LENGTH
         );
@@ -48,7 +48,7 @@ class GitSourceRequestValidator
         $this->valueLengthValidator->validate(
             $request,
             'credentials',
-            $request->getCredentials(),
+            $request->credentials,
             0,
             GitSource::CREDENTIALS_MAX_LENGTH
         );
