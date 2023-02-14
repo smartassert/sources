@@ -8,6 +8,7 @@ use App\Entity\FileSource;
 use App\Exception\InvalidRequestException;
 use App\Request\AddYamlFileRequest;
 use App\Request\YamlFileRequest;
+use App\RequestValidator\YamlFileRequestValidator;
 use App\Response\YamlResponse;
 use App\Security\UserSourceAccessChecker;
 use App\Services\RequestValidator;
@@ -57,10 +58,13 @@ class FileSourceFileController
      * @throws FilesystemException
      */
     #[Route(self::ROUTE_SOURCE_FILE, name: 'file_source_file_read', methods: ['GET'])]
-    public function read(FileSource $source, YamlFileRequest $request): Response
-    {
+    public function read(
+        YamlFileRequestValidator $requestValidator,
+        FileSource $source,
+        YamlFileRequest $request
+    ): Response {
         $this->userSourceAccessChecker->denyAccessUnlessGranted($source);
-        $this->requestValidator->validate($request, ['filename.']);
+        $requestValidator->validate($request);
 
         $location = $source->getDirectoryPath() . '/' . $request->getFilename();
 
@@ -77,10 +81,14 @@ class FileSourceFileController
      * @throws FilesystemException
      */
     #[Route(self::ROUTE_SOURCE_FILE, name: 'file_source_file_remove', methods: ['DELETE'])]
-    public function remove(FileSource $source, YamlFileRequest $request): Response
-    {
+    public function remove(
+        YamlFileRequestValidator $requestValidator,
+        FileSource $source,
+        YamlFileRequest $request,
+    ): Response {
         $this->userSourceAccessChecker->denyAccessUnlessGranted($source);
-        $this->requestValidator->validate($request, ['filename.']);
+        $requestValidator->validate($request);
+
         $this->fileSourceWriter->delete($source->getDirectoryPath() . '/' . $request->getFilename());
 
         return new Response();
