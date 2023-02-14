@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Request;
 
+use App\Entity\AbstractOriginSource;
 use App\Entity\GitSource;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -16,7 +17,7 @@ class GitSourceRequest
     public const PARAMETER_PATH = 'path';
     public const PARAMETER_CREDENTIALS = 'credentials';
 
-    #[Assert\Length(null, 1, GitSource::LABEL_MAX_LENGTH)]
+    #[Assert\Length(null, 1, AbstractOriginSource::LABEL_MAX_LENGTH)]
     private string $label;
 
     #[Assert\Length(null, 1, GitSource::HOST_URL_MAX_LENGTH)]
