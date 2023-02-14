@@ -89,25 +89,11 @@ class MutatorTest extends WebTestCase
         return [
             'git source, no credentials, no changes' => [
                 'source' => $gitSourceNoCredentials,
-                'request' => new GitSourceRequest(new Request(
-                    request: [
-                        GitSourceRequest::PARAMETER_LABEL => $label,
-                        GitSourceRequest::PARAMETER_HOST_URL => $hostUrl,
-                        GitSourceRequest::PARAMETER_PATH => $path,
-                        GitSourceRequest::PARAMETER_CREDENTIALS => '',
-                    ]
-                )),
+                'request' => new GitSourceRequest($label, $hostUrl, $path, ''),
             ],
             'git source, has credentials, no changes' => [
                 'source' => $gitSourceHasCredentials,
-                'request' => new GitSourceRequest(new Request(
-                    request: [
-                        GitSourceRequest::PARAMETER_LABEL => $label,
-                        GitSourceRequest::PARAMETER_HOST_URL => $hostUrl,
-                        GitSourceRequest::PARAMETER_PATH => $path,
-                        GitSourceRequest::PARAMETER_CREDENTIALS => $credentials,
-                    ]
-                )),
+                'request' => new GitSourceRequest($label, $hostUrl, $path, $credentials),
             ],
         ];
     }
@@ -193,50 +179,22 @@ class MutatorTest extends WebTestCase
         return [
             'git source, no credentials, no changes' => [
                 'source' => $originalGitSourceWithoutCredentials,
-                'request' => new GitSourceRequest(new Request(
-                    request: [
-                        GitSourceRequest::PARAMETER_LABEL => $label,
-                        GitSourceRequest::PARAMETER_HOST_URL => $hostUrl,
-                        GitSourceRequest::PARAMETER_PATH => $path,
-                        GitSourceRequest::PARAMETER_CREDENTIALS => '',
-                    ]
-                )),
+                'request' => new GitSourceRequest($label, $hostUrl, $path, ''),
                 'expected' => $originalGitSourceWithoutCredentials,
             ],
             'git source, has credentials, no changes' => [
                 'source' => $originalGitSourceWithCredentials,
-                'request' => new GitSourceRequest(new Request(
-                    request: [
-                        GitSourceRequest::PARAMETER_LABEL => $label,
-                        GitSourceRequest::PARAMETER_HOST_URL => $hostUrl,
-                        GitSourceRequest::PARAMETER_PATH => $path,
-                        GitSourceRequest::PARAMETER_CREDENTIALS => $credentials,
-                    ]
-                )),
+                'request' => new GitSourceRequest($label, $hostUrl, $path, $credentials),
                 'expected' => $originalGitSourceWithCredentials,
             ],
             'git source, update all' => [
                 'source' => $originalGitSourceWithCredentials,
-                'request' => new GitSourceRequest(new Request(
-                    request: [
-                        GitSourceRequest::PARAMETER_LABEL => $newLabel,
-                        GitSourceRequest::PARAMETER_HOST_URL => $newHostUrl,
-                        GitSourceRequest::PARAMETER_PATH => $newPath,
-                        GitSourceRequest::PARAMETER_CREDENTIALS => $newCredentials,
-                    ]
-                )),
+                'request' => new GitSourceRequest($newLabel, $newHostUrl, $newPath, $newCredentials),
                 'expected' => $updatedGitSource,
             ],
             'git source, nullify credentials' => [
                 'source' => $originalGitSourceWithCredentials,
-                'request' => new GitSourceRequest(new Request(
-                    request: [
-                        GitSourceRequest::PARAMETER_LABEL => $label,
-                        GitSourceRequest::PARAMETER_HOST_URL => $hostUrl,
-                        GitSourceRequest::PARAMETER_PATH => $path,
-                        GitSourceRequest::PARAMETER_CREDENTIALS => '',
-                    ]
-                )),
+                'request' => new GitSourceRequest($label, $hostUrl, $path, ''),
                 'expected' => $originalGitSourceWithNullifiedCredentials,
             ],
         ];

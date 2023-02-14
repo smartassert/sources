@@ -22,10 +22,10 @@ class Factory
     {
         $source = new GitSource(
             $user->getUserIdentifier(),
-            $request->getLabel(),
-            $request->getHostUrl(),
-            $request->getPath(),
-            $request->getCredentials(),
+            $request->label,
+            $request->hostUrl,
+            $request->path,
+            $request->credentials,
         );
 
         $foundSource = $this->finder->find($source);

@@ -82,26 +82,12 @@ class FactoryTest extends WebTestCase
         return [
             'git, empty credentials' => [
                 'user' => $user,
-                'request' => new GitSourceRequest(new Request(
-                    request: [
-                        GitSourceRequest::PARAMETER_LABEL => $label,
-                        GitSourceRequest::PARAMETER_HOST_URL => $hostUrl,
-                        GitSourceRequest::PARAMETER_PATH => $path,
-                        GitSourceRequest::PARAMETER_CREDENTIALS => '',
-                    ]
-                )),
+                'request' => new GitSourceRequest($label, $hostUrl, $path, ''),
                 'expected' => new GitSource($userId, $label, $hostUrl, $path, ''),
             ],
             'git, non-empty credentials' => [
                 'user' => $user,
-                'request' => new GitSourceRequest(new Request(
-                    request: [
-                        GitSourceRequest::PARAMETER_LABEL => $label,
-                        GitSourceRequest::PARAMETER_HOST_URL => $hostUrl,
-                        GitSourceRequest::PARAMETER_PATH => $path,
-                        GitSourceRequest::PARAMETER_CREDENTIALS => 'credentials',
-                    ]
-                )),
+                'request' => new GitSourceRequest($label, $hostUrl, $path, 'credentials'),
                 'expected' => new GitSource($userId, $label, $hostUrl, $path, 'credentials'),
             ],
         ];
