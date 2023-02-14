@@ -12,7 +12,6 @@ use App\Services\Source\Mutator;
 use App\Tests\Model\UserId;
 use App\Tests\Services\EntityRemover;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-use Symfony\Component\HttpFoundation\Request;
 
 class MutatorTest extends WebTestCase
 {
@@ -54,11 +53,7 @@ class MutatorTest extends WebTestCase
         return [
             'file source, no changes' => [
                 'source' => $fileSource,
-                'request' => new FileSourceRequest(new Request(
-                    request: [
-                        FileSourceRequest::PARAMETER_LABEL => $label,
-                    ]
-                )),
+                'request' => new FileSourceRequest($label),
             ],
         ];
     }
@@ -123,20 +118,12 @@ class MutatorTest extends WebTestCase
         return [
             'file source, no changes' => [
                 'source' => $originalFileSource,
-                'request' => new FileSourceRequest(new Request(
-                    request: [
-                        FileSourceRequest::PARAMETER_LABEL => $label,
-                    ]
-                )),
+                'request' => new FileSourceRequest($label),
                 'expected' => $originalFileSource,
             ],
             'file source, update label' => [
                 'source' => $originalFileSource,
-                'request' => new FileSourceRequest(new Request(
-                    request: [
-                        FileSourceRequest::PARAMETER_LABEL => $newLabel,
-                    ]
-                )),
+                'request' => new FileSourceRequest($newLabel),
                 'expected' => $updatedFileSource,
             ],
         ];

@@ -23,7 +23,7 @@ class FileSourceRequestValidator
         $this->valueLengthValidator->validate(
             $request,
             'label',
-            $request->getLabel(),
+            $request->label,
             1,
             AbstractOriginSource::LABEL_MAX_LENGTH
         );

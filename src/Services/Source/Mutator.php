@@ -19,7 +19,7 @@ class Mutator
 
     public function updateFile(FileSource $source, FileSourceRequest $request): SourceInterface
     {
-        $source->setLabel($request->getLabel());
+        $source->setLabel($request->label);
         $this->store->add($source);
 
         return $source;

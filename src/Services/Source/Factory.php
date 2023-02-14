@@ -40,7 +40,7 @@ class Factory
 
     public function createFromFileSourceRequest(User $user, FileSourceRequest $request): FileSource
     {
-        $source = new FileSource($user->getUserIdentifier(), $request->getLabel());
+        $source = new FileSource($user->getUserIdentifier(), $request->label);
 
         $foundSource = $this->finder->find($source);
         if ($foundSource instanceof FileSource) {

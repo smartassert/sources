@@ -20,6 +20,8 @@ class FileSourceRequestResolver implements ValueResolverInterface
             return [];
         }
 
-        return [new FileSourceRequest($request)];
+        return [new FileSourceRequest(
+            trim((string) $request->request->get(FileSourceRequest::PARAMETER_LABEL)),
+        )];
     }
 }

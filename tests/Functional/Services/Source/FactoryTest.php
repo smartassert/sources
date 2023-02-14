@@ -16,7 +16,6 @@ use App\Tests\Model\UserId;
 use App\Tests\Services\EntityRemover;
 use SmartAssert\UsersSecurityBundle\Security\User;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-use Symfony\Component\HttpFoundation\Request;
 use webignition\ObjectReflector\ObjectReflector;
 
 class FactoryTest extends WebTestCase
@@ -130,11 +129,7 @@ class FactoryTest extends WebTestCase
         return [
             'file' => [
                 'user' => $user,
-                'request' => new FileSourceRequest(new Request(
-                    request: [
-                        FileSourceRequest::PARAMETER_LABEL => 'file source label',
-                    ]
-                )),
+                'request' => new FileSourceRequest('file source label'),
                 'expected' => new FileSource($userId, 'file source label'),
             ],
         ];
