@@ -34,6 +34,7 @@ trait CreateUpdateGitSourceDataProviderTrait
                         'type' => 'invalid_request',
                         'payload' => [
                             'label' => [
+                                'name' => 'label',
                                 'value' => '',
                                 'message' => 'This value is too short. It should have 1 character or more.',
                             ],
@@ -52,6 +53,7 @@ trait CreateUpdateGitSourceDataProviderTrait
                         'type' => 'invalid_request',
                         'payload' => [
                             'label' => [
+                                'name' => 'label',
                                 'value' => $labelTooLong,
                                 'message' => 'This value is too long. It should have 255 characters or less.',
                             ],
@@ -69,6 +71,7 @@ trait CreateUpdateGitSourceDataProviderTrait
                         'type' => 'invalid_request',
                         'payload' => [
                             'host-url' => [
+                                'name' => 'host-url',
                                 'value' => '',
                                 'message' => 'This value is too short. It should have 1 character or more.',
                             ],
@@ -87,6 +90,7 @@ trait CreateUpdateGitSourceDataProviderTrait
                         'type' => 'invalid_request',
                         'payload' => [
                             'host-url' => [
+                                'name' => 'host-url',
                                 'value' => $hostUrlTooLong,
                                 'message' => 'This value is too long. It should have 255 characters or less.',
                             ],
@@ -104,6 +108,7 @@ trait CreateUpdateGitSourceDataProviderTrait
                         'type' => 'invalid_request',
                         'payload' => [
                             'path' => [
+                                'name' => 'path',
                                 'value' => '',
                                 'message' => 'This value is too short. It should have 1 character or more.',
                             ],
@@ -122,6 +127,7 @@ trait CreateUpdateGitSourceDataProviderTrait
                         'type' => 'invalid_request',
                         'payload' => [
                             'path' => [
+                                'name' => 'path',
                                 'value' => $pathTooLong,
                                 'message' => 'This value is too long. It should have 255 characters or less.',
                             ],
@@ -141,6 +147,7 @@ trait CreateUpdateGitSourceDataProviderTrait
                         'type' => 'invalid_request',
                         'payload' => [
                             'credentials' => [
+                                'name' => 'credentials',
                                 'value' => $credentialsTooLong,
                                 'message' => 'This value is too long. It should have 255 characters or less.',
                             ],

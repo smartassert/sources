@@ -77,6 +77,7 @@ abstract class AbstractFileSourceFileTest extends AbstractApplicationTest
                         'type' => 'invalid_request',
                         'payload' => [
                             'content' => [
+                                'name' => 'content',
                                 'value' => '',
                                 'message' => 'File content must not be empty.',
                             ],
@@ -92,6 +93,7 @@ abstract class AbstractFileSourceFileTest extends AbstractApplicationTest
                         'type' => 'invalid_request',
                         'payload' => [
                             'content' => [
+                                'name' => 'content',
                                 'value' => '',
                                 'message' => 'Content must be valid YAML: Unable to parse at line 2 (near "content").',
                             ],
