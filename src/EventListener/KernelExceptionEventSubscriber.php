@@ -66,7 +66,7 @@ class KernelExceptionEventSubscriber implements EventSubscriberInterface
     {
         return $this->responseFactory->createErrorResponse(
             $this->invalidRequestResponseFactory->createFromConstraintViolation(
-                $throwable->getViolations()->get(0),
+                $throwable->getViolation(),
                 $throwable->getPropertyNamePrefixesToRemove()
             ),
             $throwable->getErrorCode()

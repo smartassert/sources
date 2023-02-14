@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Exception;
 
-use Symfony\Component\Validator\ConstraintViolationListInterface;
+use Symfony\Component\Validator\ConstraintViolationInterface;
 
 class InvalidRequestException extends \Exception implements HasHttpErrorCodeInterface
 {
@@ -13,7 +13,7 @@ class InvalidRequestException extends \Exception implements HasHttpErrorCodeInte
      */
     public function __construct(
         private object $request,
-        private ConstraintViolationListInterface $violations,
+        private ConstraintViolationInterface $violation,
         private array $propertyNamePrefixesToRemove = []
     ) {
         parent::__construct();
@@ -24,9 +24,9 @@ class InvalidRequestException extends \Exception implements HasHttpErrorCodeInte
         return $this->request;
     }
 
-    public function getViolations(): ConstraintViolationListInterface
+    public function getViolation(): ConstraintViolationInterface
     {
-        return $this->violations;
+        return $this->violation;
     }
 
     /**
