@@ -30,31 +30,13 @@ class GitSourceRequestValidator
             AbstractOriginSource::LABEL_MAX_LENGTH
         );
 
-        $hostUrl = $request->getHostUrl();
-        $hostUrlLength = strlen($hostUrl);
-
-        if (0 === $hostUrlLength) {
-            throw new InvalidRequestException(
-                $request,
-                new InvalidField(
-                    'host-url',
-                    $hostUrl,
-                    'This value is too short. It should have 1 character or more.',
-                ),
-            );
-        }
-
-        $hostUrlMaxLength = GitSource::HOST_URL_MAX_LENGTH;
-        if ($hostUrlLength > $hostUrlMaxLength) {
-            throw new InvalidRequestException(
-                $request,
-                new InvalidField(
-                    'host-url',
-                    $hostUrl,
-                    'This value is too long. It should have ' . $hostUrlMaxLength . ' characters or less.',
-                ),
-            );
-        }
+        $this->valueLengthValidator->validate(
+            $request,
+            'host-url',
+            $request->getHostUrl(),
+            1,
+            GitSource::HOST_URL_MAX_LENGTH
+        );
 
         $path = $request->getPath();
         $pathLength = strlen($path);

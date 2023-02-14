@@ -68,7 +68,7 @@ trait CreateUpdateGitSourceDataProviderTrait
                         'payload' => [
                             'name' => 'host-url',
                             'value' => '',
-                            'message' => 'This value is too short. It should have 1 character or more.',
+                            'message' => 'This value should be between 1 and 255 characters long.',
                         ],
                     ],
                 ],
@@ -85,7 +85,7 @@ trait CreateUpdateGitSourceDataProviderTrait
                         'payload' => [
                             'name' => 'host-url',
                             'value' => $hostUrlTooLong,
-                            'message' => 'This value is too long. It should have 255 characters or less.',
+                            'message' => 'This value should be between 1 and 255 characters long.',
                         ],
                     ],
                 ],
