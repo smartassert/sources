@@ -14,9 +14,9 @@ use App\Message\Prepare;
 use App\Request\FileSourceRequest;
 use App\Request\GitSourceRequest;
 use App\RequestValidator\FileSourceRequestValidator;
+use App\RequestValidator\GitSourceRequestValidator;
 use App\Response\YamlResponse;
 use App\Security\UserSourceAccessChecker;
-use App\Services\RequestValidator;
 use App\Services\RunSourceFactory;
 use App\Services\RunSourceSerializer;
 use App\Services\Source\Mutator;
@@ -71,7 +71,7 @@ class UserSourceController
      */
     #[Route(SourceRoutes::ROUTE_SOURCE . '/git', name: 'user_git_source_update', methods: ['PUT'])]
     public function updateGit(
-        RequestValidator $requestValidator,
+        GitSourceRequestValidator $requestValidator,
         Mutator $mutator,
         GitSource $source,
         GitSourceRequest $request,
