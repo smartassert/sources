@@ -4,17 +4,13 @@ declare(strict_types=1);
 
 namespace App\Exception;
 
-use Symfony\Component\Validator\ConstraintViolationInterface;
+use App\ResponseBody\InvalidField;
 
 class InvalidRequestException extends \Exception implements HasHttpErrorCodeInterface
 {
-    /**
-     * @param string[] $propertyNamePrefixesToRemove
-     */
     public function __construct(
-        private object $request,
-        private ConstraintViolationInterface $violation,
-        private array $propertyNamePrefixesToRemove = []
+        private readonly object $request,
+        private readonly InvalidField $invalidField,
     ) {
         parent::__construct();
     }
@@ -24,17 +20,9 @@ class InvalidRequestException extends \Exception implements HasHttpErrorCodeInte
         return $this->request;
     }
 
-    public function getViolation(): ConstraintViolationInterface
+    public function getInvalidField(): InvalidField
     {
-        return $this->violation;
-    }
-
-    /**
-     * @return string[]
-     */
-    public function getPropertyNamePrefixesToRemove(): array
-    {
-        return $this->propertyNamePrefixesToRemove;
+        return $this->invalidField;
     }
 
     public function getErrorCode(): int

@@ -7,7 +7,7 @@ namespace App\EventListener;
 use App\Exception\HasHttpErrorCodeInterface;
 use App\Exception\InvalidRequestException;
 use App\ResponseBody\FilesystemExceptionResponse;
-use App\Services\InvalidRequestResponseFactory;
+use App\ResponseBody\InvalidRequestResponse;
 use App\Services\ResponseFactory;
 use League\Flysystem\FilesystemException;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -18,7 +18,6 @@ class KernelExceptionEventSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private ResponseFactory $responseFactory,
-        private InvalidRequestResponseFactory $invalidRequestResponseFactory,
     ) {
     }
 
@@ -65,10 +64,7 @@ class KernelExceptionEventSubscriber implements EventSubscriberInterface
     private function handleInvalidRequest(InvalidRequestException $throwable): Response
     {
         return $this->responseFactory->createErrorResponse(
-            $this->invalidRequestResponseFactory->createFromConstraintViolation(
-                $throwable->getViolation(),
-                $throwable->getPropertyNamePrefixesToRemove()
-            ),
+            new InvalidRequestResponse($throwable->getInvalidField()),
             $throwable->getErrorCode()
         );
     }
