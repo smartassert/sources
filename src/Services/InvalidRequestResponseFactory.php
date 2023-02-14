@@ -7,7 +7,7 @@ namespace App\Services;
 use App\ResponseBody\InvalidField;
 use App\ResponseBody\InvalidRequestResponse;
 use Symfony\Component\String\UnicodeString;
-use Symfony\Component\Validator\ConstraintViolationListInterface;
+use Symfony\Component\Validator\ConstraintViolationInterface;
 
 class InvalidRequestResponseFactory
 {
@@ -19,12 +19,10 @@ class InvalidRequestResponseFactory
     /**
      * @param string[] $propertyNamePrefixesToRemove
      */
-    public function createFromConstraintViolations(
-        ConstraintViolationListInterface $errors,
+    public function createFromConstraintViolation(
+        ConstraintViolationInterface $error,
         array $propertyNamePrefixesToRemove = []
     ): InvalidRequestResponse {
-        $error = $errors->get(0);
-
         $invalidValue = $error->getInvalidValue();
         $invalidValue = is_scalar($invalidValue) ? (string) $invalidValue : '';
 
