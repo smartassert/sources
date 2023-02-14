@@ -8,13 +8,9 @@ use App\ResponseBody\InvalidField;
 
 class InvalidRequestException extends \Exception implements HasHttpErrorCodeInterface
 {
-    /**
-     * @param string[] $propertyNamePrefixesToRemove
-     */
     public function __construct(
         private readonly object $request,
         private readonly InvalidField $invalidField,
-        private readonly array $propertyNamePrefixesToRemove = []
     ) {
         parent::__construct();
     }
@@ -27,14 +23,6 @@ class InvalidRequestException extends \Exception implements HasHttpErrorCodeInte
     public function getInvalidField(): InvalidField
     {
         return $this->invalidField;
-    }
-
-    /**
-     * @return string[]
-     */
-    public function getPropertyNamePrefixesToRemove(): array
-    {
-        return $this->propertyNamePrefixesToRemove;
     }
 
     public function getErrorCode(): int

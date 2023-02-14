@@ -29,8 +29,7 @@ class RequestValidator
         if (0 !== count($errors)) {
             throw new InvalidRequestException(
                 $request,
-                $this->createInvalidFieldFromConstraintViolation($errors->get(0), $propertyNamePrefixesToRemove),
-                $propertyNamePrefixesToRemove
+                $this->createInvalidFieldFromConstraintViolation($errors->get(0), $propertyNamePrefixesToRemove)
             );
         }
     }
