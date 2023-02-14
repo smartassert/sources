@@ -23,10 +23,9 @@ trait CreateUpdateFileSourceDataProviderTrait
                     'error' => [
                         'type' => 'invalid_request',
                         'payload' => [
-                            'label' => [
-                                'value' => '',
-                                'message' => 'This value is too short. It should have 1 character or more.',
-                            ],
+                            'name' => 'label',
+                            'value' => '',
+                            'message' => 'This value is too short. It should have 1 character or more.',
                         ],
                     ],
                 ],
@@ -39,10 +38,9 @@ trait CreateUpdateFileSourceDataProviderTrait
                     'error' => [
                         'type' => 'invalid_request',
                         'payload' => [
-                            'label' => [
-                                'value' => $labelTooLong,
-                                'message' => 'This value is too long. It should have 255 characters or less.',
-                            ],
+                            'name' => 'label',
+                            'value' => $labelTooLong,
+                            'message' => 'This value is too long. It should have 255 characters or less.',
                         ],
                     ],
                 ],

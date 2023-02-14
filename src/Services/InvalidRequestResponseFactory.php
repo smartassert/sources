@@ -7,7 +7,7 @@ namespace App\Services;
 use App\ResponseBody\InvalidField;
 use App\ResponseBody\InvalidRequestResponse;
 use Symfony\Component\String\UnicodeString;
-use Symfony\Component\Validator\ConstraintViolationListInterface;
+use Symfony\Component\Validator\ConstraintViolationInterface;
 
 class InvalidRequestResponseFactory
 {
@@ -19,22 +19,18 @@ class InvalidRequestResponseFactory
     /**
      * @param string[] $propertyNamePrefixesToRemove
      */
-    public function createFromConstraintViolations(
-        ConstraintViolationListInterface $errors,
+    public function createFromConstraintViolation(
+        ConstraintViolationInterface $error,
         array $propertyNamePrefixesToRemove = []
     ): InvalidRequestResponse {
-        $invalidFields = [];
+        $invalidValue = $error->getInvalidValue();
+        $invalidValue = is_scalar($invalidValue) ? (string) $invalidValue : '';
 
-        foreach ($errors as $error) {
-            $invalidValue = $error->getInvalidValue();
-            $invalidValue = is_scalar($invalidValue) ? (string) $invalidValue : '';
+        $requestField = $this->stringCaseConverter->convertCamelCaseToKebabCase($error->getPropertyPath());
+        $requestField = (string) (new UnicodeString($requestField))->trimPrefix($propertyNamePrefixesToRemove);
 
-            $requestField = $this->stringCaseConverter->convertCamelCaseToKebabCase($error->getPropertyPath());
-            $requestField = (string) (new UnicodeString($requestField))->trimPrefix($propertyNamePrefixesToRemove);
+        $invalidField = new InvalidField($requestField, $invalidValue, (string) $error->getMessage());
 
-            $invalidFields[] = new InvalidField($requestField, $invalidValue, (string) $error->getMessage());
-        }
-
-        return new InvalidRequestResponse($invalidFields);
+        return new InvalidRequestResponse($invalidField);
     }
 }

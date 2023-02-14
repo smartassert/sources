@@ -65,8 +65,8 @@ class KernelExceptionEventSubscriber implements EventSubscriberInterface
     private function handleInvalidRequest(InvalidRequestException $throwable): Response
     {
         return $this->responseFactory->createErrorResponse(
-            $this->invalidRequestResponseFactory->createFromConstraintViolations(
-                $throwable->getViolations(),
+            $this->invalidRequestResponseFactory->createFromConstraintViolation(
+                $throwable->getViolations()->get(0),
                 $throwable->getPropertyNamePrefixesToRemove()
             ),
             $throwable->getErrorCode()
