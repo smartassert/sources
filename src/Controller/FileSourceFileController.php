@@ -47,7 +47,7 @@ class FileSourceFileController
         $this->userSourceAccessChecker->denyAccessUnlessGranted($source);
         $requestValidator->validate($request);
 
-        $yamlFile = $request->getYamlFile();
+        $yamlFile = $request->file;
 
         $this->fileSourceWriter->write($source->getDirectoryPath() . '/' . $yamlFile->name, $yamlFile->content);
 
