@@ -11,6 +11,11 @@ use SmartAssert\YamlFile\Validator\YamlFilenameValidator;
 
 class YamlFileRequestValidator
 {
+    public const MESSAGE_NAME_INVALID =
+        'File name must be non-empty, '
+        . 'have a .yml or .yaml extension, '
+        . 'and contain no backslash or null byte characters.';
+
     public function __construct(
         private readonly YamlFilenameValidator $yamlFilenameValidator,
     ) {
@@ -29,8 +34,7 @@ class YamlFileRequestValidator
                 new InvalidField(
                     'name',
                     '',
-                    'File name must be non-empty, have a .yml or .yaml extension, ' .
-                    'and contain no backslash or null byte characters.',
+                    self::MESSAGE_NAME_INVALID
                 ),
             );
         }

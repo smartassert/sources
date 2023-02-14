@@ -4,15 +4,12 @@ declare(strict_types=1);
 
 namespace App\Request;
 
-use App\Validator\YamlFileConstraint;
 use SmartAssert\YamlFile\YamlFile;
 
 class AddYamlFileRequest extends YamlFileRequest
 {
-    public function __construct(
-        #[YamlFileConstraint]
-        private YamlFile $file,
-    ) {
+    public function __construct(private YamlFile $file)
+    {
         parent::__construct($file->name);
     }
 
