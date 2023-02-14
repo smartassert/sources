@@ -8,7 +8,6 @@ use App\Entity\AbstractOriginSource;
 use App\Entity\GitSource;
 use App\Exception\InvalidRequestException;
 use App\Request\GitSourceRequest;
-use App\ResponseBody\InvalidField;
 
 class GitSourceRequestValidator
 {
@@ -46,19 +45,12 @@ class GitSourceRequestValidator
             GitSource::PATH_MAX_LENGTH
         );
 
-        $credentials = $request->getCredentials();
-        $credentialsLength = strlen($credentials);
-        $credentialsMaxLength = GitSource::CREDENTIALS_MAX_LENGTH;
-
-        if ($credentialsLength > $credentialsMaxLength) {
-            throw new InvalidRequestException(
-                $request,
-                new InvalidField(
-                    'credentials',
-                    $credentials,
-                    'This value is too long. It should have ' . $credentialsMaxLength . ' characters or less.',
-                ),
-            );
-        }
+        $this->valueLengthValidator->validate(
+            $request,
+            'credentials',
+            $request->getCredentials(),
+            0,
+            GitSource::CREDENTIALS_MAX_LENGTH
+        );
     }
 }

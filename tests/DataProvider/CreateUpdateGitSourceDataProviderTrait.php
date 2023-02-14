@@ -136,7 +136,7 @@ trait CreateUpdateGitSourceDataProviderTrait
                         'payload' => [
                             'name' => 'credentials',
                             'value' => $credentialsTooLong,
-                            'message' => 'This value is too long. It should have 255 characters or less.',
+                            'message' => 'This value should be between 0 and 255 characters long.',
                         ],
                     ],
                 ],
