@@ -12,6 +12,7 @@ use Doctrine\ORM\Mapping as ORM;
 class Suite implements \JsonSerializable
 {
     public const ID_LENGTH = 32;
+    public const LABEL_MAX_LENGTH = 255;
 
     /**
      * @var non-empty-string
@@ -33,7 +34,7 @@ class Suite implements \JsonSerializable
     /**
      * @var non-empty-string
      */
-    #[ORM\Column(type: Types::STRING, length: 255)]
+    #[ORM\Column(type: Types::STRING, length: self::LABEL_MAX_LENGTH)]
     private string $label;
 
     /**
