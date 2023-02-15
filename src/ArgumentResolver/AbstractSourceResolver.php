@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\ArgumentResolver;
 
+use App\Controller\SourceRoutes;
 use App\Entity\SourceInterface;
 use App\Exception\SourceNotFoundException;
 use Symfony\Component\HttpFoundation\Request;
@@ -23,7 +24,7 @@ abstract class AbstractSourceResolver implements ValueResolverInterface
             return [];
         }
 
-        $sourceId = $request->attributes->get('sourceId');
+        $sourceId = $request->attributes->get(SourceRoutes::ATTRIBUTE_SOURCE_ID);
         if (!is_string($sourceId)) {
             return [];
         }
