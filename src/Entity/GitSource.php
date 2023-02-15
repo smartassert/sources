@@ -91,11 +91,6 @@ class GitSource extends AbstractOriginSource implements SourceOriginInterface, \
         return $this->credentials;
     }
 
-    public function getType(): Type
-    {
-        return Type::GIT;
-    }
-
     public function getRunParameterNames(): array
     {
         return [

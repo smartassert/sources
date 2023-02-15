@@ -16,11 +16,6 @@ class FileSource extends AbstractOriginSource implements
     SourceRepositoryInterface,
     \JsonSerializable
 {
-    public function getType(): Type
-    {
-        return Type::FILE;
-    }
-
     public function getRunParameterNames(): array
     {
         return [];

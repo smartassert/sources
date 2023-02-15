@@ -65,11 +65,6 @@ class RunSource extends AbstractSource implements DirectoryLocatorInterface, \Js
         return $this->parameters;
     }
 
-    public function getType(): Type
-    {
-        return Type::RUN;
-    }
-
     public function setState(State $state): self
     {
         $this->state = $state;
@@ -80,16 +75,6 @@ class RunSource extends AbstractSource implements DirectoryLocatorInterface, \Js
     public function getState(): State
     {
         return $this->state;
-    }
-
-    public function getFailureReason(): ?FailureReason
-    {
-        return $this->failureReason;
-    }
-
-    public function getFailureMessage(): ?string
-    {
-        return $this->failureMessage;
     }
 
     public function setPreparationFailed(
