@@ -103,4 +103,42 @@ abstract class AbstractCreateFileSourceTest extends AbstractApplicationTest
         self::assertSame(200, $secondResponse->getStatusCode());
         self::assertSame($firstResponse->getBody()->getContents(), $secondResponse->getBody()->getContents());
     }
+
+    public function testCreateWithLabelOfDeletedSourceIsSuccessful(): void
+    {
+        $label = 'file source label';
+        $requestParameters = [
+            FileSourceRequest::PARAMETER_LABEL => $label,
+        ];
+
+        $firstCreateResponse = $this->applicationClient->makeCreateFileSourceRequest(
+            self::$authenticationConfiguration->getValidApiToken(),
+            $requestParameters
+        );
+
+        self::assertSame(200, $firstCreateResponse->getStatusCode());
+
+        $firstCreateResponseData = json_decode($firstCreateResponse->getBody()->getContents(), true);
+        \assert(is_array($firstCreateResponseData));
+        $sourceId = $firstCreateResponseData['id'] ?? null;
+        \assert(is_string($sourceId));
+
+        $deleteResponse = $this->applicationClient->makeDeleteSourceRequest(
+            self::$authenticationConfiguration->getValidApiToken(),
+            $sourceId
+        );
+
+        self::assertSame(200, $deleteResponse->getStatusCode());
+
+        $secondCreateResponse = $this->applicationClient->makeCreateFileSourceRequest(
+            self::$authenticationConfiguration->getValidApiToken(),
+            $requestParameters
+        );
+
+        self::assertSame(200, $secondCreateResponse->getStatusCode());
+
+        $secondCreateResponseData = json_decode($secondCreateResponse->getBody()->getContents(), true);
+        \assert(is_array($secondCreateResponseData));
+        self::assertNotSame($sourceId, $secondCreateResponseData['id']);
+    }
 }

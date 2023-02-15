@@ -24,6 +24,7 @@ class GitSourceFinder implements TypeFinderInterface
         return $this->repository->findOneBy([
             'userId' => $source->getUserId(),
             'label' => $source->getLabel(),
+            'deletedAt' => null,
             'hostUrl' => $source->getHostUrl(),
             'path' => $source->getPath(),
         ]);

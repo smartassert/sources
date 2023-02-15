@@ -20,9 +20,10 @@ class Store
         $this->entityManager->flush();
     }
 
-    public function remove(SourceInterface $source): void
+    public function delete(SourceInterface $source): void
     {
-        $this->entityManager->remove($source);
-        $this->entityManager->flush();
+        $source->setDeletedAt(new \DateTimeImmutable());
+
+        $this->add($source);
     }
 }

@@ -61,14 +61,33 @@ class FinderTest extends WebTestCase
     {
         $userId = UserId::create();
 
-        $fileSource = new FileSource($userId, 'file source label');
-        $gitSource = new GitSource($userId, 'git source label', 'https://example.com/repository.git', '/');
+        $fileSourceLabel = 'file source label';
+        $gitSourceLabel = 'git source label';
+
+        $fileSource = new FileSource($userId, $fileSourceLabel);
+        $gitSource = new GitSource($userId, $gitSourceLabel, 'https://example.com/repository.git');
         $fileRunSourceWithoutParameters = new RunSource($fileSource);
         $fileRunSourceWithParameters = new RunSource($fileSource, ['key1' => 'value1']);
         $gitRunSourceWithoutParameters = new RunSource($gitSource);
         $gitRunSourceWithParameters = new RunSource($gitSource, ['key2' => 'value2']);
 
+        $fileSourceDeleted = (function () use ($userId, $fileSourceLabel) {
+            $source = new FileSource($userId, $fileSourceLabel);
+            $source->setDeletedAt(new \DateTimeImmutable('-1 second'));
+
+            return $source;
+        })();
+
+        $gitSourceDeleted = (function () use ($userId, $gitSourceLabel) {
+            $source = new GitSource($userId, $gitSourceLabel, 'https://example.com/repository.git');
+            $source->setDeletedAt(new \DateTimeImmutable('-1 second'));
+
+            return $source;
+        })();
+
         $allSources = [
+            $fileSourceDeleted,
+            $gitSourceDeleted,
             $fileSource,
             $gitSource,
             $gitRunSourceWithoutParameters,

@@ -86,7 +86,7 @@ class UserSourceController
     ): Response {
         $this->userSourceAccessChecker->denyAccessUnlessGranted($source);
 
-        $store->remove($source);
+        $store->delete($source);
 
         if ($source instanceof FileSource) {
             $fileSourceWriter->deleteDirectory($source->getDirectoryPath());

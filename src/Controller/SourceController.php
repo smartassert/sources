@@ -37,6 +37,6 @@ class SourceController
     #[Route('/list', name: 'source_list', methods: ['GET'])]
     public function list(UserInterface $user): JsonResponse
     {
-        return new JsonResponse($this->repository->findByUserAndType($user, [Type::FILE, Type::GIT]));
+        return new JsonResponse($this->repository->findNonDeletedByUserAndType($user, [Type::FILE, Type::GIT]));
     }
 }
