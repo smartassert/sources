@@ -73,14 +73,16 @@ class GitRepositoryStoreTest extends WebTestCase
             $entityRemover->removeAll();
         }
 
+        $idFactory = new EntityIdFactory();
+
         $this->source = new GitSource(
-            (new EntityIdFactory())->create(),
+            $idFactory->create(),
             UserId::create(),
             'git source label',
             self::REPOSITORY_URL,
             self::PATH
         );
-        $this->gitRepository = new UserGitRepository($this->source);
+        $this->gitRepository = new UserGitRepository($idFactory->create(), $this->source);
 
         $gitRepositoryBasePath = self::getContainer()->getParameter('git_repository_store_directory');
         \assert(is_string($gitRepositoryBasePath));

@@ -12,7 +12,6 @@ use App\Exception\GitRepositoryException;
 use App\Exception\MessageHandler\PrepareException;
 use App\Message\Prepare;
 use App\MessageHandler\PrepareHandler;
-use App\Model\EntityId;
 use App\Repository\SourceRepository;
 use App\Services\EntityIdFactory;
 use App\Services\RunSourceSerializer;
@@ -110,7 +109,7 @@ class PrepareHandlerTest extends WebTestCase
         return [
             'no entities' => [
                 'entities' => [],
-                'message' => new Prepare(EntityId::create(), []),
+                'message' => new Prepare((new EntityIdFactory())->create(), []),
             ],
             'source is not RunSource' => [
                 'entities' => [

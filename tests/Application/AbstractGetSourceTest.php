@@ -8,7 +8,7 @@ use App\Entity\RunSource;
 use App\Enum\RunSource\FailureReason;
 use App\Enum\RunSource\State;
 use App\Enum\Source\Type;
-use App\Model\EntityId;
+use App\Services\EntityIdFactory;
 use App\Tests\Services\SourceProvider;
 
 abstract class AbstractGetSourceTest extends AbstractApplicationTest
@@ -17,7 +17,7 @@ abstract class AbstractGetSourceTest extends AbstractApplicationTest
     {
         $response = $this->applicationClient->makeGetSourceRequest(
             self::$authenticationConfiguration->getValidApiToken(),
-            EntityId::create()
+            (new EntityIdFactory())->create()
         );
 
         $this->responseAsserter->assertNotFoundResponse($response);

@@ -22,7 +22,9 @@ class UserGitRepositoryFactoryTest extends WebTestCase
             'http://example.com/repository.git'
         );
 
-        $userGitRepository = (new UserGitRepositoryFactory())->create($source);
+        $userGitRepositoryFactory = new UserGitRepositoryFactory(new EntityIdFactory());
+
+        $userGitRepository = $userGitRepositoryFactory->create($source);
 
         self::assertInstanceOf(UserGitRepository::class, $userGitRepository);
         self::assertSame($source, $userGitRepository->getSource());

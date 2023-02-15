@@ -135,6 +135,7 @@ class SerializerTest extends WebTestCase
                 'fixtureSetIdentifier' => 'Source/yml_yaml_valid',
                 'sourceStorageId' => 'git_repository.storage',
                 'source' => new UserGitRepository(
+                    $idFactory->create(),
                     new GitSource(
                         $idFactory->create(),
                         UserId::create(),
@@ -149,6 +150,7 @@ class SerializerTest extends WebTestCase
                 'fixtureSetIdentifier' => 'Source/yml_yaml_valid',
                 'sourceStorageId' => 'git_repository.storage',
                 'source' => new UserGitRepository(
+                    $idFactory->create(),
                     new GitSource(
                         $idFactory->create(),
                         UserId::create(),

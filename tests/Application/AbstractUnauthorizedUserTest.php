@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Application;
 
-use App\Model\EntityId;
+use App\Services\EntityIdFactory;
 use App\Tests\Services\AuthenticationConfiguration;
 
 abstract class AbstractUnauthorizedUserTest extends AbstractApplicationTest
@@ -18,7 +18,7 @@ abstract class AbstractUnauthorizedUserTest extends AbstractApplicationTest
     {
         $response = $this->applicationClient->makeAddFileRequest(
             $tokenCreator(self::$authenticationConfiguration),
-            EntityId::create(),
+            (new EntityIdFactory())->create(),
             self::FILENAME,
             '- content'
         );
@@ -33,7 +33,7 @@ abstract class AbstractUnauthorizedUserTest extends AbstractApplicationTest
     {
         $response = $this->applicationClient->makeRemoveFileRequest(
             $tokenCreator(self::$authenticationConfiguration),
-            EntityId::create(),
+            (new EntityIdFactory())->create(),
             self::FILENAME
         );
 
@@ -47,7 +47,7 @@ abstract class AbstractUnauthorizedUserTest extends AbstractApplicationTest
     {
         $response = $this->applicationClient->makeRemoveFileRequest(
             $tokenCreator(self::$authenticationConfiguration),
-            EntityId::create(),
+            (new EntityIdFactory())->create(),
             self::FILENAME
         );
 
@@ -99,7 +99,7 @@ abstract class AbstractUnauthorizedUserTest extends AbstractApplicationTest
     {
         $response = $this->applicationClient->makeGetSourceRequest(
             $tokenCreator(self::$authenticationConfiguration),
-            EntityId::create()
+            (new EntityIdFactory())->create()
         );
 
         $this->responseAsserter->assertUnauthorizedResponse($response);
@@ -112,7 +112,7 @@ abstract class AbstractUnauthorizedUserTest extends AbstractApplicationTest
     {
         $response = $this->applicationClient->makeUpdateFileSourceRequest(
             $tokenCreator(self::$authenticationConfiguration),
-            EntityId::create(),
+            (new EntityIdFactory())->create(),
             []
         );
 
@@ -126,7 +126,7 @@ abstract class AbstractUnauthorizedUserTest extends AbstractApplicationTest
     {
         $response = $this->applicationClient->makeUpdateGitSourceRequest(
             $tokenCreator(self::$authenticationConfiguration),
-            EntityId::create(),
+            (new EntityIdFactory())->create(),
             []
         );
 
@@ -140,7 +140,7 @@ abstract class AbstractUnauthorizedUserTest extends AbstractApplicationTest
     {
         $response = $this->applicationClient->makeDeleteSourceRequest(
             $tokenCreator(self::$authenticationConfiguration),
-            EntityId::create()
+            (new EntityIdFactory())->create()
         );
 
         $this->responseAsserter->assertUnauthorizedResponse($response);
@@ -153,7 +153,7 @@ abstract class AbstractUnauthorizedUserTest extends AbstractApplicationTest
     {
         $response = $this->applicationClient->makePrepareSourceRequest(
             $tokenCreator(self::$authenticationConfiguration),
-            EntityId::create(),
+            (new EntityIdFactory())->create(),
             []
         );
 
@@ -167,7 +167,7 @@ abstract class AbstractUnauthorizedUserTest extends AbstractApplicationTest
     {
         $response = $this->applicationClient->makeReadSourceRequest(
             $tokenCreator(self::$authenticationConfiguration),
-            EntityId::create()
+            (new EntityIdFactory())->create()
         );
 
         $this->responseAsserter->assertUnauthorizedResponse($response);

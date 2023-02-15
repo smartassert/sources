@@ -109,14 +109,16 @@ class FactoryTest extends WebTestCase
 
     public function testCreateForGitSourceSuccess(): void
     {
+        $idFactory = new EntityIdFactory();
+
         $gitSource = new GitSource(
-            (new EntityIdFactory())->create(),
+            $idFactory->create(),
             UserId::create(),
             'https://example.com/repository.git',
             '/'
         );
         $parameters = ['ref' => 'v1.1'];
-        $userGitRepository = new UserGitRepository($gitSource);
+        $userGitRepository = new UserGitRepository($idFactory->create(), $gitSource);
 
         $gitSourceHandler = self::getContainer()->get(GitSourceHandler::class);
         \assert($gitSourceHandler instanceof GitSourceHandler);
@@ -169,9 +171,12 @@ class FactoryTest extends WebTestCase
         $gitRepositoryStorage = self::getContainer()->get('git_repository.storage');
         \assert($gitRepositoryStorage instanceof FilesystemOperator);
 
+        $idFactory = new EntityIdFactory();
+
         $userGitRepository = new UserGitRepository(
+            $idFactory->create(),
             new GitSource(
-                (new EntityIdFactory())->create(),
+                $idFactory->create(),
                 UserId::create(),
                 'label',
                 'https://example.com/repository.git'
