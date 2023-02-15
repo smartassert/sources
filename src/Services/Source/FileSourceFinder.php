@@ -24,6 +24,7 @@ class FileSourceFinder implements TypeFinderInterface
         return $this->repository->findOneBy([
             'userId' => $source->getUserId(),
             'label' => $source->getLabel(),
+            'deletedAt' => null,
         ]);
     }
 }
