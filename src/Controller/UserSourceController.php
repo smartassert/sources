@@ -13,7 +13,6 @@ use App\Exception\InvalidRequestException;
 use App\Message\Prepare;
 use App\Request\FileSourceRequest;
 use App\Request\GitSourceRequest;
-use App\RequestValidator\FileSourceRequestValidator;
 use App\RequestValidator\GitSourceRequestValidator;
 use App\Response\YamlResponse;
 use App\Security\UserSourceAccessChecker;
@@ -50,17 +49,14 @@ class UserSourceController
 
     /**
      * @throws AccessDeniedException
-     * @throws InvalidRequestException
      */
     #[Route(SourceRoutes::ROUTE_SOURCE . '/file', name: 'user_file_source_update', methods: ['PUT'])]
     public function updateFile(
-        FileSourceRequestValidator $requestValidator,
         Mutator $mutator,
         FileSource $source,
         FileSourceRequest $request,
     ): Response {
         $this->userSourceAccessChecker->denyAccessUnlessGranted($source);
-        $requestValidator->validate($request);
 
         return new JsonResponse($mutator->updateFile($source, $request));
     }

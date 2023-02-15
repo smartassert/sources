@@ -76,7 +76,9 @@ abstract class AbstractInvalidSourceUserTest extends AbstractApplicationTest
         $response = $this->applicationClient->makeUpdateFileSourceRequest(
             self::$authenticationConfiguration->getValidApiToken(),
             $this->fileSource->getId(),
-            []
+            [
+                'label' => 'non-empty label',
+            ]
         );
 
         $this->responseAsserter->assertForbiddenResponse($response);

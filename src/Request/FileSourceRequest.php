@@ -8,6 +8,9 @@ class FileSourceRequest
 {
     public const PARAMETER_LABEL = 'label';
 
+    /**
+     * @param non-empty-string $label
+     */
     public function __construct(
         public readonly string $label,
     ) {
