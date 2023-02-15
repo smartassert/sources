@@ -6,6 +6,9 @@ namespace App\Entity;
 
 interface SourceInterface
 {
+    /**
+     * @return non-empty-string
+     */
     public function getId(): string;
 
     /**
