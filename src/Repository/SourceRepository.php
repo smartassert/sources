@@ -32,11 +32,12 @@ class SourceRepository extends ServiceEntityRepository
      *
      * @return SourceOriginInterface[]
      */
-    public function findByUserAndType(UserInterface $user, array $types): array
+    public function findNonDeletedByUserAndType(UserInterface $user, array $types): array
     {
         $queryBuilder = $this->createQueryBuilder('Source')
             ->where('Source.userId = :UserId')
             ->andWhere(implode(' OR ', $this->createTypePredicates($types)))
+            ->andWhere('Source.deletedAt IS NULL')
             ->setParameter('UserId', $user->getUserIdentifier())
             ->orderBy('Source.id', 'ASC')
         ;

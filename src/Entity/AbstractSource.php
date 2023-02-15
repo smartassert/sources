@@ -59,6 +59,11 @@ abstract class AbstractSource implements SourceInterface
         return $this->userId;
     }
 
+    public function getDeletedAt(): ?\DateTimeImmutable
+    {
+        return $this->deletedAt;
+    }
+
     public function setDeletedAt(\DateTimeImmutable $deletedAt): void
     {
         if (null === $this->deletedAt) {

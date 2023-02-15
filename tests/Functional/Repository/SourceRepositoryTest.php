@@ -89,41 +89,57 @@ class SourceRepositoryTest extends WebTestCase
     }
 
     /**
-     * @dataProvider findByUserAndTypeDataProvider
+     * @dataProvider findNonDeletedByUserAndTypeDataProvider
      *
      * @param SourceInterface[] $sources
      * @param Type[]            $types
      * @param SourceInterface[] $expected
      */
-    public function testFindByUserAndType(array $sources, UserInterface $user, array $types, array $expected): void
-    {
+    public function testFindNonDeletedByUserAndType(
+        array $sources,
+        UserInterface $user,
+        array $types,
+        array $expected
+    ): void {
         foreach ($sources as $source) {
             $this->store->add($source);
         }
 
-        self::assertEquals($expected, $this->repository->findByUserAndType($user, $types));
+        self::assertEquals($expected, $this->repository->findNonDeletedByUserAndType($user, $types));
     }
 
     /**
      * @return array<mixed>
      */
-    public function findByUserAndTypeDataProvider(): array
+    public function findNonDeletedByUserAndTypeDataProvider(): array
     {
         $userId = UserId::create();
         \assert('' !== $userId);
         $user = new User($userId, 'non-empty string');
 
         $userFileSources = [
-            new FileSource($userId, 'file source label'),
+            'deletedAt=null' => new FileSource($userId, 'file source label'),
+            'deletedAt=-1s' => (function () use ($userId) {
+                $source = new FileSource($userId, 'file source label');
+                $source->setDeletedAt(new \DateTimeImmutable('-1 second'));
+
+                return $source;
+            })(),
+            'deletedAt=+1s' => (function () use ($userId) {
+                $source = new FileSource($userId, 'file source label');
+                $source->setDeletedAt(new \DateTimeImmutable('1 second'));
+
+                return $source;
+            })(),
         ];
 
         $userGitSources = [
-            new GitSource($userId, 'label', 'https://example.com/repository.git'),
+            'deletedAt=null' => new GitSource($userId, 'label', 'https://example.com/repository.git'),
         ];
 
         $userRunSources = [
-            new RunSource($userFileSources[0]),
-            new RunSource($userGitSources[0]),
+            'parent=file,deletedAt=null' => new RunSource($userFileSources['deletedAt=null']),
+            'parent=git,deletedAt=null' => new RunSource($userGitSources['deletedAt=null']),
         ];
 
         return [
@@ -155,8 +171,8 @@ class SourceRepositoryTest extends WebTestCase
             ],
             'has file and git sources for correct user only' => [
                 'sources' => [
-                    $userFileSources[0],
-                    $userGitSources[0],
+                    $userFileSources['deletedAt=null'],
+                    $userGitSources['deletedAt=null'],
                 ],
                 'user' => $user,
                 'types' => [
@@ -164,16 +180,16 @@ class SourceRepositoryTest extends WebTestCase
                     Type::GIT,
                 ],
                 'expected' => [
-                    $userFileSources[0],
-                    $userGitSources[0],
+                    $userFileSources['deletedAt=null'],
+                    $userGitSources['deletedAt=null'],
                 ],
             ],
             'has file, git and run sources for correct user only' => [
                 'sources' => [
-                    $userFileSources[0],
-                    $userGitSources[0],
-                    $userRunSources[0],
-                    $userRunSources[1],
+                    $userFileSources['deletedAt=null'],
+                    $userGitSources['deletedAt=null'],
+                    $userRunSources['parent=file,deletedAt=null'],
+                    $userRunSources['parent=git,deletedAt=null'],
                 ],
                 'user' => $user,
                 'types' => [
@@ -181,18 +197,18 @@ class SourceRepositoryTest extends WebTestCase
                     Type::GIT,
                 ],
                 'expected' => [
-                    $userFileSources[0],
-                    $userGitSources[0],
+                    $userFileSources['deletedAt=null'],
+                    $userGitSources['deletedAt=null'],
                 ],
             ],
             'has file, git and run sources for mixed users' => [
                 'sources' => [
-                    $userFileSources[0],
+                    $userFileSources['deletedAt=null'],
                     new FileSource(UserId::create(), 'file source label'),
-                    $userGitSources[0],
+                    $userGitSources['deletedAt=null'],
                     new GitSource(UserId::create(), 'label', 'https://example.com/repository.git'),
-                    $userRunSources[0],
-                    $userRunSources[1],
+                    $userRunSources['parent=file,deletedAt=null'],
+                    $userRunSources['parent=git,deletedAt=null'],
                     new RunSource(
                         new FileSource(UserId::create(), 'file source label')
                     ),
@@ -206,8 +222,22 @@ class SourceRepositoryTest extends WebTestCase
                     Type::GIT,
                 ],
                 'expected' => [
-                    $userFileSources[0],
-                    $userGitSources[0],
+                    $userFileSources['deletedAt=null'],
+                    $userGitSources['deletedAt=null'],
+                ],
+            ],
+            'file sources, deletedAt=null,+1s,-1s' => [
+                'sources' => [
+                    $userFileSources['deletedAt=null'],
+                    $userFileSources['deletedAt=-1s'],
+                    $userFileSources['deletedAt=+1s']
+                ],
+                'user' => $user,
+                'types' => [
+                    Type::FILE,
+                ],
+                'expected' => [
+                    $userFileSources['deletedAt=null'],
                 ],
             ],
         ];
