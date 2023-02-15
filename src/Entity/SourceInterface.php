@@ -6,6 +6,9 @@ namespace App\Entity;
 
 interface SourceInterface extends UserHeldEntityInterface
 {
+    /**
+     * @return non-empty-string
+     */
     public function getId(): string;
 
     public function setDeletedAt(\DateTimeImmutable $deletedAt): void;
