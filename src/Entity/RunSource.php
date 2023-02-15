@@ -14,8 +14,8 @@ use Doctrine\ORM\Mapping as ORM;
 class RunSource extends AbstractSource implements DirectoryLocatorInterface, \JsonSerializable
 {
     #[ORM\ManyToOne(targetEntity: AbstractSource::class, cascade: ['persist'])]
-    #[ORM\JoinColumn(nullable: true)]
-    private ?SourceOriginInterface $parent;
+    #[ORM\JoinColumn(nullable: false)]
+    private SourceOriginInterface $parent;
 
     /**
      * @var array<string, string>
@@ -45,16 +45,9 @@ class RunSource extends AbstractSource implements DirectoryLocatorInterface, \Js
         $this->state = State::REQUESTED;
     }
 
-    public function getParent(): ?SourceOriginInterface
+    public function getParent(): SourceOriginInterface
     {
         return $this->parent;
-    }
-
-    public function unsetParent(): self
-    {
-        $this->parent = null;
-
-        return $this;
     }
 
     /**
@@ -93,7 +86,7 @@ class RunSource extends AbstractSource implements DirectoryLocatorInterface, \Js
      *     "id": string,
      *     "user_id": string,
      *     "type": 'run',
-     *     "parent": string|null,
+     *     "parent": string,
      *     "parameters": array<string, string>,
      *     "state": string,
      *     "failure_reason"?: string,
@@ -106,7 +99,7 @@ class RunSource extends AbstractSource implements DirectoryLocatorInterface, \Js
             'id' => $this->id,
             'user_id' => $this->getUserId(),
             'type' => Type::RUN->value,
-            'parent' => $this->parent?->getId(),
+            'parent' => $this->parent->getId(),
             'parameters' => $this->parameters,
             'state' => $this->state->value,
         ];

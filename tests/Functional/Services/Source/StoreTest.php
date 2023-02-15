@@ -87,17 +87,6 @@ class StoreTest extends WebTestCase
                     return $source;
                 },
             ],
-            RunSource::class => [
-                'sourceCreator' => function (Store $store): SourceInterface {
-                    $parent = new FileSource(UserId::create(), 'label');
-                    $source = new RunSource($parent);
-                    $source->unsetParent();
-
-                    $store->add($source);
-
-                    return $source;
-                },
-            ],
         ];
     }
 

@@ -47,15 +47,6 @@ class RunSourceSerializerTest extends WebTestCase
         $this->fixtureStorage = $fixtureStorage;
     }
 
-    public function testWriteRunSourceHasNoParent(): void
-    {
-        $runSource = (new RunSource(
-            new FileSource(UserId::create(), 'file source label')
-        ))->unsetParent();
-
-        self::assertNull($this->runSourceSerializer->write($runSource));
-    }
-
     public function testWriteUnserializableSource(): void
     {
         $originSource = \Mockery::mock(SourceOriginInterface::class);
