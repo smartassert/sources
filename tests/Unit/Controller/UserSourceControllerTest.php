@@ -9,6 +9,7 @@ use App\Entity\FileSource;
 use App\Entity\RunSource;
 use App\Message\Prepare;
 use App\Security\UserSourceAccessChecker;
+use App\Services\EntityIdFactory;
 use App\Services\RunSourceFactory;
 use App\Tests\Model\UserId;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -22,8 +23,10 @@ class UserSourceControllerTest extends WebTestCase
     {
         $userId = UserId::create();
 
-        $fileSource = new FileSource($userId, 'file source label');
-        $runSource = new RunSource($fileSource);
+        $idFactory = new EntityIdFactory();
+
+        $fileSource = new FileSource($idFactory->create(), $userId, 'file source label');
+        $runSource = new RunSource($idFactory->create(), $fileSource);
 
         $createdMessage = null;
         $messageBus = \Mockery::mock(MessageBusInterface::class);

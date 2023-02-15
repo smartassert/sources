@@ -6,8 +6,8 @@ namespace App\Tests\Unit\Services;
 
 use App\Model\CommandDefinition\Definition;
 use App\Model\CommandDefinition\Option;
-use App\Model\EntityId;
 use App\Model\ProcessOutput;
+use App\Services\EntityIdFactory;
 use App\Services\GitRepositoryCloner;
 use App\Tests\Mock\Services\Process\MockExecutor;
 use App\Tests\Model\UserId;
@@ -18,7 +18,7 @@ class GitRepositoryClonerTest extends WebTestCase
     public function testClone(): void
     {
         $url = 'https://user:password@example.com/repository.git';
-        $path = '/' . UserId::create() . '/' . EntityId::create();
+        $path = '/' . UserId::create() . '/' . (new EntityIdFactory())->create();
 
         $expectedCommandDefinition = (new Definition('git clone'))
             ->withOptions([

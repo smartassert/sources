@@ -33,11 +33,12 @@ class RunSource extends AbstractSource implements DirectoryLocatorInterface, \Js
     private ?string $failureMessage = null;
 
     /**
+     * @param non-empty-string      $id
      * @param array<string, string> $parameters
      */
-    public function __construct(SourceOriginInterface $parent, array $parameters = [])
+    public function __construct(string $id, SourceOriginInterface $parent, array $parameters = [])
     {
-        parent::__construct($parent->getUserId());
+        parent::__construct($id, $parent->getUserId());
 
         $this->parent = $parent;
         $this->parameters = $parameters;

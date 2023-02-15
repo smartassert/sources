@@ -6,6 +6,7 @@ namespace App\Tests\Application;
 
 use App\Entity\FileSource;
 use App\RequestValidator\YamlFileRequestValidator;
+use App\Services\EntityIdFactory;
 use App\Tests\Services\InvalidFilenameResponseDataFactory;
 
 abstract class AbstractFileSourceFileTest extends AbstractApplicationTest
@@ -18,7 +19,11 @@ abstract class AbstractFileSourceFileTest extends AbstractApplicationTest
     {
         parent::setUp();
 
-        $this->fileSource = new FileSource(self::$authenticationConfiguration->getUser()->id, 'label');
+        $this->fileSource = new FileSource(
+            (new EntityIdFactory())->create(),
+            self::$authenticationConfiguration->getUser()->id,
+            'label'
+        );
         $this->store->add($this->fileSource);
     }
 

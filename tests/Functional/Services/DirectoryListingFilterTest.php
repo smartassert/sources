@@ -6,6 +6,7 @@ namespace App\Tests\Functional\Services;
 
 use App\Entity\FileSource;
 use App\Services\DirectoryListingFilter;
+use App\Services\EntityIdFactory;
 use App\Tests\Model\UserId;
 use App\Tests\Services\FileStoreFixtureCreator;
 use League\Flysystem\FilesystemOperator;
@@ -63,7 +64,7 @@ class DirectoryListingFilterTest extends WebTestCase
      */
     public function listDataProvider(): array
     {
-        $basePath = (new FileSource(UserId::create(), 'label'))->getDirectoryPath();
+        $basePath = (new FileSource((new EntityIdFactory())->create(), UserId::create(), 'label'))->getDirectoryPath();
 
         return [
             'source: txt, no extensions' => [

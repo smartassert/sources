@@ -12,6 +12,7 @@ use App\Exception\ProcessExecutorException;
 use App\Model\ProcessOutput;
 use App\Model\UserGitRepository;
 use App\Services\DirectoryListingFilter;
+use App\Services\EntityIdFactory;
 use App\Services\GitRepositoryCheckoutHandler;
 use App\Services\GitRepositoryCloner;
 use App\Services\GitRepositoryStore;
@@ -72,13 +73,16 @@ class GitRepositoryStoreTest extends WebTestCase
             $entityRemover->removeAll();
         }
 
+        $idFactory = new EntityIdFactory();
+
         $this->source = new GitSource(
+            $idFactory->create(),
             UserId::create(),
             'git source label',
             self::REPOSITORY_URL,
             self::PATH
         );
-        $this->gitRepository = new UserGitRepository($this->source);
+        $this->gitRepository = new UserGitRepository($idFactory->create(), $this->source);
 
         $gitRepositoryBasePath = self::getContainer()->getParameter('git_repository_store_directory');
         \assert(is_string($gitRepositoryBasePath));

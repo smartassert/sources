@@ -7,6 +7,7 @@ namespace App\Tests\Application;
 use App\Entity\FileSource;
 use App\Entity\GitSource;
 use App\Entity\RunSource;
+use App\Services\EntityIdFactory;
 use App\Tests\Model\UserId;
 
 abstract class AbstractInvalidSourceUserTest extends AbstractApplicationTest
@@ -20,10 +21,17 @@ abstract class AbstractInvalidSourceUserTest extends AbstractApplicationTest
     {
         parent::setUp();
 
-        $this->fileSource = new FileSource(UserId::create(), 'non-empty string');
+        $idFactory = new EntityIdFactory();
+
+        $this->fileSource = new FileSource($idFactory->create(), UserId::create(), 'file source label');
         $this->store->add($this->fileSource);
 
-        $this->gitSource = new GitSource(UserId::create(), 'http://example.com/repo.git', '/');
+        $this->gitSource = new GitSource(
+            $idFactory->create(),
+            UserId::create(),
+            'git source label',
+            'http://example.com/repo.git',
+        );
         $this->store->add($this->gitSource);
     }
 
@@ -122,7 +130,10 @@ abstract class AbstractInvalidSourceUserTest extends AbstractApplicationTest
 
     public function testReadSourceInvalidUser(): void
     {
-        $runSource = new RunSource($this->fileSource);
+        $runSource = new RunSource(
+            (new EntityIdFactory())->create(),
+            $this->fileSource
+        );
         $this->store->add($runSource);
 
         $response = $this->applicationClient->makeReadSourceRequest(

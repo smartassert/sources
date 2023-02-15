@@ -9,6 +9,7 @@ use App\Entity\GitSource;
 use App\Entity\RunSource;
 use App\Entity\SourceInterface;
 use App\Enum\RunSource\FailureReason;
+use App\Services\EntityIdFactory;
 use App\Services\Source\Store;
 use App\Tests\Model\UserId;
 
@@ -62,9 +63,12 @@ class SourceProvider
      */
     public function initialize(array $sourcesToInitialize = self::ALL): void
     {
-        $fileSourceWithoutRunSource = new FileSource($this->userId, 'without run source');
-        $fileSourceWithRunSource = new FileSource($this->userId, 'with run source');
+        $idFactory = new EntityIdFactory();
+
+        $fileSourceWithoutRunSource = new FileSource($idFactory->create(), $this->userId, 'without run source');
+        $fileSourceWithRunSource = new FileSource($idFactory->create(), $this->userId, 'with run source');
         $gitSourceWithCredentialsWithRunSource = new GitSource(
+            $idFactory->create(),
             $this->userId,
             'git source with credentials with run source',
             'http://example.com/with-credentials.git',
@@ -76,37 +80,55 @@ class SourceProvider
         $this->sources[self::FILE_WITH_RUN_SOURCE] = $fileSourceWithRunSource;
         $this->sources[self::GIT_WITH_CREDENTIALS_WITH_RUN_SOURCE] = $gitSourceWithCredentialsWithRunSource;
         $this->sources[self::GIT_WITHOUT_CREDENTIALS_WITHOUT_RUN_SOURCE] = new GitSource(
+            $idFactory->create(),
             $this->userId,
             'git source without credentials without run source',
             'http://example.com/without-credentials.git'
         );
-        $this->sources[self::RUN_WITH_FILE_PARENT] = new RunSource($fileSourceWithRunSource);
+        $this->sources[self::RUN_WITH_FILE_PARENT] = new RunSource($idFactory->create(), $fileSourceWithRunSource);
         $this->sources[self::RUN_WITH_DIFFERENT_FILE_PARENT] = new RunSource(
-            new FileSource($this->userId, 'file source label two')
+            $idFactory->create(),
+            new FileSource($idFactory->create(), $this->userId, 'file source label two')
         );
-        $this->sources[self::RUN_WITH_GIT_PARENT] = new RunSource($gitSourceWithCredentialsWithRunSource);
+        $this->sources[self::RUN_WITH_GIT_PARENT] = new RunSource(
+            $idFactory->create(),
+            $gitSourceWithCredentialsWithRunSource
+        );
         $this->sources[self::RUN_WITH_DIFFERENT_GIT_PARENT] = new RunSource(
+            $idFactory->create(),
             new GitSource(
+                $idFactory->create(),
                 $this->userId,
                 'git source as different parent',
                 'http://example.com/'
             )
         );
 
-        $this->sources[self::RUN_FAILED] = (new RunSource($gitSourceWithCredentialsWithRunSource))
+        $this->sources[self::RUN_FAILED] = (new RunSource(
+            $idFactory->create(),
+            $gitSourceWithCredentialsWithRunSource
+        ))
             ->setPreparationFailed(
                 FailureReason::GIT_CLONE,
                 'fatal: repository \'http://example.com/with-credentials.git\' not found'
             )
         ;
 
-        $this->sources[self::FILE_DIFFERENT_USER] = new FileSource(UserId::create(), 'label');
+        $this->sources[self::FILE_DIFFERENT_USER] = new FileSource(
+            $idFactory->create(),
+            UserId::create(),
+            'label'
+        );
         $this->sources[self::GIT_DIFFERENT_USER] = new GitSource(
+            $idFactory->create(),
             UserId::create(),
             'git source different user',
             'https://example.com/repository.git',
         );
-        $this->sources[self::RUN_DIFFERENT_USER] = new RunSource(new FileSource(UserId::create(), 'label'));
+        $this->sources[self::RUN_DIFFERENT_USER] = new RunSource(
+            $idFactory->create(),
+            new FileSource($idFactory->create(), UserId::create(), 'label')
+        );
 
         foreach ($sourcesToInitialize as $sourceIdentifier) {
             $source = $this->sources[$sourceIdentifier] ?? null;

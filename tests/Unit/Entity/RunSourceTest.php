@@ -9,6 +9,7 @@ use App\Entity\RunSource;
 use App\Enum\RunSource\FailureReason;
 use App\Enum\RunSource\State;
 use App\Enum\Source\Type;
+use App\Services\EntityIdFactory;
 use App\Tests\Model\UserId;
 use PHPUnit\Framework\TestCase;
 
@@ -29,21 +30,23 @@ class RunSourceTest extends TestCase
      */
     public function jsonSerializeDataProvider(): array
     {
+        $idFactory = new EntityIdFactory();
+
         $userId = UserId::create();
         $parameters = [
             'key1' => 'value1',
             'key2' => 'value2',
         ];
 
-        $parent = new FileSource($userId, 'file source label');
+        $parent = new FileSource($idFactory->create(), $userId, 'file source label');
 
-        $withoutParameters = new RunSource($parent);
-        $withParameters = new RunSource($parent, $parameters);
+        $withoutParameters = new RunSource($idFactory->create(), $parent);
+        $withParameters = new RunSource($idFactory->create(), $parent, $parameters);
 
-        $withNonDefaultState = (new RunSource($parent))->setState(State::PREPARED);
+        $withNonDefaultState = (new RunSource($idFactory->create(), $parent))->setState(State::PREPARED);
 
         $failureMessage = 'fatal: repository \'http://example.com/repository.git\' not found';
-        $hasPreparationFailed = (new RunSource($parent))->setPreparationFailed(
+        $hasPreparationFailed = (new RunSource($idFactory->create(), $parent))->setPreparationFailed(
             FailureReason::GIT_CLONE,
             $failureMessage
         );

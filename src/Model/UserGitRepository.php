@@ -8,11 +8,10 @@ use App\Entity\GitSource;
 
 class UserGitRepository implements DirectoryLocatorInterface, SourceRepositoryInterface
 {
-    private string $id;
-
-    public function __construct(private GitSource $source)
-    {
-        $this->id = EntityId::create();
+    public function __construct(
+        private readonly string $id,
+        private readonly GitSource $source
+    ) {
     }
 
     public function getId(): string

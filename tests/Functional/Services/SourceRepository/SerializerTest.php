@@ -9,6 +9,7 @@ use App\Entity\GitSource;
 use App\Exception\UnparseableSourceFileException;
 use App\Model\SourceRepositoryInterface;
 use App\Model\UserGitRepository;
+use App\Services\EntityIdFactory;
 use App\Services\SourceRepository\Serializer;
 use App\Tests\Model\UserId;
 use App\Tests\Services\FileStoreFixtureCreator;
@@ -45,7 +46,11 @@ class SerializerTest extends WebTestCase
     {
         self::assertSame(
             '',
-            $this->serializer->serialize(new FileSource(UserId::create(), 'file source label'))
+            $this->serializer->serialize(new FileSource(
+                (new EntityIdFactory())->create(),
+                UserId::create(),
+                'file source label'
+            ))
         );
     }
 
@@ -54,7 +59,7 @@ class SerializerTest extends WebTestCase
         $storage = self::getContainer()->get('file_source.storage');
         assert($storage instanceof FilesystemWriter);
 
-        $source = new FileSource(UserId::create(), 'file source label');
+        $source = new FileSource((new EntityIdFactory())->create(), UserId::create(), 'file source label');
 
         $this->fixtureCreator->copySetTo('Source/txt', $storage, $source->getDirectoryPath());
 
@@ -66,7 +71,7 @@ class SerializerTest extends WebTestCase
         $storage = self::getContainer()->get('file_source.storage');
         assert($storage instanceof FilesystemWriter);
 
-        $source = new FileSource(UserId::create(), 'file source label');
+        $source = new FileSource((new EntityIdFactory())->create(), UserId::create(), 'file source label');
 
         $this->fixtureCreator->copySetTo('Source/yml_yaml_invalid', $storage, $source->getDirectoryPath());
 
@@ -113,18 +118,31 @@ class SerializerTest extends WebTestCase
      */
     public function serializeSuccessDataProvider(): array
     {
+        $idFactory = new EntityIdFactory();
+
         return [
             'file source' => [
                 'fixtureSetIdentifier' => 'Source/yml_yaml_valid',
                 'sourceStorageId' => 'file_source.storage',
-                'source' => new FileSource(UserId::create(), 'file source label'),
+                'source' => new FileSource(
+                    $idFactory->create(),
+                    UserId::create(),
+                    'file source label'
+                ),
                 'expectedFixturePath' => 'RunSource/source_yml_yaml_entire.yaml',
             ],
             'git repository, entire' => [
                 'fixtureSetIdentifier' => 'Source/yml_yaml_valid',
                 'sourceStorageId' => 'git_repository.storage',
                 'source' => new UserGitRepository(
-                    new GitSource(UserId::create(), 'label', 'http://example.com/repository.git', '/')
+                    $idFactory->create(),
+                    new GitSource(
+                        $idFactory->create(),
+                        UserId::create(),
+                        'label',
+                        'http://example.com/repository.git',
+                        '/'
+                    )
                 ),
                 'expectedFixturePath' => 'RunSource/source_yml_yaml_entire.yaml',
             ],
@@ -132,7 +150,14 @@ class SerializerTest extends WebTestCase
                 'fixtureSetIdentifier' => 'Source/yml_yaml_valid',
                 'sourceStorageId' => 'git_repository.storage',
                 'source' => new UserGitRepository(
-                    new GitSource(UserId::create(), 'label', 'http://example.com/repository.git', '/directory')
+                    $idFactory->create(),
+                    new GitSource(
+                        $idFactory->create(),
+                        UserId::create(),
+                        'label',
+                        'http://example.com/repository.git',
+                        '/directory'
+                    )
                 ),
                 'expectedFixturePath' => 'RunSource/source_yml_yaml_partial.yaml',
             ],

@@ -9,6 +9,7 @@ use App\Entity\GitSource;
 use App\Entity\RunSource;
 use App\Entity\SourceInterface;
 use App\Repository\SourceRepository;
+use App\Services\EntityIdFactory;
 use App\Services\Source\Store;
 use App\Tests\Model\UserId;
 use App\Tests\Services\EntityRemover;
@@ -70,18 +71,25 @@ class StoreTest extends WebTestCase
      */
     public function deleteDataProvider(): array
     {
+        $idFactory = new EntityIdFactory();
+
         return [
             FileSource::class => [
-                'sourceCreator' => function (Store $store): SourceInterface {
-                    $source = new FileSource(UserId::create(), 'label');
+                'sourceCreator' => function (Store $store) use ($idFactory): SourceInterface {
+                    $source = new FileSource($idFactory->create(), UserId::create(), 'label');
                     $store->add($source);
 
                     return $source;
                 },
             ],
             GitSource::class => [
-                'sourceCreator' => function (Store $store): SourceInterface {
-                    $source = new GitSource(UserId::create(), 'label', 'https://example.com/repository.git');
+                'sourceCreator' => function (Store $store) use ($idFactory): SourceInterface {
+                    $source = new GitSource(
+                        $idFactory->create(),
+                        UserId::create(),
+                        'label',
+                        'https://example.com/repository.git'
+                    );
                     $store->add($source);
 
                     return $source;
@@ -92,11 +100,13 @@ class StoreTest extends WebTestCase
 
     public function testDeleteRunSource(): void
     {
-        $parent = new FileSource(UserId::create(), 'label');
+        $idFactory = new EntityIdFactory();
+
+        $parent = new FileSource($idFactory->create(), UserId::create(), 'label');
         $parentId = $parent->getId();
         $this->store->add($parent);
 
-        $source = new RunSource($parent);
+        $source = new RunSource($idFactory->create(), $parent);
         $sourceId = $source->getId();
         $this->store->add($source);
 
@@ -118,12 +128,14 @@ class StoreTest extends WebTestCase
 
     public function testAddRunSource(): void
     {
-        $parent = new FileSource(UserId::create(), 'label');
-        $runSource1 = new RunSource($parent);
+        $idFactory = new EntityIdFactory();
+
+        $parent = new FileSource($idFactory->create(), UserId::create(), 'label');
+        $runSource1 = new RunSource($idFactory->create(), $parent);
         $this->store->add($runSource1);
         self::assertCount(2, $this->repository->findAll());
 
-        $runSource2 = new RunSource($parent);
+        $runSource2 = new RunSource($idFactory->create(), $parent);
         $this->store->add($runSource2);
         self::assertCount(3, $this->repository->findAll());
     }
