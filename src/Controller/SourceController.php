@@ -9,7 +9,6 @@ use App\Exception\InvalidRequestException;
 use App\Repository\SourceRepository;
 use App\Request\FileSourceRequest;
 use App\Request\GitSourceRequest;
-use App\RequestValidator\GitSourceRequestValidator;
 use App\Services\Source\Factory;
 use SmartAssert\UsersSecurityBundle\Security\User;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -23,13 +22,10 @@ class SourceController
      */
     #[Route('/git', name: 'git_source_create', methods: ['POST'])]
     public function createGitSource(
-        GitSourceRequestValidator $requestValidator,
         User $user,
         Factory $factory,
         GitSourceRequest $request
     ): JsonResponse {
-        $requestValidator->validate($request);
-
         return new JsonResponse($factory->createFromGitSourceRequest($user, $request));
     }
 
