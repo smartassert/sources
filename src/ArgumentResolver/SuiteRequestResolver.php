@@ -64,8 +64,8 @@ class SuiteRequestResolver implements ValueResolverInterface
                         $request,
                         new InvalidField(
                             'tests',
-                            $label,
-                            implode(', ', $requestTests)
+                            implode(', ', $requestTests),
+                            'Tests must be valid yaml file paths.'
                         )
                     );
                 }
