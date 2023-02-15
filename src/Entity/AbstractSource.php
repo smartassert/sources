@@ -6,6 +6,7 @@ namespace App\Entity;
 
 use App\Model\EntityId;
 use App\Repository\SourceRepository;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\MappedSuperclass]
@@ -33,6 +34,9 @@ abstract class AbstractSource implements SourceInterface
     #[ORM\Column(type: 'string', length: 32)]
     private string $userId;
 
+    #[ORM\Column(type: Types::DATETIMETZ_IMMUTABLE, nullable: true)]
+    private ?\DateTimeImmutable $deletedAt = null;
+
     /**
      * @param non-empty-string $userId
      */
@@ -53,5 +57,12 @@ abstract class AbstractSource implements SourceInterface
     public function getUserId(): string
     {
         return $this->userId;
+    }
+
+    public function setDeletedAt(\DateTimeImmutable $deletedAt): void
+    {
+        if (null === $this->deletedAt) {
+            $this->deletedAt = $deletedAt;
+        }
     }
 }
