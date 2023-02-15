@@ -8,7 +8,6 @@ use App\Entity\FileSource;
 use App\Exception\InvalidRequestException;
 use App\Request\AddYamlFileRequest;
 use App\Request\YamlFileRequest;
-use App\RequestValidator\AddYamlFileRequestValidator;
 use App\Response\YamlResponse;
 use App\Security\UserSourceAccessChecker;
 use App\Services\SourceRepository\Reader\FileSourceDirectoryLister;
@@ -39,12 +38,10 @@ class FileSourceFileController
      */
     #[Route(self::ROUTE_SOURCE_FILE, name: 'file_source_file_add', methods: ['POST'])]
     public function add(
-        AddYamlFileRequestValidator $requestValidator,
         FileSource $source,
         AddYamlFileRequest $request,
     ): Response {
         $this->userSourceAccessChecker->denyAccessUnlessGranted($source);
-        $requestValidator->validate($request);
 
         $yamlFile = $request->file;
 
