@@ -36,7 +36,7 @@ class FileSource extends AbstractOriginSource implements
      *     "id": string,
      *     "user_id": non-empty-string,
      *     "type": 'file',
-     *     "label": string
+     *     "label": non-empty-string
      * }
      */
     public function jsonSerialize(): array

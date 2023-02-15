@@ -68,7 +68,7 @@ class ProviderTest extends WebTestCase
      */
     public function getYamlFilesSuccessDataProvider(): array
     {
-        $basePath = (new FileSource(UserId::create(), ''))->getDirectoryPath();
+        $basePath = (new FileSource(UserId::create(), 'label'))->getDirectoryPath();
 
         return [
             'source: txt' => [

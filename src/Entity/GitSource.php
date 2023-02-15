@@ -14,9 +14,15 @@ class GitSource extends AbstractOriginSource implements SourceOriginInterface, \
     public const PATH_MAX_LENGTH = 255;
     public const CREDENTIALS_MAX_LENGTH = 255;
 
+    /**
+     * @var non-empty-string
+     */
     #[ORM\Column(type: 'string', length: self::HOST_URL_MAX_LENGTH)]
     private string $hostUrl;
 
+    /**
+     * @var non-empty-string
+     */
     #[ORM\Column(type: 'string', length: self::PATH_MAX_LENGTH)]
     private string $path;
 
@@ -25,6 +31,9 @@ class GitSource extends AbstractOriginSource implements SourceOriginInterface, \
 
     /**
      * @param non-empty-string $userId
+     * @param non-empty-string $label
+     * @param non-empty-string $hostUrl
+     * @param non-empty-string $path
      */
     public function __construct(
         string $userId,
@@ -40,16 +49,25 @@ class GitSource extends AbstractOriginSource implements SourceOriginInterface, \
         $this->credentials = $credentials;
     }
 
+    /**
+     * @return non-empty-string
+     */
     public function getHostUrl(): string
     {
         return $this->hostUrl;
     }
 
+    /**
+     * @param non-empty-string $hostUrl
+     */
     public function setHostUrl(string $hostUrl): void
     {
         $this->hostUrl = $hostUrl;
     }
 
+    /**
+     * @param non-empty-string $path
+     */
     public function setPath(string $path): void
     {
         $this->path = $path;
@@ -60,6 +78,9 @@ class GitSource extends AbstractOriginSource implements SourceOriginInterface, \
         $this->credentials = $credentials;
     }
 
+    /**
+     * @return non-empty-string
+     */
     public function getPath(): string
     {
         return $this->path;
@@ -87,6 +108,7 @@ class GitSource extends AbstractOriginSource implements SourceOriginInterface, \
      *     "id": string,
      *     "user_id": non-empty-string,
      *     "type": 'git',
+     *     "label": non-empty-string,
      *     "host_url": string,
      *     "path": string,
      *     "has_credentials": bool
