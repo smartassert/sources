@@ -95,7 +95,8 @@ class SourceProvider
             )
         );
 
-        $this->sources[self::RUN_WITHOUT_PARENT] = (new RunSource(new FileSource($this->userId, '')))->unsetParent();
+        $this->sources[self::RUN_WITHOUT_PARENT] =
+            (new RunSource(new FileSource($this->userId, 'label')))->unsetParent();
         $this->sources[self::RUN_FAILED] = (new RunSource($gitSourceWithCredentialsWithRunSource))
             ->setPreparationFailed(
                 FailureReason::GIT_CLONE,
@@ -103,13 +104,13 @@ class SourceProvider
             )
         ;
 
-        $this->sources[self::FILE_DIFFERENT_USER] = new FileSource(UserId::create(), '');
+        $this->sources[self::FILE_DIFFERENT_USER] = new FileSource(UserId::create(), 'label');
         $this->sources[self::GIT_DIFFERENT_USER] = new GitSource(
             UserId::create(),
             'git source different user',
-            ''
+            'https://example.com/repository.git',
         );
-        $this->sources[self::RUN_DIFFERENT_USER] = new RunSource(new FileSource(UserId::create(), ''));
+        $this->sources[self::RUN_DIFFERENT_USER] = new RunSource(new FileSource(UserId::create(), 'label'));
 
         foreach ($sourcesToInitialize as $sourceIdentifier) {
             $source = $this->sources[$sourceIdentifier] ?? null;

@@ -73,9 +73,8 @@ class SourceRepositoryTest extends WebTestCase
             GitSource::class => [
                 'source' => new GitSource(
                     UserId::create(),
+                    'label',
                     'https://example.com/repository.git',
-                    '/',
-                    ''
                 ),
             ],
             FileSource::class => [

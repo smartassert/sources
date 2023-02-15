@@ -18,7 +18,7 @@ abstract class AbstractFileSourceFileTest extends AbstractApplicationTest
     {
         parent::setUp();
 
-        $this->fileSource = new FileSource(self::$authenticationConfiguration->getUser()->id, '');
+        $this->fileSource = new FileSource(self::$authenticationConfiguration->getUser()->id, 'label');
         $this->store->add($this->fileSource);
     }
 

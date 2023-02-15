@@ -63,7 +63,7 @@ class DirectoryListingFilterTest extends WebTestCase
      */
     public function listDataProvider(): array
     {
-        $basePath = (new FileSource(UserId::create(), ''))->getDirectoryPath();
+        $basePath = (new FileSource(UserId::create(), 'label'))->getDirectoryPath();
 
         return [
             'source: txt, no extensions' => [
