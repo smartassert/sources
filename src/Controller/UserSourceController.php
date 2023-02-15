@@ -9,7 +9,6 @@ use App\Entity\GitSource;
 use App\Entity\RunSource;
 use App\Entity\SourceInterface;
 use App\Entity\SourceOriginInterface;
-use App\Exception\InvalidRequestException;
 use App\Message\Prepare;
 use App\Request\FileSourceRequest;
 use App\Request\GitSourceRequest;
@@ -62,7 +61,6 @@ class UserSourceController
 
     /**
      * @throws AccessDeniedException
-     * @throws InvalidRequestException
      */
     #[Route(SourceRoutes::ROUTE_SOURCE . '/git', name: 'user_git_source_update', methods: ['PUT'])]
     public function updateGit(
