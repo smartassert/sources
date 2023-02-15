@@ -6,9 +6,8 @@ namespace App\Request;
 
 class SuiteRequest
 {
-    public const KEY_SOURCE_ID = 'source_id';
-    public const KEY_LABEL = 'label';
-    public const KEY_TESTS = 'tests';
+    public const PARAMETER_LABEL = 'label';
+    public const PARAMETER_TESTS = 'tests';
 
     /**
      * @param non-empty-string             $sourceId
