@@ -46,7 +46,7 @@ abstract class AbstractGetSourceTest extends AbstractApplicationTest
         $expectedResponseData['user_id'] = $source->getUserId();
 
         if ($source instanceof RunSource) {
-            $expectedResponseData['parent'] = $source->getParent()?->getId();
+            $expectedResponseData['parent'] = $source->getParent()->getId();
         }
 
         $this->responseAsserter->assertSuccessfulJsonResponse($response, $expectedResponseData);

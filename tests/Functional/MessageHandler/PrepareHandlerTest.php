@@ -99,8 +99,6 @@ class PrepareHandlerTest extends WebTestCase
         $gitSource = new GitSource(UserId::create(), 'label', 'http://example.com/repository.git');
         $gitRunSource = new RunSource($gitSource, []);
 
-        $runSourceWithoutParent = $fileRunSource->unsetParent();
-
         return [
             'no entities' => [
                 'entities' => [],
@@ -111,12 +109,6 @@ class PrepareHandlerTest extends WebTestCase
                     $fileSource
                 ],
                 'message' => new Prepare($fileSource->getId(), []),
-            ],
-            'source has no parent' => [
-                'entities' => [
-                    $runSourceWithoutParent
-                ],
-                'message' => new Prepare($runSourceWithoutParent->getId(), []),
             ],
             'file run source preparation state is "preparing/running"' => [
                 'entities' => [

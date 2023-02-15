@@ -22,7 +22,6 @@ class SourceProvider
     public const RUN_WITH_DIFFERENT_FILE_PARENT = 'run_with_different_file_parent';
     public const RUN_WITH_GIT_PARENT = 'run_with_git_parent';
     public const RUN_WITH_DIFFERENT_GIT_PARENT = 'run_with_different_git_parent';
-    public const RUN_WITHOUT_PARENT = 'run_without_parent';
     public const RUN_FAILED = 'run_failed';
     public const FILE_DIFFERENT_USER = 'file_different_user';
     public const GIT_DIFFERENT_USER = 'git_different_user';
@@ -37,7 +36,6 @@ class SourceProvider
         self::RUN_WITH_DIFFERENT_FILE_PARENT,
         self::RUN_WITH_GIT_PARENT,
         self::RUN_WITH_DIFFERENT_GIT_PARENT,
-        self::RUN_WITHOUT_PARENT,
         self::RUN_FAILED,
         self::FILE_DIFFERENT_USER,
         self::GIT_DIFFERENT_USER,
@@ -95,8 +93,6 @@ class SourceProvider
             )
         );
 
-        $this->sources[self::RUN_WITHOUT_PARENT] =
-            (new RunSource(new FileSource($this->userId, 'label')))->unsetParent();
         $this->sources[self::RUN_FAILED] = (new RunSource($gitSourceWithCredentialsWithRunSource))
             ->setPreparationFailed(
                 FailureReason::GIT_CLONE,

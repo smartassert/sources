@@ -37,10 +37,6 @@ class RunSourceTest extends TestCase
 
         $parent = new FileSource($userId, 'file source label');
 
-        $withoutParent = (new RunSource($parent))->unsetParent();
-
-        $withoutParentWithParameters = (new RunSource($parent, $parameters))->unsetParent();
-
         $withoutParameters = new RunSource($parent);
         $withParameters = new RunSource($parent, $parameters);
 
@@ -53,35 +49,13 @@ class RunSourceTest extends TestCase
         );
 
         return [
-            'no parent, no parameters' => [
-                'source' => $withoutParent,
-                'expected' => [
-                    'id' => $withoutParent->getId(),
-                    'user_id' => $withoutParent->getUserId(),
-                    'type' => Type::RUN->value,
-                    'parent' => null,
-                    'parameters' => [],
-                    'state' => State::REQUESTED->value,
-                ],
-            ],
-            'no parent, has parameters' => [
-                'source' => $withoutParentWithParameters,
-                'expected' => [
-                    'id' => $withoutParentWithParameters->getId(),
-                    'user_id' => $withoutParentWithParameters->getUserId(),
-                    'type' => Type::RUN->value,
-                    'parent' => null,
-                    'parameters' => $withoutParentWithParameters->getParameters(),
-                    'state' => State::REQUESTED->value,
-                ],
-            ],
             'has parent, no parameters' => [
                 'source' => $withoutParameters,
                 'expected' => [
                     'id' => $withoutParameters->getId(),
                     'user_id' => $withoutParameters->getUserId(),
                     'type' => Type::RUN->value,
-                    'parent' => $withoutParameters->getParent()?->getId(),
+                    'parent' => $withoutParameters->getParent()->getId(),
                     'parameters' => [],
                     'state' => State::REQUESTED->value,
                 ],
@@ -92,7 +66,7 @@ class RunSourceTest extends TestCase
                     'id' => $withParameters->getId(),
                     'user_id' => $withParameters->getUserId(),
                     'type' => Type::RUN->value,
-                    'parent' => $withParameters->getParent()?->getId(),
+                    'parent' => $withParameters->getParent()->getId(),
                     'parameters' => $parameters,
                     'state' => State::REQUESTED->value,
                 ],
@@ -103,7 +77,7 @@ class RunSourceTest extends TestCase
                     'id' => $withNonDefaultState->getId(),
                     'user_id' => $withNonDefaultState->getUserId(),
                     'type' => Type::RUN->value,
-                    'parent' => $withParameters->getParent()?->getId(),
+                    'parent' => $withParameters->getParent()->getId(),
                     'parameters' => [],
                     'state' => State::PREPARED->value,
                 ],
@@ -114,7 +88,7 @@ class RunSourceTest extends TestCase
                     'id' => $hasPreparationFailed->getId(),
                     'user_id' => $hasPreparationFailed->getUserId(),
                     'type' => Type::RUN->value,
-                    'parent' => $withParameters->getParent()?->getId(),
+                    'parent' => $withParameters->getParent()->getId(),
                     'parameters' => [],
                     'state' => State::FAILED->value,
                     'failure_reason' => FailureReason::GIT_CLONE->value,

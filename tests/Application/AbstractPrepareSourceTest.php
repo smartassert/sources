@@ -32,7 +32,7 @@ abstract class AbstractPrepareSourceTest extends AbstractApplicationTest
 
     public function testPrepareRunSource(): void
     {
-        $sourceIdentifier = SourceProvider::RUN_WITHOUT_PARENT;
+        $sourceIdentifier = SourceProvider::RUN_WITH_FILE_PARENT;
 
         $this->sourceProvider->initialize([$sourceIdentifier]);
         $source = $this->sourceProvider->get($sourceIdentifier);

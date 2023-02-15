@@ -37,10 +37,6 @@ class RunSourceSerializer
     public function write(RunSource $target): ?string
     {
         $source = $target->getParent();
-        if (null === $source) {
-            return null;
-        }
-
         $sourceRepository = $this->sourceRepositoryFactory->create($source, $target->getParameters());
         if (null === $sourceRepository) {
             throw new UnserializableSourceException($source);
