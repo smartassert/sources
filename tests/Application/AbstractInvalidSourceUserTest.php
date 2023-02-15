@@ -76,7 +76,9 @@ abstract class AbstractInvalidSourceUserTest extends AbstractApplicationTest
         $response = $this->applicationClient->makeUpdateFileSourceRequest(
             self::$authenticationConfiguration->getValidApiToken(),
             $this->fileSource->getId(),
-            []
+            [
+                'label' => 'non-empty label',
+            ]
         );
 
         $this->responseAsserter->assertForbiddenResponse($response);
@@ -87,7 +89,11 @@ abstract class AbstractInvalidSourceUserTest extends AbstractApplicationTest
         $response = $this->applicationClient->makeUpdateGitSourceRequest(
             self::$authenticationConfiguration->getValidApiToken(),
             $this->gitSource->getId(),
-            []
+            [
+                'label' => 'non-empty label',
+                'host-url' => 'https://example.com/repository.git',
+                'path' => '/',
+            ]
         );
 
         $this->responseAsserter->assertForbiddenResponse($response);
