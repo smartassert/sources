@@ -12,4 +12,8 @@ interface SourceInterface
      * @return non-empty-string
      */
     public function getUserId(): string;
+
+    public function setDeletedAt(\DateTimeImmutable $deletedAt): void;
+
+    public function getDeletedAt(): ?\DateTimeImmutable;
 }

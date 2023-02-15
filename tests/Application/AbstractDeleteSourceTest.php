@@ -9,13 +9,16 @@ use App\Entity\RunSource;
 use App\Entity\SourceInterface;
 use App\Repository\SourceRepository;
 use App\Services\RunSourceSerializer;
+use App\Tests\Services\EntityRemover;
 use App\Tests\Services\SourceProvider;
+use Doctrine\ORM\EntityManagerInterface;
 use League\Flysystem\FilesystemOperator;
 
 abstract class AbstractDeleteSourceTest extends AbstractApplicationTest
 {
     private SourceRepository $sourceRepository;
     private SourceProvider $sourceProvider;
+    private EntityManagerInterface $entityManager;
 
     protected function setUp(): void
     {
@@ -24,6 +27,15 @@ abstract class AbstractDeleteSourceTest extends AbstractApplicationTest
         $sourceRepository = self::getContainer()->get(SourceRepository::class);
         \assert($sourceRepository instanceof SourceRepository);
         $this->sourceRepository = $sourceRepository;
+
+        $entityManager = self::getContainer()->get(EntityManagerInterface::class);
+        \assert($entityManager instanceof EntityManagerInterface);
+        $this->entityManager = $entityManager;
+
+        $entityRemover = self::getContainer()->get(EntityRemover::class);
+        if ($entityRemover instanceof EntityRemover) {
+            $entityRemover->removeAll();
+        }
 
         $sourceProvider = self::getContainer()->get(SourceProvider::class);
         \assert($sourceProvider instanceof SourceProvider);
@@ -38,6 +50,7 @@ abstract class AbstractDeleteSourceTest extends AbstractApplicationTest
     public function testDeleteSuccess(string $sourceIdentifier): void
     {
         $source = $this->sourceProvider->get($sourceIdentifier);
+        $sourceId = $source->getId();
 
         self::assertSame(1, $this->sourceRepository->count(['id' => $source->getId()]));
         if ($source instanceof RunSource && $source->getParent() instanceof SourceInterface) {
@@ -51,9 +64,17 @@ abstract class AbstractDeleteSourceTest extends AbstractApplicationTest
 
         $this->responseAsserter->assertSuccessfulResponseWithNoBody($response);
 
-        self::assertSame(0, $this->sourceRepository->count(['id' => $source->getId()]));
-        if ($source instanceof RunSource && $source->getParent() instanceof SourceInterface) {
-            self::assertSame(1, $this->sourceRepository->count(['id' => $source->getParent()->getId()]));
+        $this->entityManager->clear();
+
+        $retrievedSource = $this->sourceRepository->find($sourceId);
+        self::assertInstanceOf(SourceInterface::class, $retrievedSource);
+        self::assertNotNull($retrievedSource->getDeletedAt());
+
+        if ($retrievedSource instanceof RunSource) {
+            $parent = $retrievedSource->getParent();
+            if ($parent instanceof SourceInterface) {
+                self::assertNull($parent->getDeletedAt());
+            }
         }
     }
 
@@ -129,7 +150,6 @@ abstract class AbstractDeleteSourceTest extends AbstractApplicationTest
         );
 
         $this->responseAsserter->assertSuccessfulResponseWithNoBody($response);
-        self::assertSame(0, $this->sourceRepository->count(['id' => $fileSource->getId()]));
         self::assertFalse($fileSourceStorage->directoryExists($sourceRelativePath));
         self::assertFalse($fileSourceStorage->fileExists($fileRelativePath));
     }

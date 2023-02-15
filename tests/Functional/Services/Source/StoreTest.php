@@ -12,12 +12,14 @@ use App\Repository\SourceRepository;
 use App\Services\Source\Store;
 use App\Tests\Model\UserId;
 use App\Tests\Services\EntityRemover;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 class StoreTest extends WebTestCase
 {
     private Store $store;
     private SourceRepository $repository;
+    private EntityManagerInterface $entityManager;
 
     protected function setUp(): void
     {
@@ -31,6 +33,10 @@ class StoreTest extends WebTestCase
         \assert($repository instanceof SourceRepository);
         $this->repository = $repository;
 
+        $entityManager = self::getContainer()->get(EntityManagerInterface::class);
+        \assert($entityManager instanceof EntityManagerInterface);
+        $this->entityManager = $entityManager;
+
         $entityRemover = self::getContainer()->get(EntityRemover::class);
         if ($entityRemover instanceof EntityRemover) {
             $entityRemover->removeAll();
@@ -38,25 +44,31 @@ class StoreTest extends WebTestCase
     }
 
     /**
-     * @dataProvider removeDataProvider
+     * @dataProvider deleteDataProvider
      *
      * @param callable(Store): SourceInterface $sourceCreator
      */
-    public function testRemoveNonEncapsulatingSource(callable $sourceCreator): void
+    public function testDeleteNonEncapsulatingSource(callable $sourceCreator): void
     {
         $source = $sourceCreator($this->store);
+        $sourceId = $source->getId();
 
         self::assertCount(1, $this->repository->findAll());
 
-        $this->store->remove($source);
+        $this->store->delete($source);
+        $this->entityManager->detach($source);
 
-        self::assertCount(0, $this->repository->findAll());
+        self::assertCount(1, $this->repository->findAll());
+
+        $foundSource = $this->repository->find($sourceId);
+        self::assertInstanceOf(SourceInterface::class, $foundSource);
+        self::assertNotNull($foundSource->getDeletedAt());
     }
 
     /**
      * @return array<mixed>
      */
-    public function removeDataProvider(): array
+    public function deleteDataProvider(): array
     {
         return [
             FileSource::class => [
@@ -89,19 +101,30 @@ class StoreTest extends WebTestCase
         ];
     }
 
-    public function testRemoveRunSource(): void
+    public function testDeleteRunSource(): void
     {
         $parent = new FileSource(UserId::create(), 'label');
+        $parentId = $parent->getId();
         $this->store->add($parent);
 
         $source = new RunSource($parent);
+        $sourceId = $source->getId();
         $this->store->add($source);
 
         self::assertCount(2, $this->repository->findAll());
 
-        $this->store->remove($source);
+        $this->store->delete($source);
+        $this->entityManager->clear();
 
-        self::assertSame([$parent], $this->repository->findAll());
+        self::assertCount(2, $this->repository->findAll());
+
+        $retrievedParent = $this->repository->find($parentId);
+        self::assertInstanceOf(SourceInterface::class, $retrievedParent);
+        self::assertNull($retrievedParent->getDeletedAt());
+
+        $retrievedSource = $this->repository->find($sourceId);
+        self::assertInstanceOf(SourceInterface::class, $retrievedSource);
+        self::assertNotNull($retrievedSource->getDeletedAt());
     }
 
     public function testAddRunSource(): void

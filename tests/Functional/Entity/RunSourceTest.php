@@ -60,7 +60,7 @@ class RunSourceTest extends WebTestCase
         self::assertNull($runSource->getParent());
 
         $this->store->add($runSource);
-        $this->store->remove($parent);
+        $this->store->delete($parent);
         $this->entityManager->detach($parent);
         $this->entityManager->detach($runSource);
 
