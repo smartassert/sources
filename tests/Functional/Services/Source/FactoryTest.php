@@ -11,6 +11,7 @@ use App\Entity\SourceInterface;
 use App\Repository\SourceRepository;
 use App\Request\FileSourceRequest;
 use App\Request\GitSourceRequest;
+use App\Services\EntityIdFactory;
 use App\Services\Source\Factory;
 use App\Tests\Model\UserId;
 use App\Tests\Services\EntityRemover;
@@ -78,16 +79,18 @@ class FactoryTest extends WebTestCase
         $hostUrl = 'https://example.com/repository.git';
         $path = '/';
 
+        $idFactory = new EntityIdFactory();
+
         return [
             'git, empty credentials' => [
                 'user' => $user,
                 'request' => new GitSourceRequest($label, $hostUrl, $path, ''),
-                'expected' => new GitSource($userId, $label, $hostUrl, $path, ''),
+                'expected' => new GitSource($idFactory->create(), $userId, $label, $hostUrl, $path, ''),
             ],
             'git, non-empty credentials' => [
                 'user' => $user,
                 'request' => new GitSourceRequest($label, $hostUrl, $path, 'credentials'),
-                'expected' => new GitSource($userId, $label, $hostUrl, $path, 'credentials'),
+                'expected' => new GitSource($idFactory->create(), $userId, $label, $hostUrl, $path, 'credentials'),
             ],
         ];
     }
@@ -130,7 +133,7 @@ class FactoryTest extends WebTestCase
             'file' => [
                 'user' => $user,
                 'request' => new FileSourceRequest('file source label'),
-                'expected' => new FileSource($userId, 'file source label'),
+                'expected' => new FileSource((new EntityIdFactory())->create(), $userId, 'file source label'),
             ],
         ];
     }

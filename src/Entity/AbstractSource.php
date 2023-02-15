@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
-use App\Model\EntityId;
 use App\Repository\SourceRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
@@ -24,6 +23,9 @@ abstract class AbstractSource implements SourceInterface
     public const ID_LENGTH = 32;
     public const TYPE_DISCRIMINATOR_LENGTH = 32;
 
+    /**
+     * @var non-empty-string
+     */
     #[ORM\Id]
     #[ORM\Column(type: 'string', length: self::ID_LENGTH, unique: true)]
     protected string $id;
@@ -38,14 +40,18 @@ abstract class AbstractSource implements SourceInterface
     private ?\DateTimeImmutable $deletedAt = null;
 
     /**
+     * @param non-empty-string $id
      * @param non-empty-string $userId
      */
-    public function __construct(string $userId)
+    public function __construct(string $id, string $userId)
     {
-        $this->id = EntityId::create();
+        $this->id = $id;
         $this->userId = $userId;
     }
 
+    /**
+     * @return non-empty-string
+     */
     public function getId(): string
     {
         return $this->id;

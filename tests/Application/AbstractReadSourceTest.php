@@ -6,6 +6,7 @@ namespace App\Tests\Application;
 
 use App\Entity\FileSource;
 use App\Entity\RunSource;
+use App\Services\EntityIdFactory;
 use App\Services\RunSourceSerializer;
 use App\Tests\Services\FileStoreFixtureCreator;
 use League\Flysystem\FilesystemOperator;
@@ -37,8 +38,14 @@ abstract class AbstractReadSourceTest extends AbstractApplicationTest
     {
         $serializedRunSourceFixturePath = 'RunSource/source_yml_yaml_entire.yaml';
 
-        $fileSource = new FileSource(self::$authenticationConfiguration->getUser()->id, 'file source label');
-        $runSource = new RunSource($fileSource);
+        $idFactory = new EntityIdFactory();
+
+        $fileSource = new FileSource(
+            $idFactory->create(),
+            self::$authenticationConfiguration->getUser()->id,
+            'file source label'
+        );
+        $runSource = new RunSource($idFactory->create(), $fileSource);
         $this->store->add($runSource);
 
         $this->fixtureCreator->copyTo(

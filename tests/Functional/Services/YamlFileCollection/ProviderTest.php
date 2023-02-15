@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Functional\Services\YamlFileCollection;
 
 use App\Entity\FileSource;
+use App\Services\EntityIdFactory;
 use App\Services\YamlFileCollection\Factory;
 use App\Tests\Model\UserId;
 use App\Tests\Services\FileStoreFixtureCreator;
@@ -68,7 +69,7 @@ class ProviderTest extends WebTestCase
      */
     public function getYamlFilesSuccessDataProvider(): array
     {
-        $basePath = (new FileSource(UserId::create(), 'label'))->getDirectoryPath();
+        $basePath = (new FileSource((new EntityIdFactory())->create(), UserId::create(), 'label'))->getDirectoryPath();
 
         return [
             'source: txt' => [

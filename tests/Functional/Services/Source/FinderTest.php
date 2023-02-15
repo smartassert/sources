@@ -8,6 +8,7 @@ use App\Entity\FileSource;
 use App\Entity\GitSource;
 use App\Entity\RunSource;
 use App\Entity\SourceInterface;
+use App\Services\EntityIdFactory;
 use App\Services\Source\Finder;
 use App\Services\Source\Store;
 use App\Tests\Model\UserId;
@@ -59,27 +60,39 @@ class FinderTest extends WebTestCase
      */
     public function findDataProvider(): array
     {
+        $idFactory = new EntityIdFactory();
+
         $userId = UserId::create();
 
         $fileSourceLabel = 'file source label';
         $gitSourceLabel = 'git source label';
 
-        $fileSource = new FileSource($userId, $fileSourceLabel);
-        $gitSource = new GitSource($userId, $gitSourceLabel, 'https://example.com/repository.git');
-        $fileRunSourceWithoutParameters = new RunSource($fileSource);
-        $fileRunSourceWithParameters = new RunSource($fileSource, ['key1' => 'value1']);
-        $gitRunSourceWithoutParameters = new RunSource($gitSource);
-        $gitRunSourceWithParameters = new RunSource($gitSource, ['key2' => 'value2']);
+        $fileSource = new FileSource($idFactory->create(), $userId, $fileSourceLabel);
+        $gitSource = new GitSource(
+            $idFactory->create(),
+            $userId,
+            $gitSourceLabel,
+            'https://example.com/repository.git'
+        );
+        $fileRunSourceWithoutParameters = new RunSource($idFactory->create(), $fileSource);
+        $fileRunSourceWithParameters = new RunSource($idFactory->create(), $fileSource, ['key1' => 'value1']);
+        $gitRunSourceWithoutParameters = new RunSource($idFactory->create(), $gitSource);
+        $gitRunSourceWithParameters = new RunSource($idFactory->create(), $gitSource, ['key2' => 'value2']);
 
-        $fileSourceDeleted = (function () use ($userId, $fileSourceLabel) {
-            $source = new FileSource($userId, $fileSourceLabel);
+        $fileSourceDeleted = (function () use ($userId, $fileSourceLabel, $idFactory) {
+            $source = new FileSource($idFactory->create(), $userId, $fileSourceLabel);
             $source->setDeletedAt(new \DateTimeImmutable('-1 second'));
 
             return $source;
         })();
 
-        $gitSourceDeleted = (function () use ($userId, $gitSourceLabel) {
-            $source = new GitSource($userId, $gitSourceLabel, 'https://example.com/repository.git');
+        $gitSourceDeleted = (function () use ($userId, $gitSourceLabel, $idFactory) {
+            $source = new GitSource(
+                $idFactory->create(),
+                $userId,
+                $gitSourceLabel,
+                'https://example.com/repository.git'
+            );
             $source->setDeletedAt(new \DateTimeImmutable('-1 second'));
 
             return $source;

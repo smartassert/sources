@@ -9,6 +9,7 @@ use App\Entity\GitSource;
 use App\Entity\RunSource;
 use App\Entity\SourceInterface;
 use App\Entity\SourceOriginInterface;
+use App\Exception\EmptyEntityIdException;
 use App\Message\Prepare;
 use App\Request\FileSourceRequest;
 use App\Request\GitSourceRequest;
@@ -101,6 +102,7 @@ class UserSourceController
 
     /**
      * @throws AccessDeniedException
+     * @throws EmptyEntityIdException
      */
     #[Route(SourceRoutes::ROUTE_SOURCE . '/prepare', name: 'user_source_prepare', methods: ['POST'])]
     public function prepare(

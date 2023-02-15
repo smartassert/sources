@@ -14,6 +14,7 @@ use App\Message\Prepare;
 use App\MessageHandler\PrepareHandler;
 use App\Model\EntityId;
 use App\Repository\SourceRepository;
+use App\Services\EntityIdFactory;
 use App\Services\RunSourceSerializer;
 use App\Services\Source\Store;
 use App\Tests\Model\UserId;
@@ -93,11 +94,18 @@ class PrepareHandlerTest extends WebTestCase
      */
     public function invokeDoesNotPrepareDataProvider(): array
     {
-        $fileSource = new FileSource(UserId::create(), 'file source label');
-        $fileRunSource = new RunSource($fileSource, []);
+        $idFactory = new EntityIdFactory();
 
-        $gitSource = new GitSource(UserId::create(), 'label', 'http://example.com/repository.git');
-        $gitRunSource = new RunSource($gitSource, []);
+        $fileSource = new FileSource($idFactory->create(), UserId::create(), 'file source label');
+        $fileRunSource = new RunSource($idFactory->create(), $fileSource, []);
+
+        $gitSource = new GitSource(
+            $idFactory->create(),
+            UserId::create(),
+            'label',
+            'http://example.com/repository.git'
+        );
+        $gitRunSource = new RunSource($idFactory->create(), $gitSource, []);
 
         return [
             'no entities' => [
@@ -177,12 +185,20 @@ class PrepareHandlerTest extends WebTestCase
      */
     public function invokeDoesPrepareDataProvider(): array
     {
-        $fileSource = new FileSource(UserId::create(), 'file source label');
-        $gitSource = new GitSource(UserId::create(), 'label', 'http://example.com/repository.git');
+        $idFactory = new EntityIdFactory();
 
-        $fileRunSource = new RunSource($fileSource);
-        $gitRunSource = new RunSource($gitSource);
-        $fileRunSourceStatePreparingHalted = (new RunSource($fileSource))->setState(State::PREPARING_HALTED);
+        $fileSource = new FileSource($idFactory->create(), UserId::create(), 'file source label');
+        $gitSource = new GitSource(
+            $idFactory->create(),
+            UserId::create(),
+            'git source label',
+            'http://example.com/repository.git'
+        );
+
+        $fileRunSource = new RunSource($idFactory->create(), $fileSource);
+        $gitRunSource = new RunSource($idFactory->create(), $gitSource);
+        $fileRunSourceStatePreparingHalted =
+            (new RunSource($idFactory->create(), $fileSource))->setState(State::PREPARING_HALTED);
 
         return [
             'run source is parent of file source, state is "requested"' => [
@@ -217,7 +233,12 @@ class PrepareHandlerTest extends WebTestCase
      */
     public function testInvokeRunSourceSerializerThrowsException(\Exception $runSourceSerializerException): void
     {
-        $fileRunSource = new RunSource(new FileSource(UserId::create(), 'file source label'));
+        $idFactory = new EntityIdFactory();
+
+        $fileRunSource = new RunSource(
+            $idFactory->create(),
+            new FileSource($idFactory->create(), UserId::create(), 'file source label')
+        );
         $this->entityManager->persist($fileRunSource);
         $this->entityManager->flush();
 

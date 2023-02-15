@@ -6,16 +6,21 @@ namespace App\Services;
 
 use App\Entity\RunSource;
 use App\Entity\SourceOriginInterface;
+use App\Exception\EmptyEntityIdException;
 use App\Services\Source\Store;
 use Symfony\Component\HttpFoundation\Request;
 
 class RunSourceFactory
 {
     public function __construct(
-        private Store $store
+        private readonly Store $store,
+        private readonly EntityIdFactory $entityIdFactory,
     ) {
     }
 
+    /**
+     * @throws EmptyEntityIdException
+     */
     public function createFromRequest(SourceOriginInterface $source, Request $request): RunSource
     {
         $parameters = [];
@@ -25,7 +30,7 @@ class RunSourceFactory
             }
         }
 
-        $source = new RunSource($source, $parameters);
+        $source = new RunSource($this->entityIdFactory->create(), $source, $parameters);
         $this->store->add($source);
 
         return $source;

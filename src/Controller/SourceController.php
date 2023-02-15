@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use App\Enum\Source\Type;
+use App\Exception\EmptyEntityIdException;
 use App\Repository\SourceRepository;
 use App\Request\FileSourceRequest;
 use App\Request\GitSourceRequest;
@@ -22,12 +23,18 @@ class SourceController
     ) {
     }
 
+    /**
+     * @throws EmptyEntityIdException
+     */
     #[Route('/git', name: 'git_source_create', methods: ['POST'])]
     public function createGitSource(User $user, GitSourceRequest $request): JsonResponse
     {
         return new JsonResponse($this->factory->createFromGitSourceRequest($user, $request));
     }
 
+    /**
+     * @throws EmptyEntityIdException
+     */
     #[Route('/file', name: 'file_source_create', methods: ['POST'])]
     public function createFileSource(User $user, FileSourceRequest $request): JsonResponse
     {

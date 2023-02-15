@@ -12,6 +12,7 @@ use App\Exception\ProcessExecutorException;
 use App\Model\ProcessOutput;
 use App\Model\UserGitRepository;
 use App\Services\DirectoryListingFilter;
+use App\Services\EntityIdFactory;
 use App\Services\GitRepositoryCheckoutHandler;
 use App\Services\GitRepositoryCloner;
 use App\Services\GitRepositoryStore;
@@ -73,6 +74,7 @@ class GitRepositoryStoreTest extends WebTestCase
         }
 
         $this->source = new GitSource(
+            (new EntityIdFactory())->create(),
             UserId::create(),
             'git source label',
             self::REPOSITORY_URL,

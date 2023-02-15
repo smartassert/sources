@@ -9,6 +9,7 @@ use App\Entity\GitSource;
 use App\Entity\SourceOriginInterface;
 use App\Model\SourceRepositoryInterface;
 use App\Model\UserGitRepository;
+use App\Services\EntityIdFactory;
 use App\Services\SourceRepository\Factory\Factory;
 use App\Services\SourceRepository\Factory\GitSourceHandler;
 use App\Tests\Model\UserId;
@@ -97,14 +98,23 @@ class FactoryTest extends WebTestCase
 
     public function testCreateForFileSource(): void
     {
-        $fileSource = new FileSource(UserId::create(), 'file source label');
+        $fileSource = new FileSource(
+            (new EntityIdFactory())->create(),
+            UserId::create(),
+            'file source label'
+        );
 
         self::assertSame($fileSource, $this->factory->create($fileSource, []));
     }
 
     public function testCreateForGitSourceSuccess(): void
     {
-        $gitSource = new GitSource(UserId::create(), 'https://example.com/repository.git', '/');
+        $gitSource = new GitSource(
+            (new EntityIdFactory())->create(),
+            UserId::create(),
+            'https://example.com/repository.git',
+            '/'
+        );
         $parameters = ['ref' => 'v1.1'];
         $userGitRepository = new UserGitRepository($gitSource);
 
@@ -160,7 +170,12 @@ class FactoryTest extends WebTestCase
         \assert($gitRepositoryStorage instanceof FilesystemOperator);
 
         $userGitRepository = new UserGitRepository(
-            new GitSource(UserId::create(), 'label', 'https://example.com/repository.git')
+            new GitSource(
+                (new EntityIdFactory())->create(),
+                UserId::create(),
+                'label',
+                'https://example.com/repository.git'
+            )
         );
 
         $fixtureCreator->copySetTo('Source/mixed', $gitRepositoryStorage, $userGitRepository->getDirectoryPath());

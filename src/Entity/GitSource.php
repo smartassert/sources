@@ -30,19 +30,21 @@ class GitSource extends AbstractOriginSource implements SourceOriginInterface, \
     private string $credentials;
 
     /**
+     * @param non-empty-string $id
      * @param non-empty-string $userId
      * @param non-empty-string $label
      * @param non-empty-string $hostUrl
      * @param non-empty-string $path
      */
     public function __construct(
+        string $id,
         string $userId,
         string $label,
         string $hostUrl,
         string $path = '/',
         string $credentials = ''
     ) {
-        parent::__construct($userId, $label);
+        parent::__construct($id, $userId, $label);
 
         $this->hostUrl = $hostUrl;
         $this->path = $path;
