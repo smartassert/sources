@@ -4,28 +4,28 @@ declare(strict_types=1);
 
 namespace App\Security;
 
-use App\Entity\SourceInterface;
+use App\Entity\UserHeldEntityInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
-class UserSourceAccessChecker
+class EntityAccessChecker
 {
     public function __construct(
-        private AuthorizationCheckerInterface $authorizationChecker,
+        private readonly AuthorizationCheckerInterface $authorizationChecker,
     ) {
     }
 
     /**
      * @throws AccessDeniedException
      */
-    public function denyAccessUnlessGranted(SourceInterface $source): void
+    public function denyAccessUnlessGranted(UserHeldEntityInterface $entity): void
     {
-        $attribute = SourceAccessVoter::ACCESS;
+        $attribute = EntityAccessVoter::ACCESS;
 
-        if (false === $this->authorizationChecker->isGranted($attribute, $source)) {
+        if (false === $this->authorizationChecker->isGranted($attribute, $entity)) {
             $exception = new AccessDeniedException('Access Denied.');
             $exception->setAttributes($attribute);
-            $exception->setSubject($source);
+            $exception->setSubject($entity);
 
             throw $exception;
         }

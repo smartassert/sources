@@ -14,7 +14,7 @@ use App\Message\Prepare;
 use App\Request\FileSourceRequest;
 use App\Request\GitSourceRequest;
 use App\Response\YamlResponse;
-use App\Security\UserSourceAccessChecker;
+use App\Security\EntityAccessChecker;
 use App\Services\RunSourceFactory;
 use App\Services\RunSourceSerializer;
 use App\Services\Source\Mutator;
@@ -31,7 +31,7 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 class UserSourceController
 {
     public function __construct(
-        private readonly UserSourceAccessChecker $userSourceAccessChecker,
+        private readonly EntityAccessChecker $entityAccessChecker,
     ) {
     }
 
@@ -41,7 +41,7 @@ class UserSourceController
     #[Route(SourceRoutes::ROUTE_SOURCE, name: 'user_source_get', methods: ['GET'])]
     public function get(SourceInterface $source): Response
     {
-        $this->userSourceAccessChecker->denyAccessUnlessGranted($source);
+        $this->entityAccessChecker->denyAccessUnlessGranted($source);
 
         return new JsonResponse($source);
     }
@@ -55,7 +55,7 @@ class UserSourceController
         FileSource $source,
         FileSourceRequest $request,
     ): Response {
-        $this->userSourceAccessChecker->denyAccessUnlessGranted($source);
+        $this->entityAccessChecker->denyAccessUnlessGranted($source);
 
         return new JsonResponse($mutator->updateFile($source, $request));
     }
@@ -69,7 +69,7 @@ class UserSourceController
         GitSource $source,
         GitSourceRequest $request,
     ): Response {
-        $this->userSourceAccessChecker->denyAccessUnlessGranted($source);
+        $this->entityAccessChecker->denyAccessUnlessGranted($source);
 
         return new JsonResponse($mutator->updateGit($source, $request));
     }
@@ -85,7 +85,7 @@ class UserSourceController
         FilesystemWriter $fileSourceWriter,
         FilesystemWriter $runSourceWriter,
     ): Response {
-        $this->userSourceAccessChecker->denyAccessUnlessGranted($source);
+        $this->entityAccessChecker->denyAccessUnlessGranted($source);
 
         $store->delete($source);
 
@@ -111,7 +111,7 @@ class UserSourceController
         MessageBusInterface $messageBus,
         RunSourceFactory $runSourceFactory,
     ): Response {
-        $this->userSourceAccessChecker->denyAccessUnlessGranted($source);
+        $this->entityAccessChecker->denyAccessUnlessGranted($source);
 
         $runSource = $runSourceFactory->createFromRequest($source, $request);
         $messageBus->dispatch(Prepare::createFromRunSource($runSource));
@@ -126,7 +126,7 @@ class UserSourceController
     #[Route(SourceRoutes::ROUTE_SOURCE . '/read', name: 'user_source_read', methods: ['GET'])]
     public function read(RunSource $source, RunSourceSerializer $runSourceSerializer): Response
     {
-        $this->userSourceAccessChecker->denyAccessUnlessGranted($source);
+        $this->entityAccessChecker->denyAccessUnlessGranted($source);
 
         return new YamlResponse($runSourceSerializer->read($source));
     }
