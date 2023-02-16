@@ -9,7 +9,7 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: SuiteRepository::class)]
-class Suite implements \JsonSerializable
+class Suite implements \JsonSerializable, UserHeldEntityInterface
 {
     public const ID_LENGTH = 32;
     public const LABEL_MAX_LENGTH = 255;
@@ -84,9 +84,6 @@ class Suite implements \JsonSerializable
         return $this;
     }
 
-    /**
-     * @return non-empty-string
-     */
     public function getUserId(): string
     {
         return $this->userId;
