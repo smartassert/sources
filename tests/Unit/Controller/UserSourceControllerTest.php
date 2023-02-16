@@ -8,7 +8,7 @@ use App\Controller\UserSourceController;
 use App\Entity\FileSource;
 use App\Entity\RunSource;
 use App\Message\Prepare;
-use App\Security\UserSourceAccessChecker;
+use App\Security\EntityAccessChecker;
 use App\Services\EntityIdFactory;
 use App\Services\RunSourceFactory;
 use App\Tests\Model\UserId;
@@ -54,7 +54,7 @@ class UserSourceControllerTest extends WebTestCase
             ->andReturn($runSource)
         ;
 
-        $userSourceAccessChecker = \Mockery::mock(UserSourceAccessChecker::class);
+        $userSourceAccessChecker = \Mockery::mock(EntityAccessChecker::class);
         $userSourceAccessChecker
             ->shouldReceive('denyAccessUnlessGranted')
             ->with($fileSource)
