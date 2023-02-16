@@ -43,6 +43,9 @@ class Suite implements \JsonSerializable
     #[ORM\Column(type: Types::SIMPLE_ARRAY)]
     private array $tests;
 
+    #[ORM\Column(type: Types::DATETIMETZ_IMMUTABLE, nullable: true)]
+    private ?\DateTimeImmutable $deletedAt = null;
+
     /**
      * @param non-empty-string             $id
      * @param non-empty-string             $id
@@ -90,6 +93,18 @@ class Suite implements \JsonSerializable
     public function getUserId(): string
     {
         return $this->userId;
+    }
+
+    public function getDeletedAt(): ?\DateTimeImmutable
+    {
+        return $this->deletedAt;
+    }
+
+    public function setDeletedAt(\DateTimeImmutable $deletedAt): void
+    {
+        if (null === $this->deletedAt) {
+            $this->deletedAt = $deletedAt;
+        }
     }
 
     /**
