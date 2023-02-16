@@ -19,7 +19,7 @@ class Suite implements \JsonSerializable
      */
     #[ORM\Id]
     #[ORM\Column(type: Types::STRING, length: self::ID_LENGTH, unique: true)]
-    private readonly string $id;
+    public readonly string $id;
 
     /**
      * @var non-empty-string
@@ -58,7 +58,7 @@ class Suite implements \JsonSerializable
         string $userId,
         SourceOriginInterface $source,
         string $label,
-        array $tests = []
+        array $tests
     ) {
         $this->id = $id;
         $this->userId = $userId;
