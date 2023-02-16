@@ -21,12 +21,6 @@ class Suite implements \JsonSerializable
     #[ORM\Column(type: Types::STRING, length: self::ID_LENGTH, unique: true)]
     private readonly string $id;
 
-    /**
-     * @var non-empty-string
-     */
-    #[ORM\Column(type: Types::STRING, length: self::ID_LENGTH)]
-    private readonly string $userId;
-
     #[ORM\ManyToOne(targetEntity: AbstractSource::class, cascade: ['persist'])]
     #[ORM\JoinColumn(nullable: false)]
     private SourceOriginInterface $source;
@@ -49,19 +43,16 @@ class Suite implements \JsonSerializable
     /**
      * @param non-empty-string             $id
      * @param non-empty-string             $id
-     * @param non-empty-string             $userId
      * @param non-empty-string             $label
      * @param array<int, non-empty-string> $tests
      */
     public function __construct(
         string $id,
-        string $userId,
         SourceOriginInterface $source,
         string $label,
         array $tests = []
     ) {
         $this->id = $id;
-        $this->userId = $userId;
         $this->source = $source;
         $this->label = $label;
         $this->tests = $tests;
@@ -85,14 +76,6 @@ class Suite implements \JsonSerializable
         $this->tests = $tests;
 
         return $this;
-    }
-
-    /**
-     * @return non-empty-string
-     */
-    public function getUserId(): string
-    {
-        return $this->userId;
     }
 
     public function getDeletedAt(): ?\DateTimeImmutable
