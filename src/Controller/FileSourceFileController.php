@@ -8,7 +8,7 @@ use App\Entity\FileSource;
 use App\Request\AddYamlFileRequest;
 use App\Request\YamlFileRequest;
 use App\Response\YamlResponse;
-use App\Security\UserSourceAccessChecker;
+use App\Security\EntityAccessChecker;
 use App\Services\SourceRepository\Reader\FileSourceDirectoryLister;
 use League\Flysystem\FilesystemException;
 use League\Flysystem\FilesystemReader;
@@ -24,7 +24,7 @@ class FileSourceFileController
     private const ROUTE_SOURCE_FILE = SourceRoutes::ROUTE_SOURCE . '/' . self::ROUTE_FILENAME_PATTERN;
 
     public function __construct(
-        private readonly UserSourceAccessChecker $userSourceAccessChecker,
+        private readonly EntityAccessChecker $entityAccessChecker,
         private readonly FilesystemWriter $fileSourceWriter,
         private readonly FilesystemReader $fileSourceReader,
     ) {
@@ -37,7 +37,7 @@ class FileSourceFileController
     #[Route(self::ROUTE_SOURCE_FILE, name: 'file_source_file_add', methods: ['POST'])]
     public function add(FileSource $source, AddYamlFileRequest $request): Response
     {
-        $this->userSourceAccessChecker->denyAccessUnlessGranted($source);
+        $this->entityAccessChecker->denyAccessUnlessGranted($source);
 
         $yamlFile = $request->file;
 
@@ -53,7 +53,7 @@ class FileSourceFileController
     #[Route(self::ROUTE_SOURCE_FILE, name: 'file_source_file_read', methods: ['GET'])]
     public function read(FileSource $source, YamlFileRequest $request): Response
     {
-        $this->userSourceAccessChecker->denyAccessUnlessGranted($source);
+        $this->entityAccessChecker->denyAccessUnlessGranted($source);
 
         $location = $source->getDirectoryPath() . '/' . $request->filename;
 
@@ -71,7 +71,7 @@ class FileSourceFileController
     #[Route(self::ROUTE_SOURCE_FILE, name: 'file_source_file_remove', methods: ['DELETE'])]
     public function remove(FileSource $source, YamlFileRequest $request): Response
     {
-        $this->userSourceAccessChecker->denyAccessUnlessGranted($source);
+        $this->entityAccessChecker->denyAccessUnlessGranted($source);
 
         $this->fileSourceWriter->delete($source->getDirectoryPath() . '/' . $request->filename);
 
@@ -85,7 +85,7 @@ class FileSourceFileController
     #[Route(SourceRoutes::ROUTE_SOURCE . '/list', name: 'file_source_list_filenames', methods: ['GET'])]
     public function listFilenames(FileSource $source, FileSourceDirectoryLister $lister): Response
     {
-        $this->userSourceAccessChecker->denyAccessUnlessGranted($source);
+        $this->entityAccessChecker->denyAccessUnlessGranted($source);
 
         return new JsonResponse($lister->list($source));
     }
