@@ -18,7 +18,7 @@ use Doctrine\ORM\Mapping as ORM;
     'file' => FileSource::class,
     'run' => RunSource::class,
 ])]
-abstract class AbstractSource implements SourceInterface
+abstract class AbstractSource implements SourceInterface, UserHeldEntityInterface
 {
     public const ID_LENGTH = 32;
     public const TYPE_DISCRIMINATOR_LENGTH = 32;
