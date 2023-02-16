@@ -131,7 +131,7 @@ abstract class AbstractCreateSuiteTest extends AbstractApplicationTest
 
             self::assertNotSame($previousSuiteId, $suiteId);
             $previousSuiteId = $suiteId;
-            $createdSuiteCount++;
+            ++$createdSuiteCount;
         }
 
         self::assertCount($createdSuiteCount, $labels);
