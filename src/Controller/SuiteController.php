@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
-use App\Entity\SourceInterface;
 use App\Entity\SourceOriginInterface;
+use App\Exception\EmptyEntityIdException;
 use App\Request\SuiteRequest;
 use App\Security\UserSourceAccessChecker;
 use App\Services\Suite\Factory;
@@ -24,14 +24,12 @@ class SuiteController
 
     /**
      * @throws AccessDeniedException
+     * @throws EmptyEntityIdException
      */
     #[Route(SuiteRoutes::ROUTE_SUITE_BASE, name: 'user_suite_create', methods: ['POST'])]
-    public function create(
-        SourceInterface $source,
-        SuiteRequest $request,
-    ): Response {
+    public function create(SourceOriginInterface $source, SuiteRequest $request): Response
+    {
         $this->userSourceAccessChecker->denyAccessUnlessGranted($source);
-        \assert($source instanceof SourceOriginInterface);
 
         return new JsonResponse($this->factory->createFromSuiteRequest($source, $request));
     }
