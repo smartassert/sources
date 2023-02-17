@@ -15,6 +15,8 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 abstract class AbstractApplicationTest extends WebTestCase
 {
+    protected const USER_EMAIL = 'user@example.com';
+
     protected static AuthenticationConfiguration $authenticationConfiguration;
     protected ResponseAsserter $responseAsserter;
     protected static KernelBrowser $kernelBrowser;

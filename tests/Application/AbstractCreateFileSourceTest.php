@@ -23,7 +23,7 @@ abstract class AbstractCreateFileSourceTest extends AbstractApplicationTest
     public function testCreateInvalidSourceRequest(array $requestParameters, array $expectedResponseData): void
     {
         $response = $this->applicationClient->makeCreateFileSourceRequest(
-            self::$authenticationConfiguration->getValidApiToken(),
+            self::$authenticationConfiguration->getValidApiToken(self::USER_EMAIL),
             $requestParameters
         );
 
@@ -39,7 +39,7 @@ abstract class AbstractCreateFileSourceTest extends AbstractApplicationTest
     public function testCreateSuccess(array $requestParameters, array $expected): void
     {
         $response = $this->applicationClient->makeCreateFileSourceRequest(
-            self::$authenticationConfiguration->getValidApiToken(),
+            self::$authenticationConfiguration->getValidApiToken(self::USER_EMAIL),
             $requestParameters
         );
 
@@ -56,7 +56,7 @@ abstract class AbstractCreateFileSourceTest extends AbstractApplicationTest
         self::assertInstanceOf(SourceInterface::class, $source);
 
         $expected['id'] = $source->getId();
-        $expected['user_id'] = self::$authenticationConfiguration->getUser()->id;
+        $expected['user_id'] = self::$authenticationConfiguration->getUser(self::USER_EMAIL)->id;
 
         $this->responseAsserter->assertSuccessfulJsonResponse($response, $expected);
     }
@@ -89,14 +89,14 @@ abstract class AbstractCreateFileSourceTest extends AbstractApplicationTest
         ];
 
         $firstResponse = $this->applicationClient->makeCreateFileSourceRequest(
-            self::$authenticationConfiguration->getValidApiToken(),
+            self::$authenticationConfiguration->getValidApiToken(self::USER_EMAIL),
             $requestParameters
         );
 
         self::assertSame(200, $firstResponse->getStatusCode());
 
         $secondResponse = $this->applicationClient->makeCreateFileSourceRequest(
-            self::$authenticationConfiguration->getValidApiToken(),
+            self::$authenticationConfiguration->getValidApiToken(self::USER_EMAIL),
             $requestParameters
         );
 
@@ -112,7 +112,7 @@ abstract class AbstractCreateFileSourceTest extends AbstractApplicationTest
         ];
 
         $firstCreateResponse = $this->applicationClient->makeCreateFileSourceRequest(
-            self::$authenticationConfiguration->getValidApiToken(),
+            self::$authenticationConfiguration->getValidApiToken(self::USER_EMAIL),
             $requestParameters
         );
 
@@ -124,14 +124,14 @@ abstract class AbstractCreateFileSourceTest extends AbstractApplicationTest
         \assert(is_string($sourceId));
 
         $deleteResponse = $this->applicationClient->makeDeleteSourceRequest(
-            self::$authenticationConfiguration->getValidApiToken(),
+            self::$authenticationConfiguration->getValidApiToken(self::USER_EMAIL),
             $sourceId
         );
 
         self::assertSame(200, $deleteResponse->getStatusCode());
 
         $secondCreateResponse = $this->applicationClient->makeCreateFileSourceRequest(
-            self::$authenticationConfiguration->getValidApiToken(),
+            self::$authenticationConfiguration->getValidApiToken(self::USER_EMAIL),
             $requestParameters
         );
 

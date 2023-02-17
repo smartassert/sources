@@ -20,7 +20,7 @@ abstract class AbstractListSourcesTest extends AbstractApplicationTest
     {
         $sourceProvider = self::getContainer()->get(SourceProvider::class);
         \assert($sourceProvider instanceof SourceProvider);
-        $sourceProvider->setUserId(self::$authenticationConfiguration->getUser()->id);
+        $sourceProvider->setUserId(self::$authenticationConfiguration->getUser(self::USER_EMAIL)->id);
         $sourceProvider->initialize($sourceIdentifiers);
 
         $sources = [];
@@ -29,7 +29,7 @@ abstract class AbstractListSourcesTest extends AbstractApplicationTest
         }
 
         $response = $this->applicationClient->makeListSourcesRequest(
-            self::$authenticationConfiguration->getValidApiToken()
+            self::$authenticationConfiguration->getValidApiToken(self::USER_EMAIL)
         );
 
         foreach ($expectedResponseData as $sourceIdentifier => $expectedSourceData) {

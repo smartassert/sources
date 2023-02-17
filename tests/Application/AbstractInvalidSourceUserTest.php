@@ -42,7 +42,7 @@ abstract class AbstractInvalidSourceUserTest extends AbstractApplicationTest
     public function testAddFileInvalidUser(): void
     {
         $response = $this->applicationClient->makeAddFileRequest(
-            self::$authenticationConfiguration->getValidApiToken(),
+            self::$authenticationConfiguration->getValidApiToken(self::USER_EMAIL),
             $this->fileSource->getId(),
             self::FILENAME,
             '- content'
@@ -54,7 +54,7 @@ abstract class AbstractInvalidSourceUserTest extends AbstractApplicationTest
     public function testRemoveFileInvalidUser(): void
     {
         $response = $this->applicationClient->makeRemoveFileRequest(
-            self::$authenticationConfiguration->getValidApiToken(),
+            self::$authenticationConfiguration->getValidApiToken(self::USER_EMAIL),
             $this->fileSource->getId(),
             self::FILENAME
         );
@@ -65,7 +65,7 @@ abstract class AbstractInvalidSourceUserTest extends AbstractApplicationTest
     public function testReadFileInvalidUser(): void
     {
         $response = $this->applicationClient->makeRemoveFileRequest(
-            self::$authenticationConfiguration->getValidApiToken(),
+            self::$authenticationConfiguration->getValidApiToken(self::USER_EMAIL),
             $this->fileSource->getId(),
             self::FILENAME
         );
@@ -76,7 +76,7 @@ abstract class AbstractInvalidSourceUserTest extends AbstractApplicationTest
     public function testGetSourceInvalidUser(): void
     {
         $response = $this->applicationClient->makeGetSourceRequest(
-            self::$authenticationConfiguration->getValidApiToken(),
+            self::$authenticationConfiguration->getValidApiToken(self::USER_EMAIL),
             $this->fileSource->getId()
         );
 
@@ -86,7 +86,7 @@ abstract class AbstractInvalidSourceUserTest extends AbstractApplicationTest
     public function testUpdateFileSourceInvalidUser(): void
     {
         $response = $this->applicationClient->makeUpdateFileSourceRequest(
-            self::$authenticationConfiguration->getValidApiToken(),
+            self::$authenticationConfiguration->getValidApiToken(self::USER_EMAIL),
             $this->fileSource->getId(),
             [
                 'label' => 'non-empty label',
@@ -99,7 +99,7 @@ abstract class AbstractInvalidSourceUserTest extends AbstractApplicationTest
     public function testUpdateGitSourceInvalidUser(): void
     {
         $response = $this->applicationClient->makeUpdateGitSourceRequest(
-            self::$authenticationConfiguration->getValidApiToken(),
+            self::$authenticationConfiguration->getValidApiToken(self::USER_EMAIL),
             $this->gitSource->getId(),
             [
                 'label' => 'non-empty label',
@@ -114,7 +114,7 @@ abstract class AbstractInvalidSourceUserTest extends AbstractApplicationTest
     public function testDeleteSourceInvalidUser(): void
     {
         $response = $this->applicationClient->makeDeleteSourceRequest(
-            self::$authenticationConfiguration->getValidApiToken(),
+            self::$authenticationConfiguration->getValidApiToken(self::USER_EMAIL),
             $this->fileSource->getId()
         );
 
@@ -124,7 +124,7 @@ abstract class AbstractInvalidSourceUserTest extends AbstractApplicationTest
     public function testPrepareSourceInvalidUser(): void
     {
         $response = $this->applicationClient->makePrepareSourceRequest(
-            self::$authenticationConfiguration->getValidApiToken(),
+            self::$authenticationConfiguration->getValidApiToken(self::USER_EMAIL),
             $this->fileSource->getId(),
             []
         );
@@ -144,7 +144,7 @@ abstract class AbstractInvalidSourceUserTest extends AbstractApplicationTest
         $sourceRepository->save($runSource);
 
         $response = $this->applicationClient->makeReadSourceRequest(
-            self::$authenticationConfiguration->getValidApiToken(),
+            self::$authenticationConfiguration->getValidApiToken(self::USER_EMAIL),
             $runSource->getId()
         );
 

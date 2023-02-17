@@ -12,30 +12,50 @@ use SmartAssert\UsersClient\Model\User;
 
 class AuthenticationConfiguration
 {
-    private RefreshableToken $frontendToken;
-    private ApiKey $apiKey;
-    private Token $apiToken;
-    private User $user;
+    /**
+     * @var RefreshableToken[]
+     */
+    private array $frontendTokens = [];
 
+    /**
+     * @var ApiKey[]
+     */
+    private array $apiKeys = [];
+
+    /**
+     * @var Token[]
+     */
+    private array $apiTokens = [];
+
+    /**
+     * @var User[]
+     */
+    private array $users = [];
+
+    /**
+     * @param array{non-empty-string: non-empty-string} $userCredentials
+     */
     public function __construct(
-        public readonly string $userEmail,
-        public readonly string $userPassword,
+        private readonly array $userCredentials,
         private readonly Client $usersClient,
     ) {
     }
 
-    public function getValidApiToken(): string
+    public function getValidApiToken(string $userEmail): string
     {
-        if (!isset($this->apiToken)) {
-            $apiToken = $this->usersClient->createApiToken($this->getDefaultApiKey()->key);
+        if (!array_key_exists($userEmail, $this->apiTokens)) {
+            $apiToken = $this->usersClient->createApiToken(
+                $this->getApiKey($userEmail)->key
+            );
+
             if (null === $apiToken) {
                 throw new \RuntimeException('Valid API token is null');
             }
 
-            $this->apiToken = $apiToken;
+            $this->apiTokens[$userEmail] = $apiToken;
         }
 
-        return $this->apiToken->token;
+        return $this->apiTokens[$userEmail]->token;
     }
 
     public function getInvalidApiToken(): string
@@ -43,41 +63,50 @@ class AuthenticationConfiguration
         return 'invalid api token value';
     }
 
-    public function getUser(): User
+    public function getUser(string $userEmail): User
     {
-        if (!isset($this->user)) {
-            $user = $this->usersClient->verifyFrontendToken($this->getFrontendToken());
+        if (!array_key_exists($userEmail, $this->users)) {
+            $user = $this->usersClient->verifyFrontendToken(
+                $this->getFrontendToken($userEmail)
+            );
+
             if (null === $user) {
                 throw new \RuntimeException('User is null');
             }
 
-            $this->user = $user;
+            $this->users[$userEmail] = $user;
         }
 
-        return $this->user;
+        return $this->users[$userEmail];
     }
 
-    private function getFrontendToken(): RefreshableToken
+    private function getFrontendToken(string $userEmail): RefreshableToken
     {
-        if (!isset($this->frontendToken)) {
-            $this->frontendToken = $this->usersClient->createFrontendToken($this->userEmail, $this->userPassword);
+        if (!array_key_exists($userEmail, $this->frontendTokens)) {
+            $this->frontendTokens[$userEmail] = $this->usersClient->createFrontendToken(
+                $userEmail,
+                $this->userCredentials[$userEmail]
+            );
         }
 
-        return $this->frontendToken;
+        return $this->frontendTokens[$userEmail];
     }
 
-    private function getDefaultApiKey(): ApiKey
+    private function getApiKey(string $userEmail): ApiKey
     {
-        if (!isset($this->apiKey)) {
-            $apiKeys = $this->usersClient->listUserApiKeys($this->getFrontendToken());
+        if (!array_key_exists($userEmail, $this->apiKeys)) {
+            $apiKeys = $this->usersClient->listUserApiKeys(
+                $this->getFrontendToken($userEmail)
+            );
+
             $apiKey = $apiKeys->getDefault();
             if (null === $apiKey) {
                 throw new \RuntimeException('API key is null');
             }
 
-            $this->apiKey = $apiKey;
+            $this->apiKeys[$userEmail] = $apiKey;
         }
 
-        return $this->apiKey;
+        return $this->apiKeys[$userEmail];
     }
 }

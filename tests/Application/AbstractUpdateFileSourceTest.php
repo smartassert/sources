@@ -21,7 +21,7 @@ abstract class AbstractUpdateFileSourceTest extends AbstractApplicationTest
 
         $sourceProvider = self::getContainer()->get(SourceProvider::class);
         \assert($sourceProvider instanceof SourceProvider);
-        $sourceProvider->setUserId(self::$authenticationConfiguration->getUser()->id);
+        $sourceProvider->setUserId(self::$authenticationConfiguration->getUser(self::USER_EMAIL)->id);
         $this->sourceProvider = $sourceProvider;
     }
 
@@ -33,7 +33,7 @@ abstract class AbstractUpdateFileSourceTest extends AbstractApplicationTest
         $source = $this->sourceProvider->get($sourceIdentifier);
 
         $response = $this->applicationClient->makeUpdateFileSourceRequest(
-            self::$authenticationConfiguration->getValidApiToken(),
+            self::$authenticationConfiguration->getValidApiToken(self::USER_EMAIL),
             $source->getId(),
             []
         );
@@ -57,7 +57,7 @@ abstract class AbstractUpdateFileSourceTest extends AbstractApplicationTest
         $source = $this->sourceProvider->get($sourceIdentifier);
 
         $response = $this->applicationClient->makeUpdateFileSourceRequest(
-            self::$authenticationConfiguration->getValidApiToken(),
+            self::$authenticationConfiguration->getValidApiToken(self::USER_EMAIL),
             $source->getId(),
             $payload
         );
@@ -80,7 +80,7 @@ abstract class AbstractUpdateFileSourceTest extends AbstractApplicationTest
         $source = $this->sourceProvider->get($sourceIdentifier);
 
         $response = $this->applicationClient->makeUpdateFileSourceRequest(
-            self::$authenticationConfiguration->getValidApiToken(),
+            self::$authenticationConfiguration->getValidApiToken(self::USER_EMAIL),
             $source->getId(),
             $payload
         );

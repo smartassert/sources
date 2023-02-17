@@ -43,7 +43,7 @@ abstract class AbstractReadSourceTest extends AbstractApplicationTest
 
         $fileSource = new FileSource(
             $idFactory->create(),
-            self::$authenticationConfiguration->getUser()->id,
+            self::$authenticationConfiguration->getUser(self::USER_EMAIL)->id,
             'file source label'
         );
         $runSource = new RunSource($idFactory->create(), $fileSource);
@@ -59,7 +59,7 @@ abstract class AbstractReadSourceTest extends AbstractApplicationTest
         );
 
         $response = $this->applicationClient->makeReadSourceRequest(
-            self::$authenticationConfiguration->getValidApiToken(),
+            self::$authenticationConfiguration->getValidApiToken(self::USER_EMAIL),
             $runSource->getId()
         );
 
