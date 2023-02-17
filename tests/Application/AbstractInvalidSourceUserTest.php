@@ -156,7 +156,7 @@ abstract class AbstractInvalidSourceUserTest extends AbstractApplicationTest
     public function testListSuitesInvalidUser(): void
     {
         $response = $this->applicationClient->makeListSuitesRequest(
-            self::$authenticationConfiguration->getValidApiToken(),
+            self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
             $this->fileSource->getId()
         );
 
