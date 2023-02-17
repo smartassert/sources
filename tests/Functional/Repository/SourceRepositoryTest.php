@@ -11,7 +11,6 @@ use App\Entity\SourceInterface;
 use App\Enum\Source\Type;
 use App\Repository\SourceRepository;
 use App\Services\EntityIdFactory;
-use App\Services\Source\Store;
 use App\Tests\Model\UserId;
 use App\Tests\Services\EntityRemover;
 use Doctrine\ORM\EntityManagerInterface;
@@ -22,7 +21,6 @@ use Symfony\Component\Security\Core\User\UserInterface;
 class SourceRepositoryTest extends WebTestCase
 {
     private SourceRepository $repository;
-    private Store $store;
     private EntityManagerInterface $entityManager;
 
     protected function setUp(): void
@@ -32,10 +30,6 @@ class SourceRepositoryTest extends WebTestCase
         $repository = self::getContainer()->get(SourceRepository::class);
         \assert($repository instanceof SourceRepository);
         $this->repository = $repository;
-
-        $store = self::getContainer()->get(Store::class);
-        \assert($store instanceof Store);
-        $this->store = $store;
 
         $entityManager = self::getContainer()->get(EntityManagerInterface::class);
         \assert($entityManager instanceof EntityManagerInterface);
@@ -54,7 +48,7 @@ class SourceRepositoryTest extends WebTestCase
     {
         $sourceId = $source->getId();
 
-        $this->store->add($source);
+        $this->repository->save($source);
         $this->entityManager->detach($source);
 
         $retrievedSource = $this->repository->find($sourceId);
@@ -107,7 +101,7 @@ class SourceRepositoryTest extends WebTestCase
         array $expected
     ): void {
         foreach ($sources as $source) {
-            $this->store->add($source);
+            $this->repository->save($source);
         }
 
         self::assertEquals($expected, $this->repository->findNonDeletedByUserAndType($user, $types));

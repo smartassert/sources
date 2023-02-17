@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Application;
 
 use App\Entity\FileSource;
+use App\Repository\SourceRepository;
 use App\RequestValidator\YamlFileRequestValidator;
 use App\Services\EntityIdFactory;
 use App\Tests\Services\InvalidFilenameResponseDataFactory;
@@ -24,7 +25,10 @@ abstract class AbstractFileSourceFileTest extends AbstractApplicationTest
             self::$authenticationConfiguration->getUser()->id,
             'label'
         );
-        $this->store->add($this->fileSource);
+
+        $sourceRepository = self::getContainer()->get(SourceRepository::class);
+        \assert($sourceRepository instanceof SourceRepository);
+        $sourceRepository->save($this->fileSource);
     }
 
     /**

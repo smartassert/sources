@@ -6,6 +6,7 @@ namespace App\Tests\Application;
 
 use App\Entity\FileSource;
 use App\Entity\RunSource;
+use App\Repository\SourceRepository;
 use App\Services\EntityIdFactory;
 use App\Services\RunSourceSerializer;
 use App\Tests\Services\FileStoreFixtureCreator;
@@ -46,7 +47,10 @@ abstract class AbstractReadSourceTest extends AbstractApplicationTest
             'file source label'
         );
         $runSource = new RunSource($idFactory->create(), $fileSource);
-        $this->store->add($runSource);
+
+        $sourceRepository = self::getContainer()->get(SourceRepository::class);
+        \assert($sourceRepository instanceof SourceRepository);
+        $sourceRepository->save($runSource);
 
         $this->fixtureCreator->copyTo(
             $serializedRunSourceFixturePath,
