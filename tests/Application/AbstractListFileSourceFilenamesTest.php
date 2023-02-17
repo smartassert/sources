@@ -25,7 +25,7 @@ abstract class AbstractListFileSourceFilenamesTest extends AbstractApplicationTe
         ];
 
         $createFileSourceResponse = $this->applicationClient->makeCreateFileSourceRequest(
-            self::$authenticationConfiguration->getValidApiToken(),
+            self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
             $requestParameters
         );
 
@@ -47,7 +47,7 @@ abstract class AbstractListFileSourceFilenamesTest extends AbstractApplicationTe
         \assert('' !== $fileSourceId);
 
         $response = $this->applicationClient->makeGetFileSourceFilenamesRequest(
-            self::$authenticationConfiguration->getValidApiToken(),
+            self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
             $fileSourceId
         );
 
@@ -64,7 +64,7 @@ abstract class AbstractListFileSourceFilenamesTest extends AbstractApplicationTe
     {
         foreach ($filenamesToAdd as $filename) {
             $this->applicationClient->makeAddFileRequest(
-                self::$authenticationConfiguration->getValidApiToken(),
+                self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
                 $this->fileSourceId,
                 $filename,
                 md5((string) rand()),
@@ -72,7 +72,7 @@ abstract class AbstractListFileSourceFilenamesTest extends AbstractApplicationTe
         }
 
         $response = $this->applicationClient->makeGetFileSourceFilenamesRequest(
-            self::$authenticationConfiguration->getValidApiToken(),
+            self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
             $this->fileSourceId
         );
 

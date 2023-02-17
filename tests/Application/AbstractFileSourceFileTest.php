@@ -22,7 +22,7 @@ abstract class AbstractFileSourceFileTest extends AbstractApplicationTest
 
         $this->fileSource = new FileSource(
             (new EntityIdFactory())->create(),
-            self::$authenticationConfiguration->getUser()->id,
+            self::$authenticationConfiguration->getUser(self::USER_1_EMAIL)->id,
             'label'
         );
 
@@ -42,7 +42,7 @@ abstract class AbstractFileSourceFileTest extends AbstractApplicationTest
         array $expectedResponseData
     ): void {
         $response = $this->applicationClient->makeAddFileRequest(
-            self::$authenticationConfiguration->getValidApiToken(),
+            self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
             $this->fileSource->getId(),
             $filename,
             $content
@@ -119,7 +119,7 @@ abstract class AbstractFileSourceFileTest extends AbstractApplicationTest
         array $expectedResponseData
     ): void {
         $response = $this->applicationClient->makeReadFileRequest(
-            self::$authenticationConfiguration->getValidApiToken(),
+            self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
             $this->fileSource->getId(),
             $filename
         );
@@ -137,7 +137,7 @@ abstract class AbstractFileSourceFileTest extends AbstractApplicationTest
         array $expectedResponseData
     ): void {
         $response = $this->applicationClient->makeRemoveFileRequest(
-            self::$authenticationConfiguration->getValidApiToken(),
+            self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
             $this->fileSource->getId(),
             $filename
         );
@@ -175,7 +175,7 @@ abstract class AbstractFileSourceFileTest extends AbstractApplicationTest
     public function testRemoveFileNotFound(): void
     {
         $response = $this->applicationClient->makeRemoveFileRequest(
-            self::$authenticationConfiguration->getValidApiToken(),
+            self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
             $this->fileSource->getId(),
             self::FILENAME
         );
@@ -186,7 +186,7 @@ abstract class AbstractFileSourceFileTest extends AbstractApplicationTest
     public function testReadFileNotFound(): void
     {
         $response = $this->applicationClient->makeReadFileRequest(
-            self::$authenticationConfiguration->getValidApiToken(),
+            self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
             $this->fileSource->getId(),
             self::FILENAME
         );
@@ -200,7 +200,7 @@ abstract class AbstractFileSourceFileTest extends AbstractApplicationTest
         $updatedContent = '- updated content';
 
         $addResponse = $this->applicationClient->makeAddFileRequest(
-            self::$authenticationConfiguration->getValidApiToken(),
+            self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
             $this->fileSource->getId(),
             self::FILENAME,
             $initialContent
@@ -209,7 +209,7 @@ abstract class AbstractFileSourceFileTest extends AbstractApplicationTest
         $this->responseAsserter->assertSuccessfulResponseWithNoBody($addResponse);
 
         $initialReadResponse = $this->applicationClient->makeReadFileRequest(
-            self::$authenticationConfiguration->getValidApiToken(),
+            self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
             $this->fileSource->getId(),
             self::FILENAME
         );
@@ -217,7 +217,7 @@ abstract class AbstractFileSourceFileTest extends AbstractApplicationTest
         $this->responseAsserter->assertReadSourceSuccessResponse($initialReadResponse, $initialContent);
 
         $updateResponse = $this->applicationClient->makeAddFileRequest(
-            self::$authenticationConfiguration->getValidApiToken(),
+            self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
             $this->fileSource->getId(),
             self::FILENAME,
             $updatedContent
@@ -226,7 +226,7 @@ abstract class AbstractFileSourceFileTest extends AbstractApplicationTest
         $this->responseAsserter->assertSuccessfulResponseWithNoBody($updateResponse);
 
         $updatedReadResponse = $this->applicationClient->makeReadFileRequest(
-            self::$authenticationConfiguration->getValidApiToken(),
+            self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
             $this->fileSource->getId(),
             self::FILENAME
         );
@@ -234,7 +234,7 @@ abstract class AbstractFileSourceFileTest extends AbstractApplicationTest
         $this->responseAsserter->assertReadSourceSuccessResponse($updatedReadResponse, $updatedContent);
 
         $removeResponse = $this->applicationClient->makeRemoveFileRequest(
-            self::$authenticationConfiguration->getValidApiToken(),
+            self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
             $this->fileSource->getId(),
             self::FILENAME
         );
@@ -242,7 +242,7 @@ abstract class AbstractFileSourceFileTest extends AbstractApplicationTest
         $this->responseAsserter->assertSuccessfulResponseWithNoBody($removeResponse);
 
         $notFoundReadResponse = $this->applicationClient->makeReadFileRequest(
-            self::$authenticationConfiguration->getValidApiToken(),
+            self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
             $this->fileSource->getId(),
             self::FILENAME
         );
