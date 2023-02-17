@@ -46,6 +46,7 @@ abstract class AbstractCreateSuiteTest extends AbstractApplicationTest
             $requestParameters,
             [
                 'id' => $suite->id,
+                'source_id' => $sourceId,
             ]
         );
 
