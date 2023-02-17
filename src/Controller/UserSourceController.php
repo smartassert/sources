@@ -10,11 +10,14 @@ use App\Entity\RunSource;
 use App\Entity\SourceInterface;
 use App\Entity\SourceOriginInterface;
 use App\Exception\EmptyEntityIdException;
+use App\Exception\InvalidRequestException;
+use App\Exception\NonUniqueSourceLabelException;
 use App\Message\Prepare;
 use App\Repository\SourceRepository;
 use App\Request\FileSourceRequest;
 use App\Request\GitSourceRequest;
 use App\Response\YamlResponse;
+use App\ResponseBody\InvalidField;
 use App\Security\UserSourceAccessChecker;
 use App\Services\RunSourceSerializer;
 use App\Services\Source\Mutator;
@@ -48,6 +51,7 @@ class UserSourceController
 
     /**
      * @throws AccessDeniedException
+     * @throws InvalidRequestException
      */
     #[Route(SourceRoutes::ROUTE_SOURCE . '/file', name: 'user_file_source_update', methods: ['PUT'])]
     public function updateFile(
@@ -57,11 +61,16 @@ class UserSourceController
     ): Response {
         $this->userSourceAccessChecker->denyAccessUnlessGranted($source);
 
-        return new JsonResponse($mutator->updateFile($source, $request));
+        try {
+            return new JsonResponse($mutator->updateFile($source, $request));
+        } catch (NonUniqueSourceLabelException) {
+            throw $this->createInvalidRequestExcpetionForNonUniqueLabels($request, $request->label, 'file');
+        }
     }
 
     /**
      * @throws AccessDeniedException
+     * @throws InvalidRequestException
      */
     #[Route(SourceRoutes::ROUTE_SOURCE . '/git', name: 'user_git_source_update', methods: ['PUT'])]
     public function updateGit(
@@ -71,7 +80,11 @@ class UserSourceController
     ): Response {
         $this->userSourceAccessChecker->denyAccessUnlessGranted($source);
 
-        return new JsonResponse($mutator->updateGit($source, $request));
+        try {
+            return new JsonResponse($mutator->updateGit($source, $request));
+        } catch (NonUniqueSourceLabelException) {
+            throw $this->createInvalidRequestExcpetionForNonUniqueLabels($request, $request->label, 'git');
+        }
     }
 
     /**
@@ -129,5 +142,20 @@ class UserSourceController
         $this->userSourceAccessChecker->denyAccessUnlessGranted($source);
 
         return new YamlResponse($runSourceSerializer->read($source));
+    }
+
+    private function createInvalidRequestExcpetionForNonUniqueLabels(
+        object $request,
+        string $label,
+        string $sourceType
+    ): InvalidRequestException {
+        return new InvalidRequestException($request, new InvalidField(
+            'label',
+            $label,
+            sprintf(
+                'This label is being used by another %s source belonging to this user',
+                $sourceType
+            )
+        ));
     }
 }
