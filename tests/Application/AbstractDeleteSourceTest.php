@@ -39,7 +39,7 @@ abstract class AbstractDeleteSourceTest extends AbstractApplicationTest
 
         $sourceProvider = self::getContainer()->get(SourceProvider::class);
         \assert($sourceProvider instanceof SourceProvider);
-        $sourceProvider->setUserId(self::$authenticationConfiguration->getUser(self::USER_EMAIL)->id);
+        $sourceProvider->setUserId(self::$authenticationConfiguration->getUser(self::USER_1_EMAIL)->id);
         $sourceProvider->initialize();
         $this->sourceProvider = $sourceProvider;
     }
@@ -58,7 +58,7 @@ abstract class AbstractDeleteSourceTest extends AbstractApplicationTest
         }
 
         $response = $this->applicationClient->makeDeleteSourceRequest(
-            self::$authenticationConfiguration->getValidApiToken(self::USER_EMAIL),
+            self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
             $source->getId()
         );
 
@@ -118,7 +118,7 @@ abstract class AbstractDeleteSourceTest extends AbstractApplicationTest
         self::assertTrue($runSourceStorage->fileExists($serializedRunSourcePath));
 
         $response = $this->applicationClient->makeDeleteSourceRequest(
-            self::$authenticationConfiguration->getValidApiToken(self::USER_EMAIL),
+            self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
             $runSource->getId()
         );
 
@@ -145,7 +145,7 @@ abstract class AbstractDeleteSourceTest extends AbstractApplicationTest
         self::assertTrue($fileSourceStorage->fileExists($fileRelativePath));
 
         $response = $this->applicationClient->makeDeleteSourceRequest(
-            self::$authenticationConfiguration->getValidApiToken(self::USER_EMAIL),
+            self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
             $fileSource->getId()
         );
 

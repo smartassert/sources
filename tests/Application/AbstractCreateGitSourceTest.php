@@ -23,7 +23,7 @@ abstract class AbstractCreateGitSourceTest extends AbstractApplicationTest
     public function testCreateInvalidSourceRequest(array $requestParameters, array $expectedResponseData): void
     {
         $response = $this->applicationClient->makeCreateGitSourceRequest(
-            self::$authenticationConfiguration->getValidApiToken(self::USER_EMAIL),
+            self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
             $requestParameters
         );
 
@@ -39,7 +39,7 @@ abstract class AbstractCreateGitSourceTest extends AbstractApplicationTest
     public function testCreateSuccess(array $requestParameters, array $expected): void
     {
         $response = $this->applicationClient->makeCreateGitSourceRequest(
-            self::$authenticationConfiguration->getValidApiToken(self::USER_EMAIL),
+            self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
             $requestParameters
         );
 
@@ -56,7 +56,7 @@ abstract class AbstractCreateGitSourceTest extends AbstractApplicationTest
         self::assertInstanceOf(SourceInterface::class, $source);
 
         $expected['id'] = $source->getId();
-        $expected['user_id'] = self::$authenticationConfiguration->getUser(self::USER_EMAIL)->id;
+        $expected['user_id'] = self::$authenticationConfiguration->getUser(self::USER_1_EMAIL)->id;
 
         $this->responseAsserter->assertSuccessfulJsonResponse($response, $expected);
     }
@@ -112,7 +112,7 @@ abstract class AbstractCreateGitSourceTest extends AbstractApplicationTest
         $credentials = md5((string) rand());
 
         $firstResponse = $this->applicationClient->makeCreateGitSourceRequest(
-            self::$authenticationConfiguration->getValidApiToken(self::USER_EMAIL),
+            self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
             [
                 GitSourceRequest::PARAMETER_LABEL => $label,
                 GitSourceRequest::PARAMETER_HOST_URL => $hostUrl,
@@ -123,7 +123,7 @@ abstract class AbstractCreateGitSourceTest extends AbstractApplicationTest
         self::assertSame(200, $firstResponse->getStatusCode());
 
         $secondResponse = $this->applicationClient->makeCreateGitSourceRequest(
-            self::$authenticationConfiguration->getValidApiToken(self::USER_EMAIL),
+            self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
             [
                 GitSourceRequest::PARAMETER_LABEL => $label,
                 GitSourceRequest::PARAMETER_HOST_URL => $hostUrl,

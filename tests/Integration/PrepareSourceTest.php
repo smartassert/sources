@@ -45,7 +45,7 @@ class PrepareSourceTest extends AbstractPrepareSourceTest
 
         foreach ($sourceFiles as $sourceFilePath) {
             $addFileResponse = $this->applicationClient->makeAddFileRequest(
-                self::$authenticationConfiguration->getValidApiToken(self::USER_EMAIL),
+                self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
                 $fileSource->getId(),
                 $sourceFilePath,
                 trim($this->fixtureStorage->read($sourceIdentifier . '/' . $sourceFilePath))
@@ -55,7 +55,7 @@ class PrepareSourceTest extends AbstractPrepareSourceTest
         }
 
         $prepareResponse = $this->applicationClient->makePrepareSourceRequest(
-            self::$authenticationConfiguration->getValidApiToken(self::USER_EMAIL),
+            self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
             $fileSource->getId(),
             []
         );
@@ -80,7 +80,7 @@ class PrepareSourceTest extends AbstractPrepareSourceTest
         $this->waitUntilSourceIsPrepared($runSourceId);
 
         $readResponse = $this->applicationClient->makeReadSourceRequest(
-            self::$authenticationConfiguration->getValidApiToken(self::USER_EMAIL),
+            self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
             $runSourceId
         );
 
@@ -98,7 +98,7 @@ class PrepareSourceTest extends AbstractPrepareSourceTest
 
         while (State::PREPARED->value !== $state) {
             $getResponse = $this->applicationClient->makeGetSourceRequest(
-                self::$authenticationConfiguration->getValidApiToken(self::USER_EMAIL),
+                self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
                 $runSourceId
             );
 
