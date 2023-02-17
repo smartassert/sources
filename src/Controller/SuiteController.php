@@ -9,7 +9,7 @@ use App\Entity\SourceOriginInterface;
 use App\Entity\Suite;
 use App\Exception\EmptyEntityIdException;
 use App\Repository\SuiteRepository;
-use App\Request\SuiteRequest;
+use App\Request\CreateSuiteRequest;
 use App\Security\EntityAccessChecker;
 use App\Services\Suite\Factory;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -31,11 +31,11 @@ class SuiteController
      * @throws EmptyEntityIdException
      */
     #[Route(SuiteRoutes::ROUTE_SUITE_BASE, name: 'user_suite_create', methods: ['POST'])]
-    public function create(SourceOriginInterface $source, SuiteRequest $request): Response
+    public function create(SourceOriginInterface $source, CreateSuiteRequest $request): Response
     {
         $this->entityAccessChecker->denyAccessUnlessGranted($source);
 
-        return new JsonResponse($this->factory->createFromSuiteRequest($source, $request));
+        return new JsonResponse($this->factory->create($source, $request));
     }
 
     /**
