@@ -6,7 +6,7 @@ namespace App\ArgumentResolver;
 
 use App\Controller\SourceRoutes;
 use App\Entity\SourceInterface;
-use App\Exception\SourceNotFoundException;
+use App\Exception\EntityNotFoundException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Controller\ValueResolverInterface;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
@@ -16,7 +16,7 @@ abstract class AbstractSourceResolver implements ValueResolverInterface
     /**
      * @return SourceInterface[]
      *
-     * @throws SourceNotFoundException
+     * @throws EntityNotFoundException
      */
     public function resolve(Request $request, ArgumentMetadata $argument): iterable
     {
@@ -31,7 +31,7 @@ abstract class AbstractSourceResolver implements ValueResolverInterface
 
         $source = $this->find($sourceId);
         if (null === $source) {
-            throw new SourceNotFoundException($sourceId);
+            throw new EntityNotFoundException($sourceId, 'Source');
         }
 
         return [$source];
