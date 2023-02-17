@@ -9,8 +9,8 @@ use App\Exception\EmptyEntityIdException;
 use App\Repository\SourceRepository;
 use App\Request\FileSourceRequest;
 use App\Request\GitSourceRequest;
-use App\Services\Source\Factory;
 use App\Services\Source\FileSourceFactory;
+use App\Services\Source\GitSourceFactory;
 use SmartAssert\UsersSecurityBundle\Security\User;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
@@ -20,7 +20,7 @@ class SourceController
 {
     public function __construct(
         private readonly FileSourceFactory $fileSourceFactory,
-        private readonly Factory $factory,
+        private readonly GitSourceFactory $gitSourceFactory,
         private readonly SourceRepository $repository,
     ) {
     }
@@ -31,7 +31,7 @@ class SourceController
     #[Route('/git', name: 'git_source_create', methods: ['POST'])]
     public function createGitSource(User $user, GitSourceRequest $request): JsonResponse
     {
-        return new JsonResponse($this->factory->createFromGitSourceRequest($user, $request));
+        return new JsonResponse($this->gitSourceFactory->create($user, $request));
     }
 
     /**
