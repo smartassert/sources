@@ -4,17 +4,32 @@ declare(strict_types=1);
 
 namespace App\ArgumentResolver;
 
+use App\Entity\FileSource;
+use App\Entity\GitSource;
 use App\Entity\SourceOriginInterface;
+use App\Repository\FileSourceRepository;
+use App\Repository\GitSourceRepository;
 
 class SourceOriginResolver extends AbstractSourceResolver
 {
+    public function __construct(
+        private readonly FileSourceRepository $fileSourceRepository,
+        private readonly GitSourceRepository $gitSourceRepository,
+    ) {
+    }
+
     protected function supportsArgumentType(string $type): bool
     {
         return SourceOriginInterface::class === $type;
     }
 
-    protected function getExpectedInstanceClassName(): string
+    protected function find(string $id): null|FileSource|GitSource
     {
-        return SourceOriginInterface::class;
+        $source = $this->fileSourceRepository->find($id);
+        if (null !== $source) {
+            return $source;
+        }
+
+        return $this->gitSourceRepository->find($id);
     }
 }

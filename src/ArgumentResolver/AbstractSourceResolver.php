@@ -6,24 +6,16 @@ namespace App\ArgumentResolver;
 
 use App\Entity\SourceInterface;
 use App\Exception\SourceNotFoundException;
-use App\Exception\UnexpectedSourceTypeException;
-use App\Repository\SourceRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Controller\ValueResolverInterface;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 
 abstract class AbstractSourceResolver implements ValueResolverInterface
 {
-    public function __construct(
-        private SourceRepository $repository,
-    ) {
-    }
-
     /**
      * @return SourceInterface[]
      *
      * @throws SourceNotFoundException
-     * @throws UnexpectedSourceTypeException
      */
     public function resolve(Request $request, ArgumentMetadata $argument): iterable
     {
@@ -36,27 +28,15 @@ abstract class AbstractSourceResolver implements ValueResolverInterface
             return [];
         }
 
-        $source = $this->repository->find($sourceId);
+        $source = $this->find($sourceId);
         if (null === $source) {
             throw new SourceNotFoundException($sourceId);
-        }
-
-        $sourceImplementedClasses = class_implements($source);
-        $sourceImplementedClasses[$source::class] = $source::class;
-
-        $expectedInstanceClassName = $this->getExpectedInstanceClassName();
-
-        if (false === in_array($expectedInstanceClassName, $sourceImplementedClasses)) {
-            throw new UnexpectedSourceTypeException($source, $expectedInstanceClassName);
         }
 
         return [$source];
     }
 
-    abstract protected function supportsArgumentType(string $type): bool;
+    abstract protected function find(string $id): ?SourceInterface;
 
-    /**
-     * @return class-string
-     */
-    abstract protected function getExpectedInstanceClassName(): string;
+    abstract protected function supportsArgumentType(string $type): bool;
 }

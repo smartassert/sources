@@ -11,11 +11,6 @@ abstract class AbstractSingleSourceTypeResolver extends AbstractSourceResolver
         return $this->getSourceClassName() === $type;
     }
 
-    protected function getExpectedInstanceClassName(): string
-    {
-        return $this->getSourceClassName();
-    }
-
     /**
      * @return class-string
      */
