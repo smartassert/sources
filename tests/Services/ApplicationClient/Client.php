@@ -253,6 +253,15 @@ class Client
         );
     }
 
+    public function makeListSuitesRequest(?string $authenticationToken, string $sourceId): ResponseInterface
+    {
+        return $this->client->makeRequest(
+            'GET',
+            $this->router->generate('user_suite_list', ['sourceId' => $sourceId]),
+            $this->createAuthorizationHeader($authenticationToken),
+        );
+    }
+
     /**
      * @return array<string, string>
      */
