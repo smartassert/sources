@@ -7,6 +7,7 @@ namespace App\Tests\Application;
 use App\Entity\FileSource;
 use App\Entity\Suite;
 use App\Repository\FileSourceRepository;
+use App\Repository\SourceRepository;
 use App\Repository\SuiteRepository;
 use App\Request\FileSourceRequest;
 use App\Services\EntityIdFactory;
@@ -31,7 +32,9 @@ abstract class AbstractInvalidSuiteUserTest extends AbstractApplicationTest
         $idFactory = new EntityIdFactory();
 
         $this->inaccessibleSource = new FileSource($idFactory->create(), UserId::create(), 'inaccessible source');
-        $this->store->add($this->inaccessibleSource);
+        $sourceRepository = self::getContainer()->get(SourceRepository::class);
+        \assert($sourceRepository instanceof SourceRepository);
+        $sourceRepository->save($this->inaccessibleSource);
 
         $createSourceResponse = $this->applicationClient->makeCreateFileSourceRequest(
             self::$authenticationConfiguration->getValidApiToken(),
