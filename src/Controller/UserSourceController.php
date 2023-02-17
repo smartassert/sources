@@ -15,9 +15,9 @@ use App\Request\FileSourceRequest;
 use App\Request\GitSourceRequest;
 use App\Response\YamlResponse;
 use App\Security\UserSourceAccessChecker;
-use App\Services\RunSourceFactory;
 use App\Services\RunSourceSerializer;
 use App\Services\Source\Mutator;
+use App\Services\Source\RunSourceFactory;
 use App\Services\Source\Store;
 use League\Flysystem\FilesystemException;
 use League\Flysystem\FilesystemWriter;
@@ -113,7 +113,7 @@ class UserSourceController
     ): Response {
         $this->userSourceAccessChecker->denyAccessUnlessGranted($source);
 
-        $runSource = $runSourceFactory->createFromRequest($source, $request);
+        $runSource = $runSourceFactory->create($source, $request);
         $messageBus->dispatch(Prepare::createFromRunSource($runSource));
 
         return new JsonResponse($runSource, 202);

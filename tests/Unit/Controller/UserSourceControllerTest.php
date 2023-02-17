@@ -10,7 +10,7 @@ use App\Entity\RunSource;
 use App\Message\Prepare;
 use App\Security\UserSourceAccessChecker;
 use App\Services\EntityIdFactory;
-use App\Services\RunSourceFactory;
+use App\Services\Source\RunSourceFactory;
 use App\Tests\Model\UserId;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Request;
@@ -49,7 +49,7 @@ class UserSourceControllerTest extends WebTestCase
 
         $runSourceFactory = \Mockery::mock(RunSourceFactory::class);
         $runSourceFactory
-            ->shouldReceive('createFromRequest')
+            ->shouldReceive('create')
             ->with($fileSource, $request)
             ->andReturn($runSource)
         ;
