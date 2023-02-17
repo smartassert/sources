@@ -7,6 +7,7 @@ namespace App\ArgumentResolver;
 use App\Controller\SourceRoutes;
 use App\Entity\Suite;
 use App\Exception\InvalidRequestException;
+use App\Request\CreateSuiteRequest;
 use App\Request\SuiteRequest;
 use App\ResponseBody\InvalidField;
 use SmartAssert\YamlFile\Filename;
@@ -15,7 +16,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Controller\ValueResolverInterface;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 
-class SuiteRequestResolver implements ValueResolverInterface
+class CreateSuiteRequestResolver implements ValueResolverInterface
 {
     public function __construct(
         private readonly YamlFilenameValidator $yamlFilenameValidator,
@@ -23,13 +24,13 @@ class SuiteRequestResolver implements ValueResolverInterface
     }
 
     /**
-     * @return SuiteRequest[]
+     * @return CreateSuiteRequest[]
      *
      * @throws InvalidRequestException
      */
     public function resolve(Request $request, ArgumentMetadata $argument): iterable
     {
-        if (SuiteRequest::class !== $argument->getType()) {
+        if (CreateSuiteRequest::class !== $argument->getType()) {
             return [];
         }
 
@@ -72,6 +73,6 @@ class SuiteRequestResolver implements ValueResolverInterface
             }
         }
 
-        return [new SuiteRequest($label, $tests)];
+        return [new CreateSuiteRequest($sourceId, $label, $tests)];
     }
 }
