@@ -21,7 +21,7 @@ abstract class AbstractCreateSuiteTest extends AbstractApplicationTest
         $sourceId = $this->createSource();
 
         $response = $this->applicationClient->makeCreateSuiteRequest(
-            self::$authenticationConfiguration->getValidApiToken(),
+            self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
             $sourceId,
             $requestParameters
         );
@@ -38,7 +38,7 @@ abstract class AbstractCreateSuiteTest extends AbstractApplicationTest
         $suite = $suites[0];
         self::assertInstanceOf(Suite::class, $suite);
         self::assertSame(
-            self::$authenticationConfiguration->getUser()->id,
+            self::$authenticationConfiguration->getUser(self::USER_1_EMAIL)->id,
             $suite->getUserId()
         );
 
@@ -84,7 +84,7 @@ abstract class AbstractCreateSuiteTest extends AbstractApplicationTest
         $sourceId = $this->createSource();
 
         $firstResponse = $this->applicationClient->makeCreateSuiteRequest(
-            self::$authenticationConfiguration->getValidApiToken(),
+            self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
             $sourceId,
             $requestParameters
         );
@@ -92,7 +92,7 @@ abstract class AbstractCreateSuiteTest extends AbstractApplicationTest
         self::assertSame(200, $firstResponse->getStatusCode());
 
         $secondResponse = $this->applicationClient->makeCreateSuiteRequest(
-            self::$authenticationConfiguration->getValidApiToken(),
+            self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
             $sourceId,
             $requestParameters
         );
@@ -115,7 +115,7 @@ abstract class AbstractCreateSuiteTest extends AbstractApplicationTest
         $previousSuiteId = null;
         foreach ($labels as $label) {
             $response = $this->applicationClient->makeCreateSuiteRequest(
-                self::$authenticationConfiguration->getValidApiToken(),
+                self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
                 $sourceId,
                 [
                     SuiteRequest::PARAMETER_LABEL => $label,
@@ -141,7 +141,7 @@ abstract class AbstractCreateSuiteTest extends AbstractApplicationTest
     private function createSource(): string
     {
         $createSourceResponse = $this->applicationClient->makeCreateFileSourceRequest(
-            self::$authenticationConfiguration->getValidApiToken(),
+            self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
             [
                 FileSourceRequest::PARAMETER_LABEL => md5((string) rand()),
             ]
