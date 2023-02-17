@@ -9,8 +9,8 @@ use App\Entity\GitSource;
 use App\Entity\RunSource;
 use App\Entity\SourceInterface;
 use App\Enum\RunSource\FailureReason;
+use App\Repository\SourceRepository;
 use App\Services\EntityIdFactory;
-use App\Services\Source\Store;
 use App\Tests\Model\UserId;
 
 class SourceProvider
@@ -54,7 +54,7 @@ class SourceProvider
     private string $userId;
 
     public function __construct(
-        private readonly Store $store,
+        private readonly SourceRepository $sourceRepository,
     ) {
     }
 
@@ -133,7 +133,7 @@ class SourceProvider
         foreach ($sourcesToInitialize as $sourceIdentifier) {
             $source = $this->sources[$sourceIdentifier] ?? null;
             if ($source instanceof SourceInterface) {
-                $this->store->add($source);
+                $this->sourceRepository->save($source);
             }
         }
     }

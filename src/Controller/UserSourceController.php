@@ -11,6 +11,7 @@ use App\Entity\SourceInterface;
 use App\Entity\SourceOriginInterface;
 use App\Exception\EmptyEntityIdException;
 use App\Message\Prepare;
+use App\Repository\SourceRepository;
 use App\Request\FileSourceRequest;
 use App\Request\GitSourceRequest;
 use App\Response\YamlResponse;
@@ -18,7 +19,6 @@ use App\Security\UserSourceAccessChecker;
 use App\Services\RunSourceSerializer;
 use App\Services\Source\Mutator;
 use App\Services\Source\RunSourceFactory;
-use App\Services\Source\Store;
 use League\Flysystem\FilesystemException;
 use League\Flysystem\FilesystemWriter;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -81,13 +81,13 @@ class UserSourceController
     #[Route(SourceRoutes::ROUTE_SOURCE, name: 'user_source_delete', methods: ['DELETE'])]
     public function delete(
         SourceInterface $source,
-        Store $store,
+        SourceRepository $sourceRepository,
         FilesystemWriter $fileSourceWriter,
         FilesystemWriter $runSourceWriter,
     ): Response {
         $this->userSourceAccessChecker->denyAccessUnlessGranted($source);
 
-        $store->delete($source);
+        $sourceRepository->delete($source);
 
         if ($source instanceof FileSource) {
             $fileSourceWriter->deleteDirectory($source->getDirectoryPath());

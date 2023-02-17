@@ -7,6 +7,7 @@ namespace App\Tests\Application;
 use App\Entity\FileSource;
 use App\Entity\GitSource;
 use App\Entity\RunSource;
+use App\Repository\SourceRepository;
 use App\Services\EntityIdFactory;
 use App\Tests\Model\UserId;
 
@@ -24,7 +25,6 @@ abstract class AbstractInvalidSourceUserTest extends AbstractApplicationTest
         $idFactory = new EntityIdFactory();
 
         $this->fileSource = new FileSource($idFactory->create(), UserId::create(), 'file source label');
-        $this->store->add($this->fileSource);
 
         $this->gitSource = new GitSource(
             $idFactory->create(),
@@ -32,7 +32,11 @@ abstract class AbstractInvalidSourceUserTest extends AbstractApplicationTest
             'git source label',
             'http://example.com/repo.git',
         );
-        $this->store->add($this->gitSource);
+
+        $sourceRepository = self::getContainer()->get(SourceRepository::class);
+        \assert($sourceRepository instanceof SourceRepository);
+        $sourceRepository->save($this->fileSource);
+        $sourceRepository->save($this->gitSource);
     }
 
     public function testAddFileInvalidUser(): void
@@ -134,7 +138,10 @@ abstract class AbstractInvalidSourceUserTest extends AbstractApplicationTest
             (new EntityIdFactory())->create(),
             $this->fileSource
         );
-        $this->store->add($runSource);
+
+        $sourceRepository = self::getContainer()->get(SourceRepository::class);
+        \assert($sourceRepository instanceof SourceRepository);
+        $sourceRepository->save($runSource);
 
         $response = $this->applicationClient->makeReadSourceRequest(
             self::$authenticationConfiguration->getValidApiToken(),

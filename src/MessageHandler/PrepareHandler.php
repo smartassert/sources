@@ -10,15 +10,13 @@ use App\Exception\MessageHandler\PrepareException;
 use App\Message\Prepare;
 use App\Repository\SourceRepository;
 use App\Services\RunSourceSerializer;
-use App\Services\Source\Store;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
 #[AsMessageHandler]
 class PrepareHandler
 {
     public function __construct(
-        private SourceRepository $sourceRepository,
-        private Store $sourceStore,
+        private readonly SourceRepository $sourceRepository,
         private RunSourceSerializer $runSourceSerializer,
     ) {
     }
@@ -37,18 +35,18 @@ class PrepareHandler
         }
 
         $runSource->setState(State::PREPARING_RUNNING);
-        $this->sourceStore->add($runSource);
+        $this->sourceRepository->save($runSource);
 
         try {
             $this->runSourceSerializer->write($runSource);
         } catch (\Throwable $e) {
             $runSource->setState(State::PREPARING_HALTED);
-            $this->sourceStore->add($runSource);
+            $this->sourceRepository->save($runSource);
 
             throw new PrepareException($e);
         }
 
         $runSource->setState(State::PREPARED);
-        $this->sourceStore->add($runSource);
+        $this->sourceRepository->save($runSource);
     }
 }

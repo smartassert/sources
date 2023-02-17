@@ -7,20 +7,21 @@ namespace App\Services\Source;
 use App\Entity\FileSource;
 use App\Entity\GitSource;
 use App\Entity\SourceInterface;
+use App\Repository\SourceRepository;
 use App\Request\FileSourceRequest;
 use App\Request\GitSourceRequest;
 
 class Mutator
 {
     public function __construct(
-        private readonly Store $store,
+        private readonly SourceRepository $sourceRepository,
     ) {
     }
 
     public function updateFile(FileSource $source, FileSourceRequest $request): SourceInterface
     {
         $source->setLabel($request->label);
-        $this->store->add($source);
+        $this->sourceRepository->save($source);
 
         return $source;
     }
@@ -32,7 +33,7 @@ class Mutator
         $source->setPath($request->path);
         $source->setCredentials($request->credentials);
 
-        $this->store->add($source);
+        $this->sourceRepository->save($source);
 
         return $source;
     }
