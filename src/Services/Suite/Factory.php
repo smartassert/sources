@@ -8,7 +8,7 @@ use App\Entity\SourceOriginInterface;
 use App\Entity\Suite;
 use App\Exception\EmptyEntityIdException;
 use App\Repository\SuiteRepository;
-use App\Request\SuiteRequest;
+use App\Request\CreateSuiteRequest;
 use App\Services\EntityIdFactory;
 
 class Factory
@@ -22,7 +22,7 @@ class Factory
     /**
      * @throws EmptyEntityIdException
      */
-    public function createFromSuiteRequest(SourceOriginInterface $source, SuiteRequest $request): Suite
+    public function create(SourceOriginInterface $source, CreateSuiteRequest $request): Suite
     {
         $suite = $this->repository->findOneBy([
             'userId' => $source->getUserId(),
