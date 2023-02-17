@@ -19,11 +19,4 @@ class Store
         $this->entityManager->persist($source);
         $this->entityManager->flush();
     }
-
-    public function delete(SourceInterface $source): void
-    {
-        $source->setDeletedAt(new \DateTimeImmutable());
-
-        $this->add($source);
-    }
 }

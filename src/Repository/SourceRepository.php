@@ -33,6 +33,19 @@ class SourceRepository extends ServiceEntityRepository
         $this->getEntityManager()->flush();
     }
 
+    public function remove(SourceInterface $entity): void
+    {
+        $this->getEntityManager()->remove($entity);
+        $this->getEntityManager()->flush();
+    }
+
+    public function delete(SourceInterface $source): void
+    {
+        $source->setDeletedAt(new \DateTimeImmutable());
+
+        $this->save($source);
+    }
+
     /**
      * @param Type[] $types
      *
