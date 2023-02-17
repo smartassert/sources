@@ -22,7 +22,7 @@ abstract class AbstractListSuitesTest extends AbstractApplicationTest
         parent::setUp();
 
         $createSourceResponse = $this->applicationClient->makeCreateFileSourceRequest(
-            self::$authenticationConfiguration->getValidApiToken(),
+            self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
             [
                 FileSourceRequest::PARAMETER_LABEL => 'label',
             ]
@@ -57,7 +57,7 @@ abstract class AbstractListSuitesTest extends AbstractApplicationTest
         }
 
         $response = $this->applicationClient->makeListSuitesRequest(
-            self::$authenticationConfiguration->getValidApiToken(),
+            self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
             $this->source->getId(),
         );
 
