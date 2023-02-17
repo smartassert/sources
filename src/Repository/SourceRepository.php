@@ -27,6 +27,12 @@ class SourceRepository extends ServiceEntityRepository
         parent::__construct($registry, AbstractSource::class);
     }
 
+    public function save(SourceInterface $entity): void
+    {
+        $this->getEntityManager()->persist($entity);
+        $this->getEntityManager()->flush();
+    }
+
     /**
      * @param Type[] $types
      *

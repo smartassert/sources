@@ -5,11 +5,9 @@ declare(strict_types=1);
 namespace App\Tests\Functional\Services\Source;
 
 use App\Entity\AbstractSource;
-use App\Entity\FileSource;
 use App\Entity\GitSource;
 use App\Entity\SourceInterface;
 use App\Repository\SourceRepository;
-use App\Request\FileSourceRequest;
 use App\Request\GitSourceRequest;
 use App\Services\EntityIdFactory;
 use App\Services\Source\Factory;
@@ -91,49 +89,6 @@ class FactoryTest extends WebTestCase
                 'user' => $user,
                 'request' => new GitSourceRequest($label, $hostUrl, $path, 'credentials'),
                 'expected' => new GitSource($idFactory->create(), $userId, $label, $hostUrl, $path, 'credentials'),
-            ],
-        ];
-    }
-
-    /**
-     * @dataProvider createFromFileSourceRequestDataProvider
-     */
-    public function testCreateFromFileSourceRequest(User $user, FileSourceRequest $request, FileSource $expected): void
-    {
-        self::assertCount(0, $this->repository->findAll());
-
-        $source = $this->factory->createFromFileSourceRequest($user, $request);
-        self::assertInstanceOf(SourceInterface::class, $source);
-
-        self::assertCount(1, $this->repository->findAll());
-        $this->factory->createFromFileSourceRequest($user, $request);
-        $this->factory->createFromFileSourceRequest($user, $request);
-        self::assertCount(1, $this->repository->findAll());
-
-        ObjectReflector::setProperty(
-            $expected,
-            AbstractSource::class,
-            'id',
-            $source->getId()
-        );
-
-        self::assertEquals($expected, $source);
-    }
-
-    /**
-     * @return array<mixed>
-     */
-    public function createFromFileSourceRequestDataProvider(): array
-    {
-        $userId = UserId::create();
-        \assert('' !== $userId);
-        $user = new User($userId, 'non-empty string');
-
-        return [
-            'file' => [
-                'user' => $user,
-                'request' => new FileSourceRequest('file source label'),
-                'expected' => new FileSource((new EntityIdFactory())->create(), $userId, 'file source label'),
             ],
         ];
     }

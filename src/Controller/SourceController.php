@@ -10,6 +10,7 @@ use App\Repository\SourceRepository;
 use App\Request\FileSourceRequest;
 use App\Request\GitSourceRequest;
 use App\Services\Source\Factory;
+use App\Services\Source\FileSourceFactory;
 use SmartAssert\UsersSecurityBundle\Security\User;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
@@ -18,6 +19,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 class SourceController
 {
     public function __construct(
+        private readonly FileSourceFactory $fileSourceFactory,
         private readonly Factory $factory,
         private readonly SourceRepository $repository,
     ) {
@@ -38,7 +40,7 @@ class SourceController
     #[Route('/file', name: 'file_source_create', methods: ['POST'])]
     public function createFileSource(User $user, FileSourceRequest $request): JsonResponse
     {
-        return new JsonResponse($this->factory->createFromFileSourceRequest($user, $request));
+        return new JsonResponse($this->fileSourceFactory->create($user, $request));
     }
 
     #[Route('/list', name: 'source_list', methods: ['GET'])]
