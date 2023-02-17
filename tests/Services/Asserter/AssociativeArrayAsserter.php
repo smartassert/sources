@@ -40,6 +40,19 @@ class AssociativeArrayAsserter
      */
     public function assert(array $actual): void
     {
+        $expectedSize = count($this->expected);
+        $actualSize = count($actual);
+
+        Assert::assertEquals(
+            $expectedSize,
+            $actualSize,
+            sprintf(
+                'Expected array size (%d) does not match actual array size (%d)',
+                $expectedSize,
+                $actualSize
+            )
+        );
+
         $actualKeys = array_keys($actual);
         $hasKeyFailureMessage = 'Available keys: ' . implode(', ', $actualKeys);
 
