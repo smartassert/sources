@@ -10,13 +10,13 @@ use App\Repository\FileSourceRepository;
 class FileSourceResolver extends AbstractSingleSourceTypeResolver
 {
     public function __construct(
-        private readonly FileSourceRepository $fooRepository,
+        private readonly FileSourceRepository $repository,
     ) {
     }
 
     protected function find(string $id): ?FileSource
     {
-        return $this->fooRepository->find($id);
+        return $this->repository->find($id);
     }
 
     protected function getSourceClassName(): string

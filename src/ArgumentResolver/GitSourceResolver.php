@@ -10,13 +10,13 @@ use App\Repository\GitSourceRepository;
 class GitSourceResolver extends AbstractSingleSourceTypeResolver
 {
     public function __construct(
-        private readonly GitSourceRepository $fooRepository,
+        private readonly GitSourceRepository $repository,
     ) {
     }
 
     protected function find(string $id): ?GitSource
     {
-        return $this->fooRepository->find($id);
+        return $this->repository->find($id);
     }
 
     protected function getSourceClassName(): string

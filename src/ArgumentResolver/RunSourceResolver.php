@@ -10,13 +10,13 @@ use App\Repository\RunSourceRepository;
 class RunSourceResolver extends AbstractSingleSourceTypeResolver
 {
     public function __construct(
-        private readonly RunSourceRepository $fooRepository,
+        private readonly RunSourceRepository $repository,
     ) {
     }
 
     protected function find(string $id): ?RunSource
     {
-        return $this->fooRepository->find($id);
+        return $this->repository->find($id);
     }
 
     protected function getSourceClassName(): string
