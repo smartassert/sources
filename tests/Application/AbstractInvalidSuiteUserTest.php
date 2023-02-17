@@ -37,7 +37,7 @@ abstract class AbstractInvalidSuiteUserTest extends AbstractApplicationTest
         $sourceRepository->save($this->inaccessibleSource);
 
         $createSourceResponse = $this->applicationClient->makeCreateFileSourceRequest(
-            self::$authenticationConfiguration->getValidApiToken(),
+            self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
             [
                 FileSourceRequest::PARAMETER_LABEL => 'label',
             ]
@@ -74,7 +74,7 @@ abstract class AbstractInvalidSuiteUserTest extends AbstractApplicationTest
     public function testGetSuiteInvalidSourceUserValidSuiteUser(): void
     {
         $response = $this->applicationClient->makeGetSuiteRequest(
-            self::$authenticationConfiguration->getValidApiToken(),
+            self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
             $this->inaccessibleSource->getId(),
             $this->accessibleSuite->id,
         );
@@ -85,7 +85,7 @@ abstract class AbstractInvalidSuiteUserTest extends AbstractApplicationTest
     public function testGetSuiteValidSourceUserInvalidSuiteUser(): void
     {
         $response = $this->applicationClient->makeGetSuiteRequest(
-            self::$authenticationConfiguration->getValidApiToken(),
+            self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
             $this->accessibleSource->getId(),
             $this->inaccessibleSuite->id,
         );
@@ -96,7 +96,7 @@ abstract class AbstractInvalidSuiteUserTest extends AbstractApplicationTest
     public function testGetSuiteInvalidSourceUserInvalidSuiteUser(): void
     {
         $response = $this->applicationClient->makeGetSuiteRequest(
-            self::$authenticationConfiguration->getValidApiToken(),
+            self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
             $this->inaccessibleSource->getId(),
             $this->inaccessibleSuite->id,
         );
