@@ -6,7 +6,7 @@ namespace App\ArgumentResolver;
 
 use App\Controller\SourceRoutes;
 use App\Entity\SourceInterface;
-use App\Exception\SourceNotFoundException;
+use App\Exception\EntityNotFoundException;
 use App\Exception\UnexpectedSourceTypeException;
 use App\Repository\SourceRepository;
 use Symfony\Component\HttpFoundation\Request;
@@ -23,8 +23,8 @@ abstract class AbstractSourceResolver implements ValueResolverInterface
     /**
      * @return SourceInterface[]
      *
-     * @throws SourceNotFoundException
      * @throws UnexpectedSourceTypeException
+     * @throws EntityNotFoundException
      */
     public function resolve(Request $request, ArgumentMetadata $argument): iterable
     {
@@ -39,7 +39,7 @@ abstract class AbstractSourceResolver implements ValueResolverInterface
 
         $source = $this->repository->find($sourceId);
         if (null === $source) {
-            throw new SourceNotFoundException($sourceId);
+            throw new EntityNotFoundException($sourceId, 'Source');
         }
 
         $sourceImplementedClasses = class_implements($source);
