@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use App\Entity\SourceInterface;
 use App\Entity\SourceOriginInterface;
+use App\Entity\Suite;
 use App\Exception\EmptyEntityIdException;
 use App\Request\SuiteRequest;
 use App\Security\EntityAccessChecker;
@@ -32,5 +34,17 @@ class SuiteController
         $this->entityAccessChecker->denyAccessUnlessGranted($source);
 
         return new JsonResponse($this->factory->createFromSuiteRequest($source, $request));
+    }
+
+    /**
+     * @throws AccessDeniedException
+     */
+    #[Route(SuiteRoutes::ROUTE_SUITE, name: 'user_suite_get', methods: ['GET'])]
+    public function get(SourceInterface $source, Suite $suite): Response
+    {
+        $this->entityAccessChecker->denyAccessUnlessGranted($source);
+        $this->entityAccessChecker->denyAccessUnlessGranted($suite);
+
+        return new JsonResponse($suite);
     }
 }
