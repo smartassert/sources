@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Application;
 
 use App\Enum\Source\Type;
+use App\Repository\GitSourceRepository;
 use App\Request\GitSourceRequest;
 use App\Tests\DataProvider\CreateUpdateGitSourceDataProviderTrait;
 use App\Tests\Services\SourceProvider;
@@ -63,6 +64,41 @@ abstract class AbstractUpdateGitSourceTest extends AbstractApplicationTest
         );
 
         $this->responseAsserter->assertInvalidRequestJsonResponse($response, $expectedResponseData);
+    }
+
+    public function testUpdateNewLabelNotUnique(): void
+    {
+        $gitSourceRepository = self::getContainer()->get(GitSourceRepository::class);
+        \assert($gitSourceRepository instanceof GitSourceRepository);
+
+        $sourceId = $this->createGitSource(self::USER_1_EMAIL, 'label1');
+        $this->createGitSource(self::USER_1_EMAIL, 'label2');
+
+        self::assertSame(1, $gitSourceRepository->count(['label' => 'label1']));
+
+        $updateResponse = $this->applicationClient->makeUpdateGitSourceRequest(
+            self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
+            $sourceId,
+            [
+                GitSourceRequest::PARAMETER_LABEL => 'label2',
+                GitSourceRequest::PARAMETER_HOST_URL => 'https://example.com/' . md5((string) rand()) . '.git',
+                GitSourceRequest::PARAMETER_PATH => md5((string) rand()),
+            ]
+        );
+
+        $this->responseAsserter->assertInvalidRequestJsonResponse(
+            $updateResponse,
+            [
+                'error' => [
+                    'type' => 'invalid_request',
+                    'payload' => [
+                        'name' => 'label',
+                        'value' => 'label2',
+                        'message' => 'This label is being used by another git source belonging to this user',
+                    ],
+                ],
+            ]
+        );
     }
 
     /**
@@ -133,5 +169,24 @@ abstract class AbstractUpdateGitSourceTest extends AbstractApplicationTest
                 ],
             ],
         ];
+    }
+
+    private function createGitSource(string $userEmail, string $label): string
+    {
+        $response = $this->applicationClient->makeCreateGitSourceRequest(
+            self::$authenticationConfiguration->getValidApiToken($userEmail),
+            [
+                GitSourceRequest::PARAMETER_LABEL => $label,
+                GitSourceRequest::PARAMETER_HOST_URL => 'https://example.com/' . md5((string) rand()) . '.git',
+                GitSourceRequest::PARAMETER_PATH => md5((string) rand()),
+            ]
+        );
+
+        $responseData = json_decode($response->getBody()->getContents(), true);
+        \assert(is_array($responseData));
+        $sourceId = $responseData['id'] ?? null;
+        \assert(is_string($sourceId));
+
+        return $sourceId;
     }
 }
