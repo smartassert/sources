@@ -8,6 +8,7 @@ use App\Entity\SourceInterface;
 use App\Entity\SourceOriginInterface;
 use App\Entity\Suite;
 use App\Exception\EmptyEntityIdException;
+use App\Repository\SuiteRepository;
 use App\Request\SuiteRequest;
 use App\Security\EntityAccessChecker;
 use App\Services\Suite\Factory;
@@ -21,6 +22,7 @@ class SuiteController
     public function __construct(
         private readonly EntityAccessChecker $entityAccessChecker,
         private readonly Factory $factory,
+        private readonly SuiteRepository $repository,
     ) {
     }
 
@@ -46,5 +48,26 @@ class SuiteController
         $this->entityAccessChecker->denyAccessUnlessGranted($suite);
 
         return new JsonResponse($suite);
+    }
+
+    /**
+     * @throws AccessDeniedException
+     */
+    #[Route(SuiteRoutes::ROUTE_SUITE_BASE, name: 'user_suite_list', methods: ['GET'])]
+    public function list(SourceOriginInterface $source): Response
+    {
+        $this->entityAccessChecker->denyAccessUnlessGranted($source);
+
+        $suites = $this->repository->findBy(
+            [
+                'userId' => $source->getUserId(),
+                'deletedAt' => null,
+            ],
+            [
+                'label' => 'ASC',
+            ]
+        );
+
+        return new JsonResponse($suites);
     }
 }
