@@ -8,7 +8,6 @@ use App\Entity\FileSource;
 use App\Entity\GitSource;
 use App\Entity\SourceInterface;
 use App\Exception\NonUniqueSourceLabelException;
-use App\Repository\FileSourceRepository;
 use App\Repository\GitSourceRepository;
 use App\Repository\SourceRepository;
 use App\Request\FileSourceRequest;
@@ -18,8 +17,8 @@ class Mutator
 {
     public function __construct(
         private readonly SourceRepository $sourceRepository,
-        private readonly FileSourceRepository $fileSourceRepository,
         private readonly GitSourceRepository $gitSourceRepository,
+        private readonly FileSourceFinder $fileSourceFinder,
     ) {
     }
 
@@ -28,12 +27,7 @@ class Mutator
      */
     public function updateFile(FileSource $source, FileSourceRequest $request): FileSource
     {
-        $sourceMatchingNewLabelCount = $this->fileSourceRepository->count([
-            'userId' => $source->getUserId(),
-            'label' => $request->label,
-        ]);
-
-        if (0 !== $sourceMatchingNewLabelCount) {
+        if ($this->fileSourceFinder->has($source->getUserId(), $request->label)) {
             throw new NonUniqueSourceLabelException();
         }
 

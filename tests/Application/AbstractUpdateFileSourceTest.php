@@ -146,6 +146,36 @@ abstract class AbstractUpdateFileSourceTest extends AbstractApplicationTest
         ];
     }
 
+    public function testUpdateNewLabelUsedByDeletedSource(): void
+    {
+        $fileSourceRepository = self::getContainer()->get(FileSourceRepository::class);
+        \assert($fileSourceRepository instanceof FileSourceRepository);
+
+        $sourceId = $this->createFileSource(self::USER_1_EMAIL, 'label1');
+        $sourceToBeDeletedId = $this->createFileSource(self::USER_1_EMAIL, 'label2');
+
+        self::assertSame(1, $fileSourceRepository->count(['label' => 'label1', 'deletedAt' => null]));
+        self::assertSame(1, $fileSourceRepository->count(['label' => 'label2', 'deletedAt' => null]));
+
+        $this->applicationClient->makeDeleteSourceRequest(
+            self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
+            $sourceToBeDeletedId,
+        );
+
+        self::assertSame(1, $fileSourceRepository->count(['label' => 'label1', 'deletedAt' => null]));
+        self::assertSame(0, $fileSourceRepository->count(['label' => 'label2', 'deletedAt' => null]));
+
+        $updateResponse = $this->applicationClient->makeUpdateFileSourceRequest(
+            self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
+            $sourceId,
+            [
+                FileSourceRequest::PARAMETER_LABEL => 'label2',
+            ]
+        );
+
+        self::assertSame(200, $updateResponse->getStatusCode());
+    }
+
     private function createFileSource(string $userEmail, string $label): string
     {
         $response = $this->applicationClient->makeCreateFileSourceRequest(
