@@ -11,7 +11,7 @@ use App\Exception\NonUniqueSourceLabelException;
 use App\Repository\SourceRepository;
 use App\Request\FileSourceRequest;
 use App\Request\GitSourceRequest;
-use App\ResponseBody\InvalidField;
+use App\Services\ExceptionFactory;
 use App\Services\Source\FileSourceFactory;
 use App\Services\Source\GitSourceFactory;
 use SmartAssert\UsersSecurityBundle\Security\User;
@@ -25,6 +25,7 @@ class SourceController
         private readonly FileSourceFactory $fileSourceFactory,
         private readonly GitSourceFactory $gitSourceFactory,
         private readonly SourceRepository $repository,
+        private readonly ExceptionFactory $exceptionFactory,
     ) {
     }
 
@@ -38,7 +39,11 @@ class SourceController
         try {
             return new JsonResponse($this->gitSourceFactory->create($user, $request));
         } catch (NonUniqueSourceLabelException) {
-            throw $this->createInvalidRequestExcpetionForNonUniqueLabels($request, $request->label, 'git');
+            throw $this->exceptionFactory->createInvalidRequestExceptionForNonUniqueSourceLabel(
+                $request,
+                $request->label,
+                'git'
+            );
         }
     }
 
@@ -55,20 +60,5 @@ class SourceController
     public function list(UserInterface $user): JsonResponse
     {
         return new JsonResponse($this->repository->findNonDeletedByUserAndType($user, [Type::FILE, Type::GIT]));
-    }
-
-    private function createInvalidRequestExcpetionForNonUniqueLabels(
-        object $request,
-        string $label,
-        string $sourceType
-    ): InvalidRequestException {
-        return new InvalidRequestException($request, new InvalidField(
-            'label',
-            $label,
-            sprintf(
-                'This label is being used by another %s source belonging to this user',
-                $sourceType
-            )
-        ));
     }
 }

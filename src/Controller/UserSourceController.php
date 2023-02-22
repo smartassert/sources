@@ -17,8 +17,8 @@ use App\Repository\SourceRepository;
 use App\Request\FileSourceRequest;
 use App\Request\GitSourceRequest;
 use App\Response\YamlResponse;
-use App\ResponseBody\InvalidField;
 use App\Security\UserSourceAccessChecker;
+use App\Services\ExceptionFactory;
 use App\Services\RunSourceSerializer;
 use App\Services\Source\Mutator;
 use App\Services\Source\RunSourceFactory;
@@ -58,13 +58,18 @@ class UserSourceController
         Mutator $mutator,
         FileSource $source,
         FileSourceRequest $request,
+        ExceptionFactory $exceptionFactory,
     ): Response {
         $this->userSourceAccessChecker->denyAccessUnlessGranted($source);
 
         try {
             return new JsonResponse($mutator->updateFile($source, $request));
         } catch (NonUniqueSourceLabelException) {
-            throw $this->createInvalidRequestExcpetionForNonUniqueLabels($request, $request->label, 'file');
+            throw $exceptionFactory->createInvalidRequestExceptionForNonUniqueSourceLabel(
+                $request,
+                $request->label,
+                'file'
+            );
         }
     }
 
@@ -77,13 +82,18 @@ class UserSourceController
         Mutator $mutator,
         GitSource $source,
         GitSourceRequest $request,
+        ExceptionFactory $exceptionFactory,
     ): Response {
         $this->userSourceAccessChecker->denyAccessUnlessGranted($source);
 
         try {
             return new JsonResponse($mutator->updateGit($source, $request));
         } catch (NonUniqueSourceLabelException) {
-            throw $this->createInvalidRequestExcpetionForNonUniqueLabels($request, $request->label, 'git');
+            throw $exceptionFactory->createInvalidRequestExceptionForNonUniqueSourceLabel(
+                $request,
+                $request->label,
+                'git'
+            );
         }
     }
 
@@ -142,20 +152,5 @@ class UserSourceController
         $this->userSourceAccessChecker->denyAccessUnlessGranted($source);
 
         return new YamlResponse($runSourceSerializer->read($source));
-    }
-
-    private function createInvalidRequestExcpetionForNonUniqueLabels(
-        object $request,
-        string $label,
-        string $sourceType
-    ): InvalidRequestException {
-        return new InvalidRequestException($request, new InvalidField(
-            'label',
-            $label,
-            sprintf(
-                'This label is being used by another %s source belonging to this user',
-                $sourceType
-            )
-        ));
     }
 }
