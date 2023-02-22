@@ -11,28 +11,19 @@ class GitSourceFinder
 {
     public function __construct(
         private readonly GitSourceRepository $repository,
+        private readonly OriginSourceFinder $originSourceFinder,
     ) {
     }
 
     public function find(string $userId, string $label): ?GitSource
     {
-        return $this->repository->findOneBy($this->createFindCriteria($userId, $label));
+        $source = $this->originSourceFinder->find($this->repository, $userId, $label);
+
+        return $source instanceof GitSource ? $source : null;
     }
 
     public function has(string $userId, string $label): bool
     {
-        return $this->repository->count($this->createFindCriteria($userId, $label)) > 0;
-    }
-
-    /**
-     * @return array{userId: string, label: string, deletedAt: null}
-     */
-    private function createFindCriteria(string $userId, string $label): array
-    {
-        return [
-            'userId' => $userId,
-            'label' => $label,
-            'deletedAt' => null,
-        ];
+        return $this->originSourceFinder->has($this->repository, $userId, $label) > 0;
     }
 }
