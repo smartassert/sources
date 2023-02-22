@@ -109,7 +109,6 @@ abstract class AbstractCreateGitSourceTest extends AbstractApplicationTest
         $label = 'git source label';
         $hostUrl = 'https://example.com/repository.git';
         $path = '/';
-        $credentials = md5((string) rand());
 
         $firstResponse = $this->applicationClient->makeCreateGitSourceRequest(
             self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
@@ -128,11 +127,49 @@ abstract class AbstractCreateGitSourceTest extends AbstractApplicationTest
                 GitSourceRequest::PARAMETER_LABEL => $label,
                 GitSourceRequest::PARAMETER_HOST_URL => $hostUrl,
                 GitSourceRequest::PARAMETER_PATH => $path,
-                GitSourceRequest::PARAMETER_CREDENTIALS => $credentials,
             ]
         );
 
         self::assertSame(200, $secondResponse->getStatusCode());
         self::assertSame($firstResponse->getBody()->getContents(), $secondResponse->getBody()->getContents());
+    }
+
+    public function testCreateWithNonUniqueLabel(): void
+    {
+        $label = 'git source label';
+
+        $successfulResponse = $this->applicationClient->makeCreateGitSourceRequest(
+            self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
+            [
+                GitSourceRequest::PARAMETER_LABEL => $label,
+                GitSourceRequest::PARAMETER_HOST_URL => md5((string) rand()),
+                GitSourceRequest::PARAMETER_PATH => md5((string) rand()),
+            ]
+        );
+
+        self::assertSame(200, $successfulResponse->getStatusCode());
+
+        $bandRequestResponse = $this->applicationClient->makeCreateGitSourceRequest(
+            self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
+            [
+                GitSourceRequest::PARAMETER_LABEL => $label,
+                GitSourceRequest::PARAMETER_HOST_URL => md5((string) rand()),
+                GitSourceRequest::PARAMETER_PATH => md5((string) rand()),
+            ]
+        );
+
+        $this->responseAsserter->assertInvalidRequestJsonResponse(
+            $bandRequestResponse,
+            [
+                'error' => [
+                    'type' => 'invalid_request',
+                    'payload' => [
+                        'name' => 'label',
+                        'value' => $label,
+                        'message' => 'This label is being used by another git source belonging to this user',
+                    ],
+                ],
+            ]
+        );
     }
 }

@@ -6,6 +6,7 @@ namespace App\Services\Source;
 
 use App\Entity\GitSource;
 use App\Exception\EmptyEntityIdException;
+use App\Exception\NonUniqueSourceLabelException;
 use App\Repository\GitSourceRepository;
 use App\Repository\SourceRepository;
 use App\Request\GitSourceRequest;
@@ -18,14 +19,28 @@ class GitSourceFactory
         private readonly EntityIdFactory $entityIdFactory,
         private readonly GitSourceRepository $gitSourceRepository,
         private readonly SourceRepository $sourceRepository,
+        private readonly GitSourceFinder $finder,
     ) {
     }
 
     /**
      * @throws EmptyEntityIdException
+     * @throws NonUniqueSourceLabelException
      */
     public function create(User $user, GitSourceRequest $request): GitSource
     {
+        $source = $this->finder->find($user->getUserIdentifier(), $request->label);
+        if (
+            $source instanceof GitSource
+            && (
+                $source->getHostUrl() !== $request->hostUrl
+                || $source->getPath() !== $request->path
+                || $source->getCredentials() !== $request->credentials
+            )
+        ) {
+            throw new NonUniqueSourceLabelException();
+        }
+
         $source = $this->gitSourceRepository->findOneBy([
             'userId' => $user->getUserIdentifier(),
             'label' => $request->label,
