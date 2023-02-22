@@ -6,7 +6,6 @@ namespace App\Services\Source;
 
 use App\Entity\FileSource;
 use App\Exception\EmptyEntityIdException;
-use App\Repository\FileSourceRepository;
 use App\Repository\SourceRepository;
 use App\Request\FileSourceRequest;
 use App\Services\EntityIdFactory;
@@ -16,8 +15,8 @@ class FileSourceFactory
 {
     public function __construct(
         private readonly EntityIdFactory $entityIdFactory,
-        private readonly FileSourceRepository $fileSourceRepository,
         private readonly SourceRepository $sourceRepository,
+        private readonly FileSourceFinder $finder,
     ) {
     }
 
@@ -26,11 +25,7 @@ class FileSourceFactory
      */
     public function create(User $user, FileSourceRequest $request): FileSource
     {
-        $source = $this->fileSourceRepository->findOneBy([
-            'userId' => $user->getUserIdentifier(),
-            'label' => $request->label,
-            'deletedAt' => null,
-        ]);
+        $source = $this->finder->find($user->getUserIdentifier(), $request->label);
 
         if (null === $source) {
             $source = new FileSource(
