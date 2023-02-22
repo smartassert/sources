@@ -31,6 +31,7 @@ class Mutator
         $sourceMatchingNewLabelCount = $this->fileSourceRepository->count([
             'userId' => $source->getUserId(),
             'label' => $request->label,
+            'deletedAt' => null,
         ]);
 
         if (0 !== $sourceMatchingNewLabelCount) {
