@@ -10,29 +10,20 @@ use App\Repository\FileSourceRepository;
 class FileSourceFinder
 {
     public function __construct(
-        private readonly FileSourceRepository $fileSourceRepository,
+        private readonly FileSourceRepository $repository,
+        private readonly OriginSourceFinder $originSourceFinder,
     ) {
     }
 
     public function find(string $userId, string $label): ?FileSource
     {
-        return $this->fileSourceRepository->findOneBy($this->createFindCriteria($userId, $label));
+        $source = $this->originSourceFinder->find($this->repository, $userId, $label);
+
+        return $source instanceof FileSource ? $source : null;
     }
 
     public function has(string $userId, string $label): bool
     {
-        return $this->fileSourceRepository->count($this->createFindCriteria($userId, $label)) > 0;
-    }
-
-    /**
-     * @return array{userId: string, label: string, deletedAt: null}
-     */
-    private function createFindCriteria(string $userId, string $label): array
-    {
-        return [
-            'userId' => $userId,
-            'label' => $label,
-            'deletedAt' => null,
-        ];
+        return $this->originSourceFinder->has($this->repository, $userId, $label);
     }
 }

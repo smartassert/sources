@@ -6,9 +6,12 @@ namespace App\Controller;
 
 use App\Enum\Source\Type;
 use App\Exception\EmptyEntityIdException;
+use App\Exception\InvalidRequestException;
+use App\Exception\NonUniqueSourceLabelException;
 use App\Repository\SourceRepository;
 use App\Request\FileSourceRequest;
 use App\Request\GitSourceRequest;
+use App\Services\ExceptionFactory;
 use App\Services\Source\FileSourceFactory;
 use App\Services\Source\GitSourceFactory;
 use SmartAssert\UsersSecurityBundle\Security\User;
@@ -22,16 +25,26 @@ class SourceController
         private readonly FileSourceFactory $fileSourceFactory,
         private readonly GitSourceFactory $gitSourceFactory,
         private readonly SourceRepository $repository,
+        private readonly ExceptionFactory $exceptionFactory,
     ) {
     }
 
     /**
      * @throws EmptyEntityIdException
+     * @throws InvalidRequestException
      */
     #[Route('/git', name: 'git_source_create', methods: ['POST'])]
     public function createGitSource(User $user, GitSourceRequest $request): JsonResponse
     {
-        return new JsonResponse($this->gitSourceFactory->create($user, $request));
+        try {
+            return new JsonResponse($this->gitSourceFactory->create($user, $request));
+        } catch (NonUniqueSourceLabelException) {
+            throw $this->exceptionFactory->createInvalidRequestExceptionForNonUniqueSourceLabel(
+                $request,
+                $request->label,
+                'git'
+            );
+        }
     }
 
     /**
