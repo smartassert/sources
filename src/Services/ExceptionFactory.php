@@ -9,17 +9,17 @@ use App\ResponseBody\InvalidField;
 
 class ExceptionFactory
 {
-    public function createInvalidRequestExceptionForNonUniqueSourceLabel(
+    public function createInvalidRequestExceptionForNonUniqueEntityLabel(
         object $request,
-        string $label,
-        string $sourceType
+        string $labelValue,
+        string $objectType
     ): InvalidRequestException {
         return new InvalidRequestException($request, new InvalidField(
             'label',
-            $label,
+            $labelValue,
             sprintf(
-                'This label is being used by another %s source belonging to this user',
-                $sourceType
+                'This label is being used by another %s belonging to this user',
+                $objectType
             )
         ));
     }
