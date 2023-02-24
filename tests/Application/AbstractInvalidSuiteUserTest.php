@@ -11,7 +11,7 @@ use App\Repository\SourceRepository;
 use App\Repository\SuiteRepository;
 use App\Request\FileSourceRequest;
 use App\Services\EntityIdFactory;
-use App\Tests\Model\UserId;
+use App\Tests\Services\FileSourceFactory;
 
 abstract class AbstractInvalidSuiteUserTest extends AbstractApplicationTest
 {
@@ -31,7 +31,7 @@ abstract class AbstractInvalidSuiteUserTest extends AbstractApplicationTest
 
         $idFactory = new EntityIdFactory();
 
-        $this->inaccessibleSource = new FileSource($idFactory->create(), UserId::create(), 'inaccessible source');
+        $this->inaccessibleSource = FileSourceFactory::create(label: 'inaccessible source');
         $sourceRepository = self::getContainer()->get(SourceRepository::class);
         \assert($sourceRepository instanceof SourceRepository);
         $sourceRepository->save($this->inaccessibleSource);
