@@ -26,7 +26,12 @@ class Mutator
      */
     public function updateFile(FileSource $source, FileSourceRequest $request): FileSource
     {
-        if ($this->fileSourceFinder->has($source->getUserId(), $request->label)) {
+        $foundSource = $this->fileSourceFinder->find($source->getUserId(), $request->label);
+        if ($foundSource instanceof FileSource) {
+            if ($foundSource->getId() === $source->getId()) {
+                return $source;
+            }
+
             throw new NonUniqueSourceLabelException();
         }
 
@@ -41,7 +46,12 @@ class Mutator
      */
     public function updateGit(GitSource $source, GitSourceRequest $request): SourceInterface
     {
-        if ($this->gitSourceFinder->has($source->getUserId(), $request->label)) {
+        $foundSource = $this->gitSourceFinder->find($source->getUserId(), $request->label);
+        if ($foundSource instanceof GitSource) {
+            if ($foundSource->getId() === $source->getId()) {
+                return $source;
+            }
+
             throw new NonUniqueSourceLabelException();
         }
 
