@@ -20,13 +20,10 @@ abstract class AbstractOriginSource extends AbstractSource
     /**
      * @param non-empty-string $id
      * @param non-empty-string $userId
-     * @param non-empty-string $label
      */
-    public function __construct(string $id, string $userId, string $label)
+    public function __construct(string $id, string $userId)
     {
         parent::__construct($id, $userId);
-
-        $this->label = $label;
     }
 
     /**

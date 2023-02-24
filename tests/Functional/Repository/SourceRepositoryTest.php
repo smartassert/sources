@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Tests\Functional\Repository;
 
 use App\Entity\FileSource;
-use App\Entity\GitSource;
 use App\Entity\RunSource;
 use App\Entity\SourceInterface;
 use App\Enum\Source\Type;
@@ -13,6 +12,8 @@ use App\Repository\SourceRepository;
 use App\Services\EntityIdFactory;
 use App\Tests\Model\UserId;
 use App\Tests\Services\EntityRemover;
+use App\Tests\Services\FileSourceFactory;
+use App\Tests\Services\GitSourceFactory;
 use SmartAssert\UsersSecurityBundle\Security\User;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -61,21 +62,19 @@ class SourceRepositoryTest extends WebTestCase
     public function findNonDeletedByUserAndTypeDataProvider(): array
     {
         $idFactory = new EntityIdFactory();
-
         $userId = UserId::create();
-        \assert('' !== $userId);
         $user = new User($userId, 'non-empty string');
 
         $userFileSources = [
-            'deletedAt=null' => new FileSource($idFactory->create(), $userId, 'file source label'),
-            'deletedAt=-1s' => (function () use ($userId, $idFactory) {
-                $source = new FileSource($idFactory->create(), $userId, 'file source label');
+            'deletedAt=null' => FileSourceFactory::create($userId),
+            'deletedAt=-1s' => (function () use ($userId): FileSource {
+                $source = FileSourceFactory::create($userId);
                 $source->setDeletedAt(new \DateTimeImmutable('-1 second'));
 
                 return $source;
             })(),
-            'deletedAt=+1s' => (function () use ($userId, $idFactory) {
-                $source = new FileSource($idFactory->create(), $userId, 'file source label');
+            'deletedAt=+1s' => (function () use ($userId): FileSource {
+                $source = FileSourceFactory::create($userId);
                 $source->setDeletedAt(new \DateTimeImmutable('1 second'));
 
                 return $source;
@@ -83,12 +82,7 @@ class SourceRepositoryTest extends WebTestCase
         ];
 
         $userGitSources = [
-            'deletedAt=null' => new GitSource(
-                $idFactory->create(),
-                $userId,
-                'label',
-                'https://example.com/repository.git'
-            ),
+            'deletedAt=null' => GitSourceFactory::create($userId),
         ];
 
         $userRunSources = [
@@ -109,17 +103,9 @@ class SourceRepositoryTest extends WebTestCase
             ],
             'has file, git and run sources, no user match' => [
                 'sources' => [
-                    new FileSource($idFactory->create(), UserId::create(), 'file source label'),
-                    new GitSource(
-                        $idFactory->create(),
-                        UserId::create(),
-                        'label',
-                        'https://example.com/repository.git'
-                    ),
-                    new RunSource(
-                        $idFactory->create(),
-                        new FileSource($idFactory->create(), UserId::create(), 'file source label'),
-                    ),
+                    FileSourceFactory::create(),
+                    GitSourceFactory::create(),
+                    new RunSource($idFactory->create(), FileSourceFactory::create()),
                 ],
                 'user' => $user,
                 'types' => [
@@ -164,29 +150,13 @@ class SourceRepositoryTest extends WebTestCase
             'has file, git and run sources for mixed users' => [
                 'sources' => [
                     $userFileSources['deletedAt=null'],
-                    new FileSource($idFactory->create(), UserId::create(), 'file source label'),
+                    FileSourceFactory::create(),
                     $userGitSources['deletedAt=null'],
-                    new GitSource(
-                        $idFactory->create(),
-                        UserId::create(),
-                        'label',
-                        'https://example.com/repository.git'
-                    ),
+                    GitSourceFactory::create(),
                     $userRunSources['parent=file,deletedAt=null'],
                     $userRunSources['parent=git,deletedAt=null'],
-                    new RunSource(
-                        $idFactory->create(),
-                        new FileSource($idFactory->create(), UserId::create(), 'file source label')
-                    ),
-                    new RunSource(
-                        $idFactory->create(),
-                        new GitSource(
-                            $idFactory->create(),
-                            UserId::create(),
-                            'label',
-                            'https://example.com/repository.git'
-                        )
-                    )
+                    new RunSource($idFactory->create(), FileSourceFactory::create()),
+                    new RunSource($idFactory->create(), GitSourceFactory::create())
                 ],
                 'user' => $user,
                 'types' => [

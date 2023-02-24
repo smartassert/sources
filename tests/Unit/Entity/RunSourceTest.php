@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\Entity;
 
-use App\Entity\FileSource;
 use App\Entity\RunSource;
 use App\Enum\RunSource\FailureReason;
 use App\Enum\RunSource\State;
 use App\Enum\Source\Type;
 use App\Services\EntityIdFactory;
 use App\Tests\Model\UserId;
+use App\Tests\Services\FileSourceFactory;
 use PHPUnit\Framework\TestCase;
 
 class RunSourceTest extends TestCase
@@ -38,7 +38,7 @@ class RunSourceTest extends TestCase
             'key2' => 'value2',
         ];
 
-        $parent = new FileSource($idFactory->create(), $userId, 'file source label');
+        $parent = FileSourceFactory::create($userId);
 
         $withoutParameters = new RunSource($idFactory->create(), $parent);
         $withParameters = new RunSource($idFactory->create(), $parent, $parameters);

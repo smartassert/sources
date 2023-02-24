@@ -50,14 +50,12 @@ class GitSourceFactory
         ]);
 
         if (null === $source) {
-            $source = new GitSource(
-                $this->entityIdFactory->create(),
-                $user->getUserIdentifier(),
-                $request->label,
-                $request->hostUrl,
-                $request->path,
-                $request->credentials,
-            );
+            $source = new GitSource($this->entityIdFactory->create(), $user->getUserIdentifier());
+
+            $source->setLabel($request->label);
+            $source->setHostUrl($request->hostUrl);
+            $source->setPath($request->path);
+            $source->setCredentials($request->credentials);
 
             $this->sourceRepository->save($source);
         }

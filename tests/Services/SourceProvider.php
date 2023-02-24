@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Tests\Services;
 
-use App\Entity\FileSource;
-use App\Entity\GitSource;
 use App\Entity\RunSource;
 use App\Entity\SourceInterface;
 use App\Enum\RunSource\FailureReason;
@@ -65,30 +63,27 @@ class SourceProvider
     {
         $idFactory = new EntityIdFactory();
 
-        $fileSourceWithoutRunSource = new FileSource($idFactory->create(), $this->userId, 'without run source');
-        $fileSourceWithRunSource = new FileSource($idFactory->create(), $this->userId, 'with run source');
-        $gitSourceWithCredentialsWithRunSource = new GitSource(
-            $idFactory->create(),
-            $this->userId,
-            'git source with credentials with run source',
-            'http://example.com/with-credentials.git',
-            '/',
-            md5((string) rand())
+        $fileSourceWithoutRunSource = FileSourceFactory::create($this->userId, 'without run source');
+        $fileSourceWithRunSource = FileSourceFactory::create($this->userId, 'with run source');
+        $gitSourceWithCredentialsWithRunSource = GitSourceFactory::create(
+            userId: $this->userId,
+            label: 'git source with credentials with run source',
+            hostUrl: 'http://example.com/with-credentials.git',
+            credentials: md5((string) rand()),
         );
 
         $this->sources[self::FILE_WITHOUT_RUN_SOURCE] = $fileSourceWithoutRunSource;
         $this->sources[self::FILE_WITH_RUN_SOURCE] = $fileSourceWithRunSource;
         $this->sources[self::GIT_WITH_CREDENTIALS_WITH_RUN_SOURCE] = $gitSourceWithCredentialsWithRunSource;
-        $this->sources[self::GIT_WITHOUT_CREDENTIALS_WITHOUT_RUN_SOURCE] = new GitSource(
-            $idFactory->create(),
-            $this->userId,
-            'git source without credentials without run source',
-            'http://example.com/without-credentials.git'
+        $this->sources[self::GIT_WITHOUT_CREDENTIALS_WITHOUT_RUN_SOURCE] = GitSourceFactory::create(
+            userId: $this->userId,
+            label: 'git source without credentials without run source',
+            hostUrl: 'http://example.com/without-credentials.git'
         );
         $this->sources[self::RUN_WITH_FILE_PARENT] = new RunSource($idFactory->create(), $fileSourceWithRunSource);
         $this->sources[self::RUN_WITH_DIFFERENT_FILE_PARENT] = new RunSource(
             $idFactory->create(),
-            new FileSource($idFactory->create(), $this->userId, 'file source label two')
+            FileSourceFactory::create($this->userId, 'file source label two')
         );
         $this->sources[self::RUN_WITH_GIT_PARENT] = new RunSource(
             $idFactory->create(),
@@ -96,11 +91,10 @@ class SourceProvider
         );
         $this->sources[self::RUN_WITH_DIFFERENT_GIT_PARENT] = new RunSource(
             $idFactory->create(),
-            new GitSource(
-                $idFactory->create(),
-                $this->userId,
-                'git source as different parent',
-                'http://example.com/'
+            GitSourceFactory::create(
+                userId: $this->userId,
+                label: 'git source as different parent',
+                hostUrl: 'http://example.com/as-different-parent.git'
             )
         );
 
@@ -114,20 +108,11 @@ class SourceProvider
             )
         ;
 
-        $this->sources[self::FILE_DIFFERENT_USER] = new FileSource(
-            $idFactory->create(),
-            UserId::create(),
-            'label'
-        );
-        $this->sources[self::GIT_DIFFERENT_USER] = new GitSource(
-            $idFactory->create(),
-            UserId::create(),
-            'git source different user',
-            'https://example.com/repository.git',
-        );
+        $this->sources[self::FILE_DIFFERENT_USER] = FileSourceFactory::create($idFactory->create());
+        $this->sources[self::GIT_DIFFERENT_USER] = GitSourceFactory::create(label: 'git source different user');
         $this->sources[self::RUN_DIFFERENT_USER] = new RunSource(
             $idFactory->create(),
-            new FileSource($idFactory->create(), UserId::create(), 'label')
+            FileSourceFactory::create(UserId::create(), 'label')
         );
 
         foreach ($sourcesToInitialize as $sourceIdentifier) {

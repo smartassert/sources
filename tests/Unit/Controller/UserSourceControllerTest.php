@@ -5,13 +5,13 @@ declare(strict_types=1);
 namespace App\Tests\Unit\Controller;
 
 use App\Controller\UserSourceController;
-use App\Entity\FileSource;
 use App\Entity\RunSource;
 use App\Message\Prepare;
 use App\Security\UserSourceAccessChecker;
 use App\Services\EntityIdFactory;
 use App\Services\Source\RunSourceFactory;
 use App\Tests\Model\UserId;
+use App\Tests\Services\FileSourceFactory;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Messenger\Envelope;
@@ -25,7 +25,7 @@ class UserSourceControllerTest extends WebTestCase
 
         $idFactory = new EntityIdFactory();
 
-        $fileSource = new FileSource($idFactory->create(), $userId, 'file source label');
+        $fileSource = FileSourceFactory::create($userId);
         $runSource = new RunSource($idFactory->create(), $fileSource);
 
         $createdMessage = null;

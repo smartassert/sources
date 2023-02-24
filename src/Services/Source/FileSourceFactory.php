@@ -31,8 +31,9 @@ class FileSourceFactory
             $source = new FileSource(
                 $this->entityIdFactory->create(),
                 $user->getUserIdentifier(),
-                $request->label
             );
+
+            $source->setLabel($request->label);
 
             $this->sourceRepository->save($source);
         }

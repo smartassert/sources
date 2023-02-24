@@ -4,15 +4,14 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\Services\SourceRepository;
 
-use App\Entity\FileSource;
-use App\Entity\GitSource;
 use App\Exception\UnparseableSourceFileException;
 use App\Model\SourceRepositoryInterface;
 use App\Model\UserGitRepository;
 use App\Services\EntityIdFactory;
 use App\Services\SourceRepository\Serializer;
-use App\Tests\Model\UserId;
+use App\Tests\Services\FileSourceFactory;
 use App\Tests\Services\FileStoreFixtureCreator;
+use App\Tests\Services\GitSourceFactory;
 use League\Flysystem\FilesystemOperator;
 use League\Flysystem\FilesystemWriter;
 use SmartAssert\YamlFile\Exception\Collection\SerializeException;
@@ -46,11 +45,7 @@ class SerializerTest extends WebTestCase
     {
         self::assertSame(
             '',
-            $this->serializer->serialize(new FileSource(
-                (new EntityIdFactory())->create(),
-                UserId::create(),
-                'file source label'
-            ))
+            $this->serializer->serialize(FileSourceFactory::create())
         );
     }
 
@@ -59,7 +54,7 @@ class SerializerTest extends WebTestCase
         $storage = self::getContainer()->get('file_source.storage');
         assert($storage instanceof FilesystemWriter);
 
-        $source = new FileSource((new EntityIdFactory())->create(), UserId::create(), 'file source label');
+        $source = FileSourceFactory::create();
 
         $this->fixtureCreator->copySetTo('Source/txt', $storage, $source->getDirectoryPath());
 
@@ -71,7 +66,7 @@ class SerializerTest extends WebTestCase
         $storage = self::getContainer()->get('file_source.storage');
         assert($storage instanceof FilesystemWriter);
 
-        $source = new FileSource((new EntityIdFactory())->create(), UserId::create(), 'file source label');
+        $source = FileSourceFactory::create();
 
         $this->fixtureCreator->copySetTo('Source/yml_yaml_invalid', $storage, $source->getDirectoryPath());
 
@@ -124,41 +119,19 @@ class SerializerTest extends WebTestCase
             'file source' => [
                 'fixtureSetIdentifier' => 'Source/yml_yaml_valid',
                 'sourceStorageId' => 'file_source.storage',
-                'source' => new FileSource(
-                    $idFactory->create(),
-                    UserId::create(),
-                    'file source label'
-                ),
+                'source' => FileSourceFactory::create(),
                 'expectedFixturePath' => 'RunSource/source_yml_yaml_entire.yaml',
             ],
             'git repository, entire' => [
                 'fixtureSetIdentifier' => 'Source/yml_yaml_valid',
                 'sourceStorageId' => 'git_repository.storage',
-                'source' => new UserGitRepository(
-                    $idFactory->create(),
-                    new GitSource(
-                        $idFactory->create(),
-                        UserId::create(),
-                        'label',
-                        'http://example.com/repository.git',
-                        '/'
-                    )
-                ),
+                'source' => new UserGitRepository($idFactory->create(), GitSourceFactory::create(path: '/')),
                 'expectedFixturePath' => 'RunSource/source_yml_yaml_entire.yaml',
             ],
             'git repository, partial' => [
                 'fixtureSetIdentifier' => 'Source/yml_yaml_valid',
                 'sourceStorageId' => 'git_repository.storage',
-                'source' => new UserGitRepository(
-                    $idFactory->create(),
-                    new GitSource(
-                        $idFactory->create(),
-                        UserId::create(),
-                        'label',
-                        'http://example.com/repository.git',
-                        '/directory'
-                    )
-                ),
+                'source' => new UserGitRepository($idFactory->create(), GitSourceFactory::create(path: '/directory')),
                 'expectedFixturePath' => 'RunSource/source_yml_yaml_partial.yaml',
             ],
         ];

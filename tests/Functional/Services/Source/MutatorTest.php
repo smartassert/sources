@@ -13,6 +13,8 @@ use App\Services\EntityIdFactory;
 use App\Services\Source\Mutator;
 use App\Tests\Model\UserId;
 use App\Tests\Services\EntityRemover;
+use App\Tests\Services\FileSourceFactory;
+use App\Tests\Services\GitSourceFactory;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 class MutatorTest extends WebTestCase
@@ -57,7 +59,8 @@ class MutatorTest extends WebTestCase
     {
         $userId = UserId::create();
         $label = 'file source label';
-        $fileSource = new FileSource((new EntityIdFactory())->create(), $userId, $label);
+        $fileSource = FileSourceFactory::create($userId, $label);
+        $fileSource->setLabel($label);
 
         return [
             'file source, no changes' => [
@@ -84,15 +87,14 @@ class MutatorTest extends WebTestCase
      */
     public function updateGitNoChangesDataProvider(): array
     {
-        $idFactory = new EntityIdFactory();
-
         $userId = UserId::create();
         $label = 'git source label';
         $hostUrl = 'https://example.com/repository.git';
         $path = '/path';
         $credentials = 'credentials';
-        $gitSourceNoCredentials = new GitSource($idFactory->create(), $userId, $label, $hostUrl, $path, '');
-        $gitSourceHasCredentials = new GitSource($idFactory->create(), $userId, $label, $hostUrl, $path, $credentials);
+
+        $gitSourceNoCredentials = GitSourceFactory::create($userId, $label, $hostUrl, $path, '');
+        $gitSourceHasCredentials = GitSourceFactory::create($userId, $label, $hostUrl, $path, $credentials);
 
         return [
             'git source, no credentials, no changes' => [
@@ -124,7 +126,7 @@ class MutatorTest extends WebTestCase
         $userId = UserId::create();
         $label = 'file source label';
         $newLabel = 'new file source label';
-        $originalFileSource = new FileSource((new EntityIdFactory())->create(), $userId, $label);
+        $originalFileSource = FileSourceFactory::create($userId, $label);
         $updatedFileSource = clone $originalFileSource;
         $updatedFileSource->setLabel($newLabel);
 
@@ -168,17 +170,13 @@ class MutatorTest extends WebTestCase
         $newHostUrl = 'https://new.example.com/repository.git';
         $newPath = '/path/new';
         $newCredentials = 'new credentials';
-        $originalGitSourceWithoutCredentials = new GitSource($idFactory->create(), $userId, $label, $hostUrl, $path);
-        $originalGitSourceWithCredentials = new GitSource(
-            $idFactory->create(),
-            $userId,
-            $label,
-            $hostUrl,
-            $path,
-            $credentials
-        );
+
+        $originalGitSourceWithoutCredentials = GitSourceFactory::create($userId, $label, $hostUrl, $path);
+        $originalGitSourceWithCredentials = GitSourceFactory::create($userId, $label, $hostUrl, $path, $credentials);
+
         $originalGitSourceWithNullifiedCredentials = clone $originalGitSourceWithCredentials;
         $originalGitSourceWithNullifiedCredentials->setCredentials('');
+
         $updatedGitSource = clone $originalGitSourceWithCredentials;
         $updatedGitSource->setLabel($newLabel);
         $updatedGitSource->setHostUrl($newHostUrl);
