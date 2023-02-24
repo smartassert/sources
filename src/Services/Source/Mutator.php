@@ -6,7 +6,6 @@ namespace App\Services\Source;
 
 use App\Entity\FileSource;
 use App\Entity\GitSource;
-use App\Entity\SourceInterface;
 use App\Exception\NonUniqueSourceLabelException;
 use App\Repository\SourceRepository;
 use App\Request\FileSourceRequest;
@@ -44,7 +43,7 @@ class Mutator
     /**
      * @throws NonUniqueSourceLabelException
      */
-    public function updateGit(GitSource $source, GitSourceRequest $request): SourceInterface
+    public function updateGit(GitSource $source, GitSourceRequest $request): GitSource
     {
         $foundSource = $this->gitSourceFinder->find($source->getUserId(), $request->label);
         if ($foundSource instanceof GitSource) {
