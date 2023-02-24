@@ -27,8 +27,11 @@ class Mutator
     {
         $foundSource = $this->fileSourceFinder->find($source->getUserId(), $request->label);
         if ($foundSource instanceof FileSource) {
-            if ($foundSource->getId() === $source->getId()) {
-                return $source;
+            if (
+                $foundSource->getId() === $source->getId()
+                || 0 === $this->sourceRepository->count(['id' => $source->getId()])
+            ) {
+                return $foundSource;
             }
 
             throw new NonUniqueSourceLabelException();
@@ -48,7 +51,7 @@ class Mutator
         $foundSource = $this->gitSourceFinder->find($source->getUserId(), $request->label);
         if ($foundSource instanceof GitSource) {
             if ($foundSource->getId() === $source->getId()) {
-                return $source;
+                return $foundSource;
             }
 
             throw new NonUniqueSourceLabelException();

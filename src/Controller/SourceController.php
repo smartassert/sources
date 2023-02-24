@@ -49,6 +49,7 @@ class SourceController
 
     /**
      * @throws EmptyEntityIdException
+     * @throws NonUniqueSourceLabelException
      */
     #[Route('/file', name: 'file_source_create', methods: ['POST'])]
     public function createFileSource(User $user, FileSourceRequest $request): JsonResponse
