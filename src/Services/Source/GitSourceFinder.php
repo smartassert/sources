@@ -21,9 +21,4 @@ class GitSourceFinder
 
         return $source instanceof GitSource ? $source : null;
     }
-
-    public function has(string $userId, string $label): bool
-    {
-        return $this->originSourceFinder->has($this->repository, $userId, $label) > 0;
-    }
 }

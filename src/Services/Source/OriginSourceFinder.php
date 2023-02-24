@@ -19,11 +19,6 @@ class OriginSourceFinder
         return $repository->findOneBy($this->createFindCriteria($userId, $label));
     }
 
-    public function has(FileSourceRepository|GitSourceRepository $repository, string $userId, string $label): bool
-    {
-        return $repository->count($this->createFindCriteria($userId, $label)) > 0;
-    }
-
     /**
      * @return array{userId: string, label: string, deletedAt: null}
      */

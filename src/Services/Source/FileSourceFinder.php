@@ -21,9 +21,4 @@ class FileSourceFinder
 
         return $source instanceof FileSource ? $source : null;
     }
-
-    public function has(string $userId, string $label): bool
-    {
-        return $this->originSourceFinder->has($this->repository, $userId, $label);
-    }
 }
