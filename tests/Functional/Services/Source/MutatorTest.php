@@ -6,6 +6,7 @@ namespace App\Tests\Functional\Services\Source;
 
 use App\Entity\FileSource;
 use App\Entity\GitSource;
+use App\Repository\SourceRepository;
 use App\Request\FileSourceRequest;
 use App\Request\GitSourceRequest;
 use App\Services\EntityIdFactory;
@@ -17,6 +18,7 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 class MutatorTest extends WebTestCase
 {
     private Mutator $mutator;
+    private SourceRepository $sourceRepository;
 
     protected function setUp(): void
     {
@@ -25,6 +27,10 @@ class MutatorTest extends WebTestCase
         $mutator = self::getContainer()->get(Mutator::class);
         \assert($mutator instanceof Mutator);
         $this->mutator = $mutator;
+
+        $sourceRepository = self::getContainer()->get(SourceRepository::class);
+        \assert($sourceRepository instanceof SourceRepository);
+        $this->sourceRepository = $sourceRepository;
 
         $entityRemover = self::getContainer()->get(EntityRemover::class);
         if ($entityRemover instanceof EntityRemover) {
@@ -37,6 +43,8 @@ class MutatorTest extends WebTestCase
      */
     public function testUpdateFileNoChanges(FileSource $source, FileSourceRequest $request): void
     {
+        $this->sourceRepository->save($source);
+
         $mutatedSource = $this->mutator->updateFile($source, $request);
 
         self::assertSame($source, $mutatedSource);
@@ -64,6 +72,8 @@ class MutatorTest extends WebTestCase
      */
     public function testUpdateGitNoChanges(GitSource $source, GitSourceRequest $request): void
     {
+        $this->sourceRepository->save($source);
+
         $mutatedSource = $this->mutator->updateGit($source, $request);
 
         self::assertSame($source, $mutatedSource);
