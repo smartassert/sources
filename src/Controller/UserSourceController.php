@@ -65,10 +65,10 @@ class UserSourceController
         try {
             return new JsonResponse($mutator->updateFile($source, $request));
         } catch (NonUniqueSourceLabelException) {
-            throw $exceptionFactory->createInvalidRequestExceptionForNonUniqueSourceLabel(
+            throw $exceptionFactory->createInvalidRequestExceptionForNonUniqueEntityLabel(
                 $request,
                 $request->label,
-                'file'
+                'file source'
             );
         }
     }
@@ -89,10 +89,10 @@ class UserSourceController
         try {
             return new JsonResponse($mutator->updateGit($source, $request));
         } catch (NonUniqueSourceLabelException) {
-            throw $exceptionFactory->createInvalidRequestExceptionForNonUniqueSourceLabel(
+            throw $exceptionFactory->createInvalidRequestExceptionForNonUniqueEntityLabel(
                 $request,
                 $request->label,
-                'git'
+                'git source'
             );
         }
     }

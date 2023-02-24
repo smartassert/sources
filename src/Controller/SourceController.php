@@ -39,10 +39,10 @@ class SourceController
         try {
             return new JsonResponse($this->gitSourceFactory->create($user, $request));
         } catch (NonUniqueSourceLabelException) {
-            throw $this->exceptionFactory->createInvalidRequestExceptionForNonUniqueSourceLabel(
+            throw $this->exceptionFactory->createInvalidRequestExceptionForNonUniqueEntityLabel(
                 $request,
                 $request->label,
-                'git'
+                'git source'
             );
         }
     }
