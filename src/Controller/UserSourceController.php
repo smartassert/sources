@@ -11,7 +11,7 @@ use App\Entity\SourceInterface;
 use App\Entity\SourceOriginInterface;
 use App\Exception\EmptyEntityIdException;
 use App\Exception\InvalidRequestException;
-use App\Exception\NonUniqueSourceLabelException;
+use App\Exception\NonUniqueEntityLabelException;
 use App\Message\Prepare;
 use App\Repository\SourceRepository;
 use App\Request\FileSourceRequest;
@@ -64,7 +64,7 @@ class UserSourceController
 
         try {
             return new JsonResponse($mutator->updateFile($source, $request));
-        } catch (NonUniqueSourceLabelException) {
+        } catch (NonUniqueEntityLabelException) {
             throw $exceptionFactory->createInvalidRequestExceptionForNonUniqueEntityLabel(
                 $request,
                 $request->label,
@@ -88,7 +88,7 @@ class UserSourceController
 
         try {
             return new JsonResponse($mutator->updateGit($source, $request));
-        } catch (NonUniqueSourceLabelException) {
+        } catch (NonUniqueEntityLabelException) {
             throw $exceptionFactory->createInvalidRequestExceptionForNonUniqueEntityLabel(
                 $request,
                 $request->label,

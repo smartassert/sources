@@ -6,7 +6,7 @@ namespace App\Services\Source;
 
 use App\Entity\GitSource;
 use App\Exception\EmptyEntityIdException;
-use App\Exception\NonUniqueSourceLabelException;
+use App\Exception\NonUniqueEntityLabelException;
 use App\Repository\GitSourceRepository;
 use App\Request\GitSourceRequest;
 use App\Services\EntityIdFactory;
@@ -23,7 +23,7 @@ class GitSourceFactory
 
     /**
      * @throws EmptyEntityIdException
-     * @throws NonUniqueSourceLabelException
+     * @throws NonUniqueEntityLabelException
      */
     public function create(User $user, GitSourceRequest $request): GitSource
     {
