@@ -6,7 +6,7 @@ namespace App\Services\Source;
 
 use App\Entity\FileSource;
 use App\Exception\EmptyEntityIdException;
-use App\Exception\NonUniqueSourceLabelException;
+use App\Exception\NonUniqueEntityLabelException;
 use App\Request\FileSourceRequest;
 use App\Services\EntityIdFactory;
 use SmartAssert\UsersSecurityBundle\Security\User;
@@ -21,7 +21,7 @@ class FileSourceFactory
 
     /**
      * @throws EmptyEntityIdException
-     * @throws NonUniqueSourceLabelException
+     * @throws NonUniqueEntityLabelException
      */
     public function create(User $user, FileSourceRequest $request): FileSource
     {

@@ -7,7 +7,7 @@ namespace App\Controller;
 use App\Enum\Source\Type;
 use App\Exception\EmptyEntityIdException;
 use App\Exception\InvalidRequestException;
-use App\Exception\NonUniqueSourceLabelException;
+use App\Exception\NonUniqueEntityLabelException;
 use App\Repository\SourceRepository;
 use App\Request\FileSourceRequest;
 use App\Request\GitSourceRequest;
@@ -38,7 +38,7 @@ class SourceController
     {
         try {
             return new JsonResponse($this->gitSourceFactory->create($user, $request));
-        } catch (NonUniqueSourceLabelException) {
+        } catch (NonUniqueEntityLabelException) {
             throw $this->exceptionFactory->createInvalidRequestExceptionForNonUniqueEntityLabel(
                 $request,
                 $request->label,
@@ -49,7 +49,7 @@ class SourceController
 
     /**
      * @throws EmptyEntityIdException
-     * @throws NonUniqueSourceLabelException
+     * @throws NonUniqueEntityLabelException
      */
     #[Route('/file', name: 'file_source_create', methods: ['POST'])]
     public function createFileSource(User $user, FileSourceRequest $request): JsonResponse

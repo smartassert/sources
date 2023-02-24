@@ -6,7 +6,7 @@ namespace App\Services\Source;
 
 use App\Entity\FileSource;
 use App\Entity\GitSource;
-use App\Exception\NonUniqueSourceLabelException;
+use App\Exception\NonUniqueEntityLabelException;
 use App\Repository\FileSourceRepository;
 use App\Repository\GitSourceRepository;
 use App\Repository\SourceRepository;
@@ -23,7 +23,7 @@ class Mutator
     }
 
     /**
-     * @throws NonUniqueSourceLabelException
+     * @throws NonUniqueEntityLabelException
      */
     public function updateFile(FileSource $source, FileSourceRequest $request): FileSource
     {
@@ -39,7 +39,7 @@ class Mutator
                 return $foundSource;
             }
 
-            throw new NonUniqueSourceLabelException();
+            throw new NonUniqueEntityLabelException();
         }
 
         $source->setLabel($request->label);
@@ -49,7 +49,7 @@ class Mutator
     }
 
     /**
-     * @throws NonUniqueSourceLabelException
+     * @throws NonUniqueEntityLabelException
      */
     public function updateGit(GitSource $source, GitSourceRequest $request): GitSource
     {
@@ -62,7 +62,7 @@ class Mutator
                 return $foundSource;
             }
 
-            throw new NonUniqueSourceLabelException();
+            throw new NonUniqueEntityLabelException();
         }
 
         $source->setLabel($request->label);
