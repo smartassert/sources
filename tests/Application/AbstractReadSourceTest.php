@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace App\Tests\Application;
 
-use App\Entity\FileSource;
 use App\Entity\RunSource;
 use App\Repository\SourceRepository;
 use App\Services\EntityIdFactory;
 use App\Services\RunSourceSerializer;
+use App\Tests\Services\FileSourceFactory;
 use App\Tests\Services\FileStoreFixtureCreator;
 use League\Flysystem\FilesystemOperator;
 
@@ -41,11 +41,10 @@ abstract class AbstractReadSourceTest extends AbstractApplicationTest
 
         $idFactory = new EntityIdFactory();
 
-        $fileSource = new FileSource(
-            $idFactory->create(),
-            self::$authenticationConfiguration->getUser(self::USER_1_EMAIL)->id,
-            'file source label'
+        $fileSource = FileSourceFactory::create(
+            self::$authenticationConfiguration->getUser(self::USER_1_EMAIL)->id
         );
+
         $runSource = new RunSource($idFactory->create(), $fileSource);
 
         $sourceRepository = self::getContainer()->get(SourceRepository::class);

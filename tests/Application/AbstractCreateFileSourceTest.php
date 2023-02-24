@@ -100,6 +100,8 @@ abstract class AbstractCreateFileSourceTest extends AbstractApplicationTest
             $requestParameters
         );
 
+//        echo $secondResponse->getBody()->getContents() . "\n\n";
+
         self::assertSame(200, $secondResponse->getStatusCode());
         self::assertSame($firstResponse->getBody()->getContents(), $secondResponse->getBody()->getContents());
     }

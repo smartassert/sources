@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\Services;
 
-use App\Entity\FileSource;
 use App\Entity\RunSource;
 use App\Entity\SourceOriginInterface;
 use App\Exception\UnserializableSourceException;
 use App\Services\EntityIdFactory;
 use App\Services\RunSourceSerializer;
 use App\Tests\Model\UserId;
+use App\Tests\Services\FileSourceFactory;
 use App\Tests\Services\FileStoreFixtureCreator;
 use League\Flysystem\FilesystemOperator;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -70,7 +70,7 @@ class RunSourceSerializerTest extends WebTestCase
     {
         $idFactory = new EntityIdFactory();
 
-        $fileSource = new FileSource($idFactory->create(), UserId::create(), 'file source label');
+        $fileSource = FileSourceFactory::create();
         $this->fixtureCreator->copySetTo(
             'Source/yml_yaml_valid',
             $this->fileSourceStorage,
@@ -94,7 +94,7 @@ class RunSourceSerializerTest extends WebTestCase
     {
         $idFactory = new EntityIdFactory();
 
-        $fileSource = new FileSource($idFactory->create(), UserId::create(), 'file source label');
+        $fileSource = FileSourceFactory::create();
         $runSource = new RunSource($idFactory->create(), $fileSource);
         $this->fixtureCreator->copyTo(
             'RunSource/source_yml_yaml_entire.yaml',

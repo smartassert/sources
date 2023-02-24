@@ -24,32 +24,10 @@ class GitSource extends AbstractOriginSource implements SourceOriginInterface, \
      * @var non-empty-string
      */
     #[ORM\Column(type: 'string', length: self::PATH_MAX_LENGTH)]
-    private string $path;
+    private string $path = '/';
 
     #[ORM\Column(type: 'string', length: self::CREDENTIALS_MAX_LENGTH)]
-    private string $credentials;
-
-    /**
-     * @param non-empty-string $id
-     * @param non-empty-string $userId
-     * @param non-empty-string $label
-     * @param non-empty-string $hostUrl
-     * @param non-empty-string $path
-     */
-    public function __construct(
-        string $id,
-        string $userId,
-        string $label,
-        string $hostUrl,
-        string $path = '/',
-        string $credentials = ''
-    ) {
-        parent::__construct($id, $userId, $label);
-
-        $this->hostUrl = $hostUrl;
-        $this->path = $path;
-        $this->credentials = $credentials;
-    }
+    private string $credentials = '';
 
     /**
      * @return non-empty-string

@@ -7,6 +7,8 @@ namespace App\Services\Source;
 use App\Entity\FileSource;
 use App\Entity\GitSource;
 use App\Exception\NonUniqueSourceLabelException;
+use App\Repository\FileSourceRepository;
+use App\Repository\GitSourceRepository;
 use App\Repository\SourceRepository;
 use App\Request\FileSourceRequest;
 use App\Request\GitSourceRequest;
@@ -15,8 +17,8 @@ class Mutator
 {
     public function __construct(
         private readonly SourceRepository $sourceRepository,
-        private readonly FileSourceFinder $fileSourceFinder,
-        private readonly GitSourceFinder $gitSourceFinder,
+        private readonly FileSourceRepository $fileSourceRepository,
+        private readonly GitSourceRepository $gitSourceRepository,
     ) {
     }
 
@@ -25,10 +27,16 @@ class Mutator
      */
     public function updateFile(FileSource $source, FileSourceRequest $request): FileSource
     {
-        $foundSource = $this->fileSourceFinder->find($source->getUserId(), $request->label);
+        $foundSource = $this->fileSourceRepository->findOneBy(
+            $this->createFindCriteria($source->getUserId(), $request->label)
+        );
+
         if ($foundSource instanceof FileSource) {
-            if ($foundSource->getId() === $source->getId()) {
-                return $source;
+            if (
+                $foundSource->getId() === $source->getId()
+                || 0 === $this->sourceRepository->count(['id' => $source->getId()])
+            ) {
+                return $foundSource;
             }
 
             throw new NonUniqueSourceLabelException();
@@ -45,10 +53,13 @@ class Mutator
      */
     public function updateGit(GitSource $source, GitSourceRequest $request): GitSource
     {
-        $foundSource = $this->gitSourceFinder->find($source->getUserId(), $request->label);
+        $foundSource = $this->gitSourceRepository->findOneBy(
+            $this->createFindCriteria($source->getUserId(), $request->label)
+        );
+
         if ($foundSource instanceof GitSource) {
             if ($foundSource->getId() === $source->getId()) {
-                return $source;
+                return $foundSource;
             }
 
             throw new NonUniqueSourceLabelException();
@@ -62,5 +73,17 @@ class Mutator
         $this->sourceRepository->save($source);
 
         return $source;
+    }
+
+    /**
+     * @return array{userId: string, label: string, deletedAt: null}
+     */
+    private function createFindCriteria(string $userId, string $label): array
+    {
+        return [
+            'userId' => $userId,
+            'label' => $label,
+            'deletedAt' => null,
+        ];
     }
 }

@@ -12,8 +12,9 @@ use App\Model\UserGitRepository;
 use App\Services\EntityIdFactory;
 use App\Services\SourceRepository\Factory\Factory;
 use App\Services\SourceRepository\Factory\GitSourceHandler;
-use App\Tests\Model\UserId;
+use App\Tests\Services\FileSourceFactory;
 use App\Tests\Services\FileStoreFixtureCreator;
+use App\Tests\Services\GitSourceFactory;
 use League\Flysystem\FilesystemOperator;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use webignition\ObjectReflector\ObjectReflector;
@@ -98,27 +99,17 @@ class FactoryTest extends WebTestCase
 
     public function testCreateForFileSource(): void
     {
-        $fileSource = new FileSource(
-            (new EntityIdFactory())->create(),
-            UserId::create(),
-            'file source label'
-        );
+        $fileSource = FileSourceFactory::create();
 
         self::assertSame($fileSource, $this->factory->create($fileSource, []));
     }
 
     public function testCreateForGitSourceSuccess(): void
     {
-        $idFactory = new EntityIdFactory();
+        $gitSource = GitSourceFactory::create();
 
-        $gitSource = new GitSource(
-            $idFactory->create(),
-            UserId::create(),
-            'https://example.com/repository.git',
-            '/'
-        );
         $parameters = ['ref' => 'v1.1'];
-        $userGitRepository = new UserGitRepository($idFactory->create(), $gitSource);
+        $userGitRepository = new UserGitRepository((new EntityIdFactory())->create(), $gitSource);
 
         $gitSourceHandler = self::getContainer()->get(GitSourceHandler::class);
         \assert($gitSourceHandler instanceof GitSourceHandler);
@@ -171,17 +162,7 @@ class FactoryTest extends WebTestCase
         $gitRepositoryStorage = self::getContainer()->get('git_repository.storage');
         \assert($gitRepositoryStorage instanceof FilesystemOperator);
 
-        $idFactory = new EntityIdFactory();
-
-        $userGitRepository = new UserGitRepository(
-            $idFactory->create(),
-            new GitSource(
-                $idFactory->create(),
-                UserId::create(),
-                'label',
-                'https://example.com/repository.git'
-            )
-        );
+        $userGitRepository = new UserGitRepository((new EntityIdFactory())->create(), GitSourceFactory::create());
 
         $fixtureCreator->copySetTo('Source/mixed', $gitRepositoryStorage, $userGitRepository->getDirectoryPath());
         self::assertTrue($gitRepositoryStorage->directoryExists($userGitRepository->getDirectoryPath()));

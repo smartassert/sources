@@ -4,23 +4,17 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\Services;
 
-use App\Entity\GitSource;
 use App\Model\UserGitRepository;
 use App\Services\EntityIdFactory;
 use App\Services\UserGitRepositoryFactory;
-use App\Tests\Model\UserId;
+use App\Tests\Services\GitSourceFactory;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 class UserGitRepositoryFactoryTest extends WebTestCase
 {
     public function testCreate(): void
     {
-        $source = new GitSource(
-            (new EntityIdFactory())->create(),
-            UserId::create(),
-            'label',
-            'http://example.com/repository.git'
-        );
+        $source = GitSourceFactory::create();
 
         $userGitRepositoryFactory = new UserGitRepositoryFactory(new EntityIdFactory());
 

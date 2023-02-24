@@ -9,7 +9,8 @@ use App\Entity\GitSource;
 use App\Entity\RunSource;
 use App\Repository\SourceRepository;
 use App\Services\EntityIdFactory;
-use App\Tests\Model\UserId;
+use App\Tests\Services\FileSourceFactory;
+use App\Tests\Services\GitSourceFactory;
 
 abstract class AbstractInvalidSourceUserTest extends AbstractApplicationTest
 {
@@ -22,16 +23,13 @@ abstract class AbstractInvalidSourceUserTest extends AbstractApplicationTest
     {
         parent::setUp();
 
-        $idFactory = new EntityIdFactory();
+        $this->fileSource = FileSourceFactory::create();
+        $this->gitSource = GitSourceFactory::create();
 
-        $this->fileSource = new FileSource($idFactory->create(), UserId::create(), 'file source label');
-
-        $this->gitSource = new GitSource(
-            $idFactory->create(),
-            UserId::create(),
-            'git source label',
-            'http://example.com/repo.git',
-        );
+        $this->gitSource->setLabel('git source label');
+        $this->gitSource->setHostUrl('http://example.com/repo.git');
+        $this->gitSource->setPath('/');
+        $this->gitSource->setCredentials('');
 
         $sourceRepository = self::getContainer()->get(SourceRepository::class);
         \assert($sourceRepository instanceof SourceRepository);
