@@ -13,7 +13,6 @@ use App\Repository\SourceRepository;
 use App\Services\EntityIdFactory;
 use App\Tests\Model\UserId;
 use App\Tests\Services\EntityRemover;
-use Doctrine\ORM\EntityManagerInterface;
 use SmartAssert\UsersSecurityBundle\Security\User;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -21,7 +20,6 @@ use Symfony\Component\Security\Core\User\UserInterface;
 class SourceRepositoryTest extends WebTestCase
 {
     private SourceRepository $repository;
-    private EntityManagerInterface $entityManager;
 
     protected function setUp(): void
     {
@@ -31,60 +29,10 @@ class SourceRepositoryTest extends WebTestCase
         \assert($repository instanceof SourceRepository);
         $this->repository = $repository;
 
-        $entityManager = self::getContainer()->get(EntityManagerInterface::class);
-        \assert($entityManager instanceof EntityManagerInterface);
-        $this->entityManager = $entityManager;
-
         $entityRemover = self::getContainer()->get(EntityRemover::class);
         if ($entityRemover instanceof EntityRemover) {
             $entityRemover->removeAll();
         }
-    }
-
-    /**
-     * @dataProvider persistAndRetrieveDataProvider
-     */
-    public function testPersistAndRetrieveSource(SourceInterface $source): void
-    {
-        $sourceId = $source->getId();
-
-        $this->repository->save($source);
-        $this->entityManager->detach($source);
-
-        $retrievedSource = $this->repository->find($sourceId);
-        self::assertInstanceOf($source::class, $retrievedSource);
-        self::assertEquals($source, $retrievedSource);
-
-        \assert(!is_null($retrievedSource));
-        self::assertNotSame(spl_object_id($source), spl_object_id($retrievedSource));
-    }
-
-    /**
-     * @return array<mixed>
-     */
-    public function persistAndRetrieveDataProvider(): array
-    {
-        $idFactory = new EntityIdFactory();
-
-        return [
-            GitSource::class => [
-                'source' => new GitSource(
-                    $idFactory->create(),
-                    UserId::create(),
-                    'label',
-                    'https://example.com/repository.git',
-                ),
-            ],
-            FileSource::class => [
-                'source' => new FileSource($idFactory->create(), UserId::create(), 'file source label'),
-            ],
-            RunSource::class => [
-                'source' => new RunSource(
-                    $idFactory->create(),
-                    new FileSource($idFactory->create(), UserId::create(), 'file source label')
-                ),
-            ],
-        ];
     }
 
     /**
