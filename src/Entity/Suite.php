@@ -40,7 +40,7 @@ class Suite implements \JsonSerializable, UserHeldEntityInterface
     /**
      * @var array<int, non-empty-string>
      */
-    #[ORM\Column(type: Types::SIMPLE_ARRAY)]
+    #[ORM\Column(type: Types::SIMPLE_ARRAY, nullable: true)]
     private array $tests;
 
     #[ORM\Column(type: Types::DATETIMETZ_IMMUTABLE, nullable: true)]
