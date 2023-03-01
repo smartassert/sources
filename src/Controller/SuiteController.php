@@ -8,10 +8,15 @@ use App\Entity\SourceInterface;
 use App\Entity\SourceOriginInterface;
 use App\Entity\Suite;
 use App\Exception\EmptyEntityIdException;
+use App\Exception\InvalidRequestException;
+use App\Exception\NonUniqueSuiteLabelException;
 use App\Repository\SuiteRepository;
 use App\Request\CreateSuiteRequest;
+use App\Request\SuiteRequest;
 use App\Security\EntityAccessChecker;
+use App\Services\ExceptionFactory;
 use App\Services\Suite\Factory;
+use App\Services\Suite\Mutator;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -23,6 +28,8 @@ class SuiteController
         private readonly EntityAccessChecker $entityAccessChecker,
         private readonly Factory $factory,
         private readonly SuiteRepository $repository,
+        private readonly Mutator $mutator,
+        private readonly ExceptionFactory $exceptionFactory,
     ) {
     }
 
@@ -69,5 +76,26 @@ class SuiteController
         );
 
         return new JsonResponse($suites);
+    }
+
+    /**
+     * @throws AccessDeniedException
+     * @throws InvalidRequestException
+     */
+    #[Route(SuiteRoutes::ROUTE_SUITE, name: 'user_suite_update', methods: ['POST'])]
+    public function update(SourceInterface $source, Suite $suite, SuiteRequest $request): Response
+    {
+        $this->entityAccessChecker->denyAccessUnlessGranted($source);
+        $this->entityAccessChecker->denyAccessUnlessGranted($suite);
+
+        try {
+            return new JsonResponse($this->mutator->update($suite, $request));
+        } catch (NonUniqueSuiteLabelException) {
+            throw $this->exceptionFactory->createInvalidRequestExceptionForNonUniqueEntityLabel(
+                $request,
+                $request->label,
+                'suite'
+            );
+        }
     }
 }
