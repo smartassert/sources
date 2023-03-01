@@ -59,7 +59,13 @@ abstract class AbstractCreateSuiteTest extends AbstractApplicationTest
     public function createSourceSuccessDataProvider(): array
     {
         return [
-            'default' => [
+            'no tests' => [
+                'requestParameters' => [
+                    SuiteRequest::PARAMETER_LABEL => md5((string) rand()),
+                    SuiteRequest::PARAMETER_TESTS => [],
+                ],
+            ],
+            'has tests' => [
                 'requestParameters' => [
                     SuiteRequest::PARAMETER_LABEL => md5((string) rand()),
                     SuiteRequest::PARAMETER_TESTS => [
