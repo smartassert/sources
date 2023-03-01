@@ -58,11 +58,9 @@ class Mutator
         );
 
         if ($foundSource instanceof GitSource) {
-            if ($foundSource->getId() === $source->getId()) {
-                return $foundSource;
+            if ($foundSource->getId() !== $source->getId()) {
+                throw new NonUniqueEntityLabelException();
             }
-
-            throw new NonUniqueEntityLabelException();
         }
 
         $source->setLabel($request->label);
