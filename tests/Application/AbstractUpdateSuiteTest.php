@@ -5,20 +5,10 @@ declare(strict_types=1);
 namespace App\Tests\Application;
 
 use App\Repository\SuiteRepository;
-use App\Request\FileSourceRequest;
 use App\Request\SuiteRequest;
 
-abstract class AbstractUpdateSuiteTest extends AbstractApplicationTest
+abstract class AbstractUpdateSuiteTest extends AbstractSuiteTest
 {
-    private string $sourceId;
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        $this->sourceId = $this->createSource(self::USER_1_EMAIL, md5((string) rand()));
-    }
-
     public function testUpdateNewLabelNotUnique(): void
     {
         $suiteRepository = self::getContainer()->get(SuiteRepository::class);
@@ -177,23 +167,6 @@ abstract class AbstractUpdateSuiteTest extends AbstractApplicationTest
             $firstUpdateResponse->getBody()->getContents(),
             $secondUpdateResponse->getBody()->getContents()
         );
-    }
-
-    private function createSource(string $userEmail, string $label): string
-    {
-        $createSourceResponse = $this->applicationClient->makeCreateFileSourceRequest(
-            self::$authenticationConfiguration->getValidApiToken($userEmail),
-            [
-                FileSourceRequest::PARAMETER_LABEL => $label,
-            ]
-        );
-
-        $createSourceResponseData = json_decode($createSourceResponse->getBody()->getContents(), true);
-        \assert(is_array($createSourceResponseData));
-        $sourceId = $createSourceResponseData['id'] ?? null;
-        \assert(is_string($sourceId));
-
-        return $sourceId;
     }
 
     /**
