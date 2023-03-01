@@ -54,20 +54,14 @@ abstract class AbstractInvalidSuiteUserTest extends AbstractApplicationTest
         \assert($accessibleSource instanceof FileSource);
         $this->accessibleSource = $accessibleSource;
 
-        $this->inaccessibleSuite = new Suite(
-            $idFactory->create(),
-            $this->inaccessibleSource,
-            'inaccessible suite',
-            ['test.yaml']
-        );
+        $this->inaccessibleSuite = new Suite($idFactory->create(), $this->inaccessibleSource);
+        $this->inaccessibleSuite->setLabel('inaccessible suite');
+        $this->inaccessibleSuite->setTests(['test.yaml']);
         $repository->save($this->inaccessibleSuite);
 
-        $this->accessibleSuite = new Suite(
-            $idFactory->create(),
-            $this->accessibleSource,
-            'accessible suite',
-            ['test.yaml']
-        );
+        $this->accessibleSuite = new Suite($idFactory->create(), $this->accessibleSource);
+        $this->accessibleSuite->setLabel('accessible suite');
+        $this->accessibleSuite->setTests(['test.yaml']);
         $repository->save($this->accessibleSuite);
     }
 
