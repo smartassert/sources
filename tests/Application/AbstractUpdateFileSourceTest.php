@@ -6,32 +6,34 @@ namespace App\Tests\Application;
 
 use App\Enum\Source\Type;
 use App\Repository\FileSourceRepository;
+use App\Repository\SourceRepository;
 use App\Request\FileSourceRequest;
 use App\Tests\DataProvider\CreateUpdateFileSourceDataProviderTrait;
-use App\Tests\Services\SourceProvider;
+use App\Tests\Services\FileSourceFactory;
+use App\Tests\Services\GitSourceFactory;
 
 abstract class AbstractUpdateFileSourceTest extends AbstractApplicationTest
 {
     use CreateUpdateFileSourceDataProviderTrait;
 
-    private SourceProvider $sourceProvider;
+    private SourceRepository $sourceRepository;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $sourceProvider = self::getContainer()->get(SourceProvider::class);
-        \assert($sourceProvider instanceof SourceProvider);
-        $sourceProvider->setUserId(self::$authenticationConfiguration->getUser(self::USER_1_EMAIL)->id);
-        $this->sourceProvider = $sourceProvider;
+        $sourceRepository = self::getContainer()->get(SourceRepository::class);
+        \assert($sourceRepository instanceof SourceRepository);
+        $this->sourceRepository = $sourceRepository;
     }
 
     public function testUpdateInvalidSourceType(): void
     {
-        $sourceIdentifier = SourceProvider::GIT_WITHOUT_CREDENTIALS_WITHOUT_RUN_SOURCE;
+        $source = GitSourceFactory::create(
+            userId: self::$authenticationConfiguration->getUser(self::USER_1_EMAIL)->id
+        );
 
-        $this->sourceProvider->initialize([$sourceIdentifier]);
-        $source = $this->sourceProvider->get($sourceIdentifier);
+        $this->sourceRepository->save($source);
 
         $response = $this->applicationClient->makeUpdateFileSourceRequest(
             self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
@@ -52,10 +54,11 @@ abstract class AbstractUpdateFileSourceTest extends AbstractApplicationTest
         array $payload,
         array $expectedResponseData
     ): void {
-        $sourceIdentifier = SourceProvider::FILE_WITHOUT_RUN_SOURCE;
+        $source = FileSourceFactory::create(
+            userId: self::$authenticationConfiguration->getUser(self::USER_1_EMAIL)->id
+        );
 
-        $this->sourceProvider->initialize([$sourceIdentifier]);
-        $source = $this->sourceProvider->get($sourceIdentifier);
+        $this->sourceRepository->save($source);
 
         $response = $this->applicationClient->makeUpdateFileSourceRequest(
             self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
@@ -68,17 +71,22 @@ abstract class AbstractUpdateFileSourceTest extends AbstractApplicationTest
 
     public function testUpdateNewLabelNotUnique(): void
     {
-        $fileSourceRepository = self::getContainer()->get(FileSourceRepository::class);
-        \assert($fileSourceRepository instanceof FileSourceRepository);
+        $source = FileSourceFactory::create(
+            userId: self::$authenticationConfiguration->getUser(self::USER_1_EMAIL)->id,
+            label: 'label1'
+        );
+        $this->sourceRepository->save($source);
 
-        $sourceId = $this->createFileSource(self::USER_1_EMAIL, 'label1');
-        $this->createFileSource(self::USER_1_EMAIL, 'label2');
-
-        self::assertSame(1, $fileSourceRepository->count(['label' => 'label1']));
+        $this->sourceRepository->save(
+            FileSourceFactory::create(
+                userId: self::$authenticationConfiguration->getUser(self::USER_1_EMAIL)->id,
+                label: 'label2'
+            )
+        );
 
         $updateResponse = $this->applicationClient->makeUpdateFileSourceRequest(
             self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
-            $sourceId,
+            $source->getId(),
             [
                 FileSourceRequest::PARAMETER_LABEL => 'label2',
             ]
@@ -99,51 +107,31 @@ abstract class AbstractUpdateFileSourceTest extends AbstractApplicationTest
         );
     }
 
-    /**
-     * @dataProvider updateSourceSuccessDataProvider
-     *
-     * @param array<string, string> $payload
-     * @param array<mixed>          $expectedResponseData
-     */
-    public function testUpdateSuccess(
-        string $sourceIdentifier,
-        array $payload,
-        array $expectedResponseData
-    ): void {
-        $this->sourceProvider->initialize([$sourceIdentifier]);
-        $source = $this->sourceProvider->get($sourceIdentifier);
+    public function testUpdateSuccess(): void
+    {
+        $source = FileSourceFactory::create(
+            userId: self::$authenticationConfiguration->getUser(self::USER_1_EMAIL)->id,
+            label: 'original label'
+        );
+        $this->sourceRepository->save($source);
 
         $response = $this->applicationClient->makeUpdateFileSourceRequest(
             self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
             $source->getId(),
-            $payload
+            [
+                FileSourceRequest::PARAMETER_LABEL => 'new label',
+            ]
         );
 
-        $expectedResponseData['id'] = $source->getId();
-        $expectedResponseData['user_id'] = $source->getUserId();
-
-        $this->responseAsserter->assertSuccessfulJsonResponse($response, $expectedResponseData);
-    }
-
-    /**
-     * @return array<mixed>
-     */
-    public function updateSourceSuccessDataProvider(): array
-    {
-        $newLabel = 'new file source label';
-
-        return [
-            Type::FILE->value => [
-                'sourceIdentifier' => SourceProvider::FILE_WITHOUT_RUN_SOURCE,
-                'payload' => [
-                    FileSourceRequest::PARAMETER_LABEL => $newLabel,
-                ],
-                'expectedResponseData' => [
-                    'type' => Type::FILE->value,
-                    'label' => $newLabel,
-                ],
-            ],
-        ];
+        $this->responseAsserter->assertSuccessfulJsonResponse(
+            $response,
+            [
+                'id' => $source->getId(),
+                'user_id' => $source->getUserId(),
+                'type' => Type::FILE->value,
+                'label' => 'new label',
+            ]
+        );
     }
 
     public function testUpdateNewLabelUsedByDeletedSource(): void
@@ -151,15 +139,24 @@ abstract class AbstractUpdateFileSourceTest extends AbstractApplicationTest
         $fileSourceRepository = self::getContainer()->get(FileSourceRepository::class);
         \assert($fileSourceRepository instanceof FileSourceRepository);
 
-        $sourceId = $this->createFileSource(self::USER_1_EMAIL, 'label1');
-        $sourceToBeDeletedId = $this->createFileSource(self::USER_1_EMAIL, 'label2');
+        $source = FileSourceFactory::create(
+            userId: self::$authenticationConfiguration->getUser(self::USER_1_EMAIL)->id,
+            label: 'label1',
+        );
+        $this->sourceRepository->save($source);
+
+        $sourceToBeDeleted = FileSourceFactory::create(
+            userId: self::$authenticationConfiguration->getUser(self::USER_1_EMAIL)->id,
+            label: 'label2',
+        );
+        $this->sourceRepository->save($sourceToBeDeleted);
 
         self::assertSame(1, $fileSourceRepository->count(['label' => 'label1', 'deletedAt' => null]));
         self::assertSame(1, $fileSourceRepository->count(['label' => 'label2', 'deletedAt' => null]));
 
         $this->applicationClient->makeDeleteSourceRequest(
             self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
-            $sourceToBeDeletedId,
+            $sourceToBeDeleted->getId(),
         );
 
         self::assertSame(1, $fileSourceRepository->count(['label' => 'label1', 'deletedAt' => null]));
@@ -167,29 +164,12 @@ abstract class AbstractUpdateFileSourceTest extends AbstractApplicationTest
 
         $updateResponse = $this->applicationClient->makeUpdateFileSourceRequest(
             self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
-            $sourceId,
+            $source->getId(),
             [
                 FileSourceRequest::PARAMETER_LABEL => 'label2',
             ]
         );
 
         self::assertSame(200, $updateResponse->getStatusCode());
-    }
-
-    private function createFileSource(string $userEmail, string $label): string
-    {
-        $response = $this->applicationClient->makeCreateFileSourceRequest(
-            self::$authenticationConfiguration->getValidApiToken($userEmail),
-            [
-                FileSourceRequest::PARAMETER_LABEL => $label,
-            ]
-        );
-
-        $responseData = json_decode($response->getBody()->getContents(), true);
-        \assert(is_array($responseData));
-        $sourceId = $responseData['id'] ?? null;
-        \assert(is_string($sourceId));
-
-        return $sourceId;
     }
 }
