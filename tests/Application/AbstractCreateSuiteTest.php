@@ -6,10 +6,9 @@ namespace App\Tests\Application;
 
 use App\Entity\Suite;
 use App\Repository\SuiteRepository;
-use App\Request\FileSourceRequest;
 use App\Request\SuiteRequest;
 
-abstract class AbstractCreateSuiteTest extends AbstractApplicationTest
+abstract class AbstractCreateSuiteTest extends AbstractSuiteTest
 {
     /**
      * @dataProvider createSourceSuccessDataProvider
@@ -18,11 +17,9 @@ abstract class AbstractCreateSuiteTest extends AbstractApplicationTest
      */
     public function testCreateSuccess(array $requestParameters): void
     {
-        $sourceId = $this->createSource();
-
         $response = $this->applicationClient->makeCreateSuiteRequest(
             self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
-            $sourceId,
+            $this->sourceId,
             $requestParameters
         );
 
@@ -46,7 +43,7 @@ abstract class AbstractCreateSuiteTest extends AbstractApplicationTest
             $requestParameters,
             [
                 'id' => $suite->id,
-                'source_id' => $sourceId,
+                'source_id' => $this->sourceId,
             ]
         );
 
@@ -87,11 +84,9 @@ abstract class AbstractCreateSuiteTest extends AbstractApplicationTest
             ],
         ];
 
-        $sourceId = $this->createSource();
-
         $firstResponse = $this->applicationClient->makeCreateSuiteRequest(
             self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
-            $sourceId,
+            $this->sourceId,
             $requestParameters
         );
 
@@ -99,7 +94,7 @@ abstract class AbstractCreateSuiteTest extends AbstractApplicationTest
 
         $secondResponse = $this->applicationClient->makeCreateSuiteRequest(
             self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
-            $sourceId,
+            $this->sourceId,
             $requestParameters
         );
 
@@ -109,8 +104,6 @@ abstract class AbstractCreateSuiteTest extends AbstractApplicationTest
 
     public function testCreateMultipleSuitesForSameSource(): void
     {
-        $sourceId = $this->createSource();
-
         $labels = [
             md5((string) rand()),
             md5((string) rand()),
@@ -122,7 +115,7 @@ abstract class AbstractCreateSuiteTest extends AbstractApplicationTest
         foreach ($labels as $label) {
             $response = $this->applicationClient->makeCreateSuiteRequest(
                 self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
-                $sourceId,
+                $this->sourceId,
                 [
                     SuiteRequest::PARAMETER_LABEL => $label,
                     SuiteRequest::PARAMETER_TESTS => [
@@ -142,22 +135,5 @@ abstract class AbstractCreateSuiteTest extends AbstractApplicationTest
         }
 
         self::assertCount($createdSuiteCount, $labels);
-    }
-
-    private function createSource(): string
-    {
-        $createSourceResponse = $this->applicationClient->makeCreateFileSourceRequest(
-            self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
-            [
-                FileSourceRequest::PARAMETER_LABEL => md5((string) rand()),
-            ]
-        );
-
-        $createSourceResponseData = json_decode($createSourceResponse->getBody()->getContents(), true);
-        \assert(is_array($createSourceResponseData));
-        $sourceId = $createSourceResponseData['id'] ?? null;
-        \assert(is_string($sourceId));
-
-        return $sourceId;
     }
 }
