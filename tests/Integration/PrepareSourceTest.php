@@ -6,9 +6,9 @@ namespace App\Tests\Integration;
 
 use App\Enum\RunSource\State;
 use App\Enum\Source\Type;
+use App\Request\FileSourceRequest;
 use App\Services\DirectoryListingFilter;
 use App\Tests\Application\AbstractPrepareSourceTest;
-use App\Tests\Services\SourceProvider;
 use League\Flysystem\FilesystemOperator;
 
 class PrepareSourceTest extends AbstractPrepareSourceTest
@@ -33,8 +33,17 @@ class PrepareSourceTest extends AbstractPrepareSourceTest
 
     public function testPrepareFileSource(): void
     {
-        $this->sourceProvider->initialize([SourceProvider::FILE_WITHOUT_RUN_SOURCE]);
-        $fileSource = $this->sourceProvider->get(SourceProvider::FILE_WITHOUT_RUN_SOURCE);
+        $createResponse = $this->applicationClient->makeCreateFileSourceRequest(
+            self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
+            [
+                FileSourceRequest::PARAMETER_LABEL => 'file source label',
+            ]
+        );
+        $createResponseData = json_decode($createResponse->getBody()->getContents(), true);
+        \assert(is_array($createResponseData));
+
+        $fileSourceId = $createResponseData['id'] ?? null;
+        $fileSourceUserId = $createResponseData['user_id'] ?? null;
 
         $sourceIdentifier = 'Source/yaml_valid';
 
@@ -46,7 +55,7 @@ class PrepareSourceTest extends AbstractPrepareSourceTest
         foreach ($sourceFiles as $sourceFilePath) {
             $addFileResponse = $this->applicationClient->makeAddFileRequest(
                 self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
-                $fileSource->getId(),
+                $fileSourceId,
                 $sourceFilePath,
                 trim($this->fixtureStorage->read($sourceIdentifier . '/' . $sourceFilePath))
             );
@@ -56,7 +65,7 @@ class PrepareSourceTest extends AbstractPrepareSourceTest
 
         $prepareResponse = $this->applicationClient->makePrepareSourceRequest(
             self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
-            $fileSource->getId(),
+            $fileSourceId,
             []
         );
 
@@ -70,9 +79,9 @@ class PrepareSourceTest extends AbstractPrepareSourceTest
 
         $this->responseAsserter->assertPrepareSourceSuccessResponse($prepareResponse, [
             'id' => $runSourceId,
-            'user_id' => $fileSource->getUserId(),
+            'user_id' => $fileSourceUserId,
             'type' => Type::RUN->value,
-            'parent' => $fileSource->getId(),
+            'parent' => $fileSourceId,
             'parameters' => [],
             'state' => State::REQUESTED->value,
         ]);

@@ -78,6 +78,3 @@ services:
 
     App\Tests\Services\ResponseAsserter:
         public: true
-
-    App\Tests\Services\SourceProvider:
-        public: true

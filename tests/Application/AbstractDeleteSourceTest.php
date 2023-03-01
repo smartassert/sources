@@ -4,20 +4,21 @@ declare(strict_types=1);
 
 namespace App\Tests\Application;
 
-use App\Entity\FileSource;
 use App\Entity\RunSource;
 use App\Entity\SourceInterface;
 use App\Repository\SourceRepository;
+use App\Services\EntityIdFactory;
 use App\Services\RunSourceSerializer;
+use App\Tests\Services\AuthenticationConfiguration;
 use App\Tests\Services\EntityRemover;
-use App\Tests\Services\SourceProvider;
+use App\Tests\Services\FileSourceFactory;
+use App\Tests\Services\GitSourceFactory;
 use Doctrine\ORM\EntityManagerInterface;
 use League\Flysystem\FilesystemOperator;
 
 abstract class AbstractDeleteSourceTest extends AbstractApplicationTest
 {
     private SourceRepository $sourceRepository;
-    private SourceProvider $sourceProvider;
     private EntityManagerInterface $entityManager;
 
     protected function setUp(): void
@@ -36,20 +37,18 @@ abstract class AbstractDeleteSourceTest extends AbstractApplicationTest
         if ($entityRemover instanceof EntityRemover) {
             $entityRemover->removeAll();
         }
-
-        $sourceProvider = self::getContainer()->get(SourceProvider::class);
-        \assert($sourceProvider instanceof SourceProvider);
-        $sourceProvider->setUserId(self::$authenticationConfiguration->getUser(self::USER_1_EMAIL)->id);
-        $sourceProvider->initialize();
-        $this->sourceProvider = $sourceProvider;
     }
 
     /**
      * @dataProvider deleteSourceSuccessDataProvider
+     *
+     * @param callable(AuthenticationConfiguration $authenticationConfiguration): SourceInterface $sourceCreator
      */
-    public function testDeleteSuccess(string $sourceIdentifier): void
+    public function testDeleteSuccess(callable $sourceCreator): void
     {
-        $source = $this->sourceProvider->get($sourceIdentifier);
+        $source = $sourceCreator(self::$authenticationConfiguration);
+        $this->sourceRepository->save($source);
+
         $sourceId = $source->getId();
 
         self::assertSame(1, $this->sourceRepository->count(['id' => $source->getId()]));
@@ -85,16 +84,38 @@ abstract class AbstractDeleteSourceTest extends AbstractApplicationTest
     {
         return [
             'file source without run source' => [
-                'sourceIdentifier' => SourceProvider::FILE_WITHOUT_RUN_SOURCE,
+                'sourceCreator' => function (AuthenticationConfiguration $authenticationConfiguration) {
+                    return FileSourceFactory::create(
+                        $authenticationConfiguration->getUser(self::USER_1_EMAIL)->id
+                    );
+                },
             ],
             'git source without run source' => [
-                'sourceIdentifier' => SourceProvider::GIT_WITHOUT_CREDENTIALS_WITHOUT_RUN_SOURCE,
+                'sourceCreator' => function (AuthenticationConfiguration $authenticationConfiguration) {
+                    return GitSourceFactory::create(
+                        $authenticationConfiguration->getUser(self::USER_1_EMAIL)->id
+                    );
+                },
             ],
-            'run source with different file parent' => [
-                'sourceIdentifier' => SourceProvider::RUN_WITH_DIFFERENT_FILE_PARENT,
+            'run source with file parent' => [
+                'sourceCreator' => function (AuthenticationConfiguration $authenticationConfiguration) {
+                    return new RunSource(
+                        (new EntityIdFactory())->create(),
+                        FileSourceFactory::create(
+                            $authenticationConfiguration->getUser(self::USER_1_EMAIL)->id
+                        )
+                    );
+                },
             ],
-            'run source with different git parent' => [
-                'sourceIdentifier' => SourceProvider::RUN_WITH_DIFFERENT_GIT_PARENT,
+            'run source with git parent' => [
+                'sourceCreator' => function (AuthenticationConfiguration $authenticationConfiguration) {
+                    return new RunSource(
+                        (new EntityIdFactory())->create(),
+                        GitSourceFactory::create(
+                            $authenticationConfiguration->getUser(self::USER_1_EMAIL)->id
+                        )
+                    );
+                },
             ],
         ];
     }
@@ -104,11 +125,13 @@ abstract class AbstractDeleteSourceTest extends AbstractApplicationTest
         $runSourceStorage = self::getContainer()->get('run_source.storage');
         \assert($runSourceStorage instanceof FilesystemOperator);
 
-        $runSource = $this->sourceProvider->get(SourceProvider::RUN_WITH_FILE_PARENT);
-        self::assertInstanceOf(RunSource::class, $runSource);
+        $fileSource = FileSourceFactory::create(
+            self::$authenticationConfiguration->getUser(self::USER_1_EMAIL)->id
+        );
 
-        $fileSource = $runSource->getParent();
-        self::assertInstanceOf(FileSource::class, $fileSource);
+        $runSource = new RunSource((new EntityIdFactory())->create(), $fileSource);
+
+        $this->sourceRepository->save($runSource);
 
         $serializedRunSourcePath = $runSource->getDirectoryPath() . '/' . RunSourceSerializer::SERIALIZED_FILENAME;
 
@@ -133,8 +156,12 @@ abstract class AbstractDeleteSourceTest extends AbstractApplicationTest
         $fileSourceStorage = self::getContainer()->get('file_source.storage');
         \assert($fileSourceStorage instanceof FilesystemOperator);
 
-        $fileSource = $this->sourceProvider->get(SourceProvider::FILE_WITHOUT_RUN_SOURCE);
-        self::assertInstanceOf(FileSource::class, $fileSource);
+        $fileSource = FileSourceFactory::create(
+            self::$authenticationConfiguration->getUser(self::USER_1_EMAIL)->id,
+            'file source label',
+        );
+
+        $this->sourceRepository->save($fileSource);
 
         $sourceRelativePath = $fileSource->getDirectoryPath();
         $fileRelativePath = $sourceRelativePath . '/file.yaml';

@@ -4,34 +4,37 @@ declare(strict_types=1);
 
 namespace App\Tests\Application;
 
+use App\Entity\GitSource;
 use App\Enum\Source\Type;
 use App\Repository\GitSourceRepository;
+use App\Repository\SourceRepository;
 use App\Request\GitSourceRequest;
 use App\Tests\DataProvider\CreateUpdateGitSourceDataProviderTrait;
-use App\Tests\Services\SourceProvider;
+use App\Tests\Services\AuthenticationConfiguration;
+use App\Tests\Services\FileSourceFactory;
+use App\Tests\Services\GitSourceFactory;
 
 abstract class AbstractUpdateGitSourceTest extends AbstractApplicationTest
 {
     use CreateUpdateGitSourceDataProviderTrait;
 
-    private SourceProvider $sourceProvider;
+    private SourceRepository $sourceRepository;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $sourceProvider = self::getContainer()->get(SourceProvider::class);
-        \assert($sourceProvider instanceof SourceProvider);
-        $sourceProvider->setUserId(self::$authenticationConfiguration->getUser(self::USER_1_EMAIL)->id);
-        $this->sourceProvider = $sourceProvider;
+        $sourceRepository = self::getContainer()->get(SourceRepository::class);
+        \assert($sourceRepository instanceof SourceRepository);
+        $this->sourceRepository = $sourceRepository;
     }
 
     public function testUpdateInvalidSourceType(): void
     {
-        $sourceIdentifier = SourceProvider::FILE_WITHOUT_RUN_SOURCE;
-
-        $this->sourceProvider->initialize([$sourceIdentifier]);
-        $source = $this->sourceProvider->get($sourceIdentifier);
+        $source = FileSourceFactory::create(
+            userId: self::$authenticationConfiguration->getUser(self::USER_1_EMAIL)->id
+        );
+        $this->sourceRepository->save($source);
 
         $response = $this->applicationClient->makeUpdateGitSourceRequest(
             self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
@@ -48,14 +51,12 @@ abstract class AbstractUpdateGitSourceTest extends AbstractApplicationTest
      * @param array<string, string> $payload
      * @param array<mixed>          $expectedResponseData
      */
-    public function testUpdateInvalidRequest(
-        array $payload,
-        array $expectedResponseData
-    ): void {
-        $sourceIdentifier = SourceProvider::GIT_WITH_CREDENTIALS_WITH_RUN_SOURCE;
-
-        $this->sourceProvider->initialize([$sourceIdentifier]);
-        $source = $this->sourceProvider->get($sourceIdentifier);
+    public function testUpdateInvalidRequest(array $payload, array $expectedResponseData): void
+    {
+        $source = GitSourceFactory::create(
+            userId: self::$authenticationConfiguration->getUser(self::USER_1_EMAIL)->id
+        );
+        $this->sourceRepository->save($source);
 
         $response = $this->applicationClient->makeUpdateGitSourceRequest(
             self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
@@ -71,14 +72,24 @@ abstract class AbstractUpdateGitSourceTest extends AbstractApplicationTest
         $gitSourceRepository = self::getContainer()->get(GitSourceRepository::class);
         \assert($gitSourceRepository instanceof GitSourceRepository);
 
-        $sourceId = $this->createGitSource(self::USER_1_EMAIL, 'label1');
-        $this->createGitSource(self::USER_1_EMAIL, 'label2');
+        $source = GitSourceFactory::create(
+            userId: self::$authenticationConfiguration->getUser(self::USER_1_EMAIL)->id,
+            label: 'label1'
+        );
+        $this->sourceRepository->save($source);
+
+        $this->sourceRepository->save(
+            GitSourceFactory::create(
+                userId: self::$authenticationConfiguration->getUser(self::USER_1_EMAIL)->id,
+                label: 'label2'
+            )
+        );
 
         self::assertSame(1, $gitSourceRepository->count(['label' => 'label1']));
 
         $updateResponse = $this->applicationClient->makeUpdateGitSourceRequest(
             self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
-            $sourceId,
+            $source->getId(),
             [
                 GitSourceRequest::PARAMETER_LABEL => 'label2',
                 GitSourceRequest::PARAMETER_HOST_URL => 'https://example.com/' . md5((string) rand()) . '.git',
@@ -104,16 +115,17 @@ abstract class AbstractUpdateGitSourceTest extends AbstractApplicationTest
     /**
      * @dataProvider updateSourceSuccessDataProvider
      *
+     * @param callable(AuthenticationConfiguration $authenticationConfiguration): GitSource $sourceCreator
      * @param array<string, string> $payload
-     * @param array<mixed>          $expectedResponseData
+     * @param callable(GitSource $source): array<mixed> $expectedResponseDataCreator
      */
     public function testUpdateSuccess(
-        string $sourceIdentifier,
+        callable $sourceCreator,
         array $payload,
-        array $expectedResponseData
+        callable $expectedResponseDataCreator,
     ): void {
-        $this->sourceProvider->initialize([$sourceIdentifier]);
-        $source = $this->sourceProvider->get($sourceIdentifier);
+        $source = $sourceCreator(self::$authenticationConfiguration);
+        $this->sourceRepository->save($source);
 
         $response = $this->applicationClient->makeUpdateGitSourceRequest(
             self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
@@ -121,8 +133,7 @@ abstract class AbstractUpdateGitSourceTest extends AbstractApplicationTest
             $payload
         );
 
-        $expectedResponseData['id'] = $source->getId();
-        $expectedResponseData['user_id'] = $source->getUserId();
+        $expectedResponseData = $expectedResponseDataCreator($source);
 
         $this->responseAsserter->assertSuccessfulJsonResponse($response, $expectedResponseData);
     }
@@ -132,41 +143,60 @@ abstract class AbstractUpdateGitSourceTest extends AbstractApplicationTest
      */
     public function updateSourceSuccessDataProvider(): array
     {
-        $newLabel = 'new git source label';
-        $newHostUrl = 'https://new.example.com/repository.git';
-        $newPath = '/new';
-
         return [
             Type::GIT->value . ' credentials present and empty' => [
-                'sourceIdentifier' => SourceProvider::GIT_WITH_CREDENTIALS_WITH_RUN_SOURCE,
+                'sourceCreator' => function (AuthenticationConfiguration $authenticationConfiguration) {
+                    return GitSourceFactory::create(
+                        userId: $authenticationConfiguration->getUser(self::USER_1_EMAIL)->id,
+                        label: 'original label',
+                        hostUrl: 'https://example.com/original.git',
+                        path: '/original',
+                        credentials: 'credentials',
+                    );
+                },
                 'payload' => [
-                    GitSourceRequest::PARAMETER_LABEL => $newLabel,
-                    GitSourceRequest::PARAMETER_HOST_URL => $newHostUrl,
-                    GitSourceRequest::PARAMETER_PATH => $newPath,
+                    GitSourceRequest::PARAMETER_LABEL => 'new label',
+                    GitSourceRequest::PARAMETER_HOST_URL => 'https://example.com/new.git',
+                    GitSourceRequest::PARAMETER_PATH => '/new',
                     GitSourceRequest::PARAMETER_CREDENTIALS => null,
                 ],
-                'expectedResponseData' => [
-                    'type' => Type::GIT->value,
-                    'label' => $newLabel,
-                    'host_url' => $newHostUrl,
-                    'path' => $newPath,
-                    'has_credentials' => false,
-                ],
+                'expectedResponseDataCreator' => function (GitSource $source) {
+                    return [
+                        'id' => $source->getId(),
+                        'user_id' => $source->getUserId(),
+                        'type' => Type::GIT->value,
+                        'label' => 'new label',
+                        'host_url' => 'https://example.com/new.git',
+                        'path' => '/new',
+                        'has_credentials' => false,
+                    ];
+                },
             ],
             Type::GIT->value . ' credentials not present' => [
-                'source' => SourceProvider::GIT_WITH_CREDENTIALS_WITH_RUN_SOURCE,
+                'sourceCreator' => function (AuthenticationConfiguration $authenticationConfiguration) {
+                    return GitSourceFactory::create(
+                        userId: $authenticationConfiguration->getUser(self::USER_1_EMAIL)->id,
+                        label: 'original label',
+                        hostUrl: 'https://example.com/original.git',
+                        path: '/original',
+                    );
+                },
                 'payload' => [
-                    GitSourceRequest::PARAMETER_LABEL => $newLabel,
-                    GitSourceRequest::PARAMETER_HOST_URL => $newHostUrl,
-                    GitSourceRequest::PARAMETER_PATH => $newPath,
+                    GitSourceRequest::PARAMETER_LABEL => 'new label',
+                    GitSourceRequest::PARAMETER_HOST_URL => 'https://example.com/new.git',
+                    GitSourceRequest::PARAMETER_PATH => '/new',
                 ],
-                'expectedResponseData' => [
-                    'type' => Type::GIT->value,
-                    'label' => $newLabel,
-                    'host_url' => $newHostUrl,
-                    'path' => $newPath,
-                    'has_credentials' => false,
-                ],
+                'expectedResponseDataCreator' => function (GitSource $source) {
+                    return [
+                        'id' => $source->getId(),
+                        'user_id' => $source->getUserId(),
+                        'type' => Type::GIT->value,
+                        'label' => 'new label',
+                        'host_url' => 'https://example.com/new.git',
+                        'path' => '/new',
+                        'has_credentials' => false,
+                    ];
+                },
             ],
         ];
     }
@@ -209,24 +239,5 @@ abstract class AbstractUpdateGitSourceTest extends AbstractApplicationTest
         $secondCreateResponseData = json_decode($secondCreateResponse->getBody()->getContents(), true);
         \assert(is_array($secondCreateResponseData));
         self::assertNotSame($sourceId, $secondCreateResponseData['id']);
-    }
-
-    private function createGitSource(string $userEmail, string $label): string
-    {
-        $response = $this->applicationClient->makeCreateGitSourceRequest(
-            self::$authenticationConfiguration->getValidApiToken($userEmail),
-            [
-                GitSourceRequest::PARAMETER_LABEL => $label,
-                GitSourceRequest::PARAMETER_HOST_URL => 'https://example.com/' . md5((string) rand()) . '.git',
-                GitSourceRequest::PARAMETER_PATH => md5((string) rand()),
-            ]
-        );
-
-        $responseData = json_decode($response->getBody()->getContents(), true);
-        \assert(is_array($responseData));
-        $sourceId = $responseData['id'] ?? null;
-        \assert(is_string($sourceId));
-
-        return $sourceId;
     }
 }

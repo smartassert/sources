@@ -9,12 +9,17 @@ use App\Entity\SourceOriginInterface;
 use App\Enum\RunSource\State;
 use App\Enum\Source\Type;
 use App\Repository\RunSourceRepository;
-use App\Tests\Services\SourceProvider;
+use App\Repository\SourceRepository;
+use App\Services\EntityIdFactory;
+use App\Tests\Services\AuthenticationConfiguration;
+use App\Tests\Services\FileSourceFactory;
+use App\Tests\Services\GitSourceFactory;
 
 abstract class AbstractPrepareSourceTest extends AbstractApplicationTest
 {
-    protected SourceProvider $sourceProvider;
     private RunSourceRepository $runSourceRepository;
+
+    private SourceRepository $sourceRepository;
 
     protected function setUp(): void
     {
@@ -24,18 +29,21 @@ abstract class AbstractPrepareSourceTest extends AbstractApplicationTest
         \assert($runSourceRepository instanceof RunSourceRepository);
         $this->runSourceRepository = $runSourceRepository;
 
-        $sourceProvider = self::getContainer()->get(SourceProvider::class);
-        \assert($sourceProvider instanceof SourceProvider);
-        $sourceProvider->setUserId(self::$authenticationConfiguration->getUser(self::USER_1_EMAIL)->id);
-        $this->sourceProvider = $sourceProvider;
+        $sourceRepository = self::getContainer()->get(SourceRepository::class);
+        \assert($sourceRepository instanceof SourceRepository);
+        $this->sourceRepository = $sourceRepository;
     }
 
     public function testPrepareRunSource(): void
     {
-        $sourceIdentifier = SourceProvider::RUN_WITH_FILE_PARENT;
+        $source = new RunSource(
+            (new EntityIdFactory())->create(),
+            FileSourceFactory::create(
+                self::$authenticationConfiguration->getUser(self::USER_1_EMAIL)->id,
+            ),
+        );
 
-        $this->sourceProvider->initialize([$sourceIdentifier]);
-        $source = $this->sourceProvider->get($sourceIdentifier);
+        $this->sourceRepository->save($source);
 
         $response = $this->applicationClient->makePrepareSourceRequest(
             self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
@@ -49,17 +57,17 @@ abstract class AbstractPrepareSourceTest extends AbstractApplicationTest
     /**
      * @dataProvider prepareSuccessDataProvider
      *
+     * @param callable(AuthenticationConfiguration $authenticationConfiguration): SourceOriginInterface $sourceCreator
      * @param array<string, string> $payload
      * @param array<string, string> $expectedResponseParameters
      */
     public function testPrepareSuccess(
-        string $sourceIdentifier,
+        callable $sourceCreator,
         array $payload,
         array $expectedResponseParameters,
     ): void {
-        $this->sourceProvider->initialize([$sourceIdentifier]);
-        $source = $this->sourceProvider->get($sourceIdentifier);
-        self::assertInstanceOf(SourceOriginInterface::class, $source);
+        $source = $sourceCreator(self::$authenticationConfiguration);
+        $this->sourceRepository->save($source);
 
         $response = $this->applicationClient->makePrepareSourceRequest(
             self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
@@ -89,17 +97,29 @@ abstract class AbstractPrepareSourceTest extends AbstractApplicationTest
     {
         return [
             Type::FILE->value => [
-                'sourceIdentifier' => SourceProvider::FILE_WITHOUT_RUN_SOURCE,
+                'sourceCreator' => function (AuthenticationConfiguration $authenticationConfiguration) {
+                    return FileSourceFactory::create(
+                        userId: $authenticationConfiguration->getUser(self::USER_1_EMAIL)->id,
+                    );
+                },
                 'payload' => [],
                 'expectedResponseParameters' => [],
             ],
             Type::GIT->value => [
-                'sourceIdentifier' => SourceProvider::GIT_WITHOUT_CREDENTIALS_WITHOUT_RUN_SOURCE,
+                'sourceCreator' => function (AuthenticationConfiguration $authenticationConfiguration) {
+                    return GitSourceFactory::create(
+                        userId: $authenticationConfiguration->getUser(self::USER_1_EMAIL)->id,
+                    );
+                },
                 'payload' => [],
                 'expectedResponseParameters' => [],
             ],
             Type::GIT->value . ' with ref request parameters' => [
-                'sourceIdentifier' => SourceProvider::GIT_WITHOUT_CREDENTIALS_WITHOUT_RUN_SOURCE,
+                'sourceCreator' => function (AuthenticationConfiguration $authenticationConfiguration) {
+                    return GitSourceFactory::create(
+                        userId: $authenticationConfiguration->getUser(self::USER_1_EMAIL)->id,
+                    );
+                },
                 'payload' => [
                     'ref' => 'v1.1',
                 ],
@@ -108,7 +128,11 @@ abstract class AbstractPrepareSourceTest extends AbstractApplicationTest
                 ],
             ],
             Type::GIT->value . ' with request parameters including ref' => [
-                'sourceIdentifier' => SourceProvider::GIT_WITHOUT_CREDENTIALS_WITHOUT_RUN_SOURCE,
+                'sourceCreator' => function (AuthenticationConfiguration $authenticationConfiguration) {
+                    return GitSourceFactory::create(
+                        userId: $authenticationConfiguration->getUser(self::USER_1_EMAIL)->id,
+                    );
+                },
                 'payload' => [
                     'ref' => 'v1.1',
                     'ignored1' => 'value',
