@@ -124,6 +124,7 @@ abstract class AbstractGetSourceTest extends AbstractApplicationTest
                         'id' => $source->getId(),
                         'user_id' => $source->getUserId(),
                         'type' => Type::RUN->value,
+                        'parent' => $source->getParent()->getId(),
                         'parameters' => [],
                         'state' => State::REQUESTED->value,
                     ];
@@ -148,6 +149,7 @@ abstract class AbstractGetSourceTest extends AbstractApplicationTest
                         'id' => $source->getId(),
                         'user_id' => $source->getUserId(),
                         'type' => Type::RUN->value,
+                        'parent' => $source->getParent()->getId(),
                         'parameters' => [],
                         'state' => State::FAILED->value,
                         'failure_reason' => FailureReason::GIT_CLONE->value,
