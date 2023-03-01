@@ -14,11 +14,9 @@ use App\Services\EntityIdFactory;
 use App\Tests\Services\AuthenticationConfiguration;
 use App\Tests\Services\FileSourceFactory;
 use App\Tests\Services\GitSourceFactory;
-use App\Tests\Services\SourceProvider;
 
 abstract class AbstractPrepareSourceTest extends AbstractApplicationTest
 {
-    protected SourceProvider $sourceProvider;
     private RunSourceRepository $runSourceRepository;
 
     private SourceRepository $sourceRepository;
@@ -34,11 +32,6 @@ abstract class AbstractPrepareSourceTest extends AbstractApplicationTest
         $sourceRepository = self::getContainer()->get(SourceRepository::class);
         \assert($sourceRepository instanceof SourceRepository);
         $this->sourceRepository = $sourceRepository;
-
-        $sourceProvider = self::getContainer()->get(SourceProvider::class);
-        \assert($sourceProvider instanceof SourceProvider);
-        $sourceProvider->setUserId(self::$authenticationConfiguration->getUser(self::USER_1_EMAIL)->id);
-        $this->sourceProvider = $sourceProvider;
     }
 
     public function testPrepareRunSource(): void
