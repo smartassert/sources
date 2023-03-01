@@ -198,6 +198,32 @@ abstract class AbstractUpdateGitSourceTest extends AbstractApplicationTest
                     ];
                 },
             ],
+            Type::GIT->value . ' update all but the label' => [
+                'sourceCreator' => function (AuthenticationConfiguration $authenticationConfiguration) {
+                    return GitSourceFactory::create(
+                        userId: $authenticationConfiguration->getUser(self::USER_1_EMAIL)->id,
+                        label: 'original label',
+                        hostUrl: 'https://example.com/original.git',
+                        path: '/original',
+                    );
+                },
+                'payload' => [
+                    GitSourceRequest::PARAMETER_LABEL => 'original label',
+                    GitSourceRequest::PARAMETER_HOST_URL => 'https://example.com/new.git',
+                    GitSourceRequest::PARAMETER_PATH => '/new',
+                ],
+                'expectedResponseDataCreator' => function (GitSource $source) {
+                    return [
+                        'id' => $source->getId(),
+                        'user_id' => $source->getUserId(),
+                        'type' => Type::GIT->value,
+                        'label' => 'original label',
+                        'host_url' => 'https://example.com/new.git',
+                        'path' => '/new',
+                        'has_credentials' => false,
+                    ];
+                },
+            ],
         ];
     }
 
