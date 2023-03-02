@@ -9,7 +9,7 @@ use App\Entity\SourceOriginInterface;
 use App\Entity\Suite;
 use App\Exception\EmptyEntityIdException;
 use App\Exception\InvalidRequestException;
-use App\Exception\NonUniqueSuiteLabelException;
+use App\Exception\NonUniqueEntityLabelException;
 use App\Repository\SuiteRepository;
 use App\Request\CreateSuiteRequest;
 use App\Request\SuiteRequest;
@@ -36,6 +36,7 @@ class SuiteController
     /**
      * @throws AccessDeniedException
      * @throws EmptyEntityIdException
+     * @throws NonUniqueEntityLabelException
      */
     #[Route(SuiteRoutes::ROUTE_SUITE_BASE, name: 'user_suite_create', methods: ['POST'])]
     public function create(SourceOriginInterface $source, CreateSuiteRequest $request): Response
@@ -90,7 +91,7 @@ class SuiteController
 
         try {
             return new JsonResponse($this->mutator->update($suite, $request));
-        } catch (NonUniqueSuiteLabelException) {
+        } catch (NonUniqueEntityLabelException) {
             throw $this->exceptionFactory->createInvalidRequestExceptionForNonUniqueEntityLabel(
                 $request,
                 $request->label,

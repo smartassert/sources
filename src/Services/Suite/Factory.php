@@ -7,7 +7,7 @@ namespace App\Services\Suite;
 use App\Entity\SourceOriginInterface;
 use App\Entity\Suite;
 use App\Exception\EmptyEntityIdException;
-use App\Exception\NonUniqueSuiteLabelException;
+use App\Exception\NonUniqueEntityLabelException;
 use App\Repository\SuiteRepository;
 use App\Request\CreateSuiteRequest;
 use App\Services\EntityIdFactory;
@@ -23,7 +23,7 @@ class Factory
 
     /**
      * @throws EmptyEntityIdException
-     * @throws NonUniqueSuiteLabelException
+     * @throws NonUniqueEntityLabelException
      */
     public function create(SourceOriginInterface $source, CreateSuiteRequest $request): Suite
     {
