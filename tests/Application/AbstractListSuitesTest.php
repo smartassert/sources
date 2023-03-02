@@ -90,8 +90,12 @@ abstract class AbstractListSuitesTest extends AbstractApplicationTest
             ],
             'single suite' => [
                 'suitesCreator' => function (SourceOriginInterface $source) use ($entityIdFactory) {
+                    $suite = new Suite($entityIdFactory->create(), $source);
+                    $suite->setLabel('suite1');
+                    $suite->setTests(['test1.yaml']);
+
                     return [
-                        'suite1' => new Suite($entityIdFactory->create(), $source, 'suite1', ['test1.yaml']),
+                        'suite1' => $suite,
                     ];
                 },
                 'expectedResponseData' => [
@@ -103,25 +107,22 @@ abstract class AbstractListSuitesTest extends AbstractApplicationTest
             ],
             'multiple suites, are ordered by label' => [
                 'suitesCreator' => function (SourceOriginInterface $source) use ($entityIdFactory) {
+                    $appleSuite = new Suite($entityIdFactory->create(), $source);
+                    $appleSuite->setLabel('apple');
+                    $appleSuite->setTests(['test1.yaml', 'test2.yaml']);
+
+                    $batSuite = new Suite($entityIdFactory->create(), $source);
+                    $batSuite->setLabel('bat');
+                    $batSuite->setTests(['test2.yaml', 'test3.yaml']);
+
+                    $zebraSuite = new Suite($entityIdFactory->create(), $source);
+                    $zebraSuite->setLabel('zebra');
+                    $zebraSuite->setTests(['test1.yaml']);
+
                     return [
-                        'zebra' => new Suite(
-                            $entityIdFactory->create(),
-                            $source,
-                            'zebra',
-                            ['test1.yaml']
-                        ),
-                        'apple' => new Suite(
-                            $entityIdFactory->create(),
-                            $source,
-                            'apple',
-                            ['test1.yaml', 'test2.yaml']
-                        ),
-                        'bat' => new Suite(
-                            $entityIdFactory->create(),
-                            $source,
-                            'bat',
-                            ['test2.yaml', 'test3.yaml']
-                        ),
+                        'zebra' => $zebraSuite,
+                        'apple' => $appleSuite,
+                        'bat' => $batSuite,
                     ];
                 },
                 'expectedResponseData' => [
