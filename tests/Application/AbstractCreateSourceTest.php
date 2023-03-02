@@ -8,15 +8,19 @@ use App\Entity\SourceInterface;
 use App\Enum\Source\Type;
 use App\Repository\SourceRepository;
 use App\Request\FileSourceRequest;
+use App\Request\GitSourceRequest;
 use App\Request\OriginSourceRequest;
 use App\Tests\DataProvider\CreateUpdateFileSourceDataProviderTrait;
+use App\Tests\DataProvider\CreateUpdateGitSourceDataProviderTrait;
 
-abstract class AbstractCreateFileSourceTest extends AbstractApplicationTest
+abstract class AbstractCreateSourceTest extends AbstractApplicationTest
 {
     use CreateUpdateFileSourceDataProviderTrait;
+    use CreateUpdateGitSourceDataProviderTrait;
 
     /**
      * @dataProvider createUpdateFileSourceInvalidRequestDataProvider
+     * @dataProvider createUpdateGitSourceInvalidRequestDataProvider
      *
      * @param array<string, string> $requestParameters
      * @param array<string, string> $expectedResponseData
@@ -32,7 +36,8 @@ abstract class AbstractCreateFileSourceTest extends AbstractApplicationTest
     }
 
     /**
-     * @dataProvider createSourceSuccessDataProvider
+     * @dataProvider createFileSourceSuccessDataProvider
+     * @dataProvider createGitSourceSuccessDataProvider
      *
      * @param array<string, string> $requestParameters
      * @param array<mixed>          $expected
@@ -65,9 +70,9 @@ abstract class AbstractCreateFileSourceTest extends AbstractApplicationTest
     /**
      * @return array<mixed>
      */
-    public function createSourceSuccessDataProvider(): array
+    public function createFileSourceSuccessDataProvider(): array
     {
-        $label = 'file source label';
+        $label = md5((string) rand());
 
         return [
             'file source' => [
@@ -83,14 +88,59 @@ abstract class AbstractCreateFileSourceTest extends AbstractApplicationTest
         ];
     }
 
-    public function testCreateIsIdempotent(): void
+    /**
+     * @return array<mixed>
+     */
+    public function createGitSourceSuccessDataProvider(): array
     {
-        $label = 'file source label';
-        $requestParameters = [
-            OriginSourceRequest::PARAMETER_TYPE => Type::FILE->value,
-            FileSourceRequest::PARAMETER_LABEL => $label,
-        ];
+        $label = md5((string) rand());
+        $hostUrl = 'https://example.com/' . md5((string) rand()) . '.git';
+        $path = '/' . md5((string) rand());
+        $credentials = md5((string) rand());
 
+        return [
+            'git source, credentials missing' => [
+                'requestParameters' => [
+                    OriginSourceRequest::PARAMETER_TYPE => Type::GIT->value,
+                    GitSourceRequest::PARAMETER_LABEL => $label,
+                    GitSourceRequest::PARAMETER_HOST_URL => $hostUrl,
+                    GitSourceRequest::PARAMETER_PATH => $path
+                ],
+                'expected' => [
+                    'type' => Type::GIT->value,
+                    'label' => $label,
+                    'host_url' => $hostUrl,
+                    'path' => $path,
+                    'has_credentials' => false,
+                ],
+            ],
+            'git source, credentials present' => [
+                'requestParameters' => [
+                    OriginSourceRequest::PARAMETER_TYPE => Type::GIT->value,
+                    GitSourceRequest::PARAMETER_LABEL => $label,
+                    GitSourceRequest::PARAMETER_HOST_URL => $hostUrl,
+                    GitSourceRequest::PARAMETER_PATH => $path,
+                    GitSourceRequest::PARAMETER_CREDENTIALS => $credentials,
+                ],
+                'expected' => [
+                    'type' => Type::GIT->value,
+                    'label' => $label,
+                    'host_url' => $hostUrl,
+                    'path' => $path,
+                    'has_credentials' => true,
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider createFileSourceSuccessDataProvider
+     * @dataProvider createGitSourceSuccessDataProvider
+     *
+     * @param array<string, string> $requestParameters
+     */
+    public function testCreateIsIdempotent(array $requestParameters): void
+    {
         $firstResponse = $this->applicationClient->makeCreateSourceRequest(
             self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
             $requestParameters
@@ -107,14 +157,14 @@ abstract class AbstractCreateFileSourceTest extends AbstractApplicationTest
         self::assertSame($firstResponse->getBody()->getContents(), $secondResponse->getBody()->getContents());
     }
 
-    public function testCreateWithLabelOfDeletedSourceIsSuccessful(): void
+    /**
+     * @dataProvider createFileSourceSuccessDataProvider
+     * @dataProvider createGitSourceSuccessDataProvider
+     *
+     * @param array<string, string> $requestParameters
+     */
+    public function testCreateWithLabelOfDeletedSource(array $requestParameters): void
     {
-        $label = 'file source label';
-        $requestParameters = [
-            OriginSourceRequest::PARAMETER_TYPE => Type::FILE->value,
-            FileSourceRequest::PARAMETER_LABEL => $label,
-        ];
-
         $firstCreateResponse = $this->applicationClient->makeCreateSourceRequest(
             self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
             $requestParameters
@@ -144,5 +194,46 @@ abstract class AbstractCreateFileSourceTest extends AbstractApplicationTest
         $secondCreateResponseData = json_decode($secondCreateResponse->getBody()->getContents(), true);
         \assert(is_array($secondCreateResponseData));
         self::assertNotSame($sourceId, $secondCreateResponseData['id']);
+    }
+
+    public function testCreateGitSourceWithNonUniqueLabel(): void
+    {
+        $label = 'git source label';
+
+        $successfulResponse = $this->applicationClient->makeCreateSourceRequest(
+            self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
+            [
+                OriginSourceRequest::PARAMETER_TYPE => Type::GIT->value,
+                GitSourceRequest::PARAMETER_LABEL => $label,
+                GitSourceRequest::PARAMETER_HOST_URL => md5((string) rand()),
+                GitSourceRequest::PARAMETER_PATH => md5((string) rand()),
+            ]
+        );
+
+        self::assertSame(200, $successfulResponse->getStatusCode());
+
+        $bandRequestResponse = $this->applicationClient->makeCreateSourceRequest(
+            self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
+            [
+                OriginSourceRequest::PARAMETER_TYPE => Type::GIT->value,
+                GitSourceRequest::PARAMETER_LABEL => $label,
+                GitSourceRequest::PARAMETER_HOST_URL => md5((string) rand()),
+                GitSourceRequest::PARAMETER_PATH => md5((string) rand()),
+            ]
+        );
+
+        $this->responseAsserter->assertInvalidRequestJsonResponse(
+            $bandRequestResponse,
+            [
+                'error' => [
+                    'type' => 'invalid_request',
+                    'payload' => [
+                        'name' => 'label',
+                        'value' => $label,
+                        'message' => 'This label is being used by another git source belonging to this user',
+                    ],
+                ],
+            ]
+        );
     }
 }
