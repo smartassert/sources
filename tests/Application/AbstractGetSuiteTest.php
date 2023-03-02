@@ -108,12 +108,11 @@ abstract class AbstractGetSuiteTest extends AbstractApplicationTest
         return [
             'default' => [
                 'suiteCreator' => function (FileSource $source) use ($label, $tests) {
-                    return new Suite(
-                        (new EntityIdFactory())->create(),
-                        $source,
-                        $label,
-                        $tests,
-                    );
+                    $suite = new Suite((new EntityIdFactory())->create(), $source);
+                    $suite->setLabel($label);
+                    $suite->setTests($tests);
+
+                    return $suite;
                 },
                 'expected' => [
                     'label' => $label,
