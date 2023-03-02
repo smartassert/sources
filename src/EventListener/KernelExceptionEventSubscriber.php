@@ -73,9 +73,4 @@ class KernelExceptionEventSubscriber implements EventSubscriberInterface
     {
         return $this->responseFactory->createErrorResponse(new FilesystemExceptionResponse($throwable), 500);
     }
-//
-//    private function handleInvalidSourceTypeException(): Response
-//    {
-//
-//    }
 }
