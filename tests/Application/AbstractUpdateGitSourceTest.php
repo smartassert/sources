@@ -232,44 +232,45 @@ abstract class AbstractUpdateGitSourceTest extends AbstractApplicationTest
         ];
     }
 
-    public function testCreateWithLabelOfDeletedSourceIsSuccessful(): void
+    public function testUpdateNewLabelUsedByDeletedSource(): void
     {
-        $label = 'git source label';
-        $requestParameters = [
-            OriginSourceRequest::PARAMETER_TYPE => Type::GIT->value,
-            GitSourceRequest::PARAMETER_LABEL => $label,
-            GitSourceRequest::PARAMETER_HOST_URL => md5((string) rand()),
-            GitSourceRequest::PARAMETER_PATH => md5((string) rand()),
-        ];
+        $gitSourceRepository = self::getContainer()->get(GitSourceRepository::class);
+        \assert($gitSourceRepository instanceof GitSourceRepository);
 
-        $firstCreateResponse = $this->applicationClient->makeCreateSourceRequest(
+        $source = GitSourceFactory::create(
+            userId: self::$authenticationConfiguration->getUser(self::USER_1_EMAIL)->id,
+            label: 'label1',
+        );
+        $this->sourceRepository->save($source);
+
+        $sourceToBeDeleted = GitSourceFactory::create(
+            userId: self::$authenticationConfiguration->getUser(self::USER_1_EMAIL)->id,
+            label: 'label2',
+        );
+        $this->sourceRepository->save($sourceToBeDeleted);
+
+        self::assertSame(1, $gitSourceRepository->count(['label' => 'label1', 'deletedAt' => null]));
+        self::assertSame(1, $gitSourceRepository->count(['label' => 'label2', 'deletedAt' => null]));
+
+        $this->applicationClient->makeDeleteSourceRequest(
             self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
-            $requestParameters
+            $sourceToBeDeleted->getId(),
         );
 
-        self::assertSame(200, $firstCreateResponse->getStatusCode());
+        self::assertSame(1, $gitSourceRepository->count(['label' => 'label1', 'deletedAt' => null]));
+        self::assertSame(0, $gitSourceRepository->count(['label' => 'label2', 'deletedAt' => null]));
 
-        $firstCreateResponseData = json_decode($firstCreateResponse->getBody()->getContents(), true);
-        \assert(is_array($firstCreateResponseData));
-        $sourceId = $firstCreateResponseData['id'] ?? null;
-        \assert(is_string($sourceId));
-
-        $deleteResponse = $this->applicationClient->makeDeleteSourceRequest(
+        $updateResponse = $this->applicationClient->makeUpdateGitSourceRequest(
             self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
-            $sourceId
+            $source->getId(),
+            [
+                OriginSourceRequest::PARAMETER_TYPE => Type::GIT->value,
+                GitSourceRequest::PARAMETER_LABEL => 'label2',
+                GitSourceRequest::PARAMETER_HOST_URL => $source->getHostUrl(),
+                GitSourceRequest::PARAMETER_PATH => $source->getPath(),
+            ]
         );
 
-        self::assertSame(200, $deleteResponse->getStatusCode());
-
-        $secondCreateResponse = $this->applicationClient->makeCreateSourceRequest(
-            self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
-            $requestParameters
-        );
-
-        self::assertSame(200, $secondCreateResponse->getStatusCode());
-
-        $secondCreateResponseData = json_decode($secondCreateResponse->getBody()->getContents(), true);
-        \assert(is_array($secondCreateResponseData));
-        self::assertNotSame($sourceId, $secondCreateResponseData['id']);
+        self::assertSame(200, $updateResponse->getStatusCode());
     }
 }
