@@ -109,7 +109,7 @@ class Client
 
         return $this->client->makeRequest(
             'PUT',
-            $this->router->generate('user_file_source_update', ['sourceId' => $sourceId]),
+            $this->router->generate('user_source_update', ['sourceId' => $sourceId]),
             $headers,
             http_build_query($payload)
         );
@@ -132,7 +132,7 @@ class Client
 
         return $this->client->makeRequest(
             'PUT',
-            $this->router->generate('user_git_source_update', ['sourceId' => $sourceId]),
+            $this->router->generate('user_source_update', ['sourceId' => $sourceId]),
             $headers,
             http_build_query($payload)
         );

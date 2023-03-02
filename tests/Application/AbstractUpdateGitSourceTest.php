@@ -40,10 +40,24 @@ abstract class AbstractUpdateGitSourceTest extends AbstractApplicationTest
         $response = $this->applicationClient->makeUpdateGitSourceRequest(
             self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
             $source->getId(),
-            []
+            [
+                OriginSourceRequest::PARAMETER_TYPE => 'invalid source type',
+            ]
         );
 
-        $this->responseAsserter->assertNotFoundResponse($response);
+        $this->responseAsserter->assertInvalidRequestJsonResponse(
+            $response,
+            [
+                'error' => [
+                    'type' => 'invalid_request',
+                    'payload' => [
+                        'name' => 'type',
+                        'value' => 'invalid source type',
+                        'message' => 'Source type must be one of: file, git.',
+                    ],
+                ],
+            ]
+        );
     }
 
     /**
