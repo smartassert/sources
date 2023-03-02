@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Services\Suite;
 
 use App\Entity\Suite;
-use App\Exception\NonUniqueSuiteLabelException;
+use App\Exception\NonUniqueEntityLabelException;
 use App\Repository\SuiteRepository;
 use App\Request\SuiteRequest;
 
@@ -17,7 +17,7 @@ class Mutator
     }
 
     /**
-     * @throws NonUniqueSuiteLabelException
+     * @throws NonUniqueEntityLabelException
      */
     public function update(Suite $suite, SuiteRequest $request): Suite
     {
@@ -28,7 +28,7 @@ class Mutator
         ]);
 
         if ($foundSuite instanceof Suite && $foundSuite->id !== $suite->id) {
-            throw new NonUniqueSuiteLabelException();
+            throw new NonUniqueEntityLabelException();
         }
 
         $suite->setLabel($request->label);
