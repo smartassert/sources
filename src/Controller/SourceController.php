@@ -33,10 +33,14 @@ class SourceController
      * @throws EmptyEntityIdException
      * @throws InvalidRequestException
      */
-    #[Route('/git', name: 'git_source_create', methods: ['POST'])]
-    public function createGitSource(User $user, GitSourceRequest $request): JsonResponse
+    #[Route('/source', name: 'source_create', methods: ['POST'])]
+    public function create(User $user, FileSourceRequest|GitSourceRequest $request): JsonResponse
     {
         try {
+            if ($request instanceof FileSourceRequest) {
+                return new JsonResponse($this->fileSourceFactory->create($user, $request));
+            }
+
             return new JsonResponse($this->gitSourceFactory->create($user, $request));
         } catch (NonUniqueEntityLabelException) {
             throw $this->exceptionFactory->createInvalidRequestExceptionForNonUniqueEntityLabel(
@@ -45,16 +49,6 @@ class SourceController
                 'git source'
             );
         }
-    }
-
-    /**
-     * @throws EmptyEntityIdException
-     * @throws NonUniqueEntityLabelException
-     */
-    #[Route('/file', name: 'file_source_create', methods: ['POST'])]
-    public function createFileSource(User $user, FileSourceRequest $request): JsonResponse
-    {
-        return new JsonResponse($this->fileSourceFactory->create($user, $request));
     }
 
     #[Route('/list', name: 'source_list', methods: ['GET'])]

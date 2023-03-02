@@ -57,7 +57,7 @@ class Client
     /**
      * @param array<string, string> $payload
      */
-    public function makeCreateFileSourceRequest(?string $authenticationToken, array $payload): ResponseInterface
+    public function makeCreateSourceRequest(?string $authenticationToken, array $payload): ResponseInterface
     {
         $headers = array_merge(
             $this->createAuthorizationHeader($authenticationToken),
@@ -68,27 +68,7 @@ class Client
 
         return $this->client->makeRequest(
             'POST',
-            $this->router->generate('file_source_create'),
-            $headers,
-            http_build_query($payload)
-        );
-    }
-
-    /**
-     * @param array<string, string> $payload
-     */
-    public function makeCreateGitSourceRequest(?string $authenticationToken, array $payload): ResponseInterface
-    {
-        $headers = array_merge(
-            $this->createAuthorizationHeader($authenticationToken),
-            [
-                'content-type' => 'application/x-www-form-urlencoded',
-            ]
-        );
-
-        return $this->client->makeRequest(
-            'POST',
-            $this->router->generate('git_source_create'),
+            $this->router->generate('source_create'),
             $headers,
             http_build_query($payload)
         );
