@@ -31,7 +31,9 @@ class Factory
         ]);
 
         if (null === $suite) {
-            $suite = new Suite($this->entityIdFactory->create(), $source, $request->label, $request->tests);
+            $suite = new Suite($this->entityIdFactory->create(), $source);
+            $suite->setLabel($request->label);
+            $suite->setTests($request->tests);
 
             $this->repository->save($suite);
         }
