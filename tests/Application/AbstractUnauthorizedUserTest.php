@@ -59,7 +59,7 @@ abstract class AbstractUnauthorizedUserTest extends AbstractApplicationTest
      */
     public function testCreateFileSourceUnauthorizedUser(callable $tokenCreator): void
     {
-        $response = $this->applicationClient->makeCreateFileSourceRequest(
+        $response = $this->applicationClient->makeCreateSourceRequest(
             $tokenCreator(self::$authenticationConfiguration),
             []
         );
@@ -72,7 +72,7 @@ abstract class AbstractUnauthorizedUserTest extends AbstractApplicationTest
      */
     public function testCreateGitSourceUnauthorizedUser(callable $tokenCreator): void
     {
-        $response = $this->applicationClient->makeCreateGitSourceRequest(
+        $response = $this->applicationClient->makeCreateSourceRequest(
             $tokenCreator(self::$authenticationConfiguration),
             []
         );

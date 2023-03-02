@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace App\Tests\DataProvider;
 
 use App\Entity\AbstractOriginSource;
+use App\Enum\Source\Type;
 use App\Request\FileSourceRequest;
+use App\Request\OriginSourceRequest;
 
 trait CreateUpdateFileSourceDataProviderTrait
 {
@@ -18,7 +20,9 @@ trait CreateUpdateFileSourceDataProviderTrait
 
         return [
             'missing label' => [
-                'requestParameters' => [],
+                'requestParameters' => [
+                    OriginSourceRequest::PARAMETER_TYPE => Type::FILE->value,
+                ],
                 'expectedResponseData' => [
                     'error' => [
                         'type' => 'invalid_request',
@@ -32,6 +36,7 @@ trait CreateUpdateFileSourceDataProviderTrait
             ],
             'label length exceeds length limit' => [
                 'requestParameters' => [
+                    OriginSourceRequest::PARAMETER_TYPE => Type::FILE->value,
                     FileSourceRequest::PARAMETER_LABEL => $labelTooLong,
                 ],
                 'expectedResponseData' => [

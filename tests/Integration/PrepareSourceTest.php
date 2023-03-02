@@ -7,6 +7,7 @@ namespace App\Tests\Integration;
 use App\Enum\RunSource\State;
 use App\Enum\Source\Type;
 use App\Request\FileSourceRequest;
+use App\Request\OriginSourceRequest;
 use App\Services\DirectoryListingFilter;
 use App\Tests\Application\AbstractPrepareSourceTest;
 use League\Flysystem\FilesystemOperator;
@@ -33,9 +34,10 @@ class PrepareSourceTest extends AbstractPrepareSourceTest
 
     public function testPrepareFileSource(): void
     {
-        $createResponse = $this->applicationClient->makeCreateFileSourceRequest(
+        $createResponse = $this->applicationClient->makeCreateSourceRequest(
             self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
             [
+                OriginSourceRequest::PARAMETER_TYPE => Type::FILE->value,
                 FileSourceRequest::PARAMETER_LABEL => 'file source label',
             ]
         );

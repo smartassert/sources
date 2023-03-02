@@ -8,6 +8,7 @@ use App\Entity\SourceInterface;
 use App\Enum\Source\Type;
 use App\Repository\SourceRepository;
 use App\Request\GitSourceRequest;
+use App\Request\OriginSourceRequest;
 use App\Tests\DataProvider\CreateUpdateGitSourceDataProviderTrait;
 
 abstract class AbstractCreateGitSourceTest extends AbstractApplicationTest
@@ -22,7 +23,7 @@ abstract class AbstractCreateGitSourceTest extends AbstractApplicationTest
      */
     public function testCreateInvalidSourceRequest(array $requestParameters, array $expectedResponseData): void
     {
-        $response = $this->applicationClient->makeCreateGitSourceRequest(
+        $response = $this->applicationClient->makeCreateSourceRequest(
             self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
             $requestParameters
         );
@@ -38,7 +39,7 @@ abstract class AbstractCreateGitSourceTest extends AbstractApplicationTest
      */
     public function testCreateSuccess(array $requestParameters, array $expected): void
     {
-        $response = $this->applicationClient->makeCreateGitSourceRequest(
+        $response = $this->applicationClient->makeCreateSourceRequest(
             self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
             $requestParameters
         );
@@ -74,6 +75,7 @@ abstract class AbstractCreateGitSourceTest extends AbstractApplicationTest
         return [
             'git source, credentials missing' => [
                 'requestParameters' => [
+                    OriginSourceRequest::PARAMETER_TYPE => Type::GIT->value,
                     GitSourceRequest::PARAMETER_LABEL => $label,
                     GitSourceRequest::PARAMETER_HOST_URL => $hostUrl,
                     GitSourceRequest::PARAMETER_PATH => $path
@@ -88,6 +90,7 @@ abstract class AbstractCreateGitSourceTest extends AbstractApplicationTest
             ],
             'git source, credentials present' => [
                 'requestParameters' => [
+                    OriginSourceRequest::PARAMETER_TYPE => Type::GIT->value,
                     GitSourceRequest::PARAMETER_LABEL => $label,
                     GitSourceRequest::PARAMETER_HOST_URL => $hostUrl,
                     GitSourceRequest::PARAMETER_PATH => $path,
@@ -110,9 +113,10 @@ abstract class AbstractCreateGitSourceTest extends AbstractApplicationTest
         $hostUrl = 'https://example.com/repository.git';
         $path = '/';
 
-        $firstResponse = $this->applicationClient->makeCreateGitSourceRequest(
+        $firstResponse = $this->applicationClient->makeCreateSourceRequest(
             self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
             [
+                OriginSourceRequest::PARAMETER_TYPE => Type::GIT->value,
                 GitSourceRequest::PARAMETER_LABEL => $label,
                 GitSourceRequest::PARAMETER_HOST_URL => $hostUrl,
                 GitSourceRequest::PARAMETER_PATH => $path,
@@ -121,9 +125,10 @@ abstract class AbstractCreateGitSourceTest extends AbstractApplicationTest
 
         self::assertSame(200, $firstResponse->getStatusCode());
 
-        $secondResponse = $this->applicationClient->makeCreateGitSourceRequest(
+        $secondResponse = $this->applicationClient->makeCreateSourceRequest(
             self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
             [
+                OriginSourceRequest::PARAMETER_TYPE => Type::GIT->value,
                 GitSourceRequest::PARAMETER_LABEL => $label,
                 GitSourceRequest::PARAMETER_HOST_URL => $hostUrl,
                 GitSourceRequest::PARAMETER_PATH => $path,
@@ -138,9 +143,10 @@ abstract class AbstractCreateGitSourceTest extends AbstractApplicationTest
     {
         $label = 'git source label';
 
-        $successfulResponse = $this->applicationClient->makeCreateGitSourceRequest(
+        $successfulResponse = $this->applicationClient->makeCreateSourceRequest(
             self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
             [
+                OriginSourceRequest::PARAMETER_TYPE => Type::GIT->value,
                 GitSourceRequest::PARAMETER_LABEL => $label,
                 GitSourceRequest::PARAMETER_HOST_URL => md5((string) rand()),
                 GitSourceRequest::PARAMETER_PATH => md5((string) rand()),
@@ -149,9 +155,10 @@ abstract class AbstractCreateGitSourceTest extends AbstractApplicationTest
 
         self::assertSame(200, $successfulResponse->getStatusCode());
 
-        $bandRequestResponse = $this->applicationClient->makeCreateGitSourceRequest(
+        $bandRequestResponse = $this->applicationClient->makeCreateSourceRequest(
             self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
             [
+                OriginSourceRequest::PARAMETER_TYPE => Type::GIT->value,
                 GitSourceRequest::PARAMETER_LABEL => $label,
                 GitSourceRequest::PARAMETER_HOST_URL => md5((string) rand()),
                 GitSourceRequest::PARAMETER_PATH => md5((string) rand()),

@@ -6,7 +6,9 @@ namespace App\Tests\DataProvider;
 
 use App\Entity\AbstractOriginSource;
 use App\Entity\GitSource;
+use App\Enum\Source\Type;
 use App\Request\GitSourceRequest;
+use App\Request\OriginSourceRequest;
 
 trait CreateUpdateGitSourceDataProviderTrait
 {
@@ -26,6 +28,7 @@ trait CreateUpdateGitSourceDataProviderTrait
         return [
             'missing label' => [
                 'requestParameters' => [
+                    OriginSourceRequest::PARAMETER_TYPE => Type::GIT->value,
                     GitSourceRequest::PARAMETER_HOST_URL => $hostUrl,
                     GitSourceRequest::PARAMETER_PATH => $path,
                 ],
@@ -42,6 +45,7 @@ trait CreateUpdateGitSourceDataProviderTrait
             ],
             'label too long' => [
                 'requestParameters' => [
+                    OriginSourceRequest::PARAMETER_TYPE => Type::GIT->value,
                     GitSourceRequest::PARAMETER_LABEL => $labelTooLong,
                     GitSourceRequest::PARAMETER_HOST_URL => $hostUrl,
                     GitSourceRequest::PARAMETER_PATH => $path,
@@ -59,6 +63,7 @@ trait CreateUpdateGitSourceDataProviderTrait
             ],
             'missing host url' => [
                 'requestParameters' => [
+                    OriginSourceRequest::PARAMETER_TYPE => Type::GIT->value,
                     GitSourceRequest::PARAMETER_LABEL => $label,
                     GitSourceRequest::PARAMETER_PATH => $path,
                 ],
@@ -75,6 +80,7 @@ trait CreateUpdateGitSourceDataProviderTrait
             ],
             'host url too long' => [
                 'requestParameters' => [
+                    OriginSourceRequest::PARAMETER_TYPE => Type::GIT->value,
                     GitSourceRequest::PARAMETER_LABEL => $label,
                     GitSourceRequest::PARAMETER_HOST_URL => $hostUrlTooLong,
                     GitSourceRequest::PARAMETER_PATH => $path,
@@ -92,6 +98,7 @@ trait CreateUpdateGitSourceDataProviderTrait
             ],
             'missing path' => [
                 'requestParameters' => [
+                    OriginSourceRequest::PARAMETER_TYPE => Type::GIT->value,
                     GitSourceRequest::PARAMETER_LABEL => $label,
                     GitSourceRequest::PARAMETER_HOST_URL => $hostUrl,
                 ],
@@ -108,6 +115,7 @@ trait CreateUpdateGitSourceDataProviderTrait
             ],
             'path too long' => [
                 'requestParameters' => [
+                    OriginSourceRequest::PARAMETER_TYPE => Type::GIT->value,
                     GitSourceRequest::PARAMETER_LABEL => $label,
                     GitSourceRequest::PARAMETER_HOST_URL => $hostUrl,
                     GitSourceRequest::PARAMETER_PATH => $pathTooLong,
@@ -125,6 +133,7 @@ trait CreateUpdateGitSourceDataProviderTrait
             ],
             'credentials too long' => [
                 'requestParameters' => [
+                    OriginSourceRequest::PARAMETER_TYPE => Type::GIT->value,
                     GitSourceRequest::PARAMETER_LABEL => $label,
                     GitSourceRequest::PARAMETER_HOST_URL => $hostUrl,
                     GitSourceRequest::PARAMETER_PATH => $path,

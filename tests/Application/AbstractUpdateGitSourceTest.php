@@ -9,6 +9,7 @@ use App\Enum\Source\Type;
 use App\Repository\GitSourceRepository;
 use App\Repository\SourceRepository;
 use App\Request\GitSourceRequest;
+use App\Request\OriginSourceRequest;
 use App\Tests\DataProvider\CreateUpdateGitSourceDataProviderTrait;
 use App\Tests\Services\AuthenticationConfiguration;
 use App\Tests\Services\FileSourceFactory;
@@ -231,12 +232,13 @@ abstract class AbstractUpdateGitSourceTest extends AbstractApplicationTest
     {
         $label = 'git source label';
         $requestParameters = [
+            OriginSourceRequest::PARAMETER_TYPE => Type::GIT->value,
             GitSourceRequest::PARAMETER_LABEL => $label,
             GitSourceRequest::PARAMETER_HOST_URL => md5((string) rand()),
             GitSourceRequest::PARAMETER_PATH => md5((string) rand()),
         ];
 
-        $firstCreateResponse = $this->applicationClient->makeCreateGitSourceRequest(
+        $firstCreateResponse = $this->applicationClient->makeCreateSourceRequest(
             self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
             $requestParameters
         );
@@ -255,7 +257,7 @@ abstract class AbstractUpdateGitSourceTest extends AbstractApplicationTest
 
         self::assertSame(200, $deleteResponse->getStatusCode());
 
-        $secondCreateResponse = $this->applicationClient->makeCreateGitSourceRequest(
+        $secondCreateResponse = $this->applicationClient->makeCreateSourceRequest(
             self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
             $requestParameters
         );

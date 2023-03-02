@@ -8,6 +8,7 @@ use App\Entity\SourceInterface;
 use App\Enum\Source\Type;
 use App\Repository\SourceRepository;
 use App\Request\FileSourceRequest;
+use App\Request\OriginSourceRequest;
 use App\Tests\DataProvider\CreateUpdateFileSourceDataProviderTrait;
 
 abstract class AbstractCreateFileSourceTest extends AbstractApplicationTest
@@ -22,7 +23,7 @@ abstract class AbstractCreateFileSourceTest extends AbstractApplicationTest
      */
     public function testCreateInvalidSourceRequest(array $requestParameters, array $expectedResponseData): void
     {
-        $response = $this->applicationClient->makeCreateFileSourceRequest(
+        $response = $this->applicationClient->makeCreateSourceRequest(
             self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
             $requestParameters
         );
@@ -38,7 +39,7 @@ abstract class AbstractCreateFileSourceTest extends AbstractApplicationTest
      */
     public function testCreateSuccess(array $requestParameters, array $expected): void
     {
-        $response = $this->applicationClient->makeCreateFileSourceRequest(
+        $response = $this->applicationClient->makeCreateSourceRequest(
             self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
             $requestParameters
         );
@@ -71,6 +72,7 @@ abstract class AbstractCreateFileSourceTest extends AbstractApplicationTest
         return [
             'file source' => [
                 'requestParameters' => [
+                    OriginSourceRequest::PARAMETER_TYPE => Type::FILE->value,
                     FileSourceRequest::PARAMETER_LABEL => $label
                 ],
                 'expected' => [
@@ -85,22 +87,21 @@ abstract class AbstractCreateFileSourceTest extends AbstractApplicationTest
     {
         $label = 'file source label';
         $requestParameters = [
+            OriginSourceRequest::PARAMETER_TYPE => Type::FILE->value,
             FileSourceRequest::PARAMETER_LABEL => $label,
         ];
 
-        $firstResponse = $this->applicationClient->makeCreateFileSourceRequest(
+        $firstResponse = $this->applicationClient->makeCreateSourceRequest(
             self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
             $requestParameters
         );
 
         self::assertSame(200, $firstResponse->getStatusCode());
 
-        $secondResponse = $this->applicationClient->makeCreateFileSourceRequest(
+        $secondResponse = $this->applicationClient->makeCreateSourceRequest(
             self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
             $requestParameters
         );
-
-//        echo $secondResponse->getBody()->getContents() . "\n\n";
 
         self::assertSame(200, $secondResponse->getStatusCode());
         self::assertSame($firstResponse->getBody()->getContents(), $secondResponse->getBody()->getContents());
@@ -110,10 +111,11 @@ abstract class AbstractCreateFileSourceTest extends AbstractApplicationTest
     {
         $label = 'file source label';
         $requestParameters = [
+            OriginSourceRequest::PARAMETER_TYPE => Type::FILE->value,
             FileSourceRequest::PARAMETER_LABEL => $label,
         ];
 
-        $firstCreateResponse = $this->applicationClient->makeCreateFileSourceRequest(
+        $firstCreateResponse = $this->applicationClient->makeCreateSourceRequest(
             self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
             $requestParameters
         );
@@ -132,7 +134,7 @@ abstract class AbstractCreateFileSourceTest extends AbstractApplicationTest
 
         self::assertSame(200, $deleteResponse->getStatusCode());
 
-        $secondCreateResponse = $this->applicationClient->makeCreateFileSourceRequest(
+        $secondCreateResponse = $this->applicationClient->makeCreateSourceRequest(
             self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
             $requestParameters
         );
