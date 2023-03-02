@@ -47,21 +47,13 @@ class Suite implements \JsonSerializable, UserHeldEntityInterface
     private ?\DateTimeImmutable $deletedAt = null;
 
     /**
-     * @param non-empty-string             $id
-     * @param non-empty-string             $label
-     * @param array<int, non-empty-string> $tests
+     * @param non-empty-string $id
      */
-    public function __construct(
-        string $id,
-        SourceOriginInterface $source,
-        string $label,
-        array $tests
-    ) {
+    public function __construct(string $id, SourceOriginInterface $source)
+    {
         $this->id = $id;
         $this->userId = $source->getUserId();
         $this->source = $source;
-        $this->label = $label;
-        $this->tests = $tests;
     }
 
     /**
