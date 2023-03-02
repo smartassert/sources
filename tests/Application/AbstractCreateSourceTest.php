@@ -18,6 +18,30 @@ abstract class AbstractCreateSourceTest extends AbstractApplicationTest
     use CreateUpdateFileSourceDataProviderTrait;
     use CreateUpdateGitSourceDataProviderTrait;
 
+    public function testCreateInvalidSourceType(): void
+    {
+        $response = $this->applicationClient->makeCreateSourceRequest(
+            self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
+            [
+                OriginSourceRequest::PARAMETER_TYPE => 'invalid source type',
+            ]
+        );
+
+        $this->responseAsserter->assertInvalidRequestJsonResponse(
+            $response,
+            [
+                'error' => [
+                    'type' => 'invalid_request',
+                    'payload' => [
+                        'name' => 'type',
+                        'value' => 'invalid source type',
+                        'message' => 'Source type must be one of: file, git.',
+                    ],
+                ],
+            ]
+        );
+    }
+
     /**
      * @dataProvider createUpdateFileSourceInvalidRequestDataProvider
      * @dataProvider createUpdateGitSourceInvalidRequestDataProvider

@@ -8,6 +8,7 @@ use App\Enum\Source\Type;
 use App\Repository\FileSourceRepository;
 use App\Repository\SourceRepository;
 use App\Request\FileSourceRequest;
+use App\Request\OriginSourceRequest;
 use App\Tests\DataProvider\CreateUpdateFileSourceDataProviderTrait;
 use App\Tests\Services\FileSourceFactory;
 use App\Tests\Services\GitSourceFactory;
@@ -88,6 +89,7 @@ abstract class AbstractUpdateFileSourceTest extends AbstractApplicationTest
             self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
             $source->getId(),
             [
+                OriginSourceRequest::PARAMETER_TYPE => Type::FILE->value,
                 FileSourceRequest::PARAMETER_LABEL => 'label2',
             ]
         );
@@ -119,6 +121,7 @@ abstract class AbstractUpdateFileSourceTest extends AbstractApplicationTest
             self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
             $source->getId(),
             [
+                OriginSourceRequest::PARAMETER_TYPE => Type::FILE->value,
                 FileSourceRequest::PARAMETER_LABEL => 'new label',
             ]
         );
@@ -166,6 +169,7 @@ abstract class AbstractUpdateFileSourceTest extends AbstractApplicationTest
             self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
             $source->getId(),
             [
+                OriginSourceRequest::PARAMETER_TYPE => Type::FILE->value,
                 FileSourceRequest::PARAMETER_LABEL => 'label2',
             ]
         );

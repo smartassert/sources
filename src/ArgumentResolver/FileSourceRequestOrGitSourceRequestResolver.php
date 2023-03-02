@@ -11,6 +11,7 @@ use App\Request\GitSourceRequest;
 use App\Request\OriginSourceRequest;
 use App\RequestFactory\FileSourceRequestFactory;
 use App\RequestFactory\GitSourceRequestFactory;
+use App\ResponseBody\InvalidField;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Controller\ValueResolverInterface;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
@@ -52,6 +53,13 @@ class FileSourceRequestOrGitSourceRequestResolver implements ValueResolverInterf
             return [$this->gitSourceRequestFactory->create($request)];
         }
 
-        return [];
+        throw new InvalidRequestException(
+            $request,
+            new InvalidField(
+                'type',
+                (string) $sourceType,
+                'Source type must be one of: file, git.'
+            )
+        );
     }
 }

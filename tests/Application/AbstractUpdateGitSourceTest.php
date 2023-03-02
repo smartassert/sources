@@ -92,6 +92,7 @@ abstract class AbstractUpdateGitSourceTest extends AbstractApplicationTest
             self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
             $source->getId(),
             [
+                OriginSourceRequest::PARAMETER_TYPE => Type::GIT->value,
                 GitSourceRequest::PARAMETER_LABEL => 'label2',
                 GitSourceRequest::PARAMETER_HOST_URL => 'https://example.com/' . md5((string) rand()) . '.git',
                 GitSourceRequest::PARAMETER_PATH => md5((string) rand()),
@@ -156,6 +157,7 @@ abstract class AbstractUpdateGitSourceTest extends AbstractApplicationTest
                     );
                 },
                 'payload' => [
+                    OriginSourceRequest::PARAMETER_TYPE => Type::GIT->value,
                     GitSourceRequest::PARAMETER_LABEL => 'new label',
                     GitSourceRequest::PARAMETER_HOST_URL => 'https://example.com/new.git',
                     GitSourceRequest::PARAMETER_PATH => '/new',
@@ -183,6 +185,7 @@ abstract class AbstractUpdateGitSourceTest extends AbstractApplicationTest
                     );
                 },
                 'payload' => [
+                    OriginSourceRequest::PARAMETER_TYPE => Type::GIT->value,
                     GitSourceRequest::PARAMETER_LABEL => 'new label',
                     GitSourceRequest::PARAMETER_HOST_URL => 'https://example.com/new.git',
                     GitSourceRequest::PARAMETER_PATH => '/new',
@@ -209,6 +212,7 @@ abstract class AbstractUpdateGitSourceTest extends AbstractApplicationTest
                     );
                 },
                 'payload' => [
+                    OriginSourceRequest::PARAMETER_TYPE => Type::GIT->value,
                     GitSourceRequest::PARAMETER_LABEL => 'original label',
                     GitSourceRequest::PARAMETER_HOST_URL => 'https://example.com/new.git',
                     GitSourceRequest::PARAMETER_PATH => '/new',

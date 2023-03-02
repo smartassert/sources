@@ -7,7 +7,9 @@ namespace App\Tests\Application;
 use App\Entity\FileSource;
 use App\Entity\GitSource;
 use App\Entity\RunSource;
+use App\Enum\Source\Type;
 use App\Repository\SourceRepository;
+use App\Request\OriginSourceRequest;
 use App\Services\EntityIdFactory;
 use App\Tests\Services\FileSourceFactory;
 use App\Tests\Services\GitSourceFactory;
@@ -87,6 +89,7 @@ abstract class AbstractInvalidSourceUserTest extends AbstractApplicationTest
             self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
             $this->fileSource->getId(),
             [
+                OriginSourceRequest::PARAMETER_TYPE => Type::FILE->value,
                 'label' => 'non-empty label',
             ]
         );
@@ -100,6 +103,7 @@ abstract class AbstractInvalidSourceUserTest extends AbstractApplicationTest
             self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
             $this->gitSource->getId(),
             [
+                OriginSourceRequest::PARAMETER_TYPE => Type::GIT->value,
                 'label' => 'non-empty label',
                 'host-url' => 'https://example.com/repository.git',
                 'path' => '/',
