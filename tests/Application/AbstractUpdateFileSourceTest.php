@@ -37,7 +37,7 @@ abstract class AbstractUpdateFileSourceTest extends AbstractApplicationTest
 
         $this->sourceRepository->save($source);
 
-        $response = $this->applicationClient->makeUpdateFileSourceRequest(
+        $response = $this->applicationClient->makeUpdateSourceRequest(
             self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
             $source->getId(),
             [
@@ -77,7 +77,7 @@ abstract class AbstractUpdateFileSourceTest extends AbstractApplicationTest
 
         $this->sourceRepository->save($source);
 
-        $response = $this->applicationClient->makeUpdateFileSourceRequest(
+        $response = $this->applicationClient->makeUpdateSourceRequest(
             self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
             $source->getId(),
             $payload
@@ -117,7 +117,7 @@ abstract class AbstractUpdateFileSourceTest extends AbstractApplicationTest
 
         self::assertSame(200, $conflictCreateResponse->getStatusCode());
 
-        $updateResponse = $this->applicationClient->makeUpdateFileSourceRequest(
+        $updateResponse = $this->applicationClient->makeUpdateSourceRequest(
             self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
             $sourceId,
             $updateParameters
@@ -191,7 +191,7 @@ abstract class AbstractUpdateFileSourceTest extends AbstractApplicationTest
         );
         $this->sourceRepository->save($source);
 
-        $response = $this->applicationClient->makeUpdateFileSourceRequest(
+        $response = $this->applicationClient->makeUpdateSourceRequest(
             self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
             $source->getId(),
             [
@@ -241,7 +241,7 @@ abstract class AbstractUpdateFileSourceTest extends AbstractApplicationTest
         self::assertSame(1, $fileSourceRepository->count(['label' => 'label1', 'deletedAt' => null]));
         self::assertSame(0, $fileSourceRepository->count(['label' => 'label2', 'deletedAt' => null]));
 
-        $updateResponse = $this->applicationClient->makeUpdateFileSourceRequest(
+        $updateResponse = $this->applicationClient->makeUpdateSourceRequest(
             self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
             $source->getId(),
             [

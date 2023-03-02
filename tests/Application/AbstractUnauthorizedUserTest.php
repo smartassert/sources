@@ -97,7 +97,7 @@ abstract class AbstractUnauthorizedUserTest extends AbstractApplicationTest
      */
     public function testUpdateFileSourceUnauthorizedUser(callable $tokenCreator): void
     {
-        $response = $this->applicationClient->makeUpdateFileSourceRequest(
+        $response = $this->applicationClient->makeUpdateSourceRequest(
             $tokenCreator(self::$authenticationConfiguration),
             (new EntityIdFactory())->create(),
             []
@@ -111,7 +111,7 @@ abstract class AbstractUnauthorizedUserTest extends AbstractApplicationTest
      */
     public function testUpdateGitSourceUnauthorizedUser(callable $tokenCreator): void
     {
-        $response = $this->applicationClient->makeUpdateGitSourceRequest(
+        $response = $this->applicationClient->makeUpdateSourceRequest(
             $tokenCreator(self::$authenticationConfiguration),
             (new EntityIdFactory())->create(),
             []

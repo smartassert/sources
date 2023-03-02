@@ -37,7 +37,7 @@ abstract class AbstractUpdateGitSourceTest extends AbstractApplicationTest
         );
         $this->sourceRepository->save($source);
 
-        $response = $this->applicationClient->makeUpdateGitSourceRequest(
+        $response = $this->applicationClient->makeUpdateSourceRequest(
             self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
             $source->getId(),
             [
@@ -74,7 +74,7 @@ abstract class AbstractUpdateGitSourceTest extends AbstractApplicationTest
         );
         $this->sourceRepository->save($source);
 
-        $response = $this->applicationClient->makeUpdateGitSourceRequest(
+        $response = $this->applicationClient->makeUpdateSourceRequest(
             self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
             $source->getId(),
             $payload
@@ -114,7 +114,7 @@ abstract class AbstractUpdateGitSourceTest extends AbstractApplicationTest
 
         self::assertSame(200, $conflictCreateResponse->getStatusCode());
 
-        $updateResponse = $this->applicationClient->makeUpdateGitSourceRequest(
+        $updateResponse = $this->applicationClient->makeUpdateSourceRequest(
             self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
             $sourceId,
             $updateParameters
@@ -202,7 +202,7 @@ abstract class AbstractUpdateGitSourceTest extends AbstractApplicationTest
         $source = $sourceCreator(self::$authenticationConfiguration);
         $this->sourceRepository->save($source);
 
-        $response = $this->applicationClient->makeUpdateGitSourceRequest(
+        $response = $this->applicationClient->makeUpdateSourceRequest(
             self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
             $source->getId(),
             $payload

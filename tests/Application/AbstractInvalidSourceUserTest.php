@@ -89,7 +89,7 @@ abstract class AbstractInvalidSourceUserTest extends AbstractApplicationTest
 
     public function testUpdateFileSourceInvalidUser(): void
     {
-        $response = $this->applicationClient->makeUpdateFileSourceRequest(
+        $response = $this->applicationClient->makeUpdateSourceRequest(
             self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
             $this->fileSource->getId(),
             [
@@ -103,7 +103,7 @@ abstract class AbstractInvalidSourceUserTest extends AbstractApplicationTest
 
     public function testUpdateGitSourceInvalidUser(): void
     {
-        $response = $this->applicationClient->makeUpdateGitSourceRequest(
+        $response = $this->applicationClient->makeUpdateSourceRequest(
             self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
             $this->gitSource->getId(),
             [
