@@ -220,34 +220,31 @@ abstract class AbstractCreateSourceTest extends AbstractApplicationTest
         self::assertNotSame($sourceId, $secondCreateResponseData['id']);
     }
 
-    public function testCreateGitSourceWithNonUniqueLabel(): void
-    {
-        $label = 'git source label';
-
-        $successfulResponse = $this->applicationClient->makeCreateSourceRequest(
+    /**
+     * @dataProvider createSourceWithNonUniqueLabelDataProvider
+     *
+     * @param array<string, string> $targetCreateParameters
+     * @param array<string, string> $conflictCreateParameters
+     */
+    public function testCreateSourceWithNonUniqueLabel(
+        string $label,
+        array $targetCreateParameters,
+        array $conflictCreateParameters,
+    ): void {
+        $firstRequestResponse = $this->applicationClient->makeCreateSourceRequest(
             self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
-            [
-                OriginSourceRequest::PARAMETER_TYPE => Type::GIT->value,
-                GitSourceRequest::PARAMETER_LABEL => $label,
-                GitSourceRequest::PARAMETER_HOST_URL => md5((string) rand()),
-                GitSourceRequest::PARAMETER_PATH => md5((string) rand()),
-            ]
+            $targetCreateParameters
         );
 
-        self::assertSame(200, $successfulResponse->getStatusCode());
+        self::assertSame(200, $firstRequestResponse->getStatusCode());
 
-        $bandRequestResponse = $this->applicationClient->makeCreateSourceRequest(
+        $secondRequestResponse = $this->applicationClient->makeCreateSourceRequest(
             self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
-            [
-                OriginSourceRequest::PARAMETER_TYPE => Type::GIT->value,
-                GitSourceRequest::PARAMETER_LABEL => $label,
-                GitSourceRequest::PARAMETER_HOST_URL => md5((string) rand()),
-                GitSourceRequest::PARAMETER_PATH => md5((string) rand()),
-            ]
+            $conflictCreateParameters
         );
 
         $this->responseAsserter->assertInvalidRequestJsonResponse(
-            $bandRequestResponse,
+            $secondRequestResponse,
             [
                 'error' => [
                     'type' => 'invalid_request',
@@ -259,5 +256,57 @@ abstract class AbstractCreateSourceTest extends AbstractApplicationTest
                 ],
             ]
         );
+    }
+
+    /**
+     * @return array<mixed>
+     */
+    public function createSourceWithNonUniqueLabelDataProvider(): array
+    {
+        $label = md5((string) rand());
+
+        return [
+            'file source with label of git source' => [
+                'label' => $label,
+                'targetCreateParameters' => [
+                    OriginSourceRequest::PARAMETER_TYPE => Type::GIT->value,
+                    GitSourceRequest::PARAMETER_LABEL => $label,
+                    GitSourceRequest::PARAMETER_HOST_URL => md5((string) rand()),
+                    GitSourceRequest::PARAMETER_PATH => md5((string) rand()),
+                ],
+                'conflictCreateParameters' => [
+                    OriginSourceRequest::PARAMETER_TYPE => Type::FILE->value,
+                    GitSourceRequest::PARAMETER_LABEL => $label,
+                ],
+            ],
+            'git source with label of file source' => [
+                'label' => $label,
+                'targetCreateParameters' => [
+                    OriginSourceRequest::PARAMETER_TYPE => Type::FILE->value,
+                    GitSourceRequest::PARAMETER_LABEL => $label,
+                ],
+                'conflictCreateParameters' => [
+                    OriginSourceRequest::PARAMETER_TYPE => Type::GIT->value,
+                    GitSourceRequest::PARAMETER_LABEL => $label,
+                    GitSourceRequest::PARAMETER_HOST_URL => md5((string) rand()),
+                    GitSourceRequest::PARAMETER_PATH => md5((string) rand()),
+                ],
+            ],
+            'git source with label of git source' => [
+                'label' => $label,
+                'targetCreateParameters' => [
+                    OriginSourceRequest::PARAMETER_TYPE => Type::GIT->value,
+                    GitSourceRequest::PARAMETER_LABEL => $label,
+                    GitSourceRequest::PARAMETER_HOST_URL => md5((string) rand()),
+                    GitSourceRequest::PARAMETER_PATH => md5((string) rand()),
+                ],
+                'conflictCreateParameters' => [
+                    OriginSourceRequest::PARAMETER_TYPE => Type::GIT->value,
+                    GitSourceRequest::PARAMETER_LABEL => $label,
+                    GitSourceRequest::PARAMETER_HOST_URL => md5((string) rand()),
+                    GitSourceRequest::PARAMETER_PATH => md5((string) rand()),
+                ],
+            ],
+        ];
     }
 }
