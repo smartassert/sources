@@ -13,7 +13,7 @@ use App\Repository\SuiteRepository;
 use App\Request\FileSourceRequest;
 use App\Request\OriginSourceRequest;
 use App\Services\EntityIdFactory;
-use App\Tests\Services\FileSourceFactory;
+use App\Tests\Services\SourceOriginFactory;
 
 abstract class AbstractInvalidSuiteUserTest extends AbstractApplicationTest
 {
@@ -33,7 +33,10 @@ abstract class AbstractInvalidSuiteUserTest extends AbstractApplicationTest
 
         $idFactory = new EntityIdFactory();
 
-        $this->inaccessibleSource = FileSourceFactory::create(label: 'inaccessible source');
+        $inaccessibleSource = SourceOriginFactory::create(type: 'file', label: 'inaccessible source');
+        \assert($inaccessibleSource instanceof FileSource);
+        $this->inaccessibleSource = $inaccessibleSource;
+
         $sourceRepository = self::getContainer()->get(SourceRepository::class);
         \assert($sourceRepository instanceof SourceRepository);
         $sourceRepository->save($this->inaccessibleSource);
