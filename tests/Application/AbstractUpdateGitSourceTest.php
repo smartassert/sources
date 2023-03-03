@@ -29,37 +29,6 @@ abstract class AbstractUpdateGitSourceTest extends AbstractApplicationTest
         $this->sourceRepository = $sourceRepository;
     }
 
-    public function testUpdateInvalidSourceType(): void
-    {
-        $source = SourceOriginFactory::create(
-            type: 'file',
-            userId: self::$authenticationConfiguration->getUser(self::USER_1_EMAIL)->id
-        );
-        $this->sourceRepository->save($source);
-
-        $response = $this->applicationClient->makeUpdateSourceRequest(
-            self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
-            $source->getId(),
-            [
-                OriginSourceRequest::PARAMETER_TYPE => 'invalid source type',
-            ]
-        );
-
-        $this->responseAsserter->assertInvalidRequestJsonResponse(
-            $response,
-            [
-                'error' => [
-                    'type' => 'invalid_request',
-                    'payload' => [
-                        'name' => 'type',
-                        'value' => 'invalid source type',
-                        'message' => 'Source type must be one of: file, git.',
-                    ],
-                ],
-            ]
-        );
-    }
-
     /**
      * @dataProvider createUpdateGitSourceInvalidRequestDataProvider
      *
@@ -157,7 +126,6 @@ abstract class AbstractUpdateGitSourceTest extends AbstractApplicationTest
                     GitSourceRequest::PARAMETER_LABEL => $conflictSourceLabel,
                 ],
                 'updateParameters' => [
-                    OriginSourceRequest::PARAMETER_TYPE => Type::GIT->value,
                     GitSourceRequest::PARAMETER_LABEL => $conflictSourceLabel,
                     GitSourceRequest::PARAMETER_HOST_URL => md5((string) rand()),
                     GitSourceRequest::PARAMETER_PATH => md5((string) rand()),
@@ -178,7 +146,6 @@ abstract class AbstractUpdateGitSourceTest extends AbstractApplicationTest
                     GitSourceRequest::PARAMETER_PATH => md5((string) rand()),
                 ],
                 'updateParameters' => [
-                    OriginSourceRequest::PARAMETER_TYPE => Type::GIT->value,
                     GitSourceRequest::PARAMETER_LABEL => $conflictSourceLabel,
                     GitSourceRequest::PARAMETER_HOST_URL => md5((string) rand()),
                     GitSourceRequest::PARAMETER_PATH => md5((string) rand()),
@@ -231,7 +198,6 @@ abstract class AbstractUpdateGitSourceTest extends AbstractApplicationTest
                     );
                 },
                 'payload' => [
-                    OriginSourceRequest::PARAMETER_TYPE => Type::GIT->value,
                     GitSourceRequest::PARAMETER_LABEL => 'new label',
                     GitSourceRequest::PARAMETER_HOST_URL => 'https://example.com/new.git',
                     GitSourceRequest::PARAMETER_PATH => '/new',
@@ -260,7 +226,6 @@ abstract class AbstractUpdateGitSourceTest extends AbstractApplicationTest
                     );
                 },
                 'payload' => [
-                    OriginSourceRequest::PARAMETER_TYPE => Type::GIT->value,
                     GitSourceRequest::PARAMETER_LABEL => 'new label',
                     GitSourceRequest::PARAMETER_HOST_URL => 'https://example.com/new.git',
                     GitSourceRequest::PARAMETER_PATH => '/new',
@@ -288,7 +253,6 @@ abstract class AbstractUpdateGitSourceTest extends AbstractApplicationTest
                     );
                 },
                 'payload' => [
-                    OriginSourceRequest::PARAMETER_TYPE => Type::GIT->value,
                     GitSourceRequest::PARAMETER_LABEL => 'original label',
                     GitSourceRequest::PARAMETER_HOST_URL => 'https://example.com/new.git',
                     GitSourceRequest::PARAMETER_PATH => '/new',
@@ -339,11 +303,10 @@ abstract class AbstractUpdateGitSourceTest extends AbstractApplicationTest
         self::assertSame(1, $gitSourceRepository->count(['label' => 'label1', 'deletedAt' => null]));
         self::assertSame(0, $gitSourceRepository->count(['label' => 'label2', 'deletedAt' => null]));
 
-        $updateResponse = $this->applicationClient->makeUpdateGitSourceRequest(
+        $updateResponse = $this->applicationClient->makeUpdateSourceRequest(
             self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
             $source->getId(),
             [
-                OriginSourceRequest::PARAMETER_TYPE => Type::GIT->value,
                 GitSourceRequest::PARAMETER_LABEL => 'label2',
                 GitSourceRequest::PARAMETER_HOST_URL => $source->getHostUrl(),
                 GitSourceRequest::PARAMETER_PATH => $source->getPath(),

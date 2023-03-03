@@ -28,38 +28,6 @@ abstract class AbstractUpdateFileSourceTest extends AbstractApplicationTest
         $this->sourceRepository = $sourceRepository;
     }
 
-    public function testUpdateInvalidSourceType(): void
-    {
-        $source = SourceOriginFactory::create(
-            type: 'git',
-            userId: self::$authenticationConfiguration->getUser(self::USER_1_EMAIL)->id
-        );
-
-        $this->sourceRepository->save($source);
-
-        $response = $this->applicationClient->makeUpdateSourceRequest(
-            self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
-            $source->getId(),
-            [
-                OriginSourceRequest::PARAMETER_TYPE => 'invalid source type',
-            ]
-        );
-
-        $this->responseAsserter->assertInvalidRequestJsonResponse(
-            $response,
-            [
-                'error' => [
-                    'type' => 'invalid_request',
-                    'payload' => [
-                        'name' => 'type',
-                        'value' => 'invalid source type',
-                        'message' => 'Source type must be one of: file, git.',
-                    ],
-                ],
-            ]
-        );
-    }
-
     /**
      * @dataProvider createUpdateFileSourceInvalidRequestDataProvider
      *
@@ -160,7 +128,6 @@ abstract class AbstractUpdateFileSourceTest extends AbstractApplicationTest
                     GitSourceRequest::PARAMETER_PATH => md5((string) rand()),
                 ],
                 'updateParameters' => [
-                    OriginSourceRequest::PARAMETER_TYPE => Type::FILE->value,
                     GitSourceRequest::PARAMETER_LABEL => $conflictSourceLabel,
                 ],
             ],
@@ -175,7 +142,6 @@ abstract class AbstractUpdateFileSourceTest extends AbstractApplicationTest
                     GitSourceRequest::PARAMETER_LABEL => $conflictSourceLabel,
                 ],
                 'updateParameters' => [
-                    OriginSourceRequest::PARAMETER_TYPE => Type::FILE->value,
                     GitSourceRequest::PARAMETER_LABEL => $conflictSourceLabel,
                 ],
             ],
@@ -195,7 +161,6 @@ abstract class AbstractUpdateFileSourceTest extends AbstractApplicationTest
             self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
             $source->getId(),
             [
-                OriginSourceRequest::PARAMETER_TYPE => Type::FILE->value,
                 FileSourceRequest::PARAMETER_LABEL => 'new label',
             ]
         );
@@ -245,7 +210,6 @@ abstract class AbstractUpdateFileSourceTest extends AbstractApplicationTest
             self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
             $source->getId(),
             [
-                OriginSourceRequest::PARAMETER_TYPE => Type::FILE->value,
                 FileSourceRequest::PARAMETER_LABEL => 'label2',
             ]
         );
