@@ -12,6 +12,7 @@ use App\Repository\SuiteRepository;
 use App\Request\FileSourceRequest;
 use App\Request\OriginSourceRequest;
 use App\Services\EntityIdFactory;
+use App\Tests\Services\SuiteFactory;
 
 abstract class AbstractGetSuiteTest extends AbstractApplicationTest
 {
@@ -111,11 +112,7 @@ abstract class AbstractGetSuiteTest extends AbstractApplicationTest
         return [
             'default' => [
                 'suiteCreator' => function (FileSource $source) use ($label, $tests) {
-                    $suite = new Suite((new EntityIdFactory())->create(), $source);
-                    $suite->setLabel($label);
-                    $suite->setTests($tests);
-
-                    return $suite;
+                    return SuiteFactory::create(source: $source, label: $label, tests: $tests);
                 },
                 'expected' => [
                     'label' => $label,

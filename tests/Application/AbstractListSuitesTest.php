@@ -12,7 +12,7 @@ use App\Repository\FileSourceRepository;
 use App\Repository\SuiteRepository;
 use App\Request\FileSourceRequest;
 use App\Request\OriginSourceRequest;
-use App\Services\EntityIdFactory;
+use App\Tests\Services\SuiteFactory;
 
 abstract class AbstractListSuitesTest extends AbstractApplicationTest
 {
@@ -82,8 +82,6 @@ abstract class AbstractListSuitesTest extends AbstractApplicationTest
      */
     public function listSuccessDataProvider(): array
     {
-        $entityIdFactory = new EntityIdFactory();
-
         return [
             'no suites' => [
                 'suitesCreator' => function () {
@@ -92,13 +90,9 @@ abstract class AbstractListSuitesTest extends AbstractApplicationTest
                 'expectedResponseData' => [],
             ],
             'single suite' => [
-                'suitesCreator' => function (SourceOriginInterface $source) use ($entityIdFactory) {
-                    $suite = new Suite($entityIdFactory->create(), $source);
-                    $suite->setLabel('suite1');
-                    $suite->setTests(['test1.yaml']);
-
+                'suitesCreator' => function (SourceOriginInterface $source) {
                     return [
-                        'suite1' => $suite,
+                        'suite1' => SuiteFactory::create($source, 'suite1', ['test1.yaml']),
                     ];
                 },
                 'expectedResponseData' => [
@@ -109,23 +103,11 @@ abstract class AbstractListSuitesTest extends AbstractApplicationTest
                 ],
             ],
             'multiple suites, are ordered by label' => [
-                'suitesCreator' => function (SourceOriginInterface $source) use ($entityIdFactory) {
-                    $appleSuite = new Suite($entityIdFactory->create(), $source);
-                    $appleSuite->setLabel('apple');
-                    $appleSuite->setTests(['test1.yaml', 'test2.yaml']);
-
-                    $batSuite = new Suite($entityIdFactory->create(), $source);
-                    $batSuite->setLabel('bat');
-                    $batSuite->setTests(['test2.yaml', 'test3.yaml']);
-
-                    $zebraSuite = new Suite($entityIdFactory->create(), $source);
-                    $zebraSuite->setLabel('zebra');
-                    $zebraSuite->setTests(['test1.yaml']);
-
+                'suitesCreator' => function (SourceOriginInterface $source) {
                     return [
-                        'zebra' => $zebraSuite,
-                        'apple' => $appleSuite,
-                        'bat' => $batSuite,
+                        'zebra' => SuiteFactory::create($source, 'zebra', ['test1.yaml']),
+                        'apple' => SuiteFactory::create($source, 'apple', ['test1.yaml', 'test2.yaml']),
+                        'bat' => SuiteFactory::create($source, 'bat', ['test2.yaml', 'test3.yaml']),
                     ];
                 },
                 'expectedResponseData' => [
