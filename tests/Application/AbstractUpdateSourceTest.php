@@ -4,18 +4,23 @@ declare(strict_types=1);
 
 namespace App\Tests\Application;
 
+use App\Entity\FileSource;
 use App\Entity\GitSource;
+use App\Entity\SourceOriginInterface;
 use App\Enum\Source\Type;
-use App\Repository\GitSourceRepository;
 use App\Repository\SourceRepository;
+use App\Request\FileSourceRequest;
 use App\Request\GitSourceRequest;
 use App\Request\OriginSourceRequest;
+use App\Tests\DataProvider\CreateUpdateFileSourceDataProviderTrait;
 use App\Tests\DataProvider\CreateUpdateGitSourceDataProviderTrait;
 use App\Tests\Services\AuthenticationConfiguration;
+use App\Tests\Services\EntityRemover;
 use App\Tests\Services\SourceOriginFactory;
 
-abstract class AbstractUpdateGitSourceTest extends AbstractApplicationTest
+abstract class AbstractUpdateSourceTest extends AbstractApplicationTest
 {
+    use CreateUpdateFileSourceDataProviderTrait;
     use CreateUpdateGitSourceDataProviderTrait;
 
     private SourceRepository $sourceRepository;
@@ -27,40 +32,31 @@ abstract class AbstractUpdateGitSourceTest extends AbstractApplicationTest
         $sourceRepository = self::getContainer()->get(SourceRepository::class);
         \assert($sourceRepository instanceof SourceRepository);
         $this->sourceRepository = $sourceRepository;
-    }
 
-    public function testUpdateInvalidSourceType(): void
-    {
-        $source = SourceOriginFactory::create(
-            type: 'file',
-            userId: self::$authenticationConfiguration->getUser(self::USER_1_EMAIL)->id
-        );
-        $this->sourceRepository->save($source);
-
-        $response = $this->applicationClient->makeUpdateGitSourceRequest(
-            self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
-            $source->getId(),
-            []
-        );
-
-        $this->responseAsserter->assertNotFoundResponse($response);
+        $entityRemover = self::getContainer()->get(EntityRemover::class);
+        \assert($entityRemover instanceof EntityRemover);
+        $entityRemover->removeAll();
     }
 
     /**
+     * @dataProvider createUpdateFileSourceInvalidRequestDataProvider
      * @dataProvider createUpdateGitSourceInvalidRequestDataProvider
      *
      * @param array<string, string> $payload
      * @param array<mixed>          $expectedResponseData
      */
-    public function testUpdateInvalidRequest(array $payload, array $expectedResponseData): void
-    {
+    public function testUpdateInvalidRequest(
+        array $payload,
+        array $expectedResponseData
+    ): void {
         $source = SourceOriginFactory::create(
-            type: 'git',
+            type: $payload['type'] ?? '',
             userId: self::$authenticationConfiguration->getUser(self::USER_1_EMAIL)->id
         );
+
         $this->sourceRepository->save($source);
 
-        $response = $this->applicationClient->makeUpdateGitSourceRequest(
+        $response = $this->applicationClient->makeUpdateSourceRequest(
             self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
             $source->getId(),
             $payload
@@ -100,7 +96,7 @@ abstract class AbstractUpdateGitSourceTest extends AbstractApplicationTest
 
         self::assertSame(200, $conflictCreateResponse->getStatusCode());
 
-        $updateResponse = $this->applicationClient->makeUpdateGitSourceRequest(
+        $updateResponse = $this->applicationClient->makeUpdateSourceRequest(
             self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
             $sourceId,
             $updateParameters
@@ -130,6 +126,36 @@ abstract class AbstractUpdateGitSourceTest extends AbstractApplicationTest
         $conflictSourceLabel = md5((string) rand());
 
         return [
+            'file source with label of git source' => [
+                'conflictSourceLabel' => $conflictSourceLabel,
+                'targetCreateParameters' => [
+                    OriginSourceRequest::PARAMETER_TYPE => Type::FILE->value,
+                    GitSourceRequest::PARAMETER_LABEL => $targetSourceLabel,
+                ],
+                'conflictCreateParameters' => [
+                    OriginSourceRequest::PARAMETER_TYPE => Type::GIT->value,
+                    GitSourceRequest::PARAMETER_LABEL => $conflictSourceLabel,
+                    GitSourceRequest::PARAMETER_HOST_URL => md5((string) rand()),
+                    GitSourceRequest::PARAMETER_PATH => md5((string) rand()),
+                ],
+                'updateParameters' => [
+                    GitSourceRequest::PARAMETER_LABEL => $conflictSourceLabel,
+                ],
+            ],
+            'file source with label of file source' => [
+                'conflictSourceLabel' => $conflictSourceLabel,
+                'targetCreateParameters' => [
+                    OriginSourceRequest::PARAMETER_TYPE => Type::FILE->value,
+                    GitSourceRequest::PARAMETER_LABEL => $targetSourceLabel,
+                ],
+                'conflictCreateParameters' => [
+                    OriginSourceRequest::PARAMETER_TYPE => Type::FILE->value,
+                    GitSourceRequest::PARAMETER_LABEL => $conflictSourceLabel,
+                ],
+                'updateParameters' => [
+                    GitSourceRequest::PARAMETER_LABEL => $conflictSourceLabel,
+                ],
+            ],
             'git source with label of file source' => [
                 'conflictSourceLabel' => $conflictSourceLabel,
                 'targetCreateParameters' => [
@@ -143,7 +169,6 @@ abstract class AbstractUpdateGitSourceTest extends AbstractApplicationTest
                     GitSourceRequest::PARAMETER_LABEL => $conflictSourceLabel,
                 ],
                 'updateParameters' => [
-                    OriginSourceRequest::PARAMETER_TYPE => Type::GIT->value,
                     GitSourceRequest::PARAMETER_LABEL => $conflictSourceLabel,
                     GitSourceRequest::PARAMETER_HOST_URL => md5((string) rand()),
                     GitSourceRequest::PARAMETER_PATH => md5((string) rand()),
@@ -164,7 +189,6 @@ abstract class AbstractUpdateGitSourceTest extends AbstractApplicationTest
                     GitSourceRequest::PARAMETER_PATH => md5((string) rand()),
                 ],
                 'updateParameters' => [
-                    OriginSourceRequest::PARAMETER_TYPE => Type::GIT->value,
                     GitSourceRequest::PARAMETER_LABEL => $conflictSourceLabel,
                     GitSourceRequest::PARAMETER_HOST_URL => md5((string) rand()),
                     GitSourceRequest::PARAMETER_PATH => md5((string) rand()),
@@ -173,12 +197,40 @@ abstract class AbstractUpdateGitSourceTest extends AbstractApplicationTest
         ];
     }
 
+//    public function testUpdateSuccess(): void
+//    {
+//        $source = SourceOriginFactory::create(
+//            type: 'file',
+//            userId: self::$authenticationConfiguration->getUser(self::USER_1_EMAIL)->id,
+//            label: 'original label'
+//        );
+//        $this->sourceRepository->save($source);
+//
+//        $response = $this->applicationClient->makeUpdateSourceRequest(
+//            self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
+//            $source->getId(),
+//            [
+//                FileSourceRequest::PARAMETER_LABEL => 'new label',
+//            ]
+//        );
+//
+//        $this->responseAsserter->assertSuccessfulJsonResponse(
+//            $response,
+//            [
+//                'id' => $source->getId(),
+//                'user_id' => $source->getUserId(),
+//                'type' => Type::FILE->value,
+//                'label' => 'new label',
+//            ]
+//        );
+//    }
+
     /**
      * @dataProvider updateSourceSuccessDataProvider
      *
-     * @param callable(AuthenticationConfiguration $authenticationConfiguration): GitSource $sourceCreator
-     * @param array<string, string> $payload
-     * @param callable(GitSource $source): array<mixed> $expectedResponseDataCreator
+     * @param callable(AuthenticationConfiguration): SourceOriginInterface $sourceCreator
+     * @param array<string, string>                                        $payload
+     * @param callable(SourceOriginInterface): array<mixed>                $expectedResponseDataCreator
      */
     public function testUpdateSuccess(
         callable $sourceCreator,
@@ -188,7 +240,7 @@ abstract class AbstractUpdateGitSourceTest extends AbstractApplicationTest
         $source = $sourceCreator(self::$authenticationConfiguration);
         $this->sourceRepository->save($source);
 
-        $response = $this->applicationClient->makeUpdateGitSourceRequest(
+        $response = $this->applicationClient->makeUpdateSourceRequest(
             self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
             $source->getId(),
             $payload
@@ -205,7 +257,7 @@ abstract class AbstractUpdateGitSourceTest extends AbstractApplicationTest
     public function updateSourceSuccessDataProvider(): array
     {
         return [
-            Type::GIT->value . ' credentials present and empty' => [
+            'git source, credentials present and empty' => [
                 'sourceCreator' => function (AuthenticationConfiguration $authenticationConfiguration) {
                     return SourceOriginFactory::create(
                         type: 'git',
@@ -217,7 +269,6 @@ abstract class AbstractUpdateGitSourceTest extends AbstractApplicationTest
                     );
                 },
                 'payload' => [
-                    OriginSourceRequest::PARAMETER_TYPE => Type::GIT->value,
                     GitSourceRequest::PARAMETER_LABEL => 'new label',
                     GitSourceRequest::PARAMETER_HOST_URL => 'https://example.com/new.git',
                     GitSourceRequest::PARAMETER_PATH => '/new',
@@ -235,7 +286,7 @@ abstract class AbstractUpdateGitSourceTest extends AbstractApplicationTest
                     ];
                 },
             ],
-            Type::GIT->value . ' credentials not present' => [
+            'git source, credentials not present' => [
                 'sourceCreator' => function (AuthenticationConfiguration $authenticationConfiguration) {
                     return SourceOriginFactory::create(
                         type: 'git',
@@ -246,7 +297,6 @@ abstract class AbstractUpdateGitSourceTest extends AbstractApplicationTest
                     );
                 },
                 'payload' => [
-                    OriginSourceRequest::PARAMETER_TYPE => Type::GIT->value,
                     GitSourceRequest::PARAMETER_LABEL => 'new label',
                     GitSourceRequest::PARAMETER_HOST_URL => 'https://example.com/new.git',
                     GitSourceRequest::PARAMETER_PATH => '/new',
@@ -263,7 +313,7 @@ abstract class AbstractUpdateGitSourceTest extends AbstractApplicationTest
                     ];
                 },
             ],
-            Type::GIT->value . ' update all but the label' => [
+            'git source, update all but the label' => [
                 'sourceCreator' => function (AuthenticationConfiguration $authenticationConfiguration) {
                     return SourceOriginFactory::create(
                         type: 'git',
@@ -274,7 +324,6 @@ abstract class AbstractUpdateGitSourceTest extends AbstractApplicationTest
                     );
                 },
                 'payload' => [
-                    OriginSourceRequest::PARAMETER_TYPE => Type::GIT->value,
                     GitSourceRequest::PARAMETER_LABEL => 'original label',
                     GitSourceRequest::PARAMETER_HOST_URL => 'https://example.com/new.git',
                     GitSourceRequest::PARAMETER_PATH => '/new',
@@ -291,51 +340,150 @@ abstract class AbstractUpdateGitSourceTest extends AbstractApplicationTest
                     ];
                 },
             ],
+            'file source' => [
+                'sourceCreator' => function (AuthenticationConfiguration $authenticationConfiguration) {
+                    return SourceOriginFactory::create(
+                        type: 'file',
+                        userId: $authenticationConfiguration->getUser(self::USER_1_EMAIL)->id,
+                        label: 'original label',
+                    );
+                },
+                'payload' => [
+                    FileSourceRequest::PARAMETER_LABEL => 'new label',
+                ],
+                'expectedResponseDataCreator' => function (FileSource $source) {
+                    return [
+                        'id' => $source->getId(),
+                        'user_id' => $source->getUserId(),
+                        'type' => Type::FILE->value,
+                        'label' => 'new label',
+                    ];
+                },
+            ],
         ];
     }
 
-    public function testUpdateNewLabelUsedByDeletedSource(): void
-    {
-        $gitSourceRepository = self::getContainer()->get(GitSourceRepository::class);
-        \assert($gitSourceRepository instanceof GitSourceRepository);
+    /**
+     * @dataProvider updateNewLabelUsedByDeletedSourceDataProvider
+     *
+     * @param callable(AuthenticationConfiguration): SourceOriginInterface $targetSourceCreator
+     * @param callable(AuthenticationConfiguration): SourceOriginInterface $deletedSourceCreator
+     * @param array<string, string>                                        $additionalUpdateParameters
+     */
+    public function testUpdateNewLabelUsedByDeletedSource(
+        callable $targetSourceCreator,
+        callable $deletedSourceCreator,
+        array $additionalUpdateParameters,
+    ): void {
+        $sourceRepository = self::getContainer()->get(SourceRepository::class);
+        \assert($sourceRepository instanceof SourceRepository);
 
-        $source = SourceOriginFactory::create(
-            type: 'git',
-            userId: self::$authenticationConfiguration->getUser(self::USER_1_EMAIL)->id,
-            label: 'label1',
-        );
+        $source = $targetSourceCreator(self::$authenticationConfiguration);
         $this->sourceRepository->save($source);
-        \assert($source instanceof GitSource);
 
-        $sourceToBeDeleted = SourceOriginFactory::create(
-            type: 'git',
-            userId: self::$authenticationConfiguration->getUser(self::USER_1_EMAIL)->id,
-            label: 'label2',
-        );
-        $this->sourceRepository->save($sourceToBeDeleted);
-
-        self::assertSame(1, $gitSourceRepository->count(['label' => 'label1', 'deletedAt' => null]));
-        self::assertSame(1, $gitSourceRepository->count(['label' => 'label2', 'deletedAt' => null]));
+        $deletedSource = $deletedSourceCreator(self::$authenticationConfiguration);
+        \assert($deletedSource instanceof FileSource || $deletedSource instanceof GitSource);
+        $this->sourceRepository->save($deletedSource);
 
         $this->applicationClient->makeDeleteSourceRequest(
             self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
-            $sourceToBeDeleted->getId(),
+            $deletedSource->getId(),
         );
 
-        self::assertSame(1, $gitSourceRepository->count(['label' => 'label1', 'deletedAt' => null]));
-        self::assertSame(0, $gitSourceRepository->count(['label' => 'label2', 'deletedAt' => null]));
-
-        $updateResponse = $this->applicationClient->makeUpdateGitSourceRequest(
+        $updateResponse = $this->applicationClient->makeUpdateSourceRequest(
             self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
             $source->getId(),
-            [
-                OriginSourceRequest::PARAMETER_TYPE => Type::GIT->value,
-                GitSourceRequest::PARAMETER_LABEL => 'label2',
-                GitSourceRequest::PARAMETER_HOST_URL => $source->getHostUrl(),
-                GitSourceRequest::PARAMETER_PATH => $source->getPath(),
-            ]
+            array_merge(
+                [
+                    'label' => $deletedSource->getLabel(),
+                ],
+                $additionalUpdateParameters
+            )
         );
 
         self::assertSame(200, $updateResponse->getStatusCode());
+    }
+
+    /**
+     * @return array<mixed>
+     */
+    public function updateNewLabelUsedByDeletedSourceDataProvider(): array
+    {
+        return [
+            'file source using label of deleted file source' => [
+                'targetSourceCreator' => function (AuthenticationConfiguration $authenticationConfiguration) {
+                    return SourceOriginFactory::create(
+                        type: 'file',
+                        userId: $authenticationConfiguration->getUser(self::USER_1_EMAIL)->id,
+                        label: 'label1',
+                    );
+                },
+                'deletedSourceCreator' => function (AuthenticationConfiguration $authenticationConfiguration) {
+                    return SourceOriginFactory::create(
+                        type: 'file',
+                        userId: $authenticationConfiguration->getUser(self::USER_1_EMAIL)->id,
+                        label: 'label2',
+                    );
+                },
+                'additionalUpdateParameters' => [],
+            ],
+            'file source using label of deleted git source' => [
+                'targetSourceCreator' => function (AuthenticationConfiguration $authenticationConfiguration) {
+                    return SourceOriginFactory::create(
+                        type: 'file',
+                        userId: $authenticationConfiguration->getUser(self::USER_1_EMAIL)->id,
+                        label: 'label1',
+                    );
+                },
+                'deletedSourceCreator' => function (AuthenticationConfiguration $authenticationConfiguration) {
+                    return SourceOriginFactory::create(
+                        type: 'git',
+                        userId: $authenticationConfiguration->getUser(self::USER_1_EMAIL)->id,
+                        label: 'label2',
+                    );
+                },
+                'additionalUpdateParameters' => [],
+            ],
+            'git source using label of deleted file source' => [
+                'targetSourceCreator' => function (AuthenticationConfiguration $authenticationConfiguration) {
+                    return SourceOriginFactory::create(
+                        type: 'git',
+                        userId: $authenticationConfiguration->getUser(self::USER_1_EMAIL)->id,
+                        label: 'label1',
+                    );
+                },
+                'deletedSourceCreator' => function (AuthenticationConfiguration $authenticationConfiguration) {
+                    return SourceOriginFactory::create(
+                        type: 'file',
+                        userId: $authenticationConfiguration->getUser(self::USER_1_EMAIL)->id,
+                        label: 'label2',
+                    );
+                },
+                'additionalUpdateParameters' => [
+                    GitSourceRequest::PARAMETER_HOST_URL => md5((string) rand()),
+                    GitSourceRequest::PARAMETER_PATH => md5((string) rand()),
+                ],
+            ],
+            'git source using label of deleted git source' => [
+                'targetSourceCreator' => function (AuthenticationConfiguration $authenticationConfiguration) {
+                    return SourceOriginFactory::create(
+                        type: 'git',
+                        userId: $authenticationConfiguration->getUser(self::USER_1_EMAIL)->id,
+                        label: 'label1',
+                    );
+                },
+                'deletedSourceCreator' => function (AuthenticationConfiguration $authenticationConfiguration) {
+                    return SourceOriginFactory::create(
+                        type: 'git',
+                        userId: $authenticationConfiguration->getUser(self::USER_1_EMAIL)->id,
+                        label: 'label2',
+                    );
+                },
+                'additionalUpdateParameters' => [
+                    GitSourceRequest::PARAMETER_HOST_URL => md5((string) rand()),
+                    GitSourceRequest::PARAMETER_PATH => md5((string) rand()),
+                ],
+            ],
+        ];
     }
 }

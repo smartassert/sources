@@ -53,17 +53,23 @@ class UserSourceController
      * @throws AccessDeniedException
      * @throws InvalidRequestException
      */
-    #[Route(SourceRoutes::ROUTE_SOURCE . '/file', name: 'user_file_source_update', methods: ['PUT'])]
-    public function updateFile(
+    #[Route(SourceRoutes::ROUTE_SOURCE, name: 'user_source_update', methods: ['PUT'])]
+    public function update(
         Mutator $mutator,
-        FileSource $source,
-        FileSourceRequest $request,
+        SourceOriginInterface $source,
+        FileSourceRequest|GitSourceRequest $request,
         ExceptionFactory $exceptionFactory,
     ): Response {
         $this->userSourceAccessChecker->denyAccessUnlessGranted($source);
 
         try {
-            return new JsonResponse($mutator->updateFile($source, $request));
+            if ($request instanceof FileSourceRequest && $source instanceof FileSource) {
+                $source = $mutator->updateFile($source, $request);
+            }
+
+            if ($request instanceof GitSourceRequest && $source instanceof GitSource) {
+                $source = $mutator->updateGit($source, $request);
+            }
         } catch (NonUniqueEntityLabelException) {
             throw $exceptionFactory->createInvalidRequestExceptionForNonUniqueEntityLabel(
                 $request,
@@ -71,30 +77,8 @@ class UserSourceController
                 'source'
             );
         }
-    }
 
-    /**
-     * @throws AccessDeniedException
-     * @throws InvalidRequestException
-     */
-    #[Route(SourceRoutes::ROUTE_SOURCE . '/git', name: 'user_git_source_update', methods: ['PUT'])]
-    public function updateGit(
-        Mutator $mutator,
-        GitSource $source,
-        GitSourceRequest $request,
-        ExceptionFactory $exceptionFactory,
-    ): Response {
-        $this->userSourceAccessChecker->denyAccessUnlessGranted($source);
-
-        try {
-            return new JsonResponse($mutator->updateGit($source, $request));
-        } catch (NonUniqueEntityLabelException) {
-            throw $exceptionFactory->createInvalidRequestExceptionForNonUniqueEntityLabel(
-                $request,
-                $request->label,
-                'source'
-            );
-        }
+        return new JsonResponse($source);
     }
 
     /**

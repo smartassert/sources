@@ -4,8 +4,11 @@ declare(strict_types=1);
 
 namespace App\ArgumentResolver;
 
+use App\Entity\FileSource;
+use App\Entity\GitSource;
 use App\Enum\Source\Type;
 use App\Exception\InvalidRequestException;
+use App\Repository\SourceRepository;
 use App\Request\FileSourceRequest;
 use App\Request\GitSourceRequest;
 use App\Request\OriginSourceRequest;
@@ -21,6 +24,7 @@ class FileSourceRequestOrGitSourceRequestResolver implements ValueResolverInterf
     public function __construct(
         private readonly FileSourceRequestFactory $fileSourceRequestFactory,
         private readonly GitSourceRequestFactory $gitSourceRequestFactory,
+        private readonly SourceRepository $sourceRepository,
     ) {
     }
 
@@ -43,8 +47,7 @@ class FileSourceRequestOrGitSourceRequestResolver implements ValueResolverInterf
             return [];
         }
 
-        $sourceType = $request->request->get(OriginSourceRequest::PARAMETER_TYPE);
-
+        $sourceType = $this->getRequestSourceType($request);
         if (Type::FILE->value === $sourceType) {
             return [$this->fileSourceRequestFactory->create($request)];
         }
@@ -61,5 +64,23 @@ class FileSourceRequestOrGitSourceRequestResolver implements ValueResolverInterf
                 'Source type must be one of: file, git.'
             )
         );
+    }
+
+    private function getRequestSourceType(Request $request): string
+    {
+        $sourceId = $request->attributes->get('sourceId');
+        if (is_string($sourceId)) {
+            $source = $this->sourceRepository->find($sourceId);
+
+            if ($source instanceof FileSource) {
+                return Type::FILE->value;
+            }
+
+            if ($source instanceof GitSource) {
+                return Type::GIT->value;
+            }
+        }
+
+        return (string) $request->request->get(OriginSourceRequest::PARAMETER_TYPE);
     }
 }
