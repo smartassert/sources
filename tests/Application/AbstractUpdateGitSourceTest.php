@@ -107,7 +107,7 @@ abstract class AbstractUpdateGitSourceTest extends AbstractApplicationTest
                     'payload' => [
                         'name' => 'label',
                         'value' => 'label2',
-                        'message' => 'This label is being used by another git source belonging to this user',
+                        'message' => 'This label is being used by another source belonging to this user',
                     ],
                 ],
             ]
