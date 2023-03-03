@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace App\Security;
 
-use App\Entity\SourceInterface;
+use App\Entity\UserHeldEntityInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 use Symfony\Component\Security\Core\User\UserInterface;
 
-class SourceAccessVoter extends Voter
+class EntityAccessVoter extends Voter
 {
     public const ACCESS = 'access';
 
@@ -19,7 +19,7 @@ class SourceAccessVoter extends Voter
             return false;
         }
 
-        if (!$subject instanceof SourceInterface) {
+        if (!$subject instanceof UserHeldEntityInterface) {
             return false;
         }
 
@@ -34,6 +34,6 @@ class SourceAccessVoter extends Voter
             return false;
         }
 
-        return $subject instanceof SourceInterface && $subject->getUserId() === $user->getUserIdentifier();
+        return $subject instanceof UserHeldEntityInterface && $subject->getUserId() === $user->getUserIdentifier();
     }
 }
