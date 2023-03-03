@@ -11,8 +11,7 @@ use App\Enum\Source\Type;
 use App\Repository\SourceRepository;
 use App\Request\OriginSourceRequest;
 use App\Services\EntityIdFactory;
-use App\Tests\Services\FileSourceFactory;
-use App\Tests\Services\GitSourceFactory;
+use App\Tests\Services\SourceOriginFactory;
 
 abstract class AbstractInvalidSourceUserTest extends AbstractApplicationTest
 {
@@ -25,8 +24,13 @@ abstract class AbstractInvalidSourceUserTest extends AbstractApplicationTest
     {
         parent::setUp();
 
-        $this->fileSource = FileSourceFactory::create();
-        $this->gitSource = GitSourceFactory::create();
+        $fileSource = SourceOriginFactory::create(type: 'file');
+        \assert($fileSource instanceof FileSource);
+        $this->fileSource = $fileSource;
+
+        $gitSource = SourceOriginFactory::create(type: 'git');
+        \assert($gitSource instanceof GitSource);
+        $this->gitSource = $gitSource;
 
         $this->gitSource->setLabel('git source label');
         $this->gitSource->setHostUrl('http://example.com/repo.git');

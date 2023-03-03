@@ -8,8 +8,8 @@ use App\Entity\RunSource;
 use App\Repository\SourceRepository;
 use App\Services\EntityIdFactory;
 use App\Services\RunSourceSerializer;
-use App\Tests\Services\FileSourceFactory;
 use App\Tests\Services\FileStoreFixtureCreator;
+use App\Tests\Services\SourceOriginFactory;
 use League\Flysystem\FilesystemOperator;
 
 abstract class AbstractReadSourceTest extends AbstractApplicationTest
@@ -41,8 +41,9 @@ abstract class AbstractReadSourceTest extends AbstractApplicationTest
 
         $idFactory = new EntityIdFactory();
 
-        $fileSource = FileSourceFactory::create(
-            self::$authenticationConfiguration->getUser(self::USER_1_EMAIL)->id
+        $fileSource = SourceOriginFactory::create(
+            type: 'file',
+            userId: self::$authenticationConfiguration->getUser(self::USER_1_EMAIL)->id
         );
 
         $runSource = new RunSource($idFactory->create(), $fileSource);

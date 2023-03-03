@@ -11,8 +11,7 @@ use App\Request\FileSourceRequest;
 use App\Request\GitSourceRequest;
 use App\Request\OriginSourceRequest;
 use App\Tests\DataProvider\CreateUpdateFileSourceDataProviderTrait;
-use App\Tests\Services\FileSourceFactory;
-use App\Tests\Services\GitSourceFactory;
+use App\Tests\Services\SourceOriginFactory;
 
 abstract class AbstractUpdateFileSourceTest extends AbstractApplicationTest
 {
@@ -31,7 +30,8 @@ abstract class AbstractUpdateFileSourceTest extends AbstractApplicationTest
 
     public function testUpdateInvalidSourceType(): void
     {
-        $source = GitSourceFactory::create(
+        $source = SourceOriginFactory::create(
+            type: 'git',
             userId: self::$authenticationConfiguration->getUser(self::USER_1_EMAIL)->id
         );
 
@@ -56,7 +56,8 @@ abstract class AbstractUpdateFileSourceTest extends AbstractApplicationTest
         array $payload,
         array $expectedResponseData
     ): void {
-        $source = FileSourceFactory::create(
+        $source = SourceOriginFactory::create(
+            type: 'file',
             userId: self::$authenticationConfiguration->getUser(self::USER_1_EMAIL)->id
         );
 
@@ -169,7 +170,8 @@ abstract class AbstractUpdateFileSourceTest extends AbstractApplicationTest
 
     public function testUpdateSuccess(): void
     {
-        $source = FileSourceFactory::create(
+        $source = SourceOriginFactory::create(
+            type: 'file',
             userId: self::$authenticationConfiguration->getUser(self::USER_1_EMAIL)->id,
             label: 'original label'
         );
@@ -200,13 +202,15 @@ abstract class AbstractUpdateFileSourceTest extends AbstractApplicationTest
         $fileSourceRepository = self::getContainer()->get(FileSourceRepository::class);
         \assert($fileSourceRepository instanceof FileSourceRepository);
 
-        $source = FileSourceFactory::create(
+        $source = SourceOriginFactory::create(
+            type: 'file',
             userId: self::$authenticationConfiguration->getUser(self::USER_1_EMAIL)->id,
             label: 'label1',
         );
         $this->sourceRepository->save($source);
 
-        $sourceToBeDeleted = FileSourceFactory::create(
+        $sourceToBeDeleted = SourceOriginFactory::create(
+            type: 'file',
             userId: self::$authenticationConfiguration->getUser(self::USER_1_EMAIL)->id,
             label: 'label2',
         );

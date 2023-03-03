@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Application;
 
+use App\Entity\FileSource;
 use App\Entity\RunSource;
 use App\Entity\SourceInterface;
 use App\Repository\SourceRepository;
@@ -11,8 +12,7 @@ use App\Services\EntityIdFactory;
 use App\Services\RunSourceSerializer;
 use App\Tests\Services\AuthenticationConfiguration;
 use App\Tests\Services\EntityRemover;
-use App\Tests\Services\FileSourceFactory;
-use App\Tests\Services\GitSourceFactory;
+use App\Tests\Services\SourceOriginFactory;
 use Doctrine\ORM\EntityManagerInterface;
 use League\Flysystem\FilesystemOperator;
 
@@ -85,15 +85,17 @@ abstract class AbstractDeleteSourceTest extends AbstractApplicationTest
         return [
             'file source without run source' => [
                 'sourceCreator' => function (AuthenticationConfiguration $authenticationConfiguration) {
-                    return FileSourceFactory::create(
-                        $authenticationConfiguration->getUser(self::USER_1_EMAIL)->id
+                    return SourceOriginFactory::create(
+                        type: 'file',
+                        userId: $authenticationConfiguration->getUser(self::USER_1_EMAIL)->id
                     );
                 },
             ],
             'git source without run source' => [
                 'sourceCreator' => function (AuthenticationConfiguration $authenticationConfiguration) {
-                    return GitSourceFactory::create(
-                        $authenticationConfiguration->getUser(self::USER_1_EMAIL)->id
+                    return SourceOriginFactory::create(
+                        type: 'git',
+                        userId: $authenticationConfiguration->getUser(self::USER_1_EMAIL)->id
                     );
                 },
             ],
@@ -101,8 +103,9 @@ abstract class AbstractDeleteSourceTest extends AbstractApplicationTest
                 'sourceCreator' => function (AuthenticationConfiguration $authenticationConfiguration) {
                     return new RunSource(
                         (new EntityIdFactory())->create(),
-                        FileSourceFactory::create(
-                            $authenticationConfiguration->getUser(self::USER_1_EMAIL)->id
+                        SourceOriginFactory::create(
+                            type: 'file',
+                            userId: $authenticationConfiguration->getUser(self::USER_1_EMAIL)->id
                         )
                     );
                 },
@@ -111,8 +114,9 @@ abstract class AbstractDeleteSourceTest extends AbstractApplicationTest
                 'sourceCreator' => function (AuthenticationConfiguration $authenticationConfiguration) {
                     return new RunSource(
                         (new EntityIdFactory())->create(),
-                        GitSourceFactory::create(
-                            $authenticationConfiguration->getUser(self::USER_1_EMAIL)->id
+                        SourceOriginFactory::create(
+                            type: 'git',
+                            userId: $authenticationConfiguration->getUser(self::USER_1_EMAIL)->id
                         )
                     );
                 },
@@ -125,8 +129,9 @@ abstract class AbstractDeleteSourceTest extends AbstractApplicationTest
         $runSourceStorage = self::getContainer()->get('run_source.storage');
         \assert($runSourceStorage instanceof FilesystemOperator);
 
-        $fileSource = FileSourceFactory::create(
-            self::$authenticationConfiguration->getUser(self::USER_1_EMAIL)->id
+        $fileSource = SourceOriginFactory::create(
+            type: 'file',
+            userId: self::$authenticationConfiguration->getUser(self::USER_1_EMAIL)->id
         );
 
         $runSource = new RunSource((new EntityIdFactory())->create(), $fileSource);
@@ -156,10 +161,12 @@ abstract class AbstractDeleteSourceTest extends AbstractApplicationTest
         $fileSourceStorage = self::getContainer()->get('file_source.storage');
         \assert($fileSourceStorage instanceof FilesystemOperator);
 
-        $fileSource = FileSourceFactory::create(
-            self::$authenticationConfiguration->getUser(self::USER_1_EMAIL)->id,
-            'file source label',
+        $fileSource = SourceOriginFactory::create(
+            type: 'file',
+            userId: self::$authenticationConfiguration->getUser(self::USER_1_EMAIL)->id,
+            label: 'file source label',
         );
+        \assert($fileSource instanceof FileSource);
 
         $this->sourceRepository->save($fileSource);
 

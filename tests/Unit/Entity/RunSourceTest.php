@@ -10,7 +10,7 @@ use App\Enum\RunSource\State;
 use App\Enum\Source\Type;
 use App\Services\EntityIdFactory;
 use App\Tests\Model\UserId;
-use App\Tests\Services\FileSourceFactory;
+use App\Tests\Services\SourceOriginFactory;
 use PHPUnit\Framework\TestCase;
 
 class RunSourceTest extends TestCase
@@ -38,7 +38,7 @@ class RunSourceTest extends TestCase
             'key2' => 'value2',
         ];
 
-        $parent = FileSourceFactory::create($userId);
+        $parent = SourceOriginFactory::create(type: 'file', userId: $userId);
 
         $withoutParameters = new RunSource($idFactory->create(), $parent);
         $withParameters = new RunSource($idFactory->create(), $parent, $parameters);

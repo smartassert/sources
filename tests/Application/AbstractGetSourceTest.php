@@ -14,8 +14,7 @@ use App\Enum\Source\Type;
 use App\Repository\SourceRepository;
 use App\Services\EntityIdFactory;
 use App\Tests\Services\AuthenticationConfiguration;
-use App\Tests\Services\FileSourceFactory;
-use App\Tests\Services\GitSourceFactory;
+use App\Tests\Services\SourceOriginFactory;
 
 abstract class AbstractGetSourceTest extends AbstractApplicationTest
 {
@@ -61,7 +60,8 @@ abstract class AbstractGetSourceTest extends AbstractApplicationTest
         return [
             'git source with credentials' => [
                 'sourceCreator' => function (AuthenticationConfiguration $authenticationConfiguration) {
-                    return GitSourceFactory::create(
+                    return SourceOriginFactory::create(
+                        type: 'git',
                         userId: $authenticationConfiguration->getUser(self::USER_1_EMAIL)->id,
                         credentials: md5((string) rand()),
                     );
@@ -80,7 +80,8 @@ abstract class AbstractGetSourceTest extends AbstractApplicationTest
             ],
             'git source without credentials' => [
                 'sourceCreator' => function (AuthenticationConfiguration $authenticationConfiguration) {
-                    return GitSourceFactory::create(
+                    return SourceOriginFactory::create(
+                        type: 'git',
                         userId: $authenticationConfiguration->getUser(self::USER_1_EMAIL)->id,
                     );
                 },
@@ -98,7 +99,8 @@ abstract class AbstractGetSourceTest extends AbstractApplicationTest
             ],
             'file' => [
                 'sourceCreator' => function (AuthenticationConfiguration $authenticationConfiguration) {
-                    return FileSourceFactory::create(
+                    return SourceOriginFactory::create(
+                        type: 'file',
                         userId: $authenticationConfiguration->getUser(self::USER_1_EMAIL)->id,
                     );
                 },
@@ -113,7 +115,8 @@ abstract class AbstractGetSourceTest extends AbstractApplicationTest
             ],
             'run' => [
                 'sourceCreator' => function (AuthenticationConfiguration $authenticationConfiguration) {
-                    $parent = FileSourceFactory::create(
+                    $parent = SourceOriginFactory::create(
+                        type: 'file',
                         userId: $authenticationConfiguration->getUser(self::USER_1_EMAIL)->id
                     );
 
@@ -132,7 +135,8 @@ abstract class AbstractGetSourceTest extends AbstractApplicationTest
             ],
             'run, preparation failed' => [
                 'sourceCreator' => function (AuthenticationConfiguration $authenticationConfiguration) {
-                    $parent = FileSourceFactory::create(
+                    $parent = SourceOriginFactory::create(
+                        type: 'file',
                         userId: $authenticationConfiguration->getUser(self::USER_1_EMAIL)->id
                     );
 

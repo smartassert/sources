@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\Services;
 
+use App\Entity\FileSource;
 use App\Services\DirectoryListingFilter;
-use App\Tests\Services\FileSourceFactory;
 use App\Tests\Services\FileStoreFixtureCreator;
+use App\Tests\Services\SourceOriginFactory;
 use League\Flysystem\FilesystemOperator;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
@@ -62,7 +63,10 @@ class DirectoryListingFilterTest extends WebTestCase
      */
     public function listDataProvider(): array
     {
-        $basePath = FileSourceFactory::create()->getDirectoryPath();
+        $source = SourceOriginFactory::create(type: 'file');
+        \assert($source instanceof FileSource);
+
+        $basePath = $source->getDirectoryPath();
 
         return [
             'source: txt, no extensions' => [

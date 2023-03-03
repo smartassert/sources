@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\Services\YamlFileCollection;
 
+use App\Entity\FileSource;
 use App\Services\YamlFileCollection\Factory;
-use App\Tests\Services\FileSourceFactory;
 use App\Tests\Services\FileStoreFixtureCreator;
+use App\Tests\Services\SourceOriginFactory;
 use League\Flysystem\FilesystemOperator;
 use SmartAssert\YamlFile\YamlFile;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -67,7 +68,10 @@ class ProviderTest extends WebTestCase
      */
     public function getYamlFilesSuccessDataProvider(): array
     {
-        $basePath = FileSourceFactory::create()->getDirectoryPath();
+        $source = SourceOriginFactory::create(type: 'file');
+        \assert($source instanceof FileSource);
+
+        $basePath = $source->getDirectoryPath();
 
         return [
             'source: txt' => [
