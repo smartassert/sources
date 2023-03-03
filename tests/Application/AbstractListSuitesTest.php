@@ -7,9 +7,11 @@ namespace App\Tests\Application;
 use App\Entity\FileSource;
 use App\Entity\SourceOriginInterface;
 use App\Entity\Suite;
+use App\Enum\Source\Type;
 use App\Repository\FileSourceRepository;
 use App\Repository\SuiteRepository;
 use App\Request\FileSourceRequest;
+use App\Request\OriginSourceRequest;
 use App\Services\EntityIdFactory;
 
 abstract class AbstractListSuitesTest extends AbstractApplicationTest
@@ -21,9 +23,10 @@ abstract class AbstractListSuitesTest extends AbstractApplicationTest
     {
         parent::setUp();
 
-        $createSourceResponse = $this->applicationClient->makeCreateFileSourceRequest(
+        $createSourceResponse = $this->applicationClient->makeCreateSourceRequest(
             self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
             [
+                OriginSourceRequest::PARAMETER_TYPE => Type::FILE->value,
                 FileSourceRequest::PARAMETER_LABEL => 'label',
             ]
         );

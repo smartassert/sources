@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Tests\Application;
 
+use App\Enum\Source\Type;
 use App\Request\FileSourceRequest;
+use App\Request\OriginSourceRequest;
 
 abstract class AbstractSuiteTest extends AbstractApplicationTest
 {
@@ -21,9 +23,10 @@ abstract class AbstractSuiteTest extends AbstractApplicationTest
     {
         $label = is_string($label) ? $label : md5((string) rand());
 
-        $createSourceResponse = $this->applicationClient->makeCreateFileSourceRequest(
+        $createSourceResponse = $this->applicationClient->makeCreateSourceRequest(
             self::$authenticationConfiguration->getValidApiToken($userEmail),
             [
+                OriginSourceRequest::PARAMETER_TYPE => Type::FILE->value,
                 FileSourceRequest::PARAMETER_LABEL => $label,
             ]
         );
