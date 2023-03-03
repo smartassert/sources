@@ -17,6 +17,7 @@ use App\Security\EntityAccessChecker;
 use App\Services\ExceptionFactory;
 use App\Services\Suite\Factory;
 use App\Services\Suite\Mutator;
+use SmartAssert\UsersSecurityBundle\Security\User;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -61,14 +62,12 @@ class SuiteController
     /**
      * @throws AccessDeniedException
      */
-    #[Route(SuiteRoutes::ROUTE_SUITE_BASE, name: 'user_suite_list', methods: ['GET'])]
-    public function list(SourceOriginInterface $source): Response
+    #[Route(SuiteRoutes::ROUTE_SUITES, name: 'user_suite_list', methods: ['GET'])]
+    public function list(User $user): Response
     {
-        $this->entityAccessChecker->denyAccessUnlessGranted($source);
-
         $suites = $this->repository->findBy(
             [
-                'userId' => $source->getUserId(),
+                'userId' => $user->getUserIdentifier(),
                 'deletedAt' => null,
             ],
             [

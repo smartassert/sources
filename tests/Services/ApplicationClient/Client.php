@@ -234,11 +234,11 @@ class Client
         );
     }
 
-    public function makeListSuitesRequest(?string $authenticationToken, string $sourceId): ResponseInterface
+    public function makeListSuitesRequest(?string $authenticationToken): ResponseInterface
     {
         return $this->client->makeRequest(
             'GET',
-            $this->router->generate('user_suite_list', ['sourceId' => $sourceId]),
+            $this->router->generate('user_suite_list'),
             $this->createAuthorizationHeader($authenticationToken),
         );
     }
