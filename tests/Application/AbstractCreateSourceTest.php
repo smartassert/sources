@@ -254,7 +254,7 @@ abstract class AbstractCreateSourceTest extends AbstractApplicationTest
                     'payload' => [
                         'name' => 'label',
                         'value' => $label,
-                        'message' => 'This label is being used by another git source belonging to this user',
+                        'message' => 'This label is being used by another source belonging to this user',
                     ],
                 ],
             ]

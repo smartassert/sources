@@ -102,7 +102,7 @@ abstract class AbstractUpdateFileSourceTest extends AbstractApplicationTest
                     'payload' => [
                         'name' => 'label',
                         'value' => 'label2',
-                        'message' => 'This label is being used by another file source belonging to this user',
+                        'message' => 'This label is being used by another source belonging to this user',
                     ],
                 ],
             ]

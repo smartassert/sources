@@ -46,7 +46,7 @@ class SourceController
             throw $this->exceptionFactory->createInvalidRequestExceptionForNonUniqueEntityLabel(
                 $request,
                 $request->label,
-                'git source'
+                'source'
             );
         }
     }

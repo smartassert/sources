@@ -68,7 +68,7 @@ class UserSourceController
             throw $exceptionFactory->createInvalidRequestExceptionForNonUniqueEntityLabel(
                 $request,
                 $request->label,
-                'file source'
+                'source'
             );
         }
     }
@@ -92,7 +92,7 @@ class UserSourceController
             throw $exceptionFactory->createInvalidRequestExceptionForNonUniqueEntityLabel(
                 $request,
                 $request->label,
-                'git source'
+                'source'
             );
         }
     }
