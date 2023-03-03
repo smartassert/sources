@@ -27,16 +27,24 @@ class Mutator
      */
     public function updateFile(FileSource $source, FileSourceRequest $request): FileSource
     {
-        $foundSource = $this->fileSourceRepository->findOneBy(
+        $gitSource = $this->gitSourceRepository->findOneBy(
             $this->createFindCriteria($source->getUserId(), $request->label)
         );
 
-        if ($foundSource instanceof FileSource) {
+        if ($gitSource instanceof GitSource) {
+            throw new NonUniqueEntityLabelException();
+        }
+
+        $fileSource = $this->fileSourceRepository->findOneBy(
+            $this->createFindCriteria($source->getUserId(), $request->label)
+        );
+
+        if ($fileSource instanceof FileSource) {
             if (
-                $foundSource->getId() === $source->getId()
+                $fileSource->getId() === $source->getId()
                 || 0 === $this->sourceRepository->count(['id' => $source->getId()])
             ) {
-                return $foundSource;
+                return $fileSource;
             }
 
             throw new NonUniqueEntityLabelException();
@@ -53,12 +61,20 @@ class Mutator
      */
     public function updateGit(GitSource $source, GitSourceRequest $request): GitSource
     {
-        $foundSource = $this->gitSourceRepository->findOneBy(
+        $fileSource = $this->fileSourceRepository->findOneBy(
             $this->createFindCriteria($source->getUserId(), $request->label)
         );
 
-        if ($foundSource instanceof GitSource) {
-            if ($foundSource->getId() !== $source->getId()) {
+        if ($fileSource instanceof FileSource) {
+            throw new NonUniqueEntityLabelException();
+        }
+
+        $gitSource = $this->gitSourceRepository->findOneBy(
+            $this->createFindCriteria($source->getUserId(), $request->label)
+        );
+
+        if ($gitSource instanceof GitSource) {
+            if ($gitSource->getId() !== $source->getId()) {
                 throw new NonUniqueEntityLabelException();
             }
         }

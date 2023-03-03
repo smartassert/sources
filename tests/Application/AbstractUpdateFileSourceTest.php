@@ -8,6 +8,7 @@ use App\Enum\Source\Type;
 use App\Repository\FileSourceRepository;
 use App\Repository\SourceRepository;
 use App\Request\FileSourceRequest;
+use App\Request\GitSourceRequest;
 use App\Request\OriginSourceRequest;
 use App\Tests\DataProvider\CreateUpdateFileSourceDataProviderTrait;
 use App\Tests\Services\FileSourceFactory;
@@ -70,28 +71,41 @@ abstract class AbstractUpdateFileSourceTest extends AbstractApplicationTest
         $this->responseAsserter->assertInvalidRequestJsonResponse($response, $expectedResponseData);
     }
 
-    public function testUpdateNewLabelNotUnique(): void
-    {
-        $source = FileSourceFactory::create(
-            userId: self::$authenticationConfiguration->getUser(self::USER_1_EMAIL)->id,
-            label: 'label1'
+    /**
+     * @dataProvider updateNewLabelNotUniqueDataProvider
+     *
+     * @param array<string, string> $targetCreateParameters
+     * @param array<string, string> $conflictCreateParameters
+     * @param array<string, string> $updateParameters
+     */
+    public function testUpdateNewLabelNotUnique(
+        string $conflictSourceLabel,
+        array $targetCreateParameters,
+        array $conflictCreateParameters,
+        array $updateParameters,
+    ): void {
+        $targetCreateResponse = $this->applicationClient->makeCreateSourceRequest(
+            self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
+            $targetCreateParameters
         );
-        $this->sourceRepository->save($source);
 
-        $this->sourceRepository->save(
-            FileSourceFactory::create(
-                userId: self::$authenticationConfiguration->getUser(self::USER_1_EMAIL)->id,
-                label: 'label2'
-            )
+        self::assertSame(200, $targetCreateResponse->getStatusCode());
+
+        $targetCreateResponseData = json_decode($targetCreateResponse->getBody()->getContents(), true);
+        \assert(is_array($targetCreateResponseData));
+        $sourceId = $targetCreateResponseData['id'] ?? null;
+
+        $conflictCreateResponse = $this->applicationClient->makeCreateSourceRequest(
+            self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
+            $conflictCreateParameters
         );
+
+        self::assertSame(200, $conflictCreateResponse->getStatusCode());
 
         $updateResponse = $this->applicationClient->makeUpdateFileSourceRequest(
             self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
-            $source->getId(),
-            [
-                OriginSourceRequest::PARAMETER_TYPE => Type::FILE->value,
-                FileSourceRequest::PARAMETER_LABEL => 'label2',
-            ]
+            $sourceId,
+            $updateParameters
         );
 
         $this->responseAsserter->assertInvalidRequestJsonResponse(
@@ -101,12 +115,56 @@ abstract class AbstractUpdateFileSourceTest extends AbstractApplicationTest
                     'type' => 'invalid_request',
                     'payload' => [
                         'name' => 'label',
-                        'value' => 'label2',
+                        'value' => $conflictSourceLabel,
                         'message' => 'This label is being used by another source belonging to this user',
                     ],
                 ],
             ]
         );
+    }
+
+    /**
+     * @return array<mixed>
+     */
+    public function updateNewLabelNotUniqueDataProvider(): array
+    {
+        $targetSourceLabel = md5((string) rand());
+        $conflictSourceLabel = md5((string) rand());
+
+        return [
+            'file source with label of git source' => [
+                'conflictSourceLabel' => $conflictSourceLabel,
+                'targetCreateParameters' => [
+                    OriginSourceRequest::PARAMETER_TYPE => Type::FILE->value,
+                    GitSourceRequest::PARAMETER_LABEL => $targetSourceLabel,
+                ],
+                'conflictCreateParameters' => [
+                    OriginSourceRequest::PARAMETER_TYPE => Type::GIT->value,
+                    GitSourceRequest::PARAMETER_LABEL => $conflictSourceLabel,
+                    GitSourceRequest::PARAMETER_HOST_URL => md5((string) rand()),
+                    GitSourceRequest::PARAMETER_PATH => md5((string) rand()),
+                ],
+                'updateParameters' => [
+                    OriginSourceRequest::PARAMETER_TYPE => Type::FILE->value,
+                    GitSourceRequest::PARAMETER_LABEL => $conflictSourceLabel,
+                ],
+            ],
+            'file source with label of file source' => [
+                'conflictSourceLabel' => $conflictSourceLabel,
+                'targetCreateParameters' => [
+                    OriginSourceRequest::PARAMETER_TYPE => Type::FILE->value,
+                    GitSourceRequest::PARAMETER_LABEL => $targetSourceLabel,
+                ],
+                'conflictCreateParameters' => [
+                    OriginSourceRequest::PARAMETER_TYPE => Type::FILE->value,
+                    GitSourceRequest::PARAMETER_LABEL => $conflictSourceLabel,
+                ],
+                'updateParameters' => [
+                    OriginSourceRequest::PARAMETER_TYPE => Type::FILE->value,
+                    GitSourceRequest::PARAMETER_LABEL => $conflictSourceLabel,
+                ],
+            ],
+        ];
     }
 
     public function testUpdateSuccess(): void
