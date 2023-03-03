@@ -194,8 +194,7 @@ abstract class AbstractUnauthorizedUserTest extends AbstractApplicationTest
     public function testListSuitesUnauthorizedUser(callable $tokenCreator): void
     {
         $response = $this->applicationClient->makeListSuitesRequest(
-            $tokenCreator(self::$authenticationConfiguration),
-            (new EntityIdFactory())->create()
+            $tokenCreator(self::$authenticationConfiguration)
         );
 
         $this->responseAsserter->assertUnauthorizedResponse($response);

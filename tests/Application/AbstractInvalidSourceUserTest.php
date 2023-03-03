@@ -140,14 +140,4 @@ abstract class AbstractInvalidSourceUserTest extends AbstractApplicationTest
 
         $this->responseAsserter->assertForbiddenResponse($response);
     }
-
-    public function testListSuitesInvalidUser(): void
-    {
-        $response = $this->applicationClient->makeListSuitesRequest(
-            self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
-            $this->fileSource->getId()
-        );
-
-        $this->responseAsserter->assertForbiddenResponse($response);
-    }
 }
