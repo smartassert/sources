@@ -14,6 +14,7 @@ use App\Request\FileSourceRequest;
 use App\Request\OriginSourceRequest;
 use App\Services\EntityIdFactory;
 use App\Tests\Services\SourceOriginFactory;
+use App\Tests\Services\SuiteFactory;
 
 abstract class AbstractInvalidSuiteUserTest extends AbstractApplicationTest
 {
@@ -60,14 +61,10 @@ abstract class AbstractInvalidSuiteUserTest extends AbstractApplicationTest
         \assert($accessibleSource instanceof FileSource);
         $this->accessibleSource = $accessibleSource;
 
-        $this->inaccessibleSuite = new Suite($idFactory->create(), $this->inaccessibleSource);
-        $this->inaccessibleSuite->setLabel('inaccessible suite');
-        $this->inaccessibleSuite->setTests(['test.yaml']);
+        $this->inaccessibleSuite = SuiteFactory::create(source: $this->inaccessibleSource);
         $repository->save($this->inaccessibleSuite);
 
-        $this->accessibleSuite = new Suite($idFactory->create(), $this->accessibleSource);
-        $this->accessibleSuite->setLabel('accessible suite');
-        $this->accessibleSuite->setTests(['test.yaml']);
+        $this->accessibleSuite = SuiteFactory::create(source: $this->accessibleSource);
         $repository->save($this->accessibleSuite);
     }
 
