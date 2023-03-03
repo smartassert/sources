@@ -12,8 +12,7 @@ use App\Repository\RunSourceRepository;
 use App\Repository\SourceRepository;
 use App\Services\EntityIdFactory;
 use App\Tests\Services\AuthenticationConfiguration;
-use App\Tests\Services\FileSourceFactory;
-use App\Tests\Services\GitSourceFactory;
+use App\Tests\Services\SourceOriginFactory;
 
 abstract class AbstractPrepareSourceTest extends AbstractApplicationTest
 {
@@ -38,8 +37,9 @@ abstract class AbstractPrepareSourceTest extends AbstractApplicationTest
     {
         $source = new RunSource(
             (new EntityIdFactory())->create(),
-            FileSourceFactory::create(
-                self::$authenticationConfiguration->getUser(self::USER_1_EMAIL)->id,
+            SourceOriginFactory::create(
+                type: 'file',
+                userId: self::$authenticationConfiguration->getUser(self::USER_1_EMAIL)->id,
             ),
         );
 
@@ -98,7 +98,8 @@ abstract class AbstractPrepareSourceTest extends AbstractApplicationTest
         return [
             Type::FILE->value => [
                 'sourceCreator' => function (AuthenticationConfiguration $authenticationConfiguration) {
-                    return FileSourceFactory::create(
+                    return SourceOriginFactory::create(
+                        type: 'file',
                         userId: $authenticationConfiguration->getUser(self::USER_1_EMAIL)->id,
                     );
                 },
@@ -107,7 +108,8 @@ abstract class AbstractPrepareSourceTest extends AbstractApplicationTest
             ],
             Type::GIT->value => [
                 'sourceCreator' => function (AuthenticationConfiguration $authenticationConfiguration) {
-                    return GitSourceFactory::create(
+                    return SourceOriginFactory::create(
+                        type: 'git',
                         userId: $authenticationConfiguration->getUser(self::USER_1_EMAIL)->id,
                     );
                 },
@@ -116,7 +118,8 @@ abstract class AbstractPrepareSourceTest extends AbstractApplicationTest
             ],
             Type::GIT->value . ' with ref request parameters' => [
                 'sourceCreator' => function (AuthenticationConfiguration $authenticationConfiguration) {
-                    return GitSourceFactory::create(
+                    return SourceOriginFactory::create(
+                        type: 'git',
                         userId: $authenticationConfiguration->getUser(self::USER_1_EMAIL)->id,
                     );
                 },
@@ -129,7 +132,8 @@ abstract class AbstractPrepareSourceTest extends AbstractApplicationTest
             ],
             Type::GIT->value . ' with request parameters including ref' => [
                 'sourceCreator' => function (AuthenticationConfiguration $authenticationConfiguration) {
-                    return GitSourceFactory::create(
+                    return SourceOriginFactory::create(
+                        type: 'git',
                         userId: $authenticationConfiguration->getUser(self::USER_1_EMAIL)->id,
                     );
                 },

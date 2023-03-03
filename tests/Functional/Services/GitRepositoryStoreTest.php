@@ -19,7 +19,7 @@ use App\Services\GitRepositoryStore;
 use App\Services\UserGitRepositoryFactory;
 use App\Tests\Services\EntityRemover;
 use App\Tests\Services\FileStoreFixtureCreator;
-use App\Tests\Services\GitSourceFactory;
+use App\Tests\Services\SourceOriginFactory;
 use League\Flysystem\FilesystemOperator;
 use League\Flysystem\FilesystemWriter;
 use League\Flysystem\UnableToDeleteDirectory;
@@ -75,7 +75,10 @@ class GitRepositoryStoreTest extends WebTestCase
 
         $idFactory = new EntityIdFactory();
 
-        $this->source = GitSourceFactory::create(hostUrl: self::REPOSITORY_URL, path: self::PATH);
+        $source = SourceOriginFactory::create(type: 'git', hostUrl: self::REPOSITORY_URL, path: self::PATH);
+        \assert($source instanceof GitSource);
+        $this->source = $source;
+
         $this->gitRepository = new UserGitRepository($idFactory->create(), $this->source);
 
         $gitRepositoryBasePath = self::getContainer()->getParameter('git_repository_store_directory');

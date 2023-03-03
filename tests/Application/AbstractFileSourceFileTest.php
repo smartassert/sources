@@ -7,8 +7,8 @@ namespace App\Tests\Application;
 use App\Entity\FileSource;
 use App\Repository\SourceRepository;
 use App\RequestValidator\YamlFileRequestValidator;
-use App\Tests\Services\FileSourceFactory;
 use App\Tests\Services\InvalidFilenameResponseDataFactory;
+use App\Tests\Services\SourceOriginFactory;
 
 abstract class AbstractFileSourceFileTest extends AbstractApplicationTest
 {
@@ -20,9 +20,12 @@ abstract class AbstractFileSourceFileTest extends AbstractApplicationTest
     {
         parent::setUp();
 
-        $this->fileSource = FileSourceFactory::create(
+        $fileSource = SourceOriginFactory::create(
+            'file',
             self::$authenticationConfiguration->getUser(self::USER_1_EMAIL)->id
         );
+        \assert($fileSource instanceof FileSource);
+        $this->fileSource = $fileSource;
 
         $sourceRepository = self::getContainer()->get(SourceRepository::class);
         \assert($sourceRepository instanceof SourceRepository);

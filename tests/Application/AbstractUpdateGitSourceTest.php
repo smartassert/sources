@@ -12,8 +12,7 @@ use App\Request\GitSourceRequest;
 use App\Request\OriginSourceRequest;
 use App\Tests\DataProvider\CreateUpdateGitSourceDataProviderTrait;
 use App\Tests\Services\AuthenticationConfiguration;
-use App\Tests\Services\FileSourceFactory;
-use App\Tests\Services\GitSourceFactory;
+use App\Tests\Services\SourceOriginFactory;
 
 abstract class AbstractUpdateGitSourceTest extends AbstractApplicationTest
 {
@@ -32,7 +31,8 @@ abstract class AbstractUpdateGitSourceTest extends AbstractApplicationTest
 
     public function testUpdateInvalidSourceType(): void
     {
-        $source = FileSourceFactory::create(
+        $source = SourceOriginFactory::create(
+            type: 'file',
             userId: self::$authenticationConfiguration->getUser(self::USER_1_EMAIL)->id
         );
         $this->sourceRepository->save($source);
@@ -54,7 +54,8 @@ abstract class AbstractUpdateGitSourceTest extends AbstractApplicationTest
      */
     public function testUpdateInvalidRequest(array $payload, array $expectedResponseData): void
     {
-        $source = GitSourceFactory::create(
+        $source = SourceOriginFactory::create(
+            type: 'git',
             userId: self::$authenticationConfiguration->getUser(self::USER_1_EMAIL)->id
         );
         $this->sourceRepository->save($source);
@@ -206,7 +207,8 @@ abstract class AbstractUpdateGitSourceTest extends AbstractApplicationTest
         return [
             Type::GIT->value . ' credentials present and empty' => [
                 'sourceCreator' => function (AuthenticationConfiguration $authenticationConfiguration) {
-                    return GitSourceFactory::create(
+                    return SourceOriginFactory::create(
+                        type: 'git',
                         userId: $authenticationConfiguration->getUser(self::USER_1_EMAIL)->id,
                         label: 'original label',
                         hostUrl: 'https://example.com/original.git',
@@ -235,7 +237,8 @@ abstract class AbstractUpdateGitSourceTest extends AbstractApplicationTest
             ],
             Type::GIT->value . ' credentials not present' => [
                 'sourceCreator' => function (AuthenticationConfiguration $authenticationConfiguration) {
-                    return GitSourceFactory::create(
+                    return SourceOriginFactory::create(
+                        type: 'git',
                         userId: $authenticationConfiguration->getUser(self::USER_1_EMAIL)->id,
                         label: 'original label',
                         hostUrl: 'https://example.com/original.git',
@@ -262,7 +265,8 @@ abstract class AbstractUpdateGitSourceTest extends AbstractApplicationTest
             ],
             Type::GIT->value . ' update all but the label' => [
                 'sourceCreator' => function (AuthenticationConfiguration $authenticationConfiguration) {
-                    return GitSourceFactory::create(
+                    return SourceOriginFactory::create(
+                        type: 'git',
                         userId: $authenticationConfiguration->getUser(self::USER_1_EMAIL)->id,
                         label: 'original label',
                         hostUrl: 'https://example.com/original.git',
@@ -295,13 +299,16 @@ abstract class AbstractUpdateGitSourceTest extends AbstractApplicationTest
         $gitSourceRepository = self::getContainer()->get(GitSourceRepository::class);
         \assert($gitSourceRepository instanceof GitSourceRepository);
 
-        $source = GitSourceFactory::create(
+        $source = SourceOriginFactory::create(
+            type: 'git',
             userId: self::$authenticationConfiguration->getUser(self::USER_1_EMAIL)->id,
             label: 'label1',
         );
         $this->sourceRepository->save($source);
+        \assert($source instanceof GitSource);
 
-        $sourceToBeDeleted = GitSourceFactory::create(
+        $sourceToBeDeleted = SourceOriginFactory::create(
+            type: 'git',
             userId: self::$authenticationConfiguration->getUser(self::USER_1_EMAIL)->id,
             label: 'label2',
         );

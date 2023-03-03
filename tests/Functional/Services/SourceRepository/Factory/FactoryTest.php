@@ -12,9 +12,8 @@ use App\Model\UserGitRepository;
 use App\Services\EntityIdFactory;
 use App\Services\SourceRepository\Factory\Factory;
 use App\Services\SourceRepository\Factory\GitSourceHandler;
-use App\Tests\Services\FileSourceFactory;
 use App\Tests\Services\FileStoreFixtureCreator;
-use App\Tests\Services\GitSourceFactory;
+use App\Tests\Services\SourceOriginFactory;
 use League\Flysystem\FilesystemOperator;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use webignition\ObjectReflector\ObjectReflector;
@@ -99,14 +98,15 @@ class FactoryTest extends WebTestCase
 
     public function testCreateForFileSource(): void
     {
-        $fileSource = FileSourceFactory::create();
+        $fileSource = SourceOriginFactory::create(type: 'file');
 
         self::assertSame($fileSource, $this->factory->create($fileSource, []));
     }
 
     public function testCreateForGitSourceSuccess(): void
     {
-        $gitSource = GitSourceFactory::create();
+        $gitSource = SourceOriginFactory::create(type: 'git');
+        \assert($gitSource instanceof GitSource);
 
         $parameters = ['ref' => 'v1.1'];
         $userGitRepository = new UserGitRepository((new EntityIdFactory())->create(), $gitSource);
@@ -162,7 +162,10 @@ class FactoryTest extends WebTestCase
         $gitRepositoryStorage = self::getContainer()->get('git_repository.storage');
         \assert($gitRepositoryStorage instanceof FilesystemOperator);
 
-        $userGitRepository = new UserGitRepository((new EntityIdFactory())->create(), GitSourceFactory::create());
+        $source = SourceOriginFactory::create(type: 'git');
+        \assert($source instanceof GitSource);
+
+        $userGitRepository = new UserGitRepository((new EntityIdFactory())->create(), $source);
 
         $fixtureCreator->copySetTo('Source/mixed', $gitRepositoryStorage, $userGitRepository->getDirectoryPath());
         self::assertTrue($gitRepositoryStorage->directoryExists($userGitRepository->getDirectoryPath()));

@@ -12,8 +12,7 @@ use App\Enum\Source\Type;
 use App\Repository\SourceRepository;
 use App\Services\EntityIdFactory;
 use App\Tests\Services\AuthenticationConfiguration;
-use App\Tests\Services\FileSourceFactory;
-use App\Tests\Services\GitSourceFactory;
+use App\Tests\Services\SourceOriginFactory;
 
 abstract class AbstractListSourcesTest extends AbstractApplicationTest
 {
@@ -66,8 +65,8 @@ abstract class AbstractListSourcesTest extends AbstractApplicationTest
             ],
             'file, git and run sources, no user match' => [
                 'sourcesCreator' => function () {
-                    $fileSource = FileSourceFactory::create();
-                    $gitSource = GitSourceFactory::create();
+                    $fileSource = SourceOriginFactory::create(type: 'file');
+                    $gitSource = SourceOriginFactory::create(type: 'git');
 
                     $entityIdFactory = new EntityIdFactory();
 
@@ -84,10 +83,12 @@ abstract class AbstractListSourcesTest extends AbstractApplicationTest
             ],
             'has file and git sources for correct user only' => [
                 'sourcesCreator' => function (AuthenticationConfiguration $authenticationConfiguration) {
-                    $fileSource = FileSourceFactory::create(
+                    $fileSource = SourceOriginFactory::create(
+                        type: 'file',
                         userId: $authenticationConfiguration->getUser(self::USER_1_EMAIL)->id,
                     );
-                    $gitSource = GitSourceFactory::create(
+                    $gitSource = SourceOriginFactory::create(
+                        type: 'git',
                         userId: $authenticationConfiguration->getUser(self::USER_1_EMAIL)->id,
                     );
 
@@ -124,10 +125,12 @@ abstract class AbstractListSourcesTest extends AbstractApplicationTest
             ],
             'has file, git and run sources for correct user only' => [
                 'sourcesCreator' => function (AuthenticationConfiguration $authenticationConfiguration) {
-                    $fileSource = FileSourceFactory::create(
+                    $fileSource = SourceOriginFactory::create(
+                        type: 'file',
                         userId: $authenticationConfiguration->getUser(self::USER_1_EMAIL)->id,
                     );
-                    $gitSource = GitSourceFactory::create(
+                    $gitSource = SourceOriginFactory::create(
+                        type: 'git',
                         userId: $authenticationConfiguration->getUser(self::USER_1_EMAIL)->id,
                     );
 
@@ -171,10 +174,12 @@ abstract class AbstractListSourcesTest extends AbstractApplicationTest
             ],
             'has file, git and run sources for mixed users' => [
                 'sourcesCreator' => function (AuthenticationConfiguration $authenticationConfiguration) {
-                    $fileSource = FileSourceFactory::create(
+                    $fileSource = SourceOriginFactory::create(
+                        type: 'file',
                         userId: $authenticationConfiguration->getUser(self::USER_1_EMAIL)->id,
                     );
-                    $gitSource = GitSourceFactory::create(
+                    $gitSource = SourceOriginFactory::create(
+                        type: 'git',
                         userId: $authenticationConfiguration->getUser(self::USER_1_EMAIL)->id,
                     );
 
@@ -185,13 +190,13 @@ abstract class AbstractListSourcesTest extends AbstractApplicationTest
 
                     return [
                         $fileSource,
-                        FileSourceFactory::create(),
-                        FileSourceFactory::create(),
+                        SourceOriginFactory::create(type: 'file'),
+                        SourceOriginFactory::create(type: 'file'),
                         $gitSource,
                         $fileRunSource,
-                        GitSourceFactory::create(),
+                        SourceOriginFactory::create(type: 'git'),
                         $gitRunSource,
-                        GitSourceFactory::create(),
+                        SourceOriginFactory::create(type: 'git'),
                     ];
                 },
                 'expectedResponseDataCreator' => function (array $sources) {

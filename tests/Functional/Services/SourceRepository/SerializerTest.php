@@ -4,14 +4,15 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\Services\SourceRepository;
 
+use App\Entity\FileSource;
+use App\Entity\GitSource;
 use App\Exception\UnparseableSourceFileException;
 use App\Model\SourceRepositoryInterface;
 use App\Model\UserGitRepository;
 use App\Services\EntityIdFactory;
 use App\Services\SourceRepository\Serializer;
-use App\Tests\Services\FileSourceFactory;
 use App\Tests\Services\FileStoreFixtureCreator;
-use App\Tests\Services\GitSourceFactory;
+use App\Tests\Services\SourceOriginFactory;
 use League\Flysystem\FilesystemOperator;
 use League\Flysystem\FilesystemWriter;
 use SmartAssert\YamlFile\Exception\Collection\SerializeException;
@@ -43,10 +44,10 @@ class SerializerTest extends WebTestCase
 
     public function testSerializeEmptyFileSource(): void
     {
-        self::assertSame(
-            '',
-            $this->serializer->serialize(FileSourceFactory::create())
-        );
+        $source = SourceOriginFactory::create(type: 'file');
+        \assert($source instanceof FileSource);
+
+        self::assertSame('', $this->serializer->serialize($source));
     }
 
     public function testSerializeNoYamlFiles(): void
@@ -54,7 +55,8 @@ class SerializerTest extends WebTestCase
         $storage = self::getContainer()->get('file_source.storage');
         assert($storage instanceof FilesystemWriter);
 
-        $source = FileSourceFactory::create();
+        $source = SourceOriginFactory::create(type: 'file');
+        \assert($source instanceof FileSource);
 
         $this->fixtureCreator->copySetTo('Source/txt', $storage, $source->getDirectoryPath());
 
@@ -66,7 +68,8 @@ class SerializerTest extends WebTestCase
         $storage = self::getContainer()->get('file_source.storage');
         assert($storage instanceof FilesystemWriter);
 
-        $source = FileSourceFactory::create();
+        $source = SourceOriginFactory::create(type: 'file');
+        \assert($source instanceof FileSource);
 
         $this->fixtureCreator->copySetTo('Source/yml_yaml_invalid', $storage, $source->getDirectoryPath());
 
@@ -119,19 +122,29 @@ class SerializerTest extends WebTestCase
             'file source' => [
                 'fixtureSetIdentifier' => 'Source/yml_yaml_valid',
                 'sourceStorageId' => 'file_source.storage',
-                'source' => FileSourceFactory::create(),
+                'source' => SourceOriginFactory::create(type: 'file'),
                 'expectedFixturePath' => 'RunSource/source_yml_yaml_entire.yaml',
             ],
             'git repository, entire' => [
                 'fixtureSetIdentifier' => 'Source/yml_yaml_valid',
                 'sourceStorageId' => 'git_repository.storage',
-                'source' => new UserGitRepository($idFactory->create(), GitSourceFactory::create(path: '/')),
+                'source' => (function () use ($idFactory) {
+                    $source = SourceOriginFactory::create(type: 'git', path: '/');
+                    \assert($source instanceof GitSource);
+
+                    return new UserGitRepository($idFactory->create(), $source);
+                })(),
                 'expectedFixturePath' => 'RunSource/source_yml_yaml_entire.yaml',
             ],
             'git repository, partial' => [
                 'fixtureSetIdentifier' => 'Source/yml_yaml_valid',
                 'sourceStorageId' => 'git_repository.storage',
-                'source' => new UserGitRepository($idFactory->create(), GitSourceFactory::create(path: '/directory')),
+                'source' => (function () use ($idFactory) {
+                    $source = SourceOriginFactory::create(type: 'git', path: '/directory');
+                    \assert($source instanceof GitSource);
+
+                    return new UserGitRepository($idFactory->create(), $source);
+                })(),
                 'expectedFixturePath' => 'RunSource/source_yml_yaml_partial.yaml',
             ],
         ];
