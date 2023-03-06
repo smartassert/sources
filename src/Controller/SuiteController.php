@@ -4,14 +4,11 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
-use App\Entity\SourceInterface;
-use App\Entity\SourceOriginInterface;
 use App\Entity\Suite;
 use App\Exception\EmptyEntityIdException;
 use App\Exception\InvalidRequestException;
 use App\Exception\NonUniqueEntityLabelException;
 use App\Repository\SuiteRepository;
-use App\Request\CreateSuiteRequest;
 use App\Request\SuiteRequest;
 use App\Security\EntityAccessChecker;
 use App\Services\ExceptionFactory;
@@ -40,20 +37,19 @@ class SuiteController
      * @throws NonUniqueEntityLabelException
      */
     #[Route(SuiteRoutes::ROUTE_SUITE_BASE, name: 'user_suite_create', methods: ['POST'])]
-    public function create(SourceOriginInterface $source, CreateSuiteRequest $request): Response
+    public function create(SuiteRequest $request): Response
     {
-        $this->entityAccessChecker->denyAccessUnlessGranted($source);
+        $this->entityAccessChecker->denyAccessUnlessGranted($request->source);
 
-        return new JsonResponse($this->factory->create($source, $request));
+        return new JsonResponse($this->factory->create($request));
     }
 
     /**
      * @throws AccessDeniedException
      */
     #[Route(SuiteRoutes::ROUTE_SUITE, name: 'user_suite_get', methods: ['GET'])]
-    public function get(SourceInterface $source, Suite $suite): Response
+    public function get(Suite $suite): Response
     {
-        $this->entityAccessChecker->denyAccessUnlessGranted($source);
         $this->entityAccessChecker->denyAccessUnlessGranted($suite);
 
         return new JsonResponse($suite);
@@ -83,9 +79,8 @@ class SuiteController
      * @throws InvalidRequestException
      */
     #[Route(SuiteRoutes::ROUTE_SUITE, name: 'user_suite_update', methods: ['POST'])]
-    public function update(SourceInterface $source, Suite $suite, SuiteRequest $request): Response
+    public function update(Suite $suite, SuiteRequest $request): Response
     {
-        $this->entityAccessChecker->denyAccessUnlessGranted($source);
         $this->entityAccessChecker->denyAccessUnlessGranted($suite);
 
         try {

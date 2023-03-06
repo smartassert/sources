@@ -180,7 +180,6 @@ class Client
      */
     public function makeCreateSuiteRequest(
         ?string $authenticationToken,
-        string $sourceId,
         array $payload
     ): ResponseInterface {
         $headers = array_merge(
@@ -192,20 +191,17 @@ class Client
 
         return $this->client->makeRequest(
             'POST',
-            $this->router->generate('user_suite_create', ['sourceId' => $sourceId]),
+            $this->router->generate('user_suite_create'),
             $headers,
             http_build_query($payload)
         );
     }
 
-    public function makeGetSuiteRequest(
-        ?string $authenticationToken,
-        string $sourceId,
-        string $suiteId
-    ): ResponseInterface {
+    public function makeGetSuiteRequest(?string $authenticationToken, string $suiteId): ResponseInterface
+    {
         return $this->client->makeRequest(
             'GET',
-            $this->router->generate('user_suite_get', ['sourceId' => $sourceId, 'suiteId' => $suiteId]),
+            $this->router->generate('user_suite_get', ['suiteId' => $suiteId]),
             $this->createAuthorizationHeader($authenticationToken),
         );
     }
@@ -215,7 +211,6 @@ class Client
      */
     public function makeUpdateSuiteRequest(
         ?string $authenticationToken,
-        string $sourceId,
         string $suiteId,
         array $payload,
     ): ResponseInterface {
@@ -228,7 +223,7 @@ class Client
 
         return $this->client->makeRequest(
             'POST',
-            $this->router->generate('user_suite_update', ['sourceId' => $sourceId, 'suiteId' => $suiteId]),
+            $this->router->generate('user_suite_update', ['suiteId' => $suiteId]),
             $headers,
             http_build_query($payload)
         );

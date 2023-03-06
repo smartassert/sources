@@ -46,22 +46,10 @@ abstract class AbstractGetSuiteTest extends AbstractApplicationTest
         $this->suiteRepository = $suiteRepository;
     }
 
-    public function testGetSuiteSourceNotFound(): void
-    {
-        $response = $this->applicationClient->makeGetSuiteRequest(
-            self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
-            (new EntityIdFactory())->create(),
-            (new EntityIdFactory())->create()
-        );
-
-        $this->responseAsserter->assertNotFoundResponse($response);
-    }
-
     public function testGetSuiteSuiteNotFound(): void
     {
         $response = $this->applicationClient->makeGetSuiteRequest(
             self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
-            $this->source->getId(),
             (new EntityIdFactory())->create()
         );
 
@@ -81,7 +69,6 @@ abstract class AbstractGetSuiteTest extends AbstractApplicationTest
 
         $response = $this->applicationClient->makeGetSuiteRequest(
             self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
-            $this->source->getId(),
             $suite->id,
         );
 
