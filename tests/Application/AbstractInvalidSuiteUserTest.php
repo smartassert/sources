@@ -57,17 +57,7 @@ abstract class AbstractInvalidSuiteUserTest extends AbstractApplicationTest
         $repository->save($this->inaccessibleSuite);
     }
 
-    public function testGetSuiteValidSourceUserInvalidSuiteUser(): void
-    {
-        $response = $this->applicationClient->makeGetSuiteRequest(
-            self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
-            $this->inaccessibleSuite->id,
-        );
-
-        $this->responseAsserter->assertForbiddenResponse($response);
-    }
-
-    public function testGetSuiteInvalidSourceUserInvalidSuiteUser(): void
+    public function testGetSuiteInvalidSuiteUser(): void
     {
         $response = $this->applicationClient->makeGetSuiteRequest(
             self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
