@@ -17,16 +17,16 @@ abstract class AbstractUpdateSuiteTest extends AbstractSuiteTest
         $suiteLabel1 = md5((string) rand());
         $suiteLabel2 = md5((string) rand());
 
-        $suiteId = $this->createSuite($this->sourceId, $suiteLabel1, ['test.yaml']);
-        $this->createSuite($this->sourceId, $suiteLabel2, ['test.yaml']);
+        $suiteId = $this->createSuite($suiteLabel1, ['test.yaml']);
+        $this->createSuite($suiteLabel2, ['test.yaml']);
 
         self::assertSame(1, $suiteRepository->count(['label' => $suiteLabel1]));
 
         $updateResponse = $this->applicationClient->makeUpdateSuiteRequest(
             self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
-            $this->sourceId,
             $suiteId,
             [
+                SuiteRequest::PARAMETER_SOURCE_ID => $this->sourceId,
                 SuiteRequest::PARAMETER_LABEL => $suiteLabel2,
                 SuiteRequest::PARAMETER_TESTS => ['test.yaml'],
             ]
@@ -58,13 +58,12 @@ abstract class AbstractUpdateSuiteTest extends AbstractSuiteTest
         array $initialSuiteTests,
         array $updateRequestParameters
     ): void {
-        $suiteId = $this->createSuite($this->sourceId, $initialSuiteLabel, $initialSuiteTests);
+        $suiteId = $this->createSuite($initialSuiteLabel, $initialSuiteTests);
 
         $response = $this->applicationClient->makeUpdateSuiteRequest(
             self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
-            $this->sourceId,
             $suiteId,
-            $updateRequestParameters,
+            array_merge(['source_id' => $this->sourceId], $updateRequestParameters),
         );
 
         $expected = array_merge(
@@ -138,28 +137,26 @@ abstract class AbstractUpdateSuiteTest extends AbstractSuiteTest
         $newLabel = md5((string) rand());
         $newTests = ['Test/test' . md5((string) rand()) . '.yaml'];
 
-        $suiteId = $this->createSuite($this->sourceId, $initialLabel, $initialTests);
+        $suiteId = $this->createSuite($initialLabel, $initialTests);
+
+        $updateParameters = [
+            SuiteRequest::PARAMETER_SOURCE_ID => $this->sourceId,
+            SuiteRequest::PARAMETER_LABEL => $newLabel,
+            SuiteRequest::PARAMETER_TESTS => $newTests,
+        ];
 
         $firstUpdateResponse = $this->applicationClient->makeUpdateSuiteRequest(
             self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
-            $this->sourceId,
             $suiteId,
-            [
-                SuiteRequest::PARAMETER_LABEL => $newLabel,
-                SuiteRequest::PARAMETER_TESTS => $newTests,
-            ],
+            $updateParameters,
         );
 
         self::assertSame(200, $firstUpdateResponse->getStatusCode());
 
         $secondUpdateResponse = $this->applicationClient->makeUpdateSuiteRequest(
             self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
-            $this->sourceId,
             $suiteId,
-            [
-                SuiteRequest::PARAMETER_LABEL => $newLabel,
-                SuiteRequest::PARAMETER_TESTS => $newTests,
-            ],
+            $updateParameters,
         );
 
         self::assertSame(200, $secondUpdateResponse->getStatusCode());
@@ -172,12 +169,12 @@ abstract class AbstractUpdateSuiteTest extends AbstractSuiteTest
     /**
      * @param string[] $tests
      */
-    private function createSuite(string $sourceId, string $label, array $tests): string
+    private function createSuite(string $label, array $tests): string
     {
         $response = $this->applicationClient->makeCreateSuiteRequest(
             self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
-            $sourceId,
             [
+                SuiteRequest::PARAMETER_SOURCE_ID => $this->sourceId,
                 SuiteRequest::PARAMETER_LABEL => $label,
                 SuiteRequest::PARAMETER_TESTS => $tests,
             ]

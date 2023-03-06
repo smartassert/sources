@@ -19,8 +19,12 @@ abstract class AbstractCreateSuiteTest extends AbstractSuiteTest
     {
         $response = $this->applicationClient->makeCreateSuiteRequest(
             self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
-            $this->sourceId,
-            $requestParameters
+            array_merge(
+                [
+                    SuiteRequest::PARAMETER_SOURCE_ID => $this->sourceId,
+                ],
+                $requestParameters
+            )
         );
 
         $suites = [];
@@ -78,6 +82,7 @@ abstract class AbstractCreateSuiteTest extends AbstractSuiteTest
     public function testCreateIsIdempotent(): void
     {
         $requestParameters = [
+            SuiteRequest::PARAMETER_SOURCE_ID => $this->sourceId,
             SuiteRequest::PARAMETER_LABEL => 'label',
             SuiteRequest::PARAMETER_TESTS => [
                 'Test/test' . md5((string) rand()) . '.yaml',
@@ -86,7 +91,6 @@ abstract class AbstractCreateSuiteTest extends AbstractSuiteTest
 
         $firstResponse = $this->applicationClient->makeCreateSuiteRequest(
             self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
-            $this->sourceId,
             $requestParameters
         );
 
@@ -94,7 +98,6 @@ abstract class AbstractCreateSuiteTest extends AbstractSuiteTest
 
         $secondResponse = $this->applicationClient->makeCreateSuiteRequest(
             self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
-            $this->sourceId,
             $requestParameters
         );
 
@@ -115,8 +118,8 @@ abstract class AbstractCreateSuiteTest extends AbstractSuiteTest
         foreach ($labels as $label) {
             $response = $this->applicationClient->makeCreateSuiteRequest(
                 self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
-                $this->sourceId,
                 [
+                    SuiteRequest::PARAMETER_SOURCE_ID => $this->sourceId,
                     SuiteRequest::PARAMETER_LABEL => $label,
                     SuiteRequest::PARAMETER_TESTS => [
                         'Test/test' . md5((string) rand()) . '.yaml',

@@ -167,7 +167,6 @@ abstract class AbstractUnauthorizedUserTest extends AbstractApplicationTest
     {
         $response = $this->applicationClient->makeCreateSuiteRequest(
             $tokenCreator(self::$authenticationConfiguration),
-            (new EntityIdFactory())->create(),
             []
         );
 
@@ -181,7 +180,6 @@ abstract class AbstractUnauthorizedUserTest extends AbstractApplicationTest
     {
         $response = $this->applicationClient->makeGetSuiteRequest(
             $tokenCreator(self::$authenticationConfiguration),
-            (new EntityIdFactory())->create(),
             (new EntityIdFactory())->create()
         );
 
