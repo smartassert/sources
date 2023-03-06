@@ -7,7 +7,7 @@ namespace App\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\MappedSuperclass]
-abstract class AbstractOriginSource extends AbstractSource
+abstract class AbstractOriginSource extends AbstractSource implements \JsonSerializable
 {
     public const LABEL_MAX_LENGTH = 255;
 
@@ -42,5 +42,18 @@ abstract class AbstractOriginSource extends AbstractSource
         $this->label = $label;
 
         return $this;
+    }
+
+    /**
+     * @return array{
+     *     "id": string,
+     *     "user_id": non-empty-string,
+     *     "type": non-empty-string,
+     *     "label": non-empty-string
+     * }
+     */
+    public function jsonSerialize(): array
+    {
+        return array_merge(parent::jsonSerialize(), ['label' => $this->getLabel()]);
     }
 }

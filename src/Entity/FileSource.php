@@ -26,24 +26,6 @@ class FileSource extends AbstractOriginSource implements
         return $this->getDirectoryPath() . '/';
     }
 
-    /**
-     * @return array{
-     *     "id": string,
-     *     "user_id": non-empty-string,
-     *     "type": 'file',
-     *     "label": non-empty-string
-     * }
-     */
-    public function jsonSerialize(): array
-    {
-        return [
-            'id' => $this->id,
-            'user_id' => $this->getUserId(),
-            'type' => Type::FILE->value,
-            'label' => $this->getLabel()
-        ];
-    }
-
     public function getDirectoryPath(): string
     {
         return sprintf(
@@ -51,5 +33,10 @@ class FileSource extends AbstractOriginSource implements
             $this->getUserId(),
             $this->getId(),
         );
+    }
+
+    protected function getType(): Type
+    {
+        return Type::FILE;
     }
 }
