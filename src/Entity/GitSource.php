@@ -82,7 +82,7 @@ class GitSource extends AbstractOriginSource implements SourceOriginInterface, \
      * @return array{
      *     "id": string,
      *     "user_id": non-empty-string,
-     *     "type": 'git',
+     *     "type": non-empty-string,
      *     "label": non-empty-string,
      *     "host_url": string,
      *     "path": string,
@@ -91,14 +91,15 @@ class GitSource extends AbstractOriginSource implements SourceOriginInterface, \
      */
     public function jsonSerialize(): array
     {
-        return [
-            'id' => $this->id,
-            'user_id' => $this->getUserId(),
-            'type' => Type::GIT->value,
-            'label' => $this->getLabel(),
+        return array_merge(parent::jsonSerialize(), [
             'host_url' => $this->hostUrl,
             'path' => $this->path,
             'has_credentials' => '' !== $this->credentials
-        ];
+        ]);
+    }
+
+    protected function getType(): Type
+    {
+        return Type::GIT;
     }
 }

@@ -86,7 +86,7 @@ class RunSource extends AbstractSource implements DirectoryLocatorInterface, \Js
      * @return array{
      *     "id": string,
      *     "user_id": string,
-     *     "type": 'run',
+     *     "type": non-empty-string,
      *     "parent": string,
      *     "parameters": array<string, string>,
      *     "state": string,
@@ -96,14 +96,11 @@ class RunSource extends AbstractSource implements DirectoryLocatorInterface, \Js
      */
     public function jsonSerialize(): array
     {
-        $data = [
-            'id' => $this->id,
-            'user_id' => $this->getUserId(),
-            'type' => Type::RUN->value,
+        $data = array_merge(parent::jsonSerialize(), [
             'parent' => $this->parent->getId(),
             'parameters' => $this->parameters,
             'state' => $this->state->value,
-        ];
+        ]);
 
         if (State::FAILED === $this->state) {
             $failureReason = $this->failureReason instanceof FailureReason
@@ -124,5 +121,10 @@ class RunSource extends AbstractSource implements DirectoryLocatorInterface, \Js
             $this->getUserId(),
             $this->getId(),
         );
+    }
+
+    protected function getType(): Type
+    {
+        return Type::RUN;
     }
 }

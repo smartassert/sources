@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
+use App\Enum\Source\Type;
 use App\Repository\SourceRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
@@ -18,7 +19,7 @@ use Doctrine\ORM\Mapping as ORM;
     'file' => FileSource::class,
     'run' => RunSource::class,
 ])]
-abstract class AbstractSource implements SourceInterface, UserHeldEntityInterface
+abstract class AbstractSource implements SourceInterface, \JsonSerializable
 {
     public const ID_LENGTH = 32;
     public const TYPE_DISCRIMINATOR_LENGTH = 32;
@@ -76,4 +77,22 @@ abstract class AbstractSource implements SourceInterface, UserHeldEntityInterfac
             $this->deletedAt = $deletedAt;
         }
     }
+
+    /**
+     * @return array{
+     *     "id": string,
+     *     "user_id": non-empty-string,
+     *     "type": non-empty-string
+     * }
+     */
+    public function jsonSerialize(): array
+    {
+        return [
+            'id' => $this->id,
+            'user_id' => $this->getUserId(),
+            'type' => $this->getType()->value,
+        ];
+    }
+
+    abstract protected function getType(): Type;
 }
