@@ -12,7 +12,6 @@ use App\Repository\SourceRepository;
 use App\Repository\SuiteRepository;
 use App\Request\FileSourceRequest;
 use App\Request\OriginSourceRequest;
-use App\Services\EntityIdFactory;
 use App\Tests\Services\SourceOriginFactory;
 use App\Tests\Services\SuiteFactory;
 
@@ -20,10 +19,7 @@ abstract class AbstractInvalidSuiteUserTest extends AbstractApplicationTest
 {
     public const FILENAME = 'filename.yaml';
 
-    private FileSource $inaccessibleSource;
-    private FileSource $accessibleSource;
     private Suite $inaccessibleSuite;
-    private Suite $accessibleSuite;
 
     protected function setUp(): void
     {
@@ -32,15 +28,12 @@ abstract class AbstractInvalidSuiteUserTest extends AbstractApplicationTest
         $repository = self::getContainer()->get(SuiteRepository::class);
         \assert($repository instanceof SuiteRepository);
 
-        $idFactory = new EntityIdFactory();
-
         $inaccessibleSource = SourceOriginFactory::create(type: 'file', label: 'inaccessible source');
         \assert($inaccessibleSource instanceof FileSource);
-        $this->inaccessibleSource = $inaccessibleSource;
 
         $sourceRepository = self::getContainer()->get(SourceRepository::class);
         \assert($sourceRepository instanceof SourceRepository);
-        $sourceRepository->save($this->inaccessibleSource);
+        $sourceRepository->save($inaccessibleSource);
 
         $createSourceResponse = $this->applicationClient->makeCreateSourceRequest(
             self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
@@ -59,31 +52,15 @@ abstract class AbstractInvalidSuiteUserTest extends AbstractApplicationTest
 
         $accessibleSource = $fileSourceRepository->find($accessibleSourceId);
         \assert($accessibleSource instanceof FileSource);
-        $this->accessibleSource = $accessibleSource;
 
-        $this->inaccessibleSuite = SuiteFactory::create(source: $this->inaccessibleSource);
+        $this->inaccessibleSuite = SuiteFactory::create(source: $inaccessibleSource);
         $repository->save($this->inaccessibleSuite);
-
-        $this->accessibleSuite = SuiteFactory::create(source: $this->accessibleSource);
-        $repository->save($this->accessibleSuite);
-    }
-
-    public function testGetSuiteInvalidSourceUserValidSuiteUser(): void
-    {
-        $response = $this->applicationClient->makeGetSuiteRequest(
-            self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
-            $this->inaccessibleSource->getId(),
-            $this->accessibleSuite->id,
-        );
-
-        $this->responseAsserter->assertForbiddenResponse($response);
     }
 
     public function testGetSuiteValidSourceUserInvalidSuiteUser(): void
     {
         $response = $this->applicationClient->makeGetSuiteRequest(
             self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
-            $this->accessibleSource->getId(),
             $this->inaccessibleSuite->id,
         );
 
@@ -94,7 +71,6 @@ abstract class AbstractInvalidSuiteUserTest extends AbstractApplicationTest
     {
         $response = $this->applicationClient->makeGetSuiteRequest(
             self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
-            $this->inaccessibleSource->getId(),
             $this->inaccessibleSuite->id,
         );
 

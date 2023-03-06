@@ -4,12 +4,11 @@ declare(strict_types=1);
 
 namespace App\Services\Suite;
 
-use App\Entity\SourceOriginInterface;
 use App\Entity\Suite;
 use App\Exception\EmptyEntityIdException;
 use App\Exception\NonUniqueEntityLabelException;
 use App\Repository\SuiteRepository;
-use App\Request\CreateSuiteRequest;
+use App\Request\SuiteRequest;
 use App\Services\EntityIdFactory;
 
 class Factory
@@ -25,8 +24,10 @@ class Factory
      * @throws EmptyEntityIdException
      * @throws NonUniqueEntityLabelException
      */
-    public function create(SourceOriginInterface $source, CreateSuiteRequest $request): Suite
+    public function create(SuiteRequest $request): Suite
     {
+        $source = $request->source;
+
         $suite = $this->repository->findOneBy([
             'source' => $source,
             'userId' => $source->getUserId(),
