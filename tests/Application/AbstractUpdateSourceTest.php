@@ -458,4 +458,36 @@ abstract class AbstractUpdateSourceTest extends AbstractApplicationTest
             ],
         ];
     }
+
+    public function testUpdateDeletedSource(): void
+    {
+        $source = SourceOriginFactory::create(
+            type: 'file',
+            userId: self::$authenticationConfiguration->getUser(self::USER_1_EMAIL)->id,
+            label: 'original label',
+        );
+        $this->sourceRepository->save($source);
+        $this->sourceRepository->delete($source);
+
+        $response = $this->applicationClient->makeUpdateSourceRequest(
+            self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
+            $source->getId(),
+            [
+                FileSourceRequest::PARAMETER_LABEL => 'new label',
+            ]
+        );
+
+        $this->responseAsserter->assertMethodNotAllowedResponse(
+            $response,
+            [
+                'error' => [
+                    'type' => 'modify-read-only-entity',
+                    'payload' => [
+                        'type' => 'source',
+                        'id' => $source->getId(),
+                    ],
+                ],
+            ]
+        );
+    }
 }
