@@ -197,34 +197,6 @@ abstract class AbstractUpdateSourceTest extends AbstractApplicationTest
         ];
     }
 
-//    public function testUpdateSuccess(): void
-//    {
-//        $source = SourceOriginFactory::create(
-//            type: 'file',
-//            userId: self::$authenticationConfiguration->getUser(self::USER_1_EMAIL)->id,
-//            label: 'original label'
-//        );
-//        $this->sourceRepository->save($source);
-//
-//        $response = $this->applicationClient->makeUpdateSourceRequest(
-//            self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
-//            $source->getId(),
-//            [
-//                FileSourceRequest::PARAMETER_LABEL => 'new label',
-//            ]
-//        );
-//
-//        $this->responseAsserter->assertSuccessfulJsonResponse(
-//            $response,
-//            [
-//                'id' => $source->getId(),
-//                'user_id' => $source->getUserId(),
-//                'type' => Type::FILE->value,
-//                'label' => 'new label',
-//            ]
-//        );
-//    }
-
     /**
      * @dataProvider updateSourceSuccessDataProvider
      *
