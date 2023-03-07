@@ -7,6 +7,7 @@ namespace App\Controller;
 use App\Entity\Suite;
 use App\Exception\EmptyEntityIdException;
 use App\Exception\InvalidRequestException;
+use App\Exception\ModifyReadOnlyEntityException;
 use App\Exception\NonUniqueEntityLabelException;
 use App\Repository\SuiteRepository;
 use App\Request\SuiteRequest;
@@ -85,11 +86,16 @@ class SuiteController
     /**
      * @throws AccessDeniedException
      * @throws InvalidRequestException
+     * @throws ModifyReadOnlyEntityException
      */
     #[Route(SuiteRoutes::ROUTE_SUITE, name: 'user_suite_update', methods: ['POST'])]
     public function update(Suite $suite, SuiteRequest $request): Response
     {
         $this->entityAccessChecker->denyAccessUnlessGranted($suite);
+
+        if (null !== $suite->getDeletedAt()) {
+            throw new ModifyReadOnlyEntityException($suite->id, 'suite');
+        }
 
         try {
             return new JsonResponse($this->mutator->update($suite, $request));
