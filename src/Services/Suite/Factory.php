@@ -30,7 +30,6 @@ class Factory
 
         $suite = $this->repository->findOneBy([
             'source' => $source,
-            'userId' => $source->getUserId(),
             'label' => $request->label,
             'tests' => $request->tests,
             'deletedAt' => null,

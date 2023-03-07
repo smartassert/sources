@@ -21,12 +21,6 @@ class Suite implements \JsonSerializable, UserHeldEntityInterface
     #[ORM\Column(type: Types::STRING, length: self::ID_LENGTH, unique: true)]
     public readonly string $id;
 
-    /**
-     * @var non-empty-string
-     */
-    #[ORM\Column(type: Types::STRING, length: self::ID_LENGTH)]
-    private readonly string $userId;
-
     #[ORM\ManyToOne(targetEntity: AbstractSource::class, cascade: ['persist'])]
     #[ORM\JoinColumn(nullable: false)]
     private SourceOriginInterface $source;
@@ -52,7 +46,6 @@ class Suite implements \JsonSerializable, UserHeldEntityInterface
     public function __construct(string $id, SourceOriginInterface $source)
     {
         $this->id = $id;
-        $this->userId = $source->getUserId();
         $this->source = $source;
     }
 
@@ -78,7 +71,7 @@ class Suite implements \JsonSerializable, UserHeldEntityInterface
 
     public function getUserId(): string
     {
-        return $this->userId;
+        return $this->source->getUserId();
     }
 
     public function getDeletedAt(): ?\DateTimeImmutable
