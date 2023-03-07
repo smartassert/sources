@@ -176,6 +176,78 @@ class Client
     }
 
     /**
+     * @param array<string, mixed> $payload
+     */
+    public function makeCreateSuiteRequest(
+        ?string $authenticationToken,
+        array $payload
+    ): ResponseInterface {
+        $headers = array_merge(
+            $this->createAuthorizationHeader($authenticationToken),
+            [
+                'content-type' => 'application/x-www-form-urlencoded',
+            ]
+        );
+
+        return $this->client->makeRequest(
+            'POST',
+            $this->router->generate('user_suite_create'),
+            $headers,
+            http_build_query($payload)
+        );
+    }
+
+    public function makeGetSuiteRequest(?string $authenticationToken, string $suiteId): ResponseInterface
+    {
+        return $this->client->makeRequest(
+            'GET',
+            $this->router->generate('user_suite_get', ['suiteId' => $suiteId]),
+            $this->createAuthorizationHeader($authenticationToken),
+        );
+    }
+
+    /**
+     * @param array<string, mixed> $payload
+     */
+    public function makeUpdateSuiteRequest(
+        ?string $authenticationToken,
+        string $suiteId,
+        array $payload,
+    ): ResponseInterface {
+        $headers = array_merge(
+            $this->createAuthorizationHeader($authenticationToken),
+            [
+                'content-type' => 'application/x-www-form-urlencoded',
+            ]
+        );
+
+        return $this->client->makeRequest(
+            'POST',
+            $this->router->generate('user_suite_update', ['suiteId' => $suiteId]),
+            $headers,
+            http_build_query($payload)
+        );
+    }
+
+    public function makeListSuitesRequest(?string $authenticationToken): ResponseInterface
+    {
+        return $this->client->makeRequest(
+            'GET',
+            $this->router->generate('user_suite_list'),
+            $this->createAuthorizationHeader($authenticationToken),
+        );
+    }
+
+    public function makeDeleteSuiteRequest(?string $authenticationToken, string $suiteId): ResponseInterface
+    {
+        return $this->client->makeRequest(
+            'DELETE',
+            $this->router->generate('user_suite_get', ['suiteId' => $suiteId]),
+            $this->createAuthorizationHeader($authenticationToken),
+        );
+    }
+
+    /**
      * @return array<string, string>
      */
     private function createAuthorizationHeader(?string $authenticationToken): array

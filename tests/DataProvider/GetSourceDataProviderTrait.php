@@ -31,7 +31,7 @@ trait GetSourceDataProviderTrait
                     );
                 },
                 'expectedResponseDataCreator' => function (GitSource $source) {
-                    return [
+                    $data = [
                         'id' => $source->getId(),
                         'user_id' => $source->getUserId(),
                         'type' => Type::GIT->value,
@@ -40,6 +40,13 @@ trait GetSourceDataProviderTrait
                         'path' => $source->getPath(),
                         'has_credentials' => true,
                     ];
+
+                    $deletedAt = $source->getDeletedAt();
+                    if ($deletedAt instanceof \DateTimeInterface) {
+                        $data['deleted_at'] = (int) $deletedAt->format('U');
+                    }
+
+                    return $data;
                 },
             ],
             'git source without credentials' => [
@@ -50,7 +57,7 @@ trait GetSourceDataProviderTrait
                     );
                 },
                 'expectedResponseDataCreator' => function (GitSource $source) {
-                    return [
+                    $data = [
                         'id' => $source->getId(),
                         'user_id' => $source->getUserId(),
                         'type' => Type::GIT->value,
@@ -59,6 +66,13 @@ trait GetSourceDataProviderTrait
                         'path' => $source->getPath(),
                         'has_credentials' => false,
                     ];
+
+                    $deletedAt = $source->getDeletedAt();
+                    if ($deletedAt instanceof \DateTimeInterface) {
+                        $data['deleted_at'] = (int) $deletedAt->format('U');
+                    }
+
+                    return $data;
                 },
             ],
             'file' => [
@@ -69,12 +83,19 @@ trait GetSourceDataProviderTrait
                     );
                 },
                 'expectedResponseDataCreator' => function (FileSource $source) {
-                    return [
+                    $data = [
                         'id' => $source->getId(),
                         'user_id' => $source->getUserId(),
                         'type' => Type::FILE->value,
                         'label' => $source->getLabel(),
                     ];
+
+                    $deletedAt = $source->getDeletedAt();
+                    if ($deletedAt instanceof \DateTimeInterface) {
+                        $data['deleted_at'] = (int) $deletedAt->format('U');
+                    }
+
+                    return $data;
                 },
             ],
             'run with file parent' => [
@@ -87,7 +108,7 @@ trait GetSourceDataProviderTrait
                     return new RunSource((new EntityIdFactory())->create(), $parent);
                 },
                 'expectedResponseDataCreator' => function (RunSource $source) {
-                    return [
+                    $data = [
                         'id' => $source->getId(),
                         'user_id' => $source->getUserId(),
                         'type' => Type::RUN->value,
@@ -95,6 +116,13 @@ trait GetSourceDataProviderTrait
                         'parameters' => [],
                         'state' => State::REQUESTED->value,
                     ];
+
+                    $deletedAt = $source->getDeletedAt();
+                    if ($deletedAt instanceof \DateTimeInterface) {
+                        $data['deleted_at'] = (int) $deletedAt->format('U');
+                    }
+
+                    return $data;
                 },
             ],
             'run with git parent' => [
@@ -107,7 +135,7 @@ trait GetSourceDataProviderTrait
                     return new RunSource((new EntityIdFactory())->create(), $parent);
                 },
                 'expectedResponseDataCreator' => function (RunSource $source) {
-                    return [
+                    $data = [
                         'id' => $source->getId(),
                         'user_id' => $source->getUserId(),
                         'type' => Type::RUN->value,
@@ -115,6 +143,13 @@ trait GetSourceDataProviderTrait
                         'parameters' => [],
                         'state' => State::REQUESTED->value,
                     ];
+
+                    $deletedAt = $source->getDeletedAt();
+                    if ($deletedAt instanceof \DateTimeInterface) {
+                        $data['deleted_at'] = (int) $deletedAt->format('U');
+                    }
+
+                    return $data;
                 },
             ],
             'run, preparation failed' => [
@@ -133,7 +168,7 @@ trait GetSourceDataProviderTrait
                     return $source;
                 },
                 'expectedResponseDataCreator' => function (RunSource $source) {
-                    return [
+                    $data = [
                         'id' => $source->getId(),
                         'user_id' => $source->getUserId(),
                         'type' => Type::RUN->value,
@@ -143,6 +178,13 @@ trait GetSourceDataProviderTrait
                         'failure_reason' => FailureReason::GIT_CLONE->value,
                         'failure_message' => 'fatal: repository \'http://example.com/with-credentials.git\' not found',
                     ];
+
+                    $deletedAt = $source->getDeletedAt();
+                    if ($deletedAt instanceof \DateTimeInterface) {
+                        $data['deleted_at'] = (int) $deletedAt->format('U');
+                    }
+
+                    return $data;
                 },
             ],
         ];

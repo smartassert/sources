@@ -161,6 +161,71 @@ abstract class AbstractUnauthorizedUserTest extends AbstractApplicationTest
     }
 
     /**
+     * @dataProvider unauthorizedUserDataProvider
+     */
+    public function testCreateSuiteUnauthorizedUser(callable $tokenCreator): void
+    {
+        $response = $this->applicationClient->makeCreateSuiteRequest(
+            $tokenCreator(self::$authenticationConfiguration),
+            []
+        );
+
+        $this->responseAsserter->assertUnauthorizedResponse($response);
+    }
+
+    /**
+     * @dataProvider unauthorizedUserDataProvider
+     */
+    public function testGetSuiteUnauthorizedUser(callable $tokenCreator): void
+    {
+        $response = $this->applicationClient->makeGetSuiteRequest(
+            $tokenCreator(self::$authenticationConfiguration),
+            (new EntityIdFactory())->create()
+        );
+
+        $this->responseAsserter->assertUnauthorizedResponse($response);
+    }
+
+    /**
+     * @dataProvider unauthorizedUserDataProvider
+     */
+    public function testListSuitesUnauthorizedUser(callable $tokenCreator): void
+    {
+        $response = $this->applicationClient->makeListSuitesRequest(
+            $tokenCreator(self::$authenticationConfiguration)
+        );
+
+        $this->responseAsserter->assertUnauthorizedResponse($response);
+    }
+
+    /**
+     * @dataProvider unauthorizedUserDataProvider
+     */
+    public function testUpdateSuiteUnauthorizedUser(callable $tokenCreator): void
+    {
+        $response = $this->applicationClient->makeUpdateSuiteRequest(
+            $tokenCreator(self::$authenticationConfiguration),
+            (new EntityIdFactory())->create(),
+            []
+        );
+
+        $this->responseAsserter->assertUnauthorizedResponse($response);
+    }
+
+    /**
+     * @dataProvider unauthorizedUserDataProvider
+     */
+    public function testDeleteSuiteUnauthorizedUser(callable $tokenCreator): void
+    {
+        $response = $this->applicationClient->makeDeleteSuiteRequest(
+            $tokenCreator(self::$authenticationConfiguration),
+            (new EntityIdFactory())->create(),
+        );
+
+        $this->responseAsserter->assertUnauthorizedResponse($response);
+    }
+
+    /**
      * @return array<mixed>
      */
     public function unauthorizedUserDataProvider(): array
