@@ -138,14 +138,16 @@ class SourceController
     ): Response {
         $this->entityAccessChecker->denyAccessUnlessGranted($source);
 
-        $this->repository->delete($source);
+        if (null === $source->getDeletedAt()) {
+            $this->repository->delete($source);
 
-        if ($source instanceof FileSource) {
-            $fileSourceWriter->deleteDirectory($source->getDirectoryPath());
-        }
+            if ($source instanceof FileSource) {
+                $fileSourceWriter->deleteDirectory($source->getDirectoryPath());
+            }
 
-        if ($source instanceof RunSource) {
-            $runSourceWriter->deleteDirectory($source->getDirectoryPath());
+            if ($source instanceof RunSource) {
+                $runSourceWriter->deleteDirectory($source->getDirectoryPath());
+            }
         }
 
         return new JsonResponse($source);
