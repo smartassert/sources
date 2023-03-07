@@ -10,6 +10,7 @@ use App\Entity\SourceInterface;
 use App\Repository\SourceRepository;
 use App\Services\EntityIdFactory;
 use App\Services\RunSourceSerializer;
+use App\Tests\DataProvider\GetSourceDataProviderTrait;
 use App\Tests\Services\AuthenticationConfiguration;
 use App\Tests\Services\EntityRemover;
 use App\Tests\Services\SourceOriginFactory;
@@ -18,6 +19,8 @@ use League\Flysystem\FilesystemOperator;
 
 abstract class AbstractDeleteSourceTest extends AbstractApplicationTest
 {
+    use GetSourceDataProviderTrait;
+
     private SourceRepository $sourceRepository;
     private EntityManagerInterface $entityManager;
 
@@ -40,11 +43,12 @@ abstract class AbstractDeleteSourceTest extends AbstractApplicationTest
     }
 
     /**
-     * @dataProvider deleteSourceSuccessDataProvider
+     * @dataProvider getSourceDataProvider
      *
      * @param callable(AuthenticationConfiguration $authenticationConfiguration): SourceInterface $sourceCreator
+     * @param callable(SourceInterface $source): array<mixed> $expectedResponseDataCreator
      */
-    public function testDeleteSuccess(callable $sourceCreator): void
+    public function testDeleteSuccess(callable $sourceCreator, callable $expectedResponseDataCreator): void
     {
         $source = $sourceCreator(self::$authenticationConfiguration);
         $this->sourceRepository->save($source);
@@ -56,12 +60,28 @@ abstract class AbstractDeleteSourceTest extends AbstractApplicationTest
             self::assertSame(1, $this->sourceRepository->count(['id' => $source->getParent()->getId()]));
         }
 
+        $unixTimestampBeforeDeletion = time();
+
         $response = $this->applicationClient->makeDeleteSourceRequest(
             self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
             $source->getId()
         );
 
-        $this->responseAsserter->assertSuccessfulResponseWithNoBody($response);
+        $unixTimestampAfterDeletion = time();
+
+        $expectedResponseData = $expectedResponseDataCreator($source);
+
+        $this->responseAsserter->assertSuccessfulJsonResponse($response, $expectedResponseData);
+
+        $responseData = json_decode($response->getBody()->getContents(), true);
+        self::assertIsArray($responseData);
+        self::assertArrayHasKey('deleted_at', $responseData);
+
+        $deletedAt = $responseData['deleted_at'];
+        self::assertIsInt($deletedAt);
+
+        self::assertGreaterThanOrEqual($unixTimestampBeforeDeletion, $deletedAt);
+        self::assertLessThanOrEqual($unixTimestampAfterDeletion, $deletedAt);
 
         $this->entityManager->clear();
 
@@ -75,53 +95,6 @@ abstract class AbstractDeleteSourceTest extends AbstractApplicationTest
                 self::assertNull($parent->getDeletedAt());
             }
         }
-    }
-
-    /**
-     * @return array<mixed>
-     */
-    public function deleteSourceSuccessDataProvider(): array
-    {
-        return [
-            'file source without run source' => [
-                'sourceCreator' => function (AuthenticationConfiguration $authenticationConfiguration) {
-                    return SourceOriginFactory::create(
-                        type: 'file',
-                        userId: $authenticationConfiguration->getUser(self::USER_1_EMAIL)->id
-                    );
-                },
-            ],
-            'git source without run source' => [
-                'sourceCreator' => function (AuthenticationConfiguration $authenticationConfiguration) {
-                    return SourceOriginFactory::create(
-                        type: 'git',
-                        userId: $authenticationConfiguration->getUser(self::USER_1_EMAIL)->id
-                    );
-                },
-            ],
-            'run source with file parent' => [
-                'sourceCreator' => function (AuthenticationConfiguration $authenticationConfiguration) {
-                    return new RunSource(
-                        (new EntityIdFactory())->create(),
-                        SourceOriginFactory::create(
-                            type: 'file',
-                            userId: $authenticationConfiguration->getUser(self::USER_1_EMAIL)->id
-                        )
-                    );
-                },
-            ],
-            'run source with git parent' => [
-                'sourceCreator' => function (AuthenticationConfiguration $authenticationConfiguration) {
-                    return new RunSource(
-                        (new EntityIdFactory())->create(),
-                        SourceOriginFactory::create(
-                            type: 'git',
-                            userId: $authenticationConfiguration->getUser(self::USER_1_EMAIL)->id
-                        )
-                    );
-                },
-            ],
-        ];
     }
 
     public function testDeleteRunSourceDeletesRunSourceFiles(): void
@@ -145,12 +118,11 @@ abstract class AbstractDeleteSourceTest extends AbstractApplicationTest
         self::assertTrue($runSourceStorage->directoryExists($runSource->getDirectoryPath()));
         self::assertTrue($runSourceStorage->fileExists($serializedRunSourcePath));
 
-        $response = $this->applicationClient->makeDeleteSourceRequest(
+        $this->applicationClient->makeDeleteSourceRequest(
             self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
             $runSource->getId()
         );
 
-        $this->responseAsserter->assertSuccessfulResponseWithNoBody($response);
         self::assertFalse($runSourceStorage->directoryExists($runSource->getDirectoryPath()));
         self::assertFalse($runSourceStorage->fileExists($serializedRunSourcePath));
         self::assertSame(1, $this->sourceRepository->count(['id' => $fileSource->getId()]));
@@ -178,12 +150,11 @@ abstract class AbstractDeleteSourceTest extends AbstractApplicationTest
         self::assertTrue($fileSourceStorage->directoryExists($sourceRelativePath));
         self::assertTrue($fileSourceStorage->fileExists($fileRelativePath));
 
-        $response = $this->applicationClient->makeDeleteSourceRequest(
+        $this->applicationClient->makeDeleteSourceRequest(
             self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
             $fileSource->getId()
         );
 
-        $this->responseAsserter->assertSuccessfulResponseWithNoBody($response);
         self::assertFalse($fileSourceStorage->directoryExists($sourceRelativePath));
         self::assertFalse($fileSourceStorage->fileExists($fileRelativePath));
     }
