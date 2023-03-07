@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Application;
 
+use App\Entity\Suite;
 use App\Repository\SuiteRepository;
 use App\Request\SuiteRequest;
 
@@ -197,6 +198,33 @@ abstract class AbstractUpdateSuiteTest extends AbstractSuiteTest
                 ],
             ]
         );
+    }
+
+    public function testUpdateSuiteWithLabelOfDeletedSuite(): void
+    {
+        $deletedSuiteLabel = 'deleted suite label';
+
+        $deletedSuiteId = $this->createSuite($deletedSuiteLabel, []);
+
+        $suiteRepository = self::getContainer()->get(SuiteRepository::class);
+        \assert($suiteRepository instanceof SuiteRepository);
+        $suite = $suiteRepository->find($deletedSuiteId);
+        \assert($suite instanceof Suite);
+        $suiteRepository->delete($suite);
+
+        $suiteId = $this->createSuite(md5((string) rand()), []);
+
+        $updateResponse = $this->applicationClient->makeUpdateSuiteRequest(
+            self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
+            $suiteId,
+            [
+                SuiteRequest::PARAMETER_SOURCE_ID => $this->sourceId,
+                SuiteRequest::PARAMETER_LABEL => $deletedSuiteLabel,
+                SuiteRequest::PARAMETER_TESTS => [],
+            ],
+        );
+
+        self::assertSame(200, $updateResponse->getStatusCode());
     }
 
     /**

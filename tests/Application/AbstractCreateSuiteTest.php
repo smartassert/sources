@@ -11,7 +11,7 @@ use App\Request\SuiteRequest;
 abstract class AbstractCreateSuiteTest extends AbstractSuiteTest
 {
     /**
-     * @dataProvider createSourceSuccessDataProvider
+     * @dataProvider createSuccessDataProvider
      *
      * @param array<string, string> $requestParameters
      */
@@ -57,7 +57,7 @@ abstract class AbstractCreateSuiteTest extends AbstractSuiteTest
     /**
      * @return array<mixed>
      */
-    public function createSourceSuccessDataProvider(): array
+    public function createSuccessDataProvider(): array
     {
         return [
             'no tests' => [
