@@ -213,6 +213,19 @@ abstract class AbstractUnauthorizedUserTest extends AbstractApplicationTest
     }
 
     /**
+     * @dataProvider unauthorizedUserDataProvider
+     */
+    public function testDeleteSuiteUnauthorizedUser(callable $tokenCreator): void
+    {
+        $response = $this->applicationClient->makeDeleteSuiteRequest(
+            $tokenCreator(self::$authenticationConfiguration),
+            (new EntityIdFactory())->create(),
+        );
+
+        $this->responseAsserter->assertUnauthorizedResponse($response);
+    }
+
+    /**
      * @return array<mixed>
      */
     public function unauthorizedUserDataProvider(): array

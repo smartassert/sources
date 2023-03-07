@@ -13,8 +13,10 @@ use App\Request\FileSourceRequest;
 use App\Request\OriginSourceRequest;
 use App\Services\EntityIdFactory;
 use App\Tests\DataProvider\GetSuiteDataProviderTrait;
+use App\Tests\Services\SuiteFactory;
+use Doctrine\ORM\EntityManagerInterface;
 
-abstract class AbstractGetSuiteTest extends AbstractApplicationTest
+abstract class AbstractDeleteSuiteTest extends AbstractApplicationTest
 {
     use GetSuiteDataProviderTrait;
 
@@ -48,9 +50,9 @@ abstract class AbstractGetSuiteTest extends AbstractApplicationTest
         $this->suiteRepository = $suiteRepository;
     }
 
-    public function testGetSuiteSuiteNotFound(): void
+    public function testDeleteSuiteSuiteNotFound(): void
     {
-        $response = $this->applicationClient->makeGetSuiteRequest(
+        $response = $this->applicationClient->makeDeleteSuiteRequest(
             self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
             (new EntityIdFactory())->create()
         );
@@ -64,18 +66,46 @@ abstract class AbstractGetSuiteTest extends AbstractApplicationTest
      * @param callable(FileSource): Suite   $suiteCreator
      * @param callable(Suite): array<mixed> $expectedResponseDataCreator
      */
-    public function testGetSuccess(callable $suiteCreator, callable $expectedResponseDataCreator): void
+    public function testDeleteSuccess(callable $suiteCreator, callable $expectedResponseDataCreator): void
     {
         $suite = $suiteCreator($this->source);
         $this->suiteRepository->save($suite);
+        $suiteId = $suite->id;
 
-        $response = $this->applicationClient->makeGetSuiteRequest(
+        $response = $this->applicationClient->makeDeleteSuiteRequest(
             self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
             $suite->id,
         );
 
+        $entityManager = self::getContainer()->get(EntityManagerInterface::class);
+        \assert($entityManager instanceof EntityManagerInterface);
+
+        $entityManager->clear();
+        $suite = $this->suiteRepository->find($suiteId);
+        \assert($suite instanceof Suite);
+
         $expectedResponseData = $expectedResponseDataCreator($suite);
 
         $this->responseAsserter->assertSuccessfulJsonResponse($response, $expectedResponseData);
+    }
+
+    public function testDeleteIsIdempotent(): void
+    {
+        $suite = SuiteFactory::create($this->source);
+        $this->suiteRepository->save($suite);
+
+        $deletedAt = new \DateTimeImmutable('1978-05-02');
+        $suite->setDeletedAt($deletedAt);
+        $this->suiteRepository->save($suite);
+
+        $response = $this->applicationClient->makeDeleteSuiteRequest(
+            self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
+            $suite->id
+        );
+
+        $responseData = json_decode($response->getBody()->getContents(), true);
+        \assert(is_array($responseData));
+
+        self::assertSame((int) $deletedAt->format('U'), $responseData['deleted_at']);
     }
 }
