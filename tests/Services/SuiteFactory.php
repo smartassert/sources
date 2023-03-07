@@ -19,7 +19,9 @@ class SuiteFactory
         ?string $label = null,
         ?array $tests = null,
     ): Suite {
-        $suite = new Suite((new EntityIdFactory())->create(), $source);
+        $suite = new Suite((new EntityIdFactory())->create());
+
+        $suite->setSource($source);
 
         $label = is_string($label) ? $label : md5((string) rand());
         $suite->setLabel($label);

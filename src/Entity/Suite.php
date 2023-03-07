@@ -43,10 +43,9 @@ class Suite implements \JsonSerializable, UserHeldEntityInterface
     /**
      * @param non-empty-string $id
      */
-    public function __construct(string $id, SourceOriginInterface $source)
+    public function __construct(string $id)
     {
         $this->id = $id;
-        $this->source = $source;
     }
 
     /**
@@ -84,6 +83,11 @@ class Suite implements \JsonSerializable, UserHeldEntityInterface
         if (null === $this->deletedAt) {
             $this->deletedAt = $deletedAt;
         }
+    }
+
+    public function setSource(SourceOriginInterface $source): void
+    {
+        $this->source = $source;
     }
 
     public function getSource(): SourceOriginInterface

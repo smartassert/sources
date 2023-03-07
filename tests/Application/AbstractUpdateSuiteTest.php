@@ -10,6 +10,15 @@ use App\Request\SuiteRequest;
 
 abstract class AbstractUpdateSuiteTest extends AbstractSuiteTest
 {
+    private string $secondarySourceId;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->secondarySourceId = $this->createSource(self::USER_1_EMAIL);
+    }
+
     public function testUpdateNewLabelNotUnique(): void
     {
         $suiteRepository = self::getContainer()->get(SuiteRepository::class);
@@ -18,8 +27,8 @@ abstract class AbstractUpdateSuiteTest extends AbstractSuiteTest
         $suiteLabel1 = md5((string) rand());
         $suiteLabel2 = md5((string) rand());
 
-        $suiteId = $this->createSuite($suiteLabel1, ['test.yaml']);
-        $this->createSuite($suiteLabel2, ['test.yaml']);
+        $suiteId = $this->createSuite($this->sourceId, $suiteLabel1, ['test.yaml']);
+        $this->createSuite($this->sourceId, $suiteLabel2, ['test.yaml']);
 
         self::assertSame(1, $suiteRepository->count(['label' => $suiteLabel1]));
 
@@ -51,15 +60,20 @@ abstract class AbstractUpdateSuiteTest extends AbstractSuiteTest
     /**
      * @dataProvider updateSuccessDataProvider
      *
-     * @param string[]              $initialSuiteTests
-     * @param array<string, string> $updateRequestParameters
+     * @param callable(string, string): string                $sourceIdSelector
+     * @param callable(string, string): array<string, string> $updateRequestParametersCreator
+     * @param string[]                                        $initialSuiteTests
      */
     public function testUpdateSuccess(
+        callable $sourceIdSelector,
         string $initialSuiteLabel,
         array $initialSuiteTests,
-        array $updateRequestParameters
+        callable $updateRequestParametersCreator,
     ): void {
-        $suiteId = $this->createSuite($initialSuiteLabel, $initialSuiteTests);
+        $sourceId = $sourceIdSelector($this->sourceId, $this->secondarySourceId);
+        $suiteId = $this->createSuite($sourceId, $initialSuiteLabel, $initialSuiteTests);
+
+        $updateRequestParameters = $updateRequestParametersCreator($this->sourceId, $this->secondarySourceId);
 
         $response = $this->applicationClient->makeUpdateSuiteRequest(
             self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
@@ -71,7 +85,6 @@ abstract class AbstractUpdateSuiteTest extends AbstractSuiteTest
             $updateRequestParameters,
             [
                 'id' => $suiteId,
-                'source_id' => $this->sourceId,
             ]
         );
 
@@ -83,49 +96,85 @@ abstract class AbstractUpdateSuiteTest extends AbstractSuiteTest
      */
     public function updateSuccessDataProvider(): array
     {
+        $primarySourceIdSelector = function (string $sourceId): string {
+            return $sourceId;
+        };
+
         return [
-            'label unchanged, tests change from empty to non-empty' => [
+            'source unchanged, label unchanged, tests change from empty to non-empty' => [
+                'sourceIdSelector' => $primarySourceIdSelector,
                 'initialSuiteLabel' => 'label',
                 'initialSuiteTests' => [],
-                'updateRequestParameters' => [
-                    SuiteRequest::PARAMETER_LABEL => 'label',
-                    SuiteRequest::PARAMETER_TESTS => [
-                        'Test/test' . md5((string) rand()) . '.yaml',
-                        'Test/test' . md5((string) rand()) . '.yaml',
-                    ],
-                ],
+                'updateRequestParametersCreator' => function (string $sourceId) {
+                    return [
+                        SuiteRequest::PARAMETER_SOURCE_ID => $sourceId,
+                        SuiteRequest::PARAMETER_LABEL => 'label',
+                        SuiteRequest::PARAMETER_TESTS => [
+                            'Test/test' . md5((string) rand()) . '.yaml',
+                            'Test/test' . md5((string) rand()) . '.yaml',
+                        ],
+                    ];
+                },
             ],
-            'label unchanged, tests change from non-empty to empty' => [
+            'source unchanged, label unchanged, tests change from non-empty to empty' => [
+                'sourceIdSelector' => $primarySourceIdSelector,
                 'initialSuiteLabel' => 'label',
                 'initialSuiteTests' => [
                     'Test/test' . md5((string) rand()) . '.yaml',
                 ],
-                'updateRequestParameters' => [
-                    SuiteRequest::PARAMETER_LABEL => 'label',
-                    SuiteRequest::PARAMETER_TESTS => [],
-                ],
+                'updateRequestParametersCreator' => function (string $sourceId) {
+                    return [
+                        SuiteRequest::PARAMETER_SOURCE_ID => $sourceId,
+                        SuiteRequest::PARAMETER_LABEL => 'label',
+                        SuiteRequest::PARAMETER_TESTS => [],
+                    ];
+                },
             ],
-            'label changed, tests remain same and empty' => [
+            'source unchanged, label changed, tests remain same and empty' => [
+                'sourceIdSelector' => $primarySourceIdSelector,
                 'initialSuiteLabel' => 'label',
                 'initialSuiteTests' => [],
-                'updateRequestParameters' => [
-                    SuiteRequest::PARAMETER_LABEL => 'new label',
-                    SuiteRequest::PARAMETER_TESTS => [],
-                ],
+                'updateRequestParametersCreator' => function (string $sourceId) {
+                    return [
+                        SuiteRequest::PARAMETER_SOURCE_ID => $sourceId,
+                        SuiteRequest::PARAMETER_LABEL => 'new label',
+                        SuiteRequest::PARAMETER_TESTS => [],
+                    ];
+                },
             ],
-            'label changed, tests remain same and non-empty' => [
+            'source unchanged, label changed, tests remain same and non-empty' => [
+                'sourceIdSelector' => $primarySourceIdSelector,
                 'initialSuiteLabel' => 'label',
                 'initialSuiteTests' => [
                     'Test/test1.yaml',
                     'Test/test2.yaml',
                 ],
-                'updateRequestParameters' => [
-                    SuiteRequest::PARAMETER_LABEL => 'new label',
-                    SuiteRequest::PARAMETER_TESTS => [
-                        'Test/test1.yaml',
-                        'Test/test2.yaml',
-                    ],
+                'updateRequestParametersCreator' => function (string $sourceId) {
+                    return [
+                        SuiteRequest::PARAMETER_SOURCE_ID => $sourceId,
+                        SuiteRequest::PARAMETER_LABEL => 'new label',
+                        SuiteRequest::PARAMETER_TESTS => [
+                            'Test/test1.yaml',
+                            'Test/test2.yaml',
+                        ],
+                    ];
+                },
+            ],
+            'all changed' => [
+                'sourceIdSelector' => $primarySourceIdSelector,
+                'initialSuiteLabel' => 'original label',
+                'initialSuiteTests' => [
+                    'Test/test1.yaml',
                 ],
+                'updateRequestParametersCreator' => function (string $sourceId, string $secondarySourceId) {
+                    return [
+                        SuiteRequest::PARAMETER_SOURCE_ID => $secondarySourceId,
+                        SuiteRequest::PARAMETER_LABEL => 'new label',
+                        SuiteRequest::PARAMETER_TESTS => [
+                            'Test/test2.yaml',
+                        ],
+                    ];
+                },
             ],
         ];
     }
@@ -138,7 +187,7 @@ abstract class AbstractUpdateSuiteTest extends AbstractSuiteTest
         $newLabel = md5((string) rand());
         $newTests = ['Test/test' . md5((string) rand()) . '.yaml'];
 
-        $suiteId = $this->createSuite($initialLabel, $initialTests);
+        $suiteId = $this->createSuite($this->sourceId, $initialLabel, $initialTests);
 
         $updateParameters = [
             SuiteRequest::PARAMETER_SOURCE_ID => $this->sourceId,
@@ -169,7 +218,7 @@ abstract class AbstractUpdateSuiteTest extends AbstractSuiteTest
 
     public function testUpdateDeletedSuite(): void
     {
-        $suiteId = $this->createSuite('label', []);
+        $suiteId = $this->createSuite($this->sourceId, 'label', []);
 
         $this->applicationClient->makeDeleteSuiteRequest(
             self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
@@ -204,7 +253,7 @@ abstract class AbstractUpdateSuiteTest extends AbstractSuiteTest
     {
         $deletedSuiteLabel = 'deleted suite label';
 
-        $deletedSuiteId = $this->createSuite($deletedSuiteLabel, []);
+        $deletedSuiteId = $this->createSuite($this->sourceId, $deletedSuiteLabel, []);
 
         $suiteRepository = self::getContainer()->get(SuiteRepository::class);
         \assert($suiteRepository instanceof SuiteRepository);
@@ -212,7 +261,7 @@ abstract class AbstractUpdateSuiteTest extends AbstractSuiteTest
         \assert($suite instanceof Suite);
         $suiteRepository->delete($suite);
 
-        $suiteId = $this->createSuite(md5((string) rand()), []);
+        $suiteId = $this->createSuite($this->sourceId, md5((string) rand()), []);
 
         $updateResponse = $this->applicationClient->makeUpdateSuiteRequest(
             self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
@@ -230,12 +279,12 @@ abstract class AbstractUpdateSuiteTest extends AbstractSuiteTest
     /**
      * @param string[] $tests
      */
-    private function createSuite(string $label, array $tests): string
+    private function createSuite(string $sourceId, string $label, array $tests): string
     {
         $response = $this->applicationClient->makeCreateSuiteRequest(
             self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
             [
-                SuiteRequest::PARAMETER_SOURCE_ID => $this->sourceId,
+                SuiteRequest::PARAMETER_SOURCE_ID => $sourceId,
                 SuiteRequest::PARAMETER_LABEL => $label,
                 SuiteRequest::PARAMETER_TESTS => $tests,
             ]

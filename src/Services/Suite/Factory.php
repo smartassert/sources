@@ -26,10 +26,8 @@ class Factory
      */
     public function create(SuiteRequest $request): Suite
     {
-        $source = $request->source;
-
         $suite = $this->repository->findOneBy([
-            'source' => $source,
+            'source' => $request->source,
             'label' => $request->label,
             'tests' => $request->tests,
             'deletedAt' => null,
@@ -37,7 +35,7 @@ class Factory
 
         if (null === $suite) {
             $suite = $this->mutator->update(
-                new Suite($this->entityIdFactory->create(), $source),
+                new Suite($this->entityIdFactory->create()),
                 $request
             );
         }
