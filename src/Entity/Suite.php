@@ -86,6 +86,11 @@ class Suite implements \JsonSerializable, UserHeldEntityInterface
         }
     }
 
+    public function setSource(SourceOriginInterface $source): void
+    {
+        $this->source = $source;
+    }
+
     public function getSource(): SourceOriginInterface
     {
         return $this->source;
