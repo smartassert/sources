@@ -22,7 +22,7 @@ class Mutator
     public function update(Suite $suite, SuiteRequest $request): Suite
     {
         $foundSuite = $this->repository->findOneBy([
-            'source' => $suite->getSource(),
+            'source' => $request->source,
             'label' => $request->label,
             'deletedAt' => null,
         ]);
@@ -31,6 +31,7 @@ class Mutator
             throw new NonUniqueEntityLabelException();
         }
 
+        $suite->setSource($request->source);
         $suite->setLabel($request->label);
         $suite->setTests($request->tests);
 

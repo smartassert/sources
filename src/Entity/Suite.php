@@ -43,10 +43,9 @@ class Suite implements \JsonSerializable, UserHeldEntityInterface
     /**
      * @param non-empty-string $id
      */
-    public function __construct(string $id, SourceOriginInterface $source)
+    public function __construct(string $id)
     {
         $this->id = $id;
-        $this->source = $source;
     }
 
     /**
