@@ -50,6 +50,48 @@ abstract class AbstractGetSourceTest extends AbstractApplicationTest
         $expectedResponseData = $expectedResponseDataCreator($source);
 
         $this->responseAsserter->assertSuccessfulJsonResponse($response, $expectedResponseData);
+
+        $responseData = json_decode($response->getBody()->getContents(), true);
+        self::assertIsArray($responseData);
+        self::assertArrayNotHasKey('deleted_at', $responseData);
+    }
+
+    /**
+     * @dataProvider getSourceSuccessDataProvider
+     *
+     * @param callable(AuthenticationConfiguration $authenticationConfiguration): SourceInterface $sourceCreator
+     */
+    public function testGetDeletedSourceSuccess(callable $sourceCreator): void
+    {
+        $sourceRepository = self::getContainer()->get(SourceRepository::class);
+        \assert($sourceRepository instanceof SourceRepository);
+
+        $source = $sourceCreator(self::$authenticationConfiguration);
+        $sourceRepository->save($source);
+
+        $unixTimestampBeforeDeletion = time();
+
+        $this->applicationClient->makeDeleteSourceRequest(
+            self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
+            $source->getId()
+        );
+
+        $unixTimestampAfterDeletion = time();
+
+        $response = $this->applicationClient->makeGetSourceRequest(
+            self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
+            $source->getId()
+        );
+
+        $responseData = json_decode($response->getBody()->getContents(), true);
+        self::assertIsArray($responseData);
+        self::assertArrayHasKey('deleted_at', $responseData);
+
+        $deletedAt = $responseData['deleted_at'];
+        self::assertIsInt($deletedAt);
+
+        self::assertGreaterThanOrEqual($unixTimestampBeforeDeletion, $deletedAt);
+        self::assertLessThanOrEqual($unixTimestampAfterDeletion, $deletedAt);
     }
 
     /**

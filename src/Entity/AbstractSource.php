@@ -82,16 +82,27 @@ abstract class AbstractSource implements SourceInterface, \JsonSerializable
      * @return array{
      *     "id": string,
      *     "user_id": non-empty-string,
-     *     "type": non-empty-string
+     *     "type": non-empty-string,
+     *     "deleted_at"?: positive-int
      * }
      */
     public function jsonSerialize(): array
     {
-        return [
+        $data = [
             'id' => $this->id,
             'user_id' => $this->getUserId(),
             'type' => $this->getType()->value,
         ];
+
+        if ($this->getDeletedAt() instanceof \DateTimeInterface) {
+            $deletedAtTimestamp = (int) $this->getDeletedAt()->format('U');
+
+            if ($deletedAtTimestamp >= 1) {
+                $data['deleted_at'] = $deletedAtTimestamp;
+            }
+        }
+
+        return $data;
     }
 
     abstract protected function getType(): Type;
