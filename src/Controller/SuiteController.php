@@ -70,15 +70,7 @@ class SuiteController
     #[Route(SuiteRoutes::ROUTE_SUITES, name: 'user_suite_list', methods: ['GET'])]
     public function list(User $user): Response
     {
-        $suites = $this->repository->findBy(
-            [
-                'userId' => $user->getUserIdentifier(),
-                'deletedAt' => null,
-            ],
-            [
-                'label' => 'ASC',
-            ]
-        );
+        $suites = $this->repository->findForUser($user);
 
         return new JsonResponse($suites);
     }
