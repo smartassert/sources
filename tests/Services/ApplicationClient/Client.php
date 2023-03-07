@@ -238,6 +238,15 @@ class Client
         );
     }
 
+    public function makeDeleteSuiteRequest(?string $authenticationToken, string $suiteId): ResponseInterface
+    {
+        return $this->client->makeRequest(
+            'DELETE',
+            $this->router->generate('user_suite_get', ['suiteId' => $suiteId]),
+            $this->createAuthorizationHeader($authenticationToken),
+        );
+    }
+
     /**
      * @return array<string, string>
      */

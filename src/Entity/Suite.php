@@ -93,21 +93,37 @@ class Suite implements \JsonSerializable, UserHeldEntityInterface
         }
     }
 
+    public function getSource(): SourceOriginInterface
+    {
+        return $this->source;
+    }
+
     /**
      * @return array{
      *     id: non-empty-string,
      *     source_id: non-empty-string,
      *     label: non-empty-string,
-     *     tests: array<int, non-empty-string>
+     *     tests: array<int, non-empty-string>,
+     *     deleted_at?: positive-int
      * }
      */
     public function jsonSerialize(): array
     {
-        return [
+        $data = [
             'id' => $this->id,
             'source_id' => $this->source->getId(),
             'label' => $this->label,
             'tests' => $this->tests,
         ];
+
+        if ($this->getDeletedAt() instanceof \DateTimeInterface) {
+            $deletedAtTimestamp = (int) $this->getDeletedAt()->format('U');
+
+            if ($deletedAtTimestamp >= 1) {
+                $data['deleted_at'] = $deletedAtTimestamp;
+            }
+        }
+
+        return $data;
     }
 }

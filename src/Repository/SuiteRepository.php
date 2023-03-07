@@ -29,12 +29,10 @@ class SuiteRepository extends ServiceEntityRepository
         $this->getEntityManager()->flush();
     }
 
-    public function remove(Suite $entity, bool $flush = false): void
+    public function delete(Suite $entity): void
     {
-        $this->getEntityManager()->remove($entity);
+        $entity->setDeletedAt(new \DateTimeImmutable());
 
-        if ($flush) {
-            $this->getEntityManager()->flush();
-        }
+        $this->save($entity);
     }
 }

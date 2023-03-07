@@ -93,4 +93,19 @@ class SuiteController
             );
         }
     }
+
+    /**
+     * @throws AccessDeniedException
+     */
+    #[Route(SuiteRoutes::ROUTE_SUITE, name: 'user_suite_delete', methods: ['DELETE'])]
+    public function delete(Suite $suite): Response
+    {
+        $this->entityAccessChecker->denyAccessUnlessGranted($suite);
+
+        if (null === $suite->getDeletedAt()) {
+            $this->repository->delete($suite);
+        }
+
+        return new JsonResponse($suite);
+    }
 }
