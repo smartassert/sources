@@ -166,6 +166,39 @@ abstract class AbstractUpdateSuiteTest extends AbstractSuiteTest
         );
     }
 
+    public function testUpdateDeletedSuite(): void
+    {
+        $suiteId = $this->createSuite('label', []);
+
+        $this->applicationClient->makeDeleteSuiteRequest(
+            self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
+            $suiteId
+        );
+
+        $response = $this->applicationClient->makeUpdateSuiteRequest(
+            self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
+            $suiteId,
+            [
+                SuiteRequest::PARAMETER_SOURCE_ID => $this->sourceId,
+                SuiteRequest::PARAMETER_LABEL => md5((string) rand()),
+                SuiteRequest::PARAMETER_TESTS => [],
+            ]
+        );
+
+        $this->responseAsserter->assertMethodNotAllowedResponse(
+            $response,
+            [
+                'error' => [
+                    'type' => 'modify-read-only-entity',
+                    'payload' => [
+                        'type' => 'suite',
+                        'id' => $suiteId,
+                    ],
+                ],
+            ]
+        );
+    }
+
     /**
      * @param string[] $tests
      */
