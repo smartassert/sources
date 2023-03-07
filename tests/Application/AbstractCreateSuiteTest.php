@@ -139,4 +139,88 @@ abstract class AbstractCreateSuiteTest extends AbstractSuiteTest
 
         self::assertCount($createdSuiteCount, $labels);
     }
+
+    public function testCreateSuiteWithLabelOfNonDeletedSuite(): void
+    {
+        $label = md5((string) rand());
+
+        $successfulCreateResponse = $this->applicationClient->makeCreateSuiteRequest(
+            self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
+            [
+                SuiteRequest::PARAMETER_SOURCE_ID => $this->sourceId,
+                SuiteRequest::PARAMETER_LABEL => $label,
+                SuiteRequest::PARAMETER_TESTS => [
+                    'Test/test' . md5((string) rand()) . '.yaml',
+                ],
+            ]
+        );
+
+        self::assertSame(200, $successfulCreateResponse->getStatusCode());
+
+        $failedCreateResponse = $this->applicationClient->makeCreateSuiteRequest(
+            self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
+            [
+                SuiteRequest::PARAMETER_SOURCE_ID => $this->sourceId,
+                SuiteRequest::PARAMETER_LABEL => $label,
+                SuiteRequest::PARAMETER_TESTS => [
+                    'Test/test' . md5((string) rand()) . '.yaml',
+                ],
+            ]
+        );
+
+        $this->responseAsserter->assertInvalidRequestJsonResponse(
+            $failedCreateResponse,
+            [
+                'error' => [
+                    'type' => 'invalid_request',
+                    'payload' => [
+                        'name' => 'label',
+                        'value' => $label,
+                        'message' => 'This label is being used by another suite belonging to this user',
+                    ],
+                ],
+            ]
+        );
+    }
+
+    public function testCreateSuiteWithLabelOfDeletedSuite(): void
+    {
+        $label = md5((string) rand());
+
+        $firstCreateResponse = $this->applicationClient->makeCreateSuiteRequest(
+            self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
+            [
+                SuiteRequest::PARAMETER_SOURCE_ID => $this->sourceId,
+                SuiteRequest::PARAMETER_LABEL => $label,
+                SuiteRequest::PARAMETER_TESTS => [
+                    'Test/test' . md5((string) rand()) . '.yaml',
+                ],
+            ]
+        );
+
+        self::assertSame(200, $firstCreateResponse->getStatusCode());
+
+        $createResponseData = json_decode($firstCreateResponse->getBody()->getContents(), true);
+        \assert(is_array($createResponseData));
+        $suiteId = $createResponseData['id'];
+
+        $suiteRepository = self::getContainer()->get(SuiteRepository::class);
+        \assert($suiteRepository instanceof SuiteRepository);
+        $suite = $suiteRepository->find($suiteId);
+        \assert($suite instanceof Suite);
+        $suiteRepository->delete($suite);
+
+        $secondCreateResponse = $this->applicationClient->makeCreateSuiteRequest(
+            self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
+            [
+                SuiteRequest::PARAMETER_SOURCE_ID => $this->sourceId,
+                SuiteRequest::PARAMETER_LABEL => $label,
+                SuiteRequest::PARAMETER_TESTS => [
+                    'Test/test' . md5((string) rand()) . '.yaml',
+                ],
+            ]
+        );
+
+        self::assertSame(200, $secondCreateResponse->getStatusCode());
+    }
 }

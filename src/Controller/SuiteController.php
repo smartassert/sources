@@ -34,14 +34,22 @@ class SuiteController
     /**
      * @throws AccessDeniedException
      * @throws EmptyEntityIdException
-     * @throws NonUniqueEntityLabelException
+     * @throws InvalidRequestException
      */
     #[Route(SuiteRoutes::ROUTE_SUITE_BASE, name: 'user_suite_create', methods: ['POST'])]
     public function create(SuiteRequest $request): Response
     {
         $this->entityAccessChecker->denyAccessUnlessGranted($request->source);
 
-        return new JsonResponse($this->factory->create($request));
+        try {
+            return new JsonResponse($this->factory->create($request));
+        } catch (NonUniqueEntityLabelException) {
+            throw $this->exceptionFactory->createInvalidRequestExceptionForNonUniqueEntityLabel(
+                $request,
+                $request->label,
+                'suite'
+            );
+        }
     }
 
     /**
