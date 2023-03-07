@@ -21,7 +21,6 @@ final class Version20230215164357 extends AbstractMigration
             CREATE TABLE suite (
                 id VARCHAR(32) NOT NULL,
                 source_id VARCHAR(32) NOT NULL,
-                user_id VARCHAR(32) NOT NULL,
                 label VARCHAR(255) NOT NULL,
                 tests TEXT,
                 deleted_at TIMESTAMP(0) WITH TIME ZONE DEFAULT NULL,

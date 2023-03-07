@@ -22,7 +22,7 @@ class Mutator
     public function update(Suite $suite, SuiteRequest $request): Suite
     {
         $foundSuite = $this->repository->findOneBy([
-            'userId' => $suite->getUserId(),
+            'source' => $suite->getSource(),
             'label' => $request->label,
             'deletedAt' => null,
         ]);
