@@ -158,4 +158,27 @@ abstract class AbstractDeleteSourceTest extends AbstractApplicationTest
         self::assertFalse($fileSourceStorage->directoryExists($sourceRelativePath));
         self::assertFalse($fileSourceStorage->fileExists($fileRelativePath));
     }
+
+    public function testDeleteIsIdempotent(): void
+    {
+        $source = SourceOriginFactory::create(
+            type: 'file',
+            userId: self::$authenticationConfiguration->getUser(self::USER_1_EMAIL)->id,
+        );
+        $this->sourceRepository->save($source);
+
+        $deletedAt = new \DateTimeImmutable('1978-05-02');
+        $source->setDeletedAt($deletedAt);
+        $this->sourceRepository->save($source);
+
+        $response = $this->applicationClient->makeDeleteSourceRequest(
+            self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
+            $source->getId()
+        );
+
+        $responseData = json_decode($response->getBody()->getContents(), true);
+        \assert(is_array($responseData));
+
+        self::assertSame((int) $deletedAt->format('U'), $responseData['deleted_at']);
+    }
 }
