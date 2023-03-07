@@ -6,6 +6,8 @@ namespace App\EventListener;
 
 use App\Exception\HasHttpErrorCodeInterface;
 use App\Exception\InvalidRequestException;
+use App\Exception\ModifyReadOnlyEntityException;
+use App\ResponseBody\ErrorResponse;
 use App\ResponseBody\FilesystemExceptionResponse;
 use App\ResponseBody\InvalidRequestResponse;
 use App\Services\ResponseFactory;
@@ -50,6 +52,10 @@ class KernelExceptionEventSubscriber implements EventSubscriberInterface
             $response = $this->handleFilesystemException($throwable);
         }
 
+        if ($throwable instanceof ModifyReadOnlyEntityException) {
+            $response = $this->handleModifyReadOnlyEntityException($throwable);
+        }
+
         if ($response instanceof Response) {
             $event->setResponse($response);
             $event->stopPropagation();
@@ -72,5 +78,19 @@ class KernelExceptionEventSubscriber implements EventSubscriberInterface
     private function handleFilesystemException(FilesystemException $throwable): Response
     {
         return $this->responseFactory->createErrorResponse(new FilesystemExceptionResponse($throwable), 500);
+    }
+
+    private function handleModifyReadOnlyEntityException(ModifyReadOnlyEntityException $throwable): Response
+    {
+        return $this->responseFactory->createErrorResponse(
+            new ErrorResponse(
+                'modify-read-only-entity',
+                [
+                    'type' => $throwable->type,
+                    'id' => $throwable->id,
+                ]
+            ),
+            $throwable->getErrorCode()
+        );
     }
 }

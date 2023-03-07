@@ -85,4 +85,14 @@ class ResponseAsserter
             ->assert($response)
         ;
     }
+
+    /**
+     * @param array<mixed> $expectedData
+     */
+    public function assertMethodNotAllowedResponse(ResponseInterface $response, array $expectedData): void
+    {
+        (new JsonResponseAsserter(Response::HTTP_METHOD_NOT_ALLOWED, $expectedData))
+            ->assert($response)
+        ;
+    }
 }

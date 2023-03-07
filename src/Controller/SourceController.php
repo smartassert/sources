@@ -12,6 +12,7 @@ use App\Entity\SourceOriginInterface;
 use App\Enum\Source\Type;
 use App\Exception\EmptyEntityIdException;
 use App\Exception\InvalidRequestException;
+use App\Exception\ModifyReadOnlyEntityException;
 use App\Exception\NonUniqueEntityLabelException;
 use App\Message\Prepare;
 use App\Repository\SourceRepository;
@@ -91,6 +92,7 @@ class SourceController
     /**
      * @throws AccessDeniedException
      * @throws InvalidRequestException
+     * @throws ModifyReadOnlyEntityException
      */
     #[Route(SourceRoutes::ROUTE_SOURCE, name: 'user_source_update', methods: ['PUT'])]
     public function update(
@@ -100,6 +102,10 @@ class SourceController
         ExceptionFactory $exceptionFactory,
     ): Response {
         $this->entityAccessChecker->denyAccessUnlessGranted($source);
+
+        if (null !== $source->getDeletedAt()) {
+            throw new ModifyReadOnlyEntityException($source->getId(), 'source');
+        }
 
         try {
             if ($request instanceof FileSourceRequest && $source instanceof FileSource) {
