@@ -52,6 +52,7 @@ abstract class AbstractDeleteSourceTest extends AbstractApplicationTest
     {
         $source = $sourceCreator(self::$authenticationConfiguration);
         $this->sourceRepository->save($source);
+        self::assertNull($source->getDeletedAt());
 
         $sourceId = $source->getId();
 
@@ -60,30 +61,18 @@ abstract class AbstractDeleteSourceTest extends AbstractApplicationTest
             self::assertSame(1, $this->sourceRepository->count(['id' => $source->getParent()->getId()]));
         }
 
-        $unixTimestampBeforeDeletion = time();
-
         $response = $this->applicationClient->makeDeleteSourceRequest(
             self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
             $source->getId()
         );
 
-        $unixTimestampAfterDeletion = time();
+        $this->entityManager->clear();
+        $source = $this->sourceRepository->find($sourceId);
+        \assert($source instanceof SourceInterface);
 
         $expectedResponseData = $expectedResponseDataCreator($source);
 
         $this->responseAsserter->assertSuccessfulJsonResponse($response, $expectedResponseData);
-
-        $responseData = json_decode($response->getBody()->getContents(), true);
-        self::assertIsArray($responseData);
-        self::assertArrayHasKey('deleted_at', $responseData);
-
-        $deletedAt = $responseData['deleted_at'];
-        self::assertIsInt($deletedAt);
-
-        self::assertGreaterThanOrEqual($unixTimestampBeforeDeletion, $deletedAt);
-        self::assertLessThanOrEqual($unixTimestampAfterDeletion, $deletedAt);
-
-        $this->entityManager->clear();
 
         $retrievedSource = $this->sourceRepository->find($sourceId);
         self::assertInstanceOf(SourceInterface::class, $retrievedSource);

@@ -9,6 +9,7 @@ use App\Repository\SourceRepository;
 use App\Services\EntityIdFactory;
 use App\Tests\DataProvider\GetSourceDataProviderTrait;
 use App\Tests\Services\AuthenticationConfiguration;
+use Doctrine\ORM\EntityManagerInterface;
 
 abstract class AbstractGetSourceTest extends AbstractApplicationTest
 {
@@ -56,37 +57,36 @@ abstract class AbstractGetSourceTest extends AbstractApplicationTest
      * @dataProvider getSourceDataProvider
      *
      * @param callable(AuthenticationConfiguration $authenticationConfiguration): SourceInterface $sourceCreator
+     * @param callable(SourceInterface $source): array<mixed> $expectedResponseDataCreator
      */
-    public function testGetDeletedSourceSuccess(callable $sourceCreator): void
+    public function testGetDeletedSourceSuccess(callable $sourceCreator, callable $expectedResponseDataCreator): void
     {
         $sourceRepository = self::getContainer()->get(SourceRepository::class);
         \assert($sourceRepository instanceof SourceRepository);
 
         $source = $sourceCreator(self::$authenticationConfiguration);
         $sourceRepository->save($source);
-
-        $unixTimestampBeforeDeletion = time();
+        $sourceId = $source->getId();
 
         $this->applicationClient->makeDeleteSourceRequest(
             self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
             $source->getId()
         );
 
-        $unixTimestampAfterDeletion = time();
+        $entityManager = self::getContainer()->get(EntityManagerInterface::class);
+        \assert($entityManager instanceof EntityManagerInterface);
+
+        $entityManager->clear();
+        $source = $sourceRepository->find($sourceId);
+        \assert($source instanceof SourceInterface);
 
         $response = $this->applicationClient->makeGetSourceRequest(
             self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
             $source->getId()
         );
 
-        $responseData = json_decode($response->getBody()->getContents(), true);
-        self::assertIsArray($responseData);
-        self::assertArrayHasKey('deleted_at', $responseData);
+        $expectedResponseData = $expectedResponseDataCreator($source);
 
-        $deletedAt = $responseData['deleted_at'];
-        self::assertIsInt($deletedAt);
-
-        self::assertGreaterThanOrEqual($unixTimestampBeforeDeletion, $deletedAt);
-        self::assertLessThanOrEqual($unixTimestampAfterDeletion, $deletedAt);
+        $this->responseAsserter->assertSuccessfulJsonResponse($response, $expectedResponseData);
     }
 }
