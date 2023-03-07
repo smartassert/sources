@@ -142,7 +142,7 @@ class SourceController
             $runSourceWriter->deleteDirectory($source->getDirectoryPath());
         }
 
-        return new Response();
+        return new JsonResponse($source);
     }
 
     /**
