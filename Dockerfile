@@ -54,6 +54,7 @@ COPY config/routes.yaml /app/config/
 COPY migrations /app/migrations
 
 RUN mkdir -p /app/var/log \
+  && mkdir "$GIT_REPOSITORY_STORE_DIRECTORY" \
   && chown -R www-data:www-data /app/var/log \
   && composer check-platform-reqs --ansi \
   && echo "APP_SECRET=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1)" > .env \
