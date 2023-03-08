@@ -16,8 +16,14 @@ class Factory
     ) {
     }
 
-    public function create(FilesystemReader $reader, string $listPath): Provider
-    {
-        return new Provider($this->yamlParser, $this->listingFilter, $reader, $listPath);
+    /**
+     * @param array<int, string> $manifestPaths
+     */
+    public function create(
+        FilesystemReader $reader,
+        string $listPath,
+        array $manifestPaths = [],
+    ): Provider {
+        return new Provider($this->yamlParser, $this->listingFilter, $reader, $listPath, $manifestPaths);
     }
 }

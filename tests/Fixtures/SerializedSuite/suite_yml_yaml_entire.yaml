@@ -1,0 +1,25 @@
+---
+5a4e0f9bf1e7492b3f0556a828f8b45c:
+    - manifest.yaml
+18ab3273e1f46c6d95251be0ee33926d:
+    - directory/file3.yml
+ab6f33cb66780b2e2b6fae982995a99b:
+    - file1.yaml
+300d262f5e104a26ec77613ed351fdcd:
+    - file2.yml
+...
+---
+- test1.yaml
+- test2.yaml
+...
+---
+- "file 3 line 1"
+...
+---
+- "file 1 line 1"
+- "file 1 line 2"
+...
+---
+- "file 2 line 1"
+- "file 2 line 2"
+...

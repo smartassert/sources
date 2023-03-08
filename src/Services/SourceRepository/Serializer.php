@@ -21,15 +21,20 @@ class Serializer
     }
 
     /**
+     * @param array<int, string> $manifestPaths
+     *
      * @throws SourceRepositoryReaderNotFoundException
      * @throws SerializeException
      */
-    public function serialize(SourceRepositoryInterface $sourceRepository): string
-    {
+    public function serialize(
+        SourceRepositoryInterface $sourceRepository,
+        array $manifestPaths = [],
+    ): string {
         return $this->yamlFileCollectionSerializer->serializeUnreliableProvider(
             $this->yamlFileProviderFactory->create(
                 $this->readerProvider->find($sourceRepository),
-                $sourceRepository->getRepositoryPath()
+                $sourceRepository->getRepositoryPath(),
+                $manifestPaths
             )
         );
     }
