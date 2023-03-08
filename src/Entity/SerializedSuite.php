@@ -25,7 +25,7 @@ class SerializedSuite implements UserHeldEntityInterface, DirectoryLocatorInterf
 
     #[ORM\ManyToOne(targetEntity: Suite::class)]
     #[ORM\JoinColumn(nullable: false)]
-    private Suite $suite;
+    public readonly Suite $suite;
 
     /**
      * @var array<string, string>
