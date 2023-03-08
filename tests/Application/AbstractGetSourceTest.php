@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Application;
 
+use App\Entity\RunSource;
 use App\Entity\SourceInterface;
 use App\Repository\SourceRepository;
 use App\Services\EntityIdFactory;
@@ -37,6 +38,10 @@ abstract class AbstractGetSourceTest extends AbstractApplicationTest
         \assert($sourceRepository instanceof SourceRepository);
 
         $source = $sourceCreator(self::$authenticationConfiguration);
+        if ($source instanceof RunSource) {
+            $sourceRepository->save($source->getParent());
+        }
+
         $sourceRepository->save($source);
 
         $response = $this->applicationClient->makeGetSourceRequest(
@@ -65,6 +70,9 @@ abstract class AbstractGetSourceTest extends AbstractApplicationTest
         \assert($sourceRepository instanceof SourceRepository);
 
         $source = $sourceCreator(self::$authenticationConfiguration);
+        if ($source instanceof RunSource) {
+            $sourceRepository->save($source->getParent());
+        }
         $sourceRepository->save($source);
         $sourceId = $source->getId();
 

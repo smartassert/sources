@@ -13,7 +13,7 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Entity]
 class RunSource extends AbstractSource implements DirectoryLocatorInterface, \JsonSerializable
 {
-    #[ORM\ManyToOne(targetEntity: AbstractSource::class, cascade: ['persist'])]
+    #[ORM\ManyToOne(targetEntity: AbstractSource::class)]
     #[ORM\JoinColumn(nullable: false)]
     private SourceOriginInterface $parent;
 

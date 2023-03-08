@@ -41,15 +41,16 @@ abstract class AbstractReadSourceTest extends AbstractApplicationTest
 
         $idFactory = new EntityIdFactory();
 
+        $sourceRepository = self::getContainer()->get(SourceRepository::class);
+        \assert($sourceRepository instanceof SourceRepository);
+
         $fileSource = SourceOriginFactory::create(
             type: 'file',
             userId: self::$authenticationConfiguration->getUser(self::USER_1_EMAIL)->id
         );
+        $sourceRepository->save($fileSource);
 
         $runSource = new RunSource($idFactory->create(), $fileSource);
-
-        $sourceRepository = self::getContainer()->get(SourceRepository::class);
-        \assert($sourceRepository instanceof SourceRepository);
         $sourceRepository->save($runSource);
 
         $this->fixtureCreator->copyTo(
