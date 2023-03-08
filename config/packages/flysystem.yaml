@@ -17,3 +17,9 @@ flysystem:
             adapter: 'local'
             options:
                 directory: '%git_repository_store_directory%'
+
+        serialized_suite.storage:
+            adapter: 'asyncaws'
+            options:
+                client: 'app.services.remote_storage.client'
+                bucket: '%env(REMOTE_STORAGE_SERIALIZED_SUITE_BUCKET)%'
