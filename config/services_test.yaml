@@ -78,3 +78,9 @@ services:
 
     App\Tests\Services\ResponseAsserter:
         public: true
+
+    App\Services\SuiteSerializer:
+        public: true
+        arguments:
+            $serializedSuiteReader: '@serialized_suite.storage'
+            $serializedSuiteWriter: '@serialized_suite.storage'

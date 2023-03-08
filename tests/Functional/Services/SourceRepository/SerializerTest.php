@@ -93,11 +93,14 @@ class SerializerTest extends WebTestCase
 
     /**
      * @dataProvider serializeSuccessDataProvider
+     *
+     * @param array<string> $manifestPaths
      */
     public function testSerializeSuccess(
         string $fixtureSetIdentifier,
         string $sourceStorageId,
         SourceRepositoryInterface $source,
+        array $manifestPaths,
         string $expectedFixturePath
     ): void {
         $storage = self::getContainer()->get($sourceStorageId);
@@ -107,7 +110,7 @@ class SerializerTest extends WebTestCase
 
         self::assertSame(
             trim($this->fixtureStorage->read($expectedFixturePath)),
-            $this->serializer->serialize($source)
+            $this->serializer->serialize($source, $manifestPaths)
         );
     }
 
@@ -119,11 +122,19 @@ class SerializerTest extends WebTestCase
         $idFactory = new EntityIdFactory();
 
         return [
-            'file source' => [
+            'file source, empty manifest paths' => [
                 'fixtureSetIdentifier' => 'Source/yml_yaml_valid',
                 'sourceStorageId' => 'file_source.storage',
                 'source' => SourceOriginFactory::create(type: 'file'),
+                'manifestPaths' => [],
                 'expectedFixturePath' => 'RunSource/source_yml_yaml_entire.yaml',
+            ],
+            'file source, non-empty manifest paths' => [
+                'fixtureSetIdentifier' => 'Source/yml_yaml_valid',
+                'sourceStorageId' => 'file_source.storage',
+                'source' => SourceOriginFactory::create(type: 'file'),
+                'manifestPaths' => ['test1.yaml', 'test2.yaml'],
+                'expectedFixturePath' => 'SerializedSuite/suite_yml_yaml_entire.yaml',
             ],
             'git repository, entire' => [
                 'fixtureSetIdentifier' => 'Source/yml_yaml_valid',
@@ -134,6 +145,7 @@ class SerializerTest extends WebTestCase
 
                     return new UserGitRepository($idFactory->create(), $source);
                 })(),
+                'manifestPaths' => [],
                 'expectedFixturePath' => 'RunSource/source_yml_yaml_entire.yaml',
             ],
             'git repository, partial' => [
@@ -145,6 +157,7 @@ class SerializerTest extends WebTestCase
 
                     return new UserGitRepository($idFactory->create(), $source);
                 })(),
+                'manifestPaths' => [],
                 'expectedFixturePath' => 'RunSource/source_yml_yaml_partial.yaml',
             ],
         ];
