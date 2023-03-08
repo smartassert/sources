@@ -35,13 +35,14 @@ abstract class AbstractPrepareSourceTest extends AbstractApplicationTest
 
     public function testPrepareRunSource(): void
     {
-        $source = new RunSource(
-            (new EntityIdFactory())->create(),
-            SourceOriginFactory::create(
-                type: 'file',
-                userId: self::$authenticationConfiguration->getUser(self::USER_1_EMAIL)->id,
-            ),
+        $fileSource = SourceOriginFactory::create(
+            type: 'file',
+            userId: self::$authenticationConfiguration->getUser(self::USER_1_EMAIL)->id,
         );
+
+        $this->sourceRepository->save($fileSource);
+
+        $source = new RunSource((new EntityIdFactory())->create(), $fileSource);
 
         $this->sourceRepository->save($source);
 

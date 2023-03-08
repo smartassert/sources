@@ -49,6 +49,10 @@ class SourceRepositoryTest extends WebTestCase
         array $expected
     ): void {
         foreach ($sources as $source) {
+            if ($source instanceof RunSource) {
+                $this->repository->save($source->getParent());
+            }
+
             $this->repository->save($source);
         }
 

@@ -51,6 +51,10 @@ abstract class AbstractDeleteSourceTest extends AbstractApplicationTest
     public function testDeleteSuccess(callable $sourceCreator, callable $expectedResponseDataCreator): void
     {
         $source = $sourceCreator(self::$authenticationConfiguration);
+        if ($source instanceof RunSource) {
+            $this->sourceRepository->save($source->getParent());
+        }
+
         $this->sourceRepository->save($source);
         self::assertNull($source->getDeletedAt());
 
@@ -98,6 +102,7 @@ abstract class AbstractDeleteSourceTest extends AbstractApplicationTest
 
         $runSource = new RunSource((new EntityIdFactory())->create(), $fileSource);
 
+        $this->sourceRepository->save($fileSource);
         $this->sourceRepository->save($runSource);
 
         $serializedRunSourcePath = $runSource->getDirectoryPath() . '/' . RunSourceSerializer::SERIALIZED_FILENAME;
