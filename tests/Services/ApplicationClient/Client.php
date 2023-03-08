@@ -247,6 +247,15 @@ class Client
         );
     }
 
+    public function makeReadSuiteRequest(?string $authenticationToken, string $suiteId): ResponseInterface
+    {
+        return $this->client->makeRequest(
+            'GET',
+            $this->router->generate('user_suite_read', ['suiteId' => $suiteId]),
+            $this->createAuthorizationHeader($authenticationToken),
+        );
+    }
+
     /**
      * @return array<string, string>
      */

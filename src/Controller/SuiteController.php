@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use App\Entity\SerializedSuite;
 use App\Entity\Suite;
 use App\Exception\EmptyEntityIdException;
 use App\Exception\InvalidRequestException;
@@ -11,10 +12,13 @@ use App\Exception\ModifyReadOnlyEntityException;
 use App\Exception\NonUniqueEntityLabelException;
 use App\Repository\SuiteRepository;
 use App\Request\SuiteRequest;
+use App\Response\YamlResponse;
 use App\Security\EntityAccessChecker;
 use App\Services\ExceptionFactory;
 use App\Services\Suite\Factory;
 use App\Services\Suite\Mutator;
+use App\Services\SuiteSerializer;
+use League\Flysystem\FilesystemException;
 use SmartAssert\UsersSecurityBundle\Security\User;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -113,5 +117,17 @@ class SuiteController
         }
 
         return new JsonResponse($suite);
+    }
+
+    /**
+     * @throws AccessDeniedException
+     * @throws FilesystemException
+     */
+    #[Route(SuiteRoutes::ROUTE_SUITE . '/read', name: 'user_suite_read', methods: ['GET'])]
+    public function read(SerializedSuite $serializedSuite, SuiteSerializer $suiteSerializer): Response
+    {
+        $this->entityAccessChecker->denyAccessUnlessGranted($serializedSuite);
+
+        return new YamlResponse($suiteSerializer->read($serializedSuite));
     }
 }
