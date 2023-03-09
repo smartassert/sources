@@ -6,7 +6,6 @@ namespace App\Controller;
 
 use App\Entity\FileSource;
 use App\Entity\GitSource;
-use App\Entity\RunSource;
 use App\Entity\SourceOriginInterface;
 use App\Enum\Source\Type;
 use App\Exception\EmptyEntityIdException;
@@ -127,7 +126,6 @@ class SourceController
     public function delete(
         SourceOriginInterface $source,
         FilesystemWriter $fileSourceWriter,
-        FilesystemWriter $runSourceWriter,
     ): Response {
         $this->entityAccessChecker->denyAccessUnlessGranted($source);
 
@@ -136,10 +134,6 @@ class SourceController
 
             if ($source instanceof FileSource) {
                 $fileSourceWriter->deleteDirectory($source->getDirectoryPath());
-            }
-
-            if ($source instanceof RunSource) {
-                $runSourceWriter->deleteDirectory($source->getDirectoryPath());
             }
         }
 

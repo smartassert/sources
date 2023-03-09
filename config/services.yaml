@@ -22,7 +22,6 @@ services:
             $fileSourceWriter: '@file_source.storage'
             $gitRepositoryReader: '@git_repository.storage'
             $gitRepositoryWriter: '@git_repository.storage'
-            $runSourceWriter: '@run_source.storage'
             $serializedSuiteReader: '@serialized_suite.storage'
             $serializedSuiteWriter: '@serialized_suite.storage'
 
