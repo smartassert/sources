@@ -10,7 +10,7 @@ use App\Repository\SerializedSuiteRepository;
 use App\Repository\SourceRepository;
 use App\Repository\SuiteRepository;
 use App\Services\EntityIdFactory;
-use App\Services\RunSourceSerializer;
+use App\Services\SuiteSerializer;
 use App\Tests\Services\EntityRemover;
 use App\Tests\Services\FileStoreFixtureCreator;
 use App\Tests\Services\SourceOriginFactory;
@@ -76,7 +76,7 @@ abstract class AbstractReadSuiteTest extends AbstractApplicationTest
         $this->fixtureCreator->copyTo(
             $serializedSuiteFixturePath,
             $this->serializedSuiteStorage,
-            $serializedSuite->getDirectoryPath() . '/' . RunSourceSerializer::SERIALIZED_FILENAME
+            $serializedSuite->getDirectoryPath() . '/' . SuiteSerializer::SERIALIZED_FILENAME
         );
 
         $response = $this->applicationClient->makeReadSerializedSuiteRequest(

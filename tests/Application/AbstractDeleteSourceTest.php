@@ -9,7 +9,6 @@ use App\Entity\RunSource;
 use App\Entity\SourceInterface;
 use App\Repository\SourceRepository;
 use App\Services\EntityIdFactory;
-use App\Services\RunSourceSerializer;
 use App\Tests\DataProvider\GetSourceDataProviderTrait;
 use App\Tests\Services\AuthenticationConfiguration;
 use App\Tests\Services\EntityRemover;
@@ -105,7 +104,7 @@ abstract class AbstractDeleteSourceTest extends AbstractApplicationTest
         $this->sourceRepository->save($fileSource);
         $this->sourceRepository->save($runSource);
 
-        $serializedRunSourcePath = $runSource->getDirectoryPath() . '/' . RunSourceSerializer::SERIALIZED_FILENAME;
+        $serializedRunSourcePath = $runSource->getDirectoryPath() . '/source.yaml';
 
         $runSourceStorage->write($serializedRunSourcePath, '- serialized content');
 
