@@ -7,7 +7,7 @@ namespace App\Tests\Application;
 use App\Entity\SerializedSuite;
 use App\Entity\SourceOriginInterface;
 use App\Entity\Suite;
-use App\Enum\RunSource\State;
+use App\Enum\SerializedSuite\State;
 use App\Repository\SerializedSuiteRepository;
 use App\Repository\SourceRepository;
 use App\Repository\SuiteRepository;

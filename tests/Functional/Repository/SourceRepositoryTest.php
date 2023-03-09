@@ -4,12 +4,10 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\Repository;
 
-use App\Entity\RunSource;
 use App\Entity\SourceInterface;
 use App\Entity\SourceOriginInterface;
 use App\Enum\Source\Type;
 use App\Repository\SourceRepository;
-use App\Services\EntityIdFactory;
 use App\Tests\Model\UserId;
 use App\Tests\Services\EntityRemover;
 use App\Tests\Services\SourceOriginFactory;
@@ -49,10 +47,6 @@ class SourceRepositoryTest extends WebTestCase
         array $expected
     ): void {
         foreach ($sources as $source) {
-            if ($source instanceof RunSource) {
-                $this->repository->save($source->getParent());
-            }
-
             $this->repository->save($source);
         }
 
@@ -64,7 +58,6 @@ class SourceRepositoryTest extends WebTestCase
      */
     public function findNonDeletedByUserAndTypeDataProvider(): array
     {
-        $idFactory = new EntityIdFactory();
         $userId = UserId::create();
         $user = new User($userId, 'non-empty string');
 
@@ -88,11 +81,6 @@ class SourceRepositoryTest extends WebTestCase
             'deletedAt=null' => SourceOriginFactory::create(type: 'git', userId: $userId),
         ];
 
-        $userRunSources = [
-            'parent=file,deletedAt=null' => new RunSource($idFactory->create(), $userFileSources['deletedAt=null']),
-            'parent=git,deletedAt=null' => new RunSource($idFactory->create(), $userGitSources['deletedAt=null']),
-        ];
-
         return [
             'no sources' => [
                 'sources' => [],
@@ -100,21 +88,18 @@ class SourceRepositoryTest extends WebTestCase
                 'types' => [
                     Type::FILE,
                     Type::GIT,
-                    Type::RUN,
                 ],
                 'expected' => [],
             ],
-            'has file, git and run sources, no user match' => [
+            'has file and git sources, no user match' => [
                 'sources' => [
                     SourceOriginFactory::create(type: 'file'),
                     SourceOriginFactory::create(type: 'git'),
-                    new RunSource($idFactory->create(), SourceOriginFactory::create(type: 'file')),
                 ],
                 'user' => $user,
                 'types' => [
                     Type::FILE,
                     Type::GIT,
-                    Type::RUN,
                 ],
                 'expected' => [],
             ],
@@ -133,12 +118,10 @@ class SourceRepositoryTest extends WebTestCase
                     $userGitSources['deletedAt=null'],
                 ],
             ],
-            'has file, git and run sources for correct user only' => [
+            'has file and git for correct user only' => [
                 'sources' => [
                     $userFileSources['deletedAt=null'],
                     $userGitSources['deletedAt=null'],
-                    $userRunSources['parent=file,deletedAt=null'],
-                    $userRunSources['parent=git,deletedAt=null'],
                 ],
                 'user' => $user,
                 'types' => [
@@ -150,16 +133,12 @@ class SourceRepositoryTest extends WebTestCase
                     $userGitSources['deletedAt=null'],
                 ],
             ],
-            'has file, git and run sources for mixed users' => [
+            'has file and git sources for mixed users' => [
                 'sources' => [
                     $userFileSources['deletedAt=null'],
                     SourceOriginFactory::create(type: 'file'),
                     $userGitSources['deletedAt=null'],
                     SourceOriginFactory::create(type: 'git'),
-                    $userRunSources['parent=file,deletedAt=null'],
-                    $userRunSources['parent=git,deletedAt=null'],
-                    new RunSource($idFactory->create(), SourceOriginFactory::create(type: 'file')),
-                    new RunSource($idFactory->create(), SourceOriginFactory::create(type: 'git'))
                 ],
                 'user' => $user,
                 'types' => [
