@@ -79,7 +79,7 @@ abstract class AbstractReadSuiteTest extends AbstractApplicationTest
             $serializedSuite->getDirectoryPath() . '/' . RunSourceSerializer::SERIALIZED_FILENAME
         );
 
-        $response = $this->applicationClient->makeReadSuiteRequest(
+        $response = $this->applicationClient->makeReadSerializedSuiteRequest(
             self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
             $serializedSuite->id
         );
