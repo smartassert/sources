@@ -14,7 +14,6 @@ use App\Exception\EmptyEntityIdException;
 use App\Exception\InvalidRequestException;
 use App\Exception\ModifyReadOnlyEntityException;
 use App\Exception\NonUniqueEntityLabelException;
-use App\Message\Prepare;
 use App\Repository\SourceRepository;
 use App\Request\FileSourceRequest;
 use App\Request\GitSourceRequest;
@@ -25,14 +24,11 @@ use App\Services\RunSourceSerializer;
 use App\Services\Source\FileSourceFactory;
 use App\Services\Source\GitSourceFactory;
 use App\Services\Source\Mutator;
-use App\Services\Source\RunSourceFactory;
 use League\Flysystem\FilesystemException;
 use League\Flysystem\FilesystemWriter;
 use SmartAssert\UsersSecurityBundle\Security\User;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -151,25 +147,6 @@ class SourceController
         }
 
         return new JsonResponse($source);
-    }
-
-    /**
-     * @throws AccessDeniedException
-     * @throws EmptyEntityIdException
-     */
-    #[Route(SourceRoutes::ROUTE_SOURCE . '/prepare', name: 'user_source_prepare', methods: ['POST'])]
-    public function prepare(
-        Request $request,
-        SourceOriginInterface $source,
-        MessageBusInterface $messageBus,
-        RunSourceFactory $runSourceFactory,
-    ): Response {
-        $this->entityAccessChecker->denyAccessUnlessGranted($source);
-
-        $runSource = $runSourceFactory->create($source, $request);
-        $messageBus->dispatch(Prepare::createFromRunSource($runSource));
-
-        return new JsonResponse($runSource, 202);
     }
 
     /**
