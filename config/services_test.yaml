@@ -84,3 +84,9 @@ services:
         arguments:
             $serializedSuiteReader: '@serialized_suite.storage'
             $serializedSuiteWriter: '@serialized_suite.storage'
+
+    App\Services\RunSourceSerializer:
+        public: true
+        arguments:
+            $runSourceReader: '@run_source.storage'
+            $runSourceWriter: '@run_source.storage'

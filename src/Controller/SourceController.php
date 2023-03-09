@@ -17,10 +17,8 @@ use App\Exception\NonUniqueEntityLabelException;
 use App\Repository\SourceRepository;
 use App\Request\FileSourceRequest;
 use App\Request\GitSourceRequest;
-use App\Response\YamlResponse;
 use App\Security\EntityAccessChecker;
 use App\Services\ExceptionFactory;
-use App\Services\RunSourceSerializer;
 use App\Services\Source\FileSourceFactory;
 use App\Services\Source\GitSourceFactory;
 use App\Services\Source\Mutator;
@@ -147,17 +145,5 @@ class SourceController
         }
 
         return new JsonResponse($source);
-    }
-
-    /**
-     * @throws AccessDeniedException
-     * @throws FilesystemException
-     */
-    #[Route(SourceRoutes::ROUTE_SOURCE . '/read', name: 'user_source_read', methods: ['GET'])]
-    public function read(RunSource $source, RunSourceSerializer $runSourceSerializer): Response
-    {
-        $this->entityAccessChecker->denyAccessUnlessGranted($source);
-
-        return new YamlResponse($runSourceSerializer->read($source));
     }
 }
