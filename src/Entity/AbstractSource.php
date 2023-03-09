@@ -17,7 +17,6 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\DiscriminatorMap([
     'git' => GitSource::class,
     'file' => FileSource::class,
-    'run' => RunSource::class,
 ])]
 abstract class AbstractSource implements SourceInterface, \JsonSerializable
 {

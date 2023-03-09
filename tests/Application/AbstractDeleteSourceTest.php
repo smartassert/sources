@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Tests\Application;
 
 use App\Entity\FileSource;
-use App\Entity\RunSource;
 use App\Entity\SourceInterface;
 use App\Repository\SourceRepository;
 use App\Tests\DataProvider\GetSourceDataProviderTrait;
@@ -49,19 +48,12 @@ abstract class AbstractDeleteSourceTest extends AbstractApplicationTest
     public function testDeleteSuccess(callable $sourceCreator, callable $expectedResponseDataCreator): void
     {
         $source = $sourceCreator(self::$authenticationConfiguration);
-        if ($source instanceof RunSource) {
-            $this->sourceRepository->save($source->getParent());
-        }
-
         $this->sourceRepository->save($source);
         self::assertNull($source->getDeletedAt());
 
         $sourceId = $source->getId();
 
         self::assertSame(1, $this->sourceRepository->count(['id' => $source->getId()]));
-        if ($source instanceof RunSource && $source->getParent() instanceof SourceInterface) {
-            self::assertSame(1, $this->sourceRepository->count(['id' => $source->getParent()->getId()]));
-        }
 
         $response = $this->applicationClient->makeDeleteSourceRequest(
             self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
@@ -79,13 +71,6 @@ abstract class AbstractDeleteSourceTest extends AbstractApplicationTest
         $retrievedSource = $this->sourceRepository->find($sourceId);
         self::assertInstanceOf(SourceInterface::class, $retrievedSource);
         self::assertNotNull($retrievedSource->getDeletedAt());
-
-        if ($retrievedSource instanceof RunSource) {
-            $parent = $retrievedSource->getParent();
-            if ($parent instanceof SourceInterface) {
-                self::assertNull($parent->getDeletedAt());
-            }
-        }
     }
 
     public function testDeleteFileSourceDeletesFileSourceFiles(): void
