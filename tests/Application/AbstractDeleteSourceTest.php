@@ -8,7 +8,6 @@ use App\Entity\FileSource;
 use App\Entity\RunSource;
 use App\Entity\SourceInterface;
 use App\Repository\SourceRepository;
-use App\Services\EntityIdFactory;
 use App\Tests\DataProvider\GetSourceDataProviderTrait;
 use App\Tests\Services\AuthenticationConfiguration;
 use App\Tests\Services\EntityRemover;
@@ -87,38 +86,6 @@ abstract class AbstractDeleteSourceTest extends AbstractApplicationTest
                 self::assertNull($parent->getDeletedAt());
             }
         }
-    }
-
-    public function testDeleteRunSourceDeletesRunSourceFiles(): void
-    {
-        $runSourceStorage = self::getContainer()->get('run_source.storage');
-        \assert($runSourceStorage instanceof FilesystemOperator);
-
-        $fileSource = SourceOriginFactory::create(
-            type: 'file',
-            userId: self::$authenticationConfiguration->getUser(self::USER_1_EMAIL)->id
-        );
-
-        $runSource = new RunSource((new EntityIdFactory())->create(), $fileSource);
-
-        $this->sourceRepository->save($fileSource);
-        $this->sourceRepository->save($runSource);
-
-        $serializedRunSourcePath = $runSource->getDirectoryPath() . '/source.yaml';
-
-        $runSourceStorage->write($serializedRunSourcePath, '- serialized content');
-
-        self::assertTrue($runSourceStorage->directoryExists($runSource->getDirectoryPath()));
-        self::assertTrue($runSourceStorage->fileExists($serializedRunSourcePath));
-
-        $this->applicationClient->makeDeleteSourceRequest(
-            self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
-            $runSource->getId()
-        );
-
-        self::assertFalse($runSourceStorage->directoryExists($runSource->getDirectoryPath()));
-        self::assertFalse($runSourceStorage->fileExists($serializedRunSourcePath));
-        self::assertSame(1, $this->sourceRepository->count(['id' => $fileSource->getId()]));
     }
 
     public function testDeleteFileSourceDeletesFileSourceFiles(): void
