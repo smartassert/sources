@@ -124,15 +124,6 @@ class Client
         );
     }
 
-    public function makeReadSourceRequest(?string $authenticationToken, string $sourceId): ResponseInterface
-    {
-        return $this->client->makeRequest(
-            'GET',
-            $this->router->generate('user_source_read', ['sourceId' => $sourceId]),
-            $this->createAuthorizationHeader($authenticationToken),
-        );
-    }
-
     public function makeGetStatusRequest(): ResponseInterface
     {
         return $this->client->makeRequest('GET', $this->router->generate('status'));
