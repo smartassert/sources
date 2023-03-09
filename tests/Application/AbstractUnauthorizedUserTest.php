@@ -136,20 +136,6 @@ abstract class AbstractUnauthorizedUserTest extends AbstractApplicationTest
     /**
      * @dataProvider unauthorizedUserDataProvider
      */
-    public function testPrepareSourceUnauthorizedUser(callable $tokenCreator): void
-    {
-        $response = $this->applicationClient->makePrepareSourceRequest(
-            $tokenCreator(self::$authenticationConfiguration),
-            (new EntityIdFactory())->create(),
-            []
-        );
-
-        $this->responseAsserter->assertUnauthorizedResponse($response);
-    }
-
-    /**
-     * @dataProvider unauthorizedUserDataProvider
-     */
     public function testReadSourceUnauthorizedUser(callable $tokenCreator): void
     {
         $response = $this->applicationClient->makeReadSourceRequest(
