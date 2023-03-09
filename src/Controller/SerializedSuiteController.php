@@ -51,7 +51,7 @@ class SerializedSuiteController
      * @throws AccessDeniedException
      * @throws FilesystemException
      */
-    #[Route(SuiteRoutes::ROUTE_SUITE . '/read', name: 'serialized_suite_read', methods: ['GET'])]
+    #[Route(SerializedSuiteRoutes::ROUTE_SERIALIZED_SUITE, name: 'serialized_suite_read', methods: ['GET'])]
     public function read(SerializedSuite $serializedSuite, SuiteSerializer $suiteSerializer): Response
     {
         $this->entityAccessChecker->denyAccessUnlessGranted($serializedSuite);
