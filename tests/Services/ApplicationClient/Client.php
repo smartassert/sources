@@ -279,6 +279,15 @@ class Client
         );
     }
 
+    public function makeGetSerializedSuiteRequest(?string $authenticationToken, string $suiteId): ResponseInterface
+    {
+        return $this->client->makeRequest(
+            'GET',
+            $this->router->generate('serialized_suite_get', ['suiteId' => $suiteId]),
+            $this->createAuthorizationHeader($authenticationToken),
+        );
+    }
+
     /**
      * @return array<string, string>
      */

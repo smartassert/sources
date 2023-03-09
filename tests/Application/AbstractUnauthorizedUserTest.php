@@ -228,12 +228,38 @@ abstract class AbstractUnauthorizedUserTest extends AbstractApplicationTest
     /**
      * @dataProvider unauthorizedUserDataProvider
      */
-    public function testSerializeSuiteUnauthorizedUser(callable $tokenCreator): void
+    public function testCreateSerializedSuiteUnauthorizedUser(callable $tokenCreator): void
     {
         $response = $this->applicationClient->makeCreateSerializedSuiteRequest(
             $tokenCreator(self::$authenticationConfiguration),
             (new EntityIdFactory())->create(),
             [],
+        );
+
+        $this->responseAsserter->assertUnauthorizedResponse($response);
+    }
+
+    /**
+     * @dataProvider unauthorizedUserDataProvider
+     */
+    public function testReadSerializedSuiteUnauthorizedUser(callable $tokenCreator): void
+    {
+        $response = $this->applicationClient->makeReadSerializedSuiteRequest(
+            $tokenCreator(self::$authenticationConfiguration),
+            (new EntityIdFactory())->create(),
+        );
+
+        $this->responseAsserter->assertUnauthorizedResponse($response);
+    }
+
+    /**
+     * @dataProvider unauthorizedUserDataProvider
+     */
+    public function testGetSerializedSuiteUnauthorizedUser(callable $tokenCreator): void
+    {
+        $response = $this->applicationClient->makeGetSerializedSuiteRequest(
+            $tokenCreator(self::$authenticationConfiguration),
+            (new EntityIdFactory())->create(),
         );
 
         $this->responseAsserter->assertUnauthorizedResponse($response);
