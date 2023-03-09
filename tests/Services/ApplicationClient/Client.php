@@ -191,7 +191,7 @@ class Client
 
         return $this->client->makeRequest(
             'POST',
-            $this->router->generate('user_suite_create'),
+            $this->router->generate('suite_create'),
             $headers,
             http_build_query($payload)
         );
@@ -201,7 +201,7 @@ class Client
     {
         return $this->client->makeRequest(
             'GET',
-            $this->router->generate('user_suite_get', ['suiteId' => $suiteId]),
+            $this->router->generate('suite_get', ['suiteId' => $suiteId]),
             $this->createAuthorizationHeader($authenticationToken),
         );
     }
@@ -223,7 +223,7 @@ class Client
 
         return $this->client->makeRequest(
             'POST',
-            $this->router->generate('user_suite_update', ['suiteId' => $suiteId]),
+            $this->router->generate('suite_update', ['suiteId' => $suiteId]),
             $headers,
             http_build_query($payload)
         );
@@ -233,7 +233,7 @@ class Client
     {
         return $this->client->makeRequest(
             'GET',
-            $this->router->generate('user_suite_list'),
+            $this->router->generate('suite_list'),
             $this->createAuthorizationHeader($authenticationToken),
         );
     }
@@ -242,7 +242,7 @@ class Client
     {
         return $this->client->makeRequest(
             'DELETE',
-            $this->router->generate('user_suite_get', ['suiteId' => $suiteId]),
+            $this->router->generate('suite_get', ['suiteId' => $suiteId]),
             $this->createAuthorizationHeader($authenticationToken),
         );
     }
