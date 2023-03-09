@@ -62,10 +62,6 @@ services:
             $config:
                 handler: '@GuzzleHttp\HandlerStack'
 
-    App\ArgumentResolver\SourceResolver:
-        tags:
-            - { name: controller.argument_value_resolver, priority: 50 }
-
     Symfony\Component\Yaml\Parser: ~
 
     Symfony\Component\Yaml\Dumper: ~
