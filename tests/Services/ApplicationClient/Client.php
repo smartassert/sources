@@ -257,6 +257,29 @@ class Client
     }
 
     /**
+     * @param array<string, string> $payload
+     */
+    public function makeSerializeSuiteRequest(
+        ?string $authenticationToken,
+        string $suiteId,
+        array $payload
+    ): ResponseInterface {
+        $headers = array_merge(
+            $this->createAuthorizationHeader($authenticationToken),
+            [
+                'content-type' => 'application/x-www-form-urlencoded',
+            ]
+        );
+
+        return $this->client->makeRequest(
+            'POST',
+            $this->router->generate('user_suite_serialize', ['suiteId' => $suiteId]),
+            $headers,
+            http_build_query($payload)
+        );
+    }
+
+    /**
      * @return array<string, string>
      */
     private function createAuthorizationHeader(?string $authenticationToken): array

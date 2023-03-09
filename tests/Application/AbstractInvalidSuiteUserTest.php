@@ -70,4 +70,26 @@ abstract class AbstractInvalidSuiteUserTest extends AbstractApplicationTest
 
         $this->responseAsserter->assertForbiddenResponse($response);
     }
+
+    public function testSerializeSuiteValidSourceUserInvalidSuiteUser(): void
+    {
+        $response = $this->applicationClient->makeSerializeSuiteRequest(
+            self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
+            $this->accessibleSourceInaccessibleSuite->id,
+            [],
+        );
+
+        $this->responseAsserter->assertNotFoundResponse($response);
+    }
+
+    public function testSerializeSuiteInvalidSourceUserInvalidSuiteUser(): void
+    {
+        $response = $this->applicationClient->makeSerializeSuiteRequest(
+            self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
+            $this->inaccessibleSourceInaccessibleSuite->id,
+            [],
+        );
+
+        $this->responseAsserter->assertForbiddenResponse($response);
+    }
 }
