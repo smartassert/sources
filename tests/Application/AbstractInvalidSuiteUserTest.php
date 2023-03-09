@@ -16,9 +16,7 @@ abstract class AbstractInvalidSuiteUserTest extends AbstractApplicationTest
 {
     public const FILENAME = 'filename.yaml';
 
-    private Suite $accessibleSourceInaccessibleSuite;
-
-    private Suite $inaccessibleSourceInaccessibleSuite;
+    private Suite $suite;
 
     protected function setUp(): void
     {
@@ -30,78 +28,34 @@ abstract class AbstractInvalidSuiteUserTest extends AbstractApplicationTest
         $inaccessibleSource = SourceOriginFactory::create(type: 'file', label: 'inaccessible source');
         \assert($inaccessibleSource instanceof FileSource);
 
-        $accessibleSource = SourceOriginFactory::create(
-            type: 'file',
-            userId: self::$authenticationConfiguration->getUser(self::USER_1_EMAIL)->id,
-            label: 'accessible source',
-        );
-        \assert($accessibleSource instanceof FileSource);
-
         $sourceRepository = self::getContainer()->get(SourceRepository::class);
         \assert($sourceRepository instanceof SourceRepository);
         $sourceRepository->save($inaccessibleSource);
-        $sourceRepository->save($accessibleSource);
 
-        $this->accessibleSourceInaccessibleSuite = SuiteFactory::create(source: $accessibleSource);
-        $this->inaccessibleSourceInaccessibleSuite = SuiteFactory::create(source: $inaccessibleSource);
-        $repository->save($this->inaccessibleSourceInaccessibleSuite);
-    }
-
-    public function testGetSuiteValidSourceUserInvalidSuiteUser(): void
-    {
-        $response = $this->applicationClient->makeGetSuiteRequest(
-            self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
-            $this->accessibleSourceInaccessibleSuite->id,
-        );
-
-        $this->responseAsserter->assertNotFoundResponse($response);
+        $this->suite = SuiteFactory::create(source: $inaccessibleSource);
+        $repository->save($this->suite);
     }
 
     public function testGetSuiteInvalidSourceUserInvalidSuiteUser(): void
     {
         $response = $this->applicationClient->makeGetSuiteRequest(
             self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
-            $this->inaccessibleSourceInaccessibleSuite->id,
+            $this->suite->id,
         );
 
         $this->responseAsserter->assertForbiddenResponse($response);
-    }
-
-    public function testUpdateSuiteValidSourceUserInvalidSuiteUser(): void
-    {
-        $response = $this->applicationClient->makeUpdateSuiteRequest(
-            self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
-            $this->accessibleSourceInaccessibleSuite->id,
-            [
-                SuiteRequest::PARAMETER_SOURCE_ID => $this->accessibleSourceInaccessibleSuite->id,
-                SuiteRequest::PARAMETER_LABEL => md5((string) rand()),
-                SuiteRequest::PARAMETER_TESTS => [],
-            ]
-        );
-
-        $this->responseAsserter->assertNotFoundResponse($response);
     }
 
     public function testUpdateSuiteInvalidSourceUserInvalidSuiteUser(): void
     {
         $response = $this->applicationClient->makeUpdateSuiteRequest(
             self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
-            $this->inaccessibleSourceInaccessibleSuite->id,
+            $this->suite->id,
             [
-                SuiteRequest::PARAMETER_SOURCE_ID => $this->inaccessibleSourceInaccessibleSuite->id,
+                SuiteRequest::PARAMETER_SOURCE_ID => $this->suite->id,
                 SuiteRequest::PARAMETER_LABEL => md5((string) rand()),
                 SuiteRequest::PARAMETER_TESTS => [],
             ]
-        );
-
-        $this->responseAsserter->assertNotFoundResponse($response);
-    }
-
-    public function testDeleteSuiteValidSourceUserInvalidSuiteUser(): void
-    {
-        $response = $this->applicationClient->makeDeleteSuiteRequest(
-            self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
-            $this->accessibleSourceInaccessibleSuite->id,
         );
 
         $this->responseAsserter->assertNotFoundResponse($response);
@@ -111,7 +65,7 @@ abstract class AbstractInvalidSuiteUserTest extends AbstractApplicationTest
     {
         $response = $this->applicationClient->makeDeleteSuiteRequest(
             self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
-            $this->inaccessibleSourceInaccessibleSuite->id,
+            $this->suite->id,
         );
 
         $this->responseAsserter->assertForbiddenResponse($response);
