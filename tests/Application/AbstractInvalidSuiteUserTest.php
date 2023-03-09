@@ -36,7 +36,7 @@ abstract class AbstractInvalidSuiteUserTest extends AbstractApplicationTest
         $repository->save($this->suite);
     }
 
-    public function testGetSuiteInvalidSourceUserInvalidSuiteUser(): void
+    public function testGetSuite(): void
     {
         $response = $this->applicationClient->makeGetSuiteRequest(
             self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
@@ -46,7 +46,7 @@ abstract class AbstractInvalidSuiteUserTest extends AbstractApplicationTest
         $this->responseAsserter->assertForbiddenResponse($response);
     }
 
-    public function testUpdateSuiteInvalidSourceUserInvalidSuiteUser(): void
+    public function testUpdateSuite(): void
     {
         $response = $this->applicationClient->makeUpdateSuiteRequest(
             self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
@@ -61,7 +61,7 @@ abstract class AbstractInvalidSuiteUserTest extends AbstractApplicationTest
         $this->responseAsserter->assertNotFoundResponse($response);
     }
 
-    public function testDeleteSuiteInvalidSourceUserInvalidSuiteUser(): void
+    public function testDeleteSuite(): void
     {
         $response = $this->applicationClient->makeDeleteSuiteRequest(
             self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
