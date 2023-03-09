@@ -104,4 +104,14 @@ abstract class AbstractInvalidSuiteUserTest extends AbstractApplicationTest
 
         $this->responseAsserter->assertForbiddenResponse($response);
     }
+
+    public function testGetSerializedSuite(): void
+    {
+        $response = $this->applicationClient->makeGetSerializedSuiteRequest(
+            self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
+            $this->serializedSuite->id,
+        );
+
+        $this->responseAsserter->assertForbiddenResponse($response);
+    }
 }

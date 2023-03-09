@@ -15,7 +15,7 @@ use App\Tests\Services\AuthenticationConfiguration;
 use App\Tests\Services\SourceOriginFactory;
 use App\Tests\Services\SuiteFactory;
 
-abstract class AbstractSerializeSuiteTest extends AbstractApplicationTest
+abstract class AbstractCreateSerializedSuiteTest extends AbstractApplicationTest
 {
     private SourceRepository $sourceRepository;
     private SerializedSuiteRepository $serializedSuiteRepository;

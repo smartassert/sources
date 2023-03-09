@@ -51,11 +51,22 @@ class SerializedSuiteController
      * @throws AccessDeniedException
      * @throws FilesystemException
      */
-    #[Route(SerializedSuiteRoutes::ROUTE_SERIALIZED_SUITE, name: 'serialized_suite_read', methods: ['GET'])]
+    #[Route(SerializedSuiteRoutes::ROUTE_SERIALIZED_SUITE . '/read', name: 'serialized_suite_read', methods: ['GET'])]
     public function read(SerializedSuite $serializedSuite, SuiteSerializer $suiteSerializer): Response
     {
         $this->entityAccessChecker->denyAccessUnlessGranted($serializedSuite);
 
         return new YamlResponse($suiteSerializer->read($serializedSuite));
+    }
+
+    /**
+     * @throws AccessDeniedException
+     */
+    #[Route(SerializedSuiteRoutes::ROUTE_SERIALIZED_SUITE, name: 'serialized_suite_get', methods: ['GET'])]
+    public function get(SerializedSuite $serializedSuite): Response
+    {
+        $this->entityAccessChecker->denyAccessUnlessGranted($serializedSuite);
+
+        return new JsonResponse($serializedSuite);
     }
 }
