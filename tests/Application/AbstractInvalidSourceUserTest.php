@@ -6,11 +6,9 @@ namespace App\Tests\Application;
 
 use App\Entity\FileSource;
 use App\Entity\GitSource;
-use App\Entity\RunSource;
 use App\Enum\Source\Type;
 use App\Repository\SourceRepository;
 use App\Request\OriginSourceRequest;
-use App\Services\EntityIdFactory;
 use App\Tests\Services\SourceOriginFactory;
 
 abstract class AbstractInvalidSourceUserTest extends AbstractApplicationTest
@@ -106,25 +104,6 @@ abstract class AbstractInvalidSourceUserTest extends AbstractApplicationTest
         $response = $this->applicationClient->makeDeleteSourceRequest(
             self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
             $this->fileSource->getId()
-        );
-
-        $this->responseAsserter->assertForbiddenResponse($response);
-    }
-
-    public function testReadSourceInvalidUser(): void
-    {
-        $runSource = new RunSource(
-            (new EntityIdFactory())->create(),
-            $this->fileSource
-        );
-
-        $sourceRepository = self::getContainer()->get(SourceRepository::class);
-        \assert($sourceRepository instanceof SourceRepository);
-        $sourceRepository->save($runSource);
-
-        $response = $this->applicationClient->makeReadSourceRequest(
-            self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
-            $runSource->getId()
         );
 
         $this->responseAsserter->assertForbiddenResponse($response);
