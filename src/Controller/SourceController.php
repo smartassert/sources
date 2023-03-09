@@ -6,8 +6,6 @@ namespace App\Controller;
 
 use App\Entity\FileSource;
 use App\Entity\GitSource;
-use App\Entity\RunSource;
-use App\Entity\SourceInterface;
 use App\Entity\SourceOriginInterface;
 use App\Enum\Source\Type;
 use App\Exception\EmptyEntityIdException;
@@ -76,7 +74,7 @@ class SourceController
      * @throws AccessDeniedException
      */
     #[Route(SourceRoutes::ROUTE_SOURCE, name: 'user_source_get', methods: ['GET'])]
-    public function get(SourceInterface $source): Response
+    public function get(SourceOriginInterface $source): Response
     {
         $this->entityAccessChecker->denyAccessUnlessGranted($source);
 
@@ -126,9 +124,8 @@ class SourceController
      */
     #[Route(SourceRoutes::ROUTE_SOURCE, name: 'user_source_delete', methods: ['DELETE'])]
     public function delete(
-        SourceInterface $source,
+        SourceOriginInterface $source,
         FilesystemWriter $fileSourceWriter,
-        FilesystemWriter $runSourceWriter,
     ): Response {
         $this->entityAccessChecker->denyAccessUnlessGranted($source);
 
@@ -137,10 +134,6 @@ class SourceController
 
             if ($source instanceof FileSource) {
                 $fileSourceWriter->deleteDirectory($source->getDirectoryPath());
-            }
-
-            if ($source instanceof RunSource) {
-                $runSourceWriter->deleteDirectory($source->getDirectoryPath());
             }
         }
 
