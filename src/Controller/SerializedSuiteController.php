@@ -31,7 +31,7 @@ class SerializedSuiteController
      * @throws AccessDeniedException
      * @throws EmptyEntityIdException
      */
-    #[Route(SuiteRoutes::ROUTE_SUITE . '/serialize', name: 'user_suite_serialize', methods: ['POST'])]
+    #[Route(SuiteRoutes::ROUTE_SUITE . '/serialize', name: 'serialized_suite_create', methods: ['POST'])]
     public function create(
         Request $request,
         Suite $suite,
@@ -51,7 +51,7 @@ class SerializedSuiteController
      * @throws AccessDeniedException
      * @throws FilesystemException
      */
-    #[Route(SuiteRoutes::ROUTE_SUITE . '/read', name: 'user_suite_read', methods: ['GET'])]
+    #[Route(SuiteRoutes::ROUTE_SUITE . '/read', name: 'serialized_suite_read', methods: ['GET'])]
     public function read(SerializedSuite $serializedSuite, SuiteSerializer $suiteSerializer): Response
     {
         $this->entityAccessChecker->denyAccessUnlessGranted($serializedSuite);

@@ -251,7 +251,7 @@ class Client
     {
         return $this->client->makeRequest(
             'GET',
-            $this->router->generate('user_suite_read', ['suiteId' => $suiteId]),
+            $this->router->generate('serialized_suite_read', ['suiteId' => $suiteId]),
             $this->createAuthorizationHeader($authenticationToken),
         );
     }
@@ -273,7 +273,7 @@ class Client
 
         return $this->client->makeRequest(
             'POST',
-            $this->router->generate('user_suite_serialize', ['suiteId' => $suiteId]),
+            $this->router->generate('serialized_suite_create', ['suiteId' => $suiteId]),
             $headers,
             http_build_query($payload)
         );
