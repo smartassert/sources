@@ -95,4 +95,14 @@ class ResponseAsserter
             ->assert($response)
         ;
     }
+
+    /**
+     * @param array<mixed> $expectedData
+     */
+    public function assertSerializeSuiteSuccessResponse(ResponseInterface $response, array $expectedData): void
+    {
+        (new JsonResponseAsserter(Response::HTTP_ACCEPTED, $expectedData))
+            ->assert($response)
+        ;
+    }
 }
