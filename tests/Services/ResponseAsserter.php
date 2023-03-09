@@ -6,7 +6,6 @@ namespace App\Tests\Services;
 
 use App\Tests\Services\Asserter\Response\BodyContentAsserter;
 use App\Tests\Services\Asserter\Response\JsonResponseAsserter;
-use App\Tests\Services\Asserter\Response\NonEmptyBodyContentAsserter;
 use App\Tests\Services\Asserter\Response\YamlResponseAsserter;
 use PHPUnit\Framework\Assert;
 use Psr\Http\Message\ResponseInterface;
@@ -51,30 +50,12 @@ class ResponseAsserter
         Assert::assertSame('', $response->getBody()->getContents());
     }
 
-    public function assertPrepareSourceSuccessResponseWithUnknownData(ResponseInterface $response): void
-    {
-        (new JsonResponseAsserter(Response::HTTP_ACCEPTED, null))
-            ->addBodyAsserter(new NonEmptyBodyContentAsserter())
-            ->assert($response)
-        ;
-    }
-
     /**
      * @param array<mixed> $expectedData
      */
     public function assertSuccessfulJsonResponse(ResponseInterface $response, array $expectedData): void
     {
         (new JsonResponseAsserter(Response::HTTP_OK, $expectedData))
-            ->assert($response)
-        ;
-    }
-
-    /**
-     * @param array<mixed> $expectedData
-     */
-    public function assertPrepareSourceSuccessResponse(ResponseInterface $response, array $expectedData): void
-    {
-        (new JsonResponseAsserter(Response::HTTP_ACCEPTED, $expectedData))
             ->assert($response)
         ;
     }
