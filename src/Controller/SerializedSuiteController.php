@@ -32,7 +32,7 @@ class SerializedSuiteController
      * @throws EmptyEntityIdException
      */
     #[Route(SuiteRoutes::ROUTE_SUITE . '/serialize', name: 'user_suite_serialize', methods: ['POST'])]
-    public function serialize(
+    public function create(
         Request $request,
         Suite $suite,
         MessageBusInterface $messageBus,
