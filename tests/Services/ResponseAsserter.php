@@ -105,4 +105,11 @@ class ResponseAsserter
             ->assert($response)
         ;
     }
+
+    public function assertReadSerializedSuiteSuccessResponse(ResponseInterface $response, string $expectedBody): void
+    {
+        (new YamlResponseAsserter(Response::HTTP_OK, $expectedBody))
+            ->assert($response)
+        ;
+    }
 }
