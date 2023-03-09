@@ -247,7 +247,7 @@ class Client
         );
     }
 
-    public function makeReadSuiteRequest(?string $authenticationToken, string $suiteId): ResponseInterface
+    public function makeReadSerializedSuiteRequest(?string $authenticationToken, string $suiteId): ResponseInterface
     {
         return $this->client->makeRequest(
             'GET',
@@ -259,7 +259,7 @@ class Client
     /**
      * @param array<string, string> $payload
      */
-    public function makeSerializeSuiteRequest(
+    public function makeCreateSerializedSuiteRequest(
         ?string $authenticationToken,
         string $suiteId,
         array $payload

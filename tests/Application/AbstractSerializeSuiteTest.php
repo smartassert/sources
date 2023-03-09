@@ -60,7 +60,7 @@ abstract class AbstractSerializeSuiteTest extends AbstractApplicationTest
 
         self::assertEquals(0, $this->serializedSuiteRepository->count(['suite' => $suite]));
 
-        $response = $this->applicationClient->makeSerializeSuiteRequest(
+        $response = $this->applicationClient->makeCreateSerializedSuiteRequest(
             self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
             $suite->id,
             $payload
@@ -177,7 +177,7 @@ abstract class AbstractSerializeSuiteTest extends AbstractApplicationTest
 
         self::assertEquals(0, $this->serializedSuiteRepository->count(['suite' => $suite]));
 
-        $firstResponse = $this->applicationClient->makeSerializeSuiteRequest(
+        $firstResponse = $this->applicationClient->makeCreateSerializedSuiteRequest(
             self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
             $suite->id,
             []
@@ -186,7 +186,7 @@ abstract class AbstractSerializeSuiteTest extends AbstractApplicationTest
         $firstResponseData = json_decode($firstResponse->getBody()->getContents(), true);
         self::assertIsArray($firstResponseData);
 
-        $secondResponse = $this->applicationClient->makeSerializeSuiteRequest(
+        $secondResponse = $this->applicationClient->makeCreateSerializedSuiteRequest(
             self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
             $suite->id,
             []

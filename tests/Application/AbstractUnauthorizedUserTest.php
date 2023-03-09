@@ -230,7 +230,7 @@ abstract class AbstractUnauthorizedUserTest extends AbstractApplicationTest
      */
     public function testSerializeSuiteUnauthorizedUser(callable $tokenCreator): void
     {
-        $response = $this->applicationClient->makeSerializeSuiteRequest(
+        $response = $this->applicationClient->makeCreateSerializedSuiteRequest(
             $tokenCreator(self::$authenticationConfiguration),
             (new EntityIdFactory())->create(),
             [],
