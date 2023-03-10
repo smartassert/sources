@@ -5,17 +5,17 @@ declare(strict_types=1);
 namespace App\Services\SourceRepository\Factory;
 
 use App\Entity\FileSource;
-use App\Entity\SourceOriginInterface;
+use App\Entity\SourceInterface;
 use App\Model\SourceRepositoryInterface;
 
 class FileSourceHandler implements CreatorInterface
 {
-    public function createsFor(SourceOriginInterface $source): bool
+    public function createsFor(SourceInterface $source): bool
     {
         return $source instanceof FileSource;
     }
 
-    public function create(SourceOriginInterface $source, array $parameters): ?SourceRepositoryInterface
+    public function create(SourceInterface $source, array $parameters): ?SourceRepositoryInterface
     {
         return $source instanceof FileSource ? $source : null;
     }
