@@ -50,15 +50,12 @@ class Provider implements UnreliableProviderInterface
             throw new ProvisionException(sprintf('Listing contents failed for "%s"', $this->path), 0, $e);
         }
 
-        // @todo: remove emptiness check in #971
-        if ([] !== $this->manifestPaths) {
-            $manifestLines = [];
-            foreach ($this->manifestPaths as $manifestPath) {
-                $manifestLines[] = '- ' . $manifestPath;
-            }
-
-            yield YamlFile::create('manifest.yaml', implode("\n", $manifestLines));
+        $manifestLines = [];
+        foreach ($this->manifestPaths as $manifestPath) {
+            $manifestLines[] = '- ' . $manifestPath;
         }
+
+        yield YamlFile::create('manifest.yaml', implode("\n", $manifestLines));
 
         $files = $this->listingFilter->filter($sourceRepositoryDirectoryListing, $this->path, ['yaml', 'yml']);
 
