@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Services\SourceRepository\Factory;
 
 use App\Entity\GitSource;
-use App\Entity\SourceOriginInterface;
+use App\Entity\SourceInterface;
 use App\Exception\GitRepositoryException;
 use App\Exception\SourceRepositoryCreationException;
 use App\Model\SourceRepositoryInterface;
@@ -20,7 +20,7 @@ class GitSourceHandler implements CreatorInterface, DestructorInterface
     ) {
     }
 
-    public function createsFor(SourceOriginInterface $source): bool
+    public function createsFor(SourceInterface $source): bool
     {
         return $source instanceof GitSource;
     }
@@ -28,7 +28,7 @@ class GitSourceHandler implements CreatorInterface, DestructorInterface
     /**
      * @throws SourceRepositoryCreationException
      */
-    public function create(SourceOriginInterface $source, array $parameters): ?SourceRepositoryInterface
+    public function create(SourceInterface $source, array $parameters): ?SourceRepositoryInterface
     {
         if ($source instanceof GitSource) {
             try {

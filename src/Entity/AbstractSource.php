@@ -17,12 +17,12 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\DiscriminatorMap([
     'git' => GitSource::class,
     'file' => FileSource::class,
-    'run' => RunSource::class,
 ])]
 abstract class AbstractSource implements SourceInterface, \JsonSerializable
 {
     public const ID_LENGTH = 32;
     public const TYPE_DISCRIMINATOR_LENGTH = 32;
+    public const LABEL_MAX_LENGTH = 255;
 
     /**
      * @var non-empty-string
@@ -39,6 +39,12 @@ abstract class AbstractSource implements SourceInterface, \JsonSerializable
 
     #[ORM\Column(type: Types::DATETIMETZ_IMMUTABLE, nullable: true)]
     private ?\DateTimeImmutable $deletedAt = null;
+
+    /**
+     * @var non-empty-string
+     */
+    #[ORM\Column(type: 'string', length: self::LABEL_MAX_LENGTH)]
+    private string $label;
 
     /**
      * @param non-empty-string $id
@@ -79,10 +85,29 @@ abstract class AbstractSource implements SourceInterface, \JsonSerializable
     }
 
     /**
+     * @return non-empty-string
+     */
+    public function getLabel(): string
+    {
+        return $this->label;
+    }
+
+    /**
+     * @param non-empty-string $label
+     */
+    public function setLabel(string $label): self
+    {
+        $this->label = $label;
+
+        return $this;
+    }
+
+    /**
      * @return array{
      *     "id": string,
      *     "user_id": non-empty-string,
      *     "type": non-empty-string,
+     *     "label": non-empty-string,
      *     "deleted_at"?: positive-int
      * }
      */
@@ -92,6 +117,7 @@ abstract class AbstractSource implements SourceInterface, \JsonSerializable
             'id' => $this->id,
             'user_id' => $this->getUserId(),
             'type' => $this->getType()->value,
+            'label' => $this->getLabel(),
         ];
 
         if ($this->getDeletedAt() instanceof \DateTimeInterface) {

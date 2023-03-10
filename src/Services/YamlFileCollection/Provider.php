@@ -18,13 +18,23 @@ class Provider implements UnreliableProviderInterface
 {
     private string $path;
 
+    /**
+     * @var array<int, string>
+     */
+    private array $manifestPaths;
+
+    /**
+     * @param array<int, string> $manifestPaths
+     */
     public function __construct(
         private Parser $yamlParser,
         private DirectoryListingFilter $listingFilter,
         private FilesystemReader $reader,
         string $path,
+        array $manifestPaths = [],
     ) {
         $this->path = rtrim(ltrim($path, '/'), '/');
+        $this->manifestPaths = $manifestPaths;
     }
 
     /**
@@ -39,6 +49,13 @@ class Provider implements UnreliableProviderInterface
         } catch (FilesystemException $e) {
             throw new ProvisionException(sprintf('Listing contents failed for "%s"', $this->path), 0, $e);
         }
+
+        $manifestLines = [];
+        foreach ($this->manifestPaths as $manifestPath) {
+            $manifestLines[] = '- ' . $manifestPath;
+        }
+
+        yield YamlFile::create('manifest.yaml', implode("\n", $manifestLines));
 
         $files = $this->listingFilter->filter($sourceRepositoryDirectoryListing, $this->path, ['yaml', 'yml']);
 

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Request;
 
-use App\Entity\SourceOriginInterface;
+use App\Entity\SourceInterface;
 
 class SuiteRequest
 {
@@ -17,7 +17,7 @@ class SuiteRequest
      * @param array<int, non-empty-string> $tests
      */
     public function __construct(
-        public readonly SourceOriginInterface $source,
+        public readonly SourceInterface $source,
         public readonly string $label,
         public readonly array $tests,
     ) {

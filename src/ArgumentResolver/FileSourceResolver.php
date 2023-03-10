@@ -5,22 +5,11 @@ declare(strict_types=1);
 namespace App\ArgumentResolver;
 
 use App\Entity\FileSource;
-use App\Repository\FileSourceRepository;
 
-class FileSourceResolver extends AbstractSingleSourceTypeResolver
+class FileSourceResolver extends AbstractSourceResolver
 {
-    public function __construct(
-        private readonly FileSourceRepository $repository,
-    ) {
-    }
-
-    protected function find(string $id): ?FileSource
+    protected function supportsArgumentType(string $type): bool
     {
-        return $this->repository->find($id);
-    }
-
-    protected function getSourceClassName(): string
-    {
-        return FileSource::class;
+        return FileSource::class === $type;
     }
 }

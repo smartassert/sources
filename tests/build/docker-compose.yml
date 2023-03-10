@@ -39,7 +39,7 @@ services:
       - "9090:9090"
     environment:
       - validKmsKeys=remote_storage_key_id
-      - initialBuckets=file_source_bucket,run_source_bucket
+      - initialBuckets=file_source_bucket,serialized_suite_bucket
     restart: unless-stopped
 
   caddy-app:

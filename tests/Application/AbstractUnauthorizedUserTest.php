@@ -136,33 +136,6 @@ abstract class AbstractUnauthorizedUserTest extends AbstractApplicationTest
     /**
      * @dataProvider unauthorizedUserDataProvider
      */
-    public function testPrepareSourceUnauthorizedUser(callable $tokenCreator): void
-    {
-        $response = $this->applicationClient->makePrepareSourceRequest(
-            $tokenCreator(self::$authenticationConfiguration),
-            (new EntityIdFactory())->create(),
-            []
-        );
-
-        $this->responseAsserter->assertUnauthorizedResponse($response);
-    }
-
-    /**
-     * @dataProvider unauthorizedUserDataProvider
-     */
-    public function testReadSourceUnauthorizedUser(callable $tokenCreator): void
-    {
-        $response = $this->applicationClient->makeReadSourceRequest(
-            $tokenCreator(self::$authenticationConfiguration),
-            (new EntityIdFactory())->create()
-        );
-
-        $this->responseAsserter->assertUnauthorizedResponse($response);
-    }
-
-    /**
-     * @dataProvider unauthorizedUserDataProvider
-     */
     public function testCreateSuiteUnauthorizedUser(callable $tokenCreator): void
     {
         $response = $this->applicationClient->makeCreateSuiteRequest(
@@ -218,6 +191,46 @@ abstract class AbstractUnauthorizedUserTest extends AbstractApplicationTest
     public function testDeleteSuiteUnauthorizedUser(callable $tokenCreator): void
     {
         $response = $this->applicationClient->makeDeleteSuiteRequest(
+            $tokenCreator(self::$authenticationConfiguration),
+            (new EntityIdFactory())->create(),
+        );
+
+        $this->responseAsserter->assertUnauthorizedResponse($response);
+    }
+
+    /**
+     * @dataProvider unauthorizedUserDataProvider
+     */
+    public function testCreateSerializedSuiteUnauthorizedUser(callable $tokenCreator): void
+    {
+        $response = $this->applicationClient->makeCreateSerializedSuiteRequest(
+            $tokenCreator(self::$authenticationConfiguration),
+            (new EntityIdFactory())->create(),
+            [],
+        );
+
+        $this->responseAsserter->assertUnauthorizedResponse($response);
+    }
+
+    /**
+     * @dataProvider unauthorizedUserDataProvider
+     */
+    public function testReadSerializedSuiteUnauthorizedUser(callable $tokenCreator): void
+    {
+        $response = $this->applicationClient->makeReadSerializedSuiteRequest(
+            $tokenCreator(self::$authenticationConfiguration),
+            (new EntityIdFactory())->create(),
+        );
+
+        $this->responseAsserter->assertUnauthorizedResponse($response);
+    }
+
+    /**
+     * @dataProvider unauthorizedUserDataProvider
+     */
+    public function testGetSerializedSuiteUnauthorizedUser(callable $tokenCreator): void
+    {
+        $response = $this->applicationClient->makeGetSerializedSuiteRequest(
             $tokenCreator(self::$authenticationConfiguration),
             (new EntityIdFactory())->create(),
         );

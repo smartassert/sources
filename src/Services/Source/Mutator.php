@@ -7,8 +7,6 @@ namespace App\Services\Source;
 use App\Entity\FileSource;
 use App\Entity\GitSource;
 use App\Exception\NonUniqueEntityLabelException;
-use App\Repository\FileSourceRepository;
-use App\Repository\GitSourceRepository;
 use App\Repository\SourceRepository;
 use App\Request\FileSourceRequest;
 use App\Request\GitSourceRequest;
@@ -17,8 +15,6 @@ class Mutator
 {
     public function __construct(
         private readonly SourceRepository $sourceRepository,
-        private readonly FileSourceRepository $fileSourceRepository,
-        private readonly GitSourceRepository $gitSourceRepository,
     ) {
     }
 
@@ -27,24 +23,20 @@ class Mutator
      */
     public function updateFile(FileSource $source, FileSourceRequest $request): FileSource
     {
-        $gitSource = $this->gitSourceRepository->findOneBy(
+        $existingSource = $this->sourceRepository->findOneBy(
             $this->createFindCriteria($source->getUserId(), $request->label)
         );
 
-        if ($gitSource instanceof GitSource) {
+        if ($existingSource instanceof GitSource) {
             throw new NonUniqueEntityLabelException();
         }
 
-        $fileSource = $this->fileSourceRepository->findOneBy(
-            $this->createFindCriteria($source->getUserId(), $request->label)
-        );
-
-        if ($fileSource instanceof FileSource) {
+        if ($existingSource instanceof FileSource) {
             if (
-                $fileSource->getId() === $source->getId()
+                $existingSource->getId() === $source->getId()
                 || 0 === $this->sourceRepository->count(['id' => $source->getId()])
             ) {
-                return $fileSource;
+                return $existingSource;
             }
 
             throw new NonUniqueEntityLabelException();
@@ -61,22 +53,15 @@ class Mutator
      */
     public function updateGit(GitSource $source, GitSourceRequest $request): GitSource
     {
-        $fileSource = $this->fileSourceRepository->findOneBy(
+        $existingSource = $this->sourceRepository->findOneBy(
             $this->createFindCriteria($source->getUserId(), $request->label)
         );
 
-        if ($fileSource instanceof FileSource) {
+        if (
+            $existingSource instanceof FileSource
+            || ($existingSource instanceof GitSource && $existingSource->getId() !== $source->getId())
+        ) {
             throw new NonUniqueEntityLabelException();
-        }
-
-        $gitSource = $this->gitSourceRepository->findOneBy(
-            $this->createFindCriteria($source->getUserId(), $request->label)
-        );
-
-        if ($gitSource instanceof GitSource) {
-            if ($gitSource->getId() !== $source->getId()) {
-                throw new NonUniqueEntityLabelException();
-            }
         }
 
         $source->setLabel($request->label);

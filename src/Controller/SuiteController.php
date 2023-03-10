@@ -37,7 +37,7 @@ class SuiteController
      * @throws EmptyEntityIdException
      * @throws InvalidRequestException
      */
-    #[Route(SuiteRoutes::ROUTE_SUITE_BASE, name: 'user_suite_create', methods: ['POST'])]
+    #[Route(SuiteRoutes::ROUTE_SUITE_BASE, name: 'suite_create', methods: ['POST'])]
     public function create(SuiteRequest $request): Response
     {
         $this->entityAccessChecker->denyAccessUnlessGranted($request->source);
@@ -56,7 +56,7 @@ class SuiteController
     /**
      * @throws AccessDeniedException
      */
-    #[Route(SuiteRoutes::ROUTE_SUITE, name: 'user_suite_get', methods: ['GET'])]
+    #[Route(SuiteRoutes::ROUTE_SUITE, name: 'suite_get', methods: ['GET'])]
     public function get(Suite $suite): Response
     {
         $this->entityAccessChecker->denyAccessUnlessGranted($suite);
@@ -67,7 +67,7 @@ class SuiteController
     /**
      * @throws AccessDeniedException
      */
-    #[Route(SuiteRoutes::ROUTE_SUITES, name: 'user_suite_list', methods: ['GET'])]
+    #[Route(SuiteRoutes::ROUTE_SUITES, name: 'suite_list', methods: ['GET'])]
     public function list(User $user): Response
     {
         $suites = $this->repository->findForUser($user);
@@ -80,7 +80,7 @@ class SuiteController
      * @throws InvalidRequestException
      * @throws ModifyReadOnlyEntityException
      */
-    #[Route(SuiteRoutes::ROUTE_SUITE, name: 'user_suite_update', methods: ['POST'])]
+    #[Route(SuiteRoutes::ROUTE_SUITE, name: 'suite_update', methods: ['POST'])]
     public function update(Suite $suite, SuiteRequest $request): Response
     {
         $this->entityAccessChecker->denyAccessUnlessGranted($suite);
@@ -103,7 +103,7 @@ class SuiteController
     /**
      * @throws AccessDeniedException
      */
-    #[Route(SuiteRoutes::ROUTE_SUITE, name: 'user_suite_delete', methods: ['DELETE'])]
+    #[Route(SuiteRoutes::ROUTE_SUITE, name: 'suite_delete', methods: ['DELETE'])]
     public function delete(Suite $suite): Response
     {
         $this->entityAccessChecker->denyAccessUnlessGranted($suite);

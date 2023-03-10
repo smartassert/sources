@@ -20,7 +20,6 @@ final class Version20211220142952 extends AbstractMigration
         $this->addSql('
             CREATE TABLE file_source (
                 id VARCHAR(32) NOT NULL, 
-                label VARCHAR(255) NOT NULL, 
                 PRIMARY KEY(id)
             )
         ');

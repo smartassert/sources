@@ -124,38 +124,6 @@ class Client
         );
     }
 
-    /**
-     * @param array<string, string> $payload
-     */
-    public function makePrepareSourceRequest(
-        ?string $authenticationToken,
-        string $sourceId,
-        array $payload
-    ): ResponseInterface {
-        $headers = array_merge(
-            $this->createAuthorizationHeader($authenticationToken),
-            [
-                'content-type' => 'application/x-www-form-urlencoded',
-            ]
-        );
-
-        return $this->client->makeRequest(
-            'POST',
-            $this->router->generate('user_source_prepare', ['sourceId' => $sourceId]),
-            $headers,
-            http_build_query($payload)
-        );
-    }
-
-    public function makeReadSourceRequest(?string $authenticationToken, string $sourceId): ResponseInterface
-    {
-        return $this->client->makeRequest(
-            'GET',
-            $this->router->generate('user_source_read', ['sourceId' => $sourceId]),
-            $this->createAuthorizationHeader($authenticationToken),
-        );
-    }
-
     public function makeGetStatusRequest(): ResponseInterface
     {
         return $this->client->makeRequest('GET', $this->router->generate('status'));
@@ -191,7 +159,7 @@ class Client
 
         return $this->client->makeRequest(
             'POST',
-            $this->router->generate('user_suite_create'),
+            $this->router->generate('suite_create'),
             $headers,
             http_build_query($payload)
         );
@@ -201,7 +169,7 @@ class Client
     {
         return $this->client->makeRequest(
             'GET',
-            $this->router->generate('user_suite_get', ['suiteId' => $suiteId]),
+            $this->router->generate('suite_get', ['suiteId' => $suiteId]),
             $this->createAuthorizationHeader($authenticationToken),
         );
     }
@@ -223,7 +191,7 @@ class Client
 
         return $this->client->makeRequest(
             'POST',
-            $this->router->generate('user_suite_update', ['suiteId' => $suiteId]),
+            $this->router->generate('suite_update', ['suiteId' => $suiteId]),
             $headers,
             http_build_query($payload)
         );
@@ -233,7 +201,7 @@ class Client
     {
         return $this->client->makeRequest(
             'GET',
-            $this->router->generate('user_suite_list'),
+            $this->router->generate('suite_list'),
             $this->createAuthorizationHeader($authenticationToken),
         );
     }
@@ -242,7 +210,48 @@ class Client
     {
         return $this->client->makeRequest(
             'DELETE',
-            $this->router->generate('user_suite_get', ['suiteId' => $suiteId]),
+            $this->router->generate('suite_get', ['suiteId' => $suiteId]),
+            $this->createAuthorizationHeader($authenticationToken),
+        );
+    }
+
+    public function makeReadSerializedSuiteRequest(?string $authenticationToken, string $suiteId): ResponseInterface
+    {
+        return $this->client->makeRequest(
+            'GET',
+            $this->router->generate('serialized_suite_read', ['suiteId' => $suiteId]),
+            $this->createAuthorizationHeader($authenticationToken),
+        );
+    }
+
+    /**
+     * @param array<string, string> $payload
+     */
+    public function makeCreateSerializedSuiteRequest(
+        ?string $authenticationToken,
+        string $suiteId,
+        array $payload
+    ): ResponseInterface {
+        $headers = array_merge(
+            $this->createAuthorizationHeader($authenticationToken),
+            [
+                'content-type' => 'application/x-www-form-urlencoded',
+            ]
+        );
+
+        return $this->client->makeRequest(
+            'POST',
+            $this->router->generate('serialized_suite_create', ['suiteId' => $suiteId]),
+            $headers,
+            http_build_query($payload)
+        );
+    }
+
+    public function makeGetSerializedSuiteRequest(?string $authenticationToken, string $suiteId): ResponseInterface
+    {
+        return $this->client->makeRequest(
+            'GET',
+            $this->router->generate('serialized_suite_get', ['suiteId' => $suiteId]),
             $this->createAuthorizationHeader($authenticationToken),
         );
     }

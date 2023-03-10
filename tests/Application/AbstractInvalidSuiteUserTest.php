@@ -5,10 +5,13 @@ declare(strict_types=1);
 namespace App\Tests\Application;
 
 use App\Entity\FileSource;
+use App\Entity\SerializedSuite;
 use App\Entity\Suite;
+use App\Repository\SerializedSuiteRepository;
 use App\Repository\SourceRepository;
 use App\Repository\SuiteRepository;
 use App\Request\SuiteRequest;
+use App\Services\EntityIdFactory;
 use App\Tests\Services\SourceOriginFactory;
 use App\Tests\Services\SuiteFactory;
 
@@ -17,13 +20,11 @@ abstract class AbstractInvalidSuiteUserTest extends AbstractApplicationTest
     public const FILENAME = 'filename.yaml';
 
     private Suite $suite;
+    private SerializedSuite $serializedSuite;
 
     protected function setUp(): void
     {
         parent::setUp();
-
-        $repository = self::getContainer()->get(SuiteRepository::class);
-        \assert($repository instanceof SuiteRepository);
 
         $inaccessibleSource = SourceOriginFactory::create(type: 'file', label: 'inaccessible source');
         \assert($inaccessibleSource instanceof FileSource);
@@ -33,7 +34,19 @@ abstract class AbstractInvalidSuiteUserTest extends AbstractApplicationTest
         $sourceRepository->save($inaccessibleSource);
 
         $this->suite = SuiteFactory::create(source: $inaccessibleSource);
-        $repository->save($this->suite);
+        $suiteRepository = self::getContainer()->get(SuiteRepository::class);
+        \assert($suiteRepository instanceof SuiteRepository);
+        $suiteRepository->save($this->suite);
+
+        $this->serializedSuite = new SerializedSuite(
+            (new EntityIdFactory())->create(),
+            $this->suite,
+            []
+        );
+
+        $serializedSuiteRepository = self::getContainer()->get(SerializedSuiteRepository::class);
+        \assert($serializedSuiteRepository instanceof SerializedSuiteRepository);
+        $serializedSuiteRepository->save($this->serializedSuite);
     }
 
     public function testGetSuite(): void
@@ -66,6 +79,37 @@ abstract class AbstractInvalidSuiteUserTest extends AbstractApplicationTest
         $response = $this->applicationClient->makeDeleteSuiteRequest(
             self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
             $this->suite->id,
+        );
+
+        $this->responseAsserter->assertForbiddenResponse($response);
+    }
+
+    public function testCreateSerializedSuite(): void
+    {
+        $response = $this->applicationClient->makeCreateSerializedSuiteRequest(
+            self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
+            $this->suite->id,
+            [],
+        );
+
+        $this->responseAsserter->assertForbiddenResponse($response);
+    }
+
+    public function testReadSerializedSuite(): void
+    {
+        $response = $this->applicationClient->makeReadSerializedSuiteRequest(
+            self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
+            $this->serializedSuite->id,
+        );
+
+        $this->responseAsserter->assertForbiddenResponse($response);
+    }
+
+    public function testGetSerializedSuite(): void
+    {
+        $response = $this->applicationClient->makeGetSerializedSuiteRequest(
+            self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
+            $this->serializedSuite->id,
         );
 
         $this->responseAsserter->assertForbiddenResponse($response);

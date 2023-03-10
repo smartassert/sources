@@ -23,7 +23,7 @@ class Suite implements \JsonSerializable, UserHeldEntityInterface
 
     #[ORM\ManyToOne(targetEntity: AbstractSource::class, cascade: ['persist'])]
     #[ORM\JoinColumn(nullable: false)]
-    private SourceOriginInterface $source;
+    private SourceInterface $source;
 
     /**
      * @var non-empty-string
@@ -85,14 +85,22 @@ class Suite implements \JsonSerializable, UserHeldEntityInterface
         }
     }
 
-    public function setSource(SourceOriginInterface $source): void
+    public function setSource(SourceInterface $source): void
     {
         $this->source = $source;
     }
 
-    public function getSource(): SourceOriginInterface
+    public function getSource(): SourceInterface
     {
         return $this->source;
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    public function getTests(): array
+    {
+        return $this->tests;
     }
 
     /**

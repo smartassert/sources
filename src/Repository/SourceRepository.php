@@ -6,7 +6,6 @@ namespace App\Repository;
 
 use App\Entity\AbstractSource;
 use App\Entity\SourceInterface;
-use App\Entity\SourceOriginInterface;
 use App\Enum\Source\Type;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -43,7 +42,7 @@ class SourceRepository extends ServiceEntityRepository
     /**
      * @param Type[] $types
      *
-     * @return SourceOriginInterface[]
+     * @return SourceInterface[]
      */
     public function findNonDeletedByUserAndType(UserInterface $user, array $types): array
     {
@@ -68,7 +67,7 @@ class SourceRepository extends ServiceEntityRepository
         }
 
         return array_filter($result, function ($item) {
-            return $item instanceof SourceOriginInterface;
+            return $item instanceof SourceInterface;
         });
     }
 

@@ -8,7 +8,7 @@ use App\Enum\Source\Type;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity]
-class GitSource extends AbstractOriginSource implements SourceOriginInterface, \JsonSerializable
+class GitSource extends AbstractSource
 {
     public const HOST_URL_MAX_LENGTH = 255;
     public const PATH_MAX_LENGTH = 255;

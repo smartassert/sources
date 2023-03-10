@@ -6,7 +6,7 @@ namespace App\Tests\Functional\Services\SourceRepository\Factory;
 
 use App\Entity\FileSource;
 use App\Entity\GitSource;
-use App\Entity\SourceOriginInterface;
+use App\Entity\SourceInterface;
 use App\Model\SourceRepositoryInterface;
 use App\Model\UserGitRepository;
 use App\Services\EntityIdFactory;
@@ -34,7 +34,7 @@ class FactoryTest extends WebTestCase
     /**
      * @dataProvider createsForDataProvider
      */
-    public function testCreatesFor(SourceOriginInterface $source, bool $expected): void
+    public function testCreatesFor(SourceInterface $source, bool $expected): void
     {
         self::assertSame($expected, $this->factory->createsFor($source));
     }
@@ -53,8 +53,8 @@ class FactoryTest extends WebTestCase
                 'source' => \Mockery::mock(GitSource::class),
                 'expected' => true,
             ],
-            SourceOriginInterface::class => [
-                'source' => \Mockery::mock(SourceOriginInterface::class),
+            SourceInterface::class => [
+                'source' => \Mockery::mock(SourceInterface::class),
                 'expected' => false,
             ],
         ];
@@ -92,7 +92,7 @@ class FactoryTest extends WebTestCase
     public function testCreateForUnknownSource(): void
     {
         self::assertNull(
-            $this->factory->create(\Mockery::mock(SourceOriginInterface::class), [])
+            $this->factory->create(\Mockery::mock(SourceInterface::class), [])
         );
     }
 

@@ -8,5 +8,4 @@ enum Type: string
 {
     case GIT = 'git';
     case FILE = 'file';
-    case RUN = 'run';
 }
