@@ -10,7 +10,7 @@ use App\Entity\SourceInterface;
 use App\Repository\FileSourceRepository;
 use App\Repository\GitSourceRepository;
 
-class SourceOriginResolver extends AbstractSourceResolver
+class SourceResolver extends AbstractSourceResolver
 {
     public function __construct(
         private readonly FileSourceRepository $fileSourceRepository,
