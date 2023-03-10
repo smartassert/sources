@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Tests\Functional\Repository;
 
 use App\Entity\SourceInterface;
-use App\Entity\SourceOriginInterface;
 use App\Enum\Source\Type;
 use App\Repository\SourceRepository;
 use App\Tests\Model\UserId;
@@ -63,13 +62,13 @@ class SourceRepositoryTest extends WebTestCase
 
         $userFileSources = [
             'deletedAt=null' => SourceOriginFactory::create(type: 'file', userId: $userId),
-            'deletedAt=-1s' => (function () use ($userId): SourceOriginInterface {
+            'deletedAt=-1s' => (function () use ($userId): SourceInterface {
                 $source = SourceOriginFactory::create(type: 'file', userId: $userId);
                 $source->setDeletedAt(new \DateTimeImmutable('-1 second'));
 
                 return $source;
             })(),
-            'deletedAt=+1s' => (function () use ($userId): SourceOriginInterface {
+            'deletedAt=+1s' => (function () use ($userId): SourceInterface {
                 $source = SourceOriginFactory::create(type: 'file', userId: $userId);
                 $source->setDeletedAt(new \DateTimeImmutable('1 second'));
 

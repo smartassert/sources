@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\ArgumentResolver;
 
-use App\Entity\SourceOriginInterface;
+use App\Entity\SourceInterface;
 use App\Entity\Suite;
 use App\Exception\EntityNotFoundException;
 use App\Exception\InvalidRequestException;
@@ -45,7 +45,7 @@ class SuiteRequestResolver implements ValueResolverInterface
     /**
      * @throws EntityNotFoundException
      */
-    private function getSource(Request $request): SourceOriginInterface
+    private function getSource(Request $request): SourceInterface
     {
         $sourceId = $request->request->get(SuiteRequest::PARAMETER_SOURCE_ID);
         $sourceId = is_string($sourceId) ? trim($sourceId) : '';

@@ -6,7 +6,7 @@ namespace App\ArgumentResolver;
 
 use App\Entity\FileSource;
 use App\Entity\GitSource;
-use App\Entity\SourceOriginInterface;
+use App\Entity\SourceInterface;
 use App\Repository\FileSourceRepository;
 use App\Repository\GitSourceRepository;
 
@@ -20,7 +20,7 @@ class SourceOriginResolver extends AbstractSourceResolver
 
     protected function supportsArgumentType(string $type): bool
     {
-        return SourceOriginInterface::class === $type;
+        return SourceInterface::class === $type;
     }
 
     protected function find(string $id): null|FileSource|GitSource

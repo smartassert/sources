@@ -6,7 +6,7 @@ namespace App\Tests\Application;
 
 use App\Entity\FileSource;
 use App\Entity\GitSource;
-use App\Entity\SourceOriginInterface;
+use App\Entity\SourceInterface;
 use App\Enum\Source\Type;
 use App\Repository\SourceRepository;
 use App\Request\FileSourceRequest;
@@ -200,9 +200,9 @@ abstract class AbstractUpdateSourceTest extends AbstractApplicationTest
     /**
      * @dataProvider updateSourceSuccessDataProvider
      *
-     * @param callable(AuthenticationConfiguration): SourceOriginInterface $sourceCreator
-     * @param array<string, string>                                        $payload
-     * @param callable(SourceOriginInterface): array<mixed>                $expectedResponseDataCreator
+     * @param callable(AuthenticationConfiguration): SourceInterface $sourceCreator
+     * @param array<string, string>                                  $payload
+     * @param callable(SourceInterface): array<mixed>                $expectedResponseDataCreator
      */
     public function testUpdateSuccess(
         callable $sourceCreator,
@@ -338,9 +338,9 @@ abstract class AbstractUpdateSourceTest extends AbstractApplicationTest
     /**
      * @dataProvider updateNewLabelUsedByDeletedSourceDataProvider
      *
-     * @param callable(AuthenticationConfiguration): SourceOriginInterface $targetSourceCreator
-     * @param callable(AuthenticationConfiguration): SourceOriginInterface $deletedSourceCreator
-     * @param array<string, string>                                        $additionalUpdateParameters
+     * @param callable(AuthenticationConfiguration): SourceInterface $targetSourceCreator
+     * @param callable(AuthenticationConfiguration): SourceInterface $deletedSourceCreator
+     * @param array<string, string>                                  $additionalUpdateParameters
      */
     public function testUpdateNewLabelUsedByDeletedSource(
         callable $targetSourceCreator,

@@ -6,7 +6,7 @@ namespace App\Tests\Functional\Services\SuiteSerializer;
 
 use App\Entity\FileSource;
 use App\Entity\SerializedSuite;
-use App\Entity\SourceOriginInterface;
+use App\Entity\SourceInterface;
 use App\Entity\Suite;
 use App\Exception\UnparseableSourceFileException;
 use App\Exception\UnserializableSourceException;
@@ -53,7 +53,7 @@ class SuiteSerializerTest extends WebTestCase
     {
         $idFactory = new EntityIdFactory();
 
-        $source = \Mockery::mock(SourceOriginInterface::class);
+        $source = \Mockery::mock(SourceInterface::class);
         $source
             ->shouldReceive('getUserId')
             ->andReturn(UserId::create())

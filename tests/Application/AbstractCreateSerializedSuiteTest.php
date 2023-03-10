@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Application;
 
 use App\Entity\SerializedSuite;
-use App\Entity\SourceOriginInterface;
+use App\Entity\SourceInterface;
 use App\Entity\Suite;
 use App\Enum\SerializedSuite\State;
 use App\Repository\SerializedSuiteRepository;
@@ -41,10 +41,10 @@ abstract class AbstractCreateSerializedSuiteTest extends AbstractApplicationTest
     /**
      * @dataProvider serializeSuccessDataProvider
      *
-     * @param callable(AuthenticationConfiguration): SourceOriginInterface $sourceCreator
-     * @param callable(SourceOriginInterface): Suite                       $suiteCreator
-     * @param array<string, string>                                        $payload
-     * @param array<string, string>                                        $expectedResponseParameters
+     * @param callable(AuthenticationConfiguration): SourceInterface $sourceCreator
+     * @param callable(SourceInterface): Suite                       $suiteCreator
+     * @param array<string, string>                                  $payload
+     * @param array<string, string>                                  $expectedResponseParameters
      */
     public function testSerializeSuccess(
         callable $sourceCreator,
@@ -93,7 +93,7 @@ abstract class AbstractCreateSerializedSuiteTest extends AbstractApplicationTest
                         userId: $authenticationConfiguration->getUser(self::USER_1_EMAIL)->id,
                     );
                 },
-                'suiteCreator' => function (SourceOriginInterface $source) {
+                'suiteCreator' => function (SourceInterface $source) {
                     return SuiteFactory::create(source: $source, tests: []);
                 },
                 'payload' => [],
@@ -106,7 +106,7 @@ abstract class AbstractCreateSerializedSuiteTest extends AbstractApplicationTest
                         userId: $authenticationConfiguration->getUser(self::USER_1_EMAIL)->id,
                     );
                 },
-                'suiteCreator' => function (SourceOriginInterface $source) {
+                'suiteCreator' => function (SourceInterface $source) {
                     return SuiteFactory::create(source: $source, tests: ['test.yaml']);
                 },
                 'payload' => [],
@@ -119,7 +119,7 @@ abstract class AbstractCreateSerializedSuiteTest extends AbstractApplicationTest
                         userId: $authenticationConfiguration->getUser(self::USER_1_EMAIL)->id,
                     );
                 },
-                'suiteCreator' => function (SourceOriginInterface $source) {
+                'suiteCreator' => function (SourceInterface $source) {
                     return SuiteFactory::create(source: $source, tests: ['test.yaml']);
                 },
                 'payload' => [],
@@ -132,7 +132,7 @@ abstract class AbstractCreateSerializedSuiteTest extends AbstractApplicationTest
                         userId: $authenticationConfiguration->getUser(self::USER_1_EMAIL)->id,
                     );
                 },
-                'suiteCreator' => function (SourceOriginInterface $source) {
+                'suiteCreator' => function (SourceInterface $source) {
                     return SuiteFactory::create(source: $source, tests: ['test.yaml']);
                 },
                 'payload' => [
@@ -149,7 +149,7 @@ abstract class AbstractCreateSerializedSuiteTest extends AbstractApplicationTest
                         userId: $authenticationConfiguration->getUser(self::USER_1_EMAIL)->id,
                     );
                 },
-                'suiteCreator' => function (SourceOriginInterface $source) {
+                'suiteCreator' => function (SourceInterface $source) {
                     return SuiteFactory::create(source: $source, tests: ['test.yaml']);
                 },
                 'payload' => [
