@@ -2,19 +2,23 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Functional\Services;
+namespace App\Tests\Functional\Services\SuiteSerializer;
 
 use App\Entity\FileSource;
 use App\Entity\SerializedSuite;
 use App\Entity\SourceOriginInterface;
 use App\Entity\Suite;
+use App\Exception\UnparseableSourceFileException;
 use App\Exception\UnserializableSourceException;
 use App\Services\EntityIdFactory;
 use App\Services\SuiteSerializer;
 use App\Tests\Model\UserId;
 use App\Tests\Services\FileStoreFixtureCreator;
 use App\Tests\Services\SourceOriginFactory;
+use App\Tests\Services\SuiteFactory;
 use League\Flysystem\FilesystemOperator;
+use SmartAssert\YamlFile\Exception\Collection\SerializeException;
+use SmartAssert\YamlFile\Exception\ProvisionException;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 class SuiteSerializerTest extends WebTestCase
@@ -23,7 +27,6 @@ class SuiteSerializerTest extends WebTestCase
     private FileStoreFixtureCreator $fixtureCreator;
     private FilesystemOperator $fileSourceStorage;
     private FilesystemOperator $serializedSuiteStorage;
-    private FilesystemOperator $fixtureStorage;
 
     protected function setUp(): void
     {
@@ -44,25 +47,21 @@ class SuiteSerializerTest extends WebTestCase
         $serializedSuiteStorage = self::getContainer()->get('serialized_suite.storage');
         \assert($serializedSuiteStorage instanceof FilesystemOperator);
         $this->serializedSuiteStorage = $serializedSuiteStorage;
-
-        $fixtureStorage = self::getContainer()->get('test_fixtures.storage');
-        \assert($fixtureStorage instanceof FilesystemOperator);
-        $this->fixtureStorage = $fixtureStorage;
     }
 
     public function testWriteUnserializableSource(): void
     {
         $idFactory = new EntityIdFactory();
 
-        $fileSource = \Mockery::mock(SourceOriginInterface::class);
-        $fileSource
+        $source = \Mockery::mock(SourceOriginInterface::class);
+        $source
             ->shouldReceive('getUserId')
             ->andReturn(UserId::create())
         ;
 
         $suite = new Suite($idFactory->create());
         $suite->setLabel('suite label');
-        $suite->setSource($fileSource);
+        $suite->setSource($source);
         $suite->setTests(['test1.yaml', 'test2.yaml']);
 
         $serializedSuite = new SerializedSuite($idFactory->create(), $suite, []);
@@ -71,37 +70,47 @@ class SuiteSerializerTest extends WebTestCase
             $this->suiteSerializer->write($serializedSuite);
             self::fail(UnserializableSourceException::class . ' not thrown');
         } catch (UnserializableSourceException $e) {
-            self::assertSame($fileSource, $e->getOriginSource());
+            self::assertSame($source, $e->getOriginSource());
         }
     }
 
-    public function testWriteSuccess(): void
+    public function testWriteInvalidSourceYaml(): void
     {
-        $serializedSuite = $this->createSerializedSuite();
-        $fileSource = $serializedSuite->suite->getSource();
-        \assert($fileSource instanceof FileSource);
+        $source = SourceOriginFactory::create(type: 'file');
+        \assert($source instanceof FileSource);
+
+        $suite = SuiteFactory::create($source);
+        $serializedSuite = new SerializedSuite((new EntityIdFactory())->create(), $suite, []);
 
         $this->fixtureCreator->copySetTo(
-            'Source/yml_yaml_valid',
+            'Source/yml_yaml_invalid',
             $this->fileSourceStorage,
-            $fileSource->getDirectoryPath()
+            $source->getDirectoryPath()
         );
 
-        $this->suiteSerializer->write($serializedSuite);
+        try {
+            $this->suiteSerializer->write($serializedSuite);
+            self::fail(UnparseableSourceFileException::class . ' not thrown');
+        } catch (SerializeException $exception) {
+            $provisionException = $exception->getPrevious();
+            self::assertInstanceOf(ProvisionException::class, $provisionException);
 
-        $serializedSuitePath = $serializedSuite->getDirectoryPath() . '/' . SuiteSerializer::SERIALIZED_FILENAME;
+            $unparseableSourceFileException = $provisionException->getPrevious();
+            self::assertInstanceOf(UnparseableSourceFileException::class, $unparseableSourceFileException);
 
-        self::assertTrue($this->serializedSuiteStorage->directoryExists($serializedSuite->getDirectoryPath()));
-        self::assertTrue($this->serializedSuiteStorage->fileExists($serializedSuitePath));
-        self::assertSame(
-            trim($this->fixtureStorage->read('SerializedSuite/suite_yml_yaml_entire.yaml')),
-            $this->serializedSuiteStorage->read($serializedSuitePath)
-        );
+            self::assertSame('file2.yml', $unparseableSourceFileException->getPath());
+            self::assertSame(
+                'Unable to parse at line 1 (near "  invalid").',
+                $unparseableSourceFileException->getParseException()->getMessage()
+            );
+        }
     }
 
     public function testReadSuccess(): void
     {
-        $serializedSuite = $this->createSerializedSuite();
+        $source = SourceOriginFactory::create(type: 'file');
+        $suite = SuiteFactory::create($source);
+        $serializedSuite = new SerializedSuite((new EntityIdFactory())->create(), $suite, []);
 
         $this->fixtureCreator->copyTo(
             'SerializedSuite/suite_yml_yaml_entire.yaml',
@@ -114,19 +123,5 @@ class SuiteSerializerTest extends WebTestCase
         );
 
         self::assertSame(trim($expected), $this->suiteSerializer->read($serializedSuite));
-    }
-
-    private function createSerializedSuite(): SerializedSuite
-    {
-        $idFactory = new EntityIdFactory();
-
-        $fileSource = SourceOriginFactory::create(type: 'file');
-
-        $suite = new Suite($idFactory->create());
-        $suite->setLabel('suite label');
-        $suite->setSource($fileSource);
-        $suite->setTests(['test1.yaml', 'test2.yaml']);
-
-        return new SerializedSuite($idFactory->create(), $suite, []);
     }
 }
