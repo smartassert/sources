@@ -33,11 +33,13 @@ class ProviderTest extends WebTestCase
     /**
      * @dataProvider getYamlFilesSuccessDataProvider
      *
-     * @param YamlFile[] $expectedYamlFiles
+     * @param array<non-empty-string> $manifestPaths
+     * @param YamlFile[]              $expectedYamlFiles
      */
     public function testGetYamlFilesSuccess(
         string $fixtureSet,
         string $relativePath,
+        array $manifestPaths,
         array $expectedYamlFiles
     ): void {
         $storage = self::getContainer()->get('file_source.storage');
@@ -46,7 +48,7 @@ class ProviderTest extends WebTestCase
 
         $this->fixtureCreator->copySetTo('Source/' . $fixtureSet, $storage, $relativePath);
 
-        $provider = $this->factory->create($storage, $relativePath);
+        $provider = $this->factory->create($storage, $relativePath, $manifestPaths);
         $count = 0;
 
         foreach ($provider->getYamlFiles() as $index => $yamlFile) {
@@ -74,15 +76,20 @@ class ProviderTest extends WebTestCase
         $basePath = $source->getDirectoryPath();
 
         return [
-            'source: txt' => [
+            'source: txt, empty manifest paths' => [
                 'fixtureSet' => 'txt',
                 'relativePath' => $basePath,
-                'expectedYamlFiles' => [],
+                'manifestPaths' => [],
+                'expectedYamlFiles' => [
+                    YamlFile::create('manifest.yaml', ''),
+                ],
             ],
             'source: yml_yaml' => [
                 'fixtureSet' => 'yml_yaml_valid',
                 'relativePath' => $basePath,
+                'manifestPaths' => ['file1.yaml', 'file2.yml'],
                 'expectedYamlFiles' => [
+                    YamlFile::create('manifest.yaml', '- file1.yaml' . "\n" . '- file2.yml'),
                     YamlFile::create('directory/file3.yml', '- "file 3 line 1"'),
                     YamlFile::create('file1.yaml', '- "file 1 line 1"' . "\n" . '- "file 1 line 2"'),
                     YamlFile::create('file2.yml', '- "file 2 line 1"' . "\n" . '- "file 2 line 2"'),
@@ -91,7 +98,9 @@ class ProviderTest extends WebTestCase
             'source: mixed' => [
                 'fixtureSet' => 'mixed',
                 'relativePath' => $basePath,
+                'manifestPaths' => ['directory/file3.yaml'],
                 'expectedYamlFiles' => [
+                    YamlFile::create('manifest.yaml', '- directory/file3.yaml'),
                     YamlFile::create('directory/file3.yaml', 'File Three'),
                     YamlFile::create('file1.yaml', 'File One'),
                 ],
