@@ -7,7 +7,7 @@ namespace App\ArgumentResolver;
 use App\Entity\FileSource;
 use App\Repository\FileSourceRepository;
 
-class FileSourceResolver extends AbstractSingleSourceTypeResolver
+class FileSourceResolver extends AbstractSourceResolver
 {
     public function __construct(
         private readonly FileSourceRepository $repository,
@@ -19,8 +19,8 @@ class FileSourceResolver extends AbstractSingleSourceTypeResolver
         return $this->repository->find($id);
     }
 
-    protected function getSourceClassName(): string
+    protected function supportsArgumentType(string $type): bool
     {
-        return FileSource::class;
+        return FileSource::class === $type;
     }
 }
