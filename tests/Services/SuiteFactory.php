@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Services;
 
-use App\Entity\SourceOriginInterface;
+use App\Entity\SourceInterface;
 use App\Entity\Suite;
 use App\Services\EntityIdFactory;
 
@@ -15,7 +15,7 @@ class SuiteFactory
      * @param null|non-empty-string[] $tests
      */
     public static function create(
-        SourceOriginInterface $source,
+        SourceInterface $source,
         ?string $label = null,
         ?array $tests = null,
     ): Suite {
