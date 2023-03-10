@@ -89,13 +89,13 @@ class SuiteSerializerTest extends WebTestCase
 
         $this->suiteSerializer->write($serializedSuite);
 
-        $serializedRunSourcePath = $serializedSuite->getDirectoryPath() . '/' . SuiteSerializer::SERIALIZED_FILENAME;
+        $serializedSuitePath = $serializedSuite->getDirectoryPath() . '/' . SuiteSerializer::SERIALIZED_FILENAME;
 
         self::assertTrue($this->serializedSuiteStorage->directoryExists($serializedSuite->getDirectoryPath()));
-        self::assertTrue($this->serializedSuiteStorage->fileExists($serializedRunSourcePath));
+        self::assertTrue($this->serializedSuiteStorage->fileExists($serializedSuitePath));
         self::assertSame(
             trim($this->fixtureStorage->read('SerializedSuite/suite_yml_yaml_entire.yaml')),
-            $this->serializedSuiteStorage->read($serializedRunSourcePath)
+            $this->serializedSuiteStorage->read($serializedSuitePath)
         );
     }
 
