@@ -10,7 +10,7 @@ use App\Model\SourceRepositoryInterface;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity]
-class FileSource extends AbstractOriginSource implements DirectoryLocatorInterface, SourceRepositoryInterface
+class FileSource extends AbstractSource implements DirectoryLocatorInterface, SourceRepositoryInterface
 {
     public function getRunParameterNames(): array
     {

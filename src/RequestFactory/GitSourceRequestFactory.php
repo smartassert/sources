@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\RequestFactory;
 
-use App\Entity\AbstractOriginSource;
+use App\Entity\AbstractSource;
 use App\Entity\GitSource;
 use App\Exception\InvalidRequestException;
 use App\Request\GitSourceRequest;
@@ -19,10 +19,10 @@ class GitSourceRequestFactory
     public function create(Request $request): GitSourceRequest
     {
         $label = trim((string) $request->request->get(GitSourceRequest::PARAMETER_LABEL));
-        if ('' === $label || mb_strlen($label) > AbstractOriginSource::LABEL_MAX_LENGTH) {
+        if ('' === $label || mb_strlen($label) > AbstractSource::LABEL_MAX_LENGTH) {
             $message = sprintf(
                 'This value should be between 1 and %d characters long.',
-                AbstractOriginSource::LABEL_MAX_LENGTH
+                AbstractSource::LABEL_MAX_LENGTH
             );
 
             throw new InvalidRequestException($request, new InvalidField('label', $label, $message));
