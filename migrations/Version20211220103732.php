@@ -21,7 +21,8 @@ final class Version20211220103732 extends AbstractMigration
             CREATE TABLE source (
                 id VARCHAR(32) NOT NULL, 
                 user_id VARCHAR(32) NOT NULL,
-                deleted_at TIMESTAMP(0) WITH TIME ZONE DEFAULT NULL, 
+                deleted_at TIMESTAMP(0) WITH TIME ZONE DEFAULT NULL,
+                label VARCHAR(255) NOT NULL, 
                 type VARCHAR(32) NOT NULL, 
                 PRIMARY KEY(id)
             )

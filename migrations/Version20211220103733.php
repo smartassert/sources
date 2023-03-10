@@ -19,8 +19,7 @@ final class Version20211220103733 extends AbstractMigration
     {
         $this->addSql('
             CREATE TABLE git_source (
-                id VARCHAR(32) NOT NULL, 
-                label VARCHAR(255) NOT NULL,
+                id VARCHAR(32) NOT NULL,                
                 host_url VARCHAR(255) NOT NULL, 
                 path VARCHAR(255) NOT NULL, 
                 credentials VARCHAR(255) NOT NULL, 
