@@ -7,12 +7,18 @@ namespace App\ArgumentResolver;
 use App\Controller\SourceRoutes;
 use App\Entity\SourceInterface;
 use App\Exception\EntityNotFoundException;
+use App\Repository\SourceRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Controller\ValueResolverInterface;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 
 abstract class AbstractSourceResolver implements ValueResolverInterface
 {
+    public function __construct(
+        private readonly SourceRepository $sourceRepository
+    ) {
+    }
+
     /**
      * @return SourceInterface[]
      *
@@ -29,15 +35,13 @@ abstract class AbstractSourceResolver implements ValueResolverInterface
             return [];
         }
 
-        $source = $this->find($sourceId);
+        $source = $this->sourceRepository->find($sourceId);
         if (null === $source) {
             throw new EntityNotFoundException($sourceId, 'Source');
         }
 
         return [$source];
     }
-
-    abstract protected function find(string $id): ?SourceInterface;
 
     abstract protected function supportsArgumentType(string $type): bool;
 }

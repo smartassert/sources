@@ -7,7 +7,7 @@ namespace App\Tests\Application;
 use App\Entity\FileSource;
 use App\Entity\Suite;
 use App\Enum\Source\Type;
-use App\Repository\FileSourceRepository;
+use App\Repository\SourceRepository;
 use App\Repository\SuiteRepository;
 use App\Request\FileSourceRequest;
 use App\Request\OriginSourceRequest;
@@ -39,9 +39,9 @@ abstract class AbstractDeleteSuiteTest extends AbstractApplicationTest
         $sourceId = $createSourceResponseData['id'] ?? null;
         \assert(is_string($sourceId));
 
-        $fileSourceRepository = self::getContainer()->get(FileSourceRepository::class);
-        \assert($fileSourceRepository instanceof FileSourceRepository);
-        $source = $fileSourceRepository->find($sourceId);
+        $sourceRepository = self::getContainer()->get(SourceRepository::class);
+        \assert($sourceRepository instanceof SourceRepository);
+        $source = $sourceRepository->find($sourceId);
         \assert($source instanceof FileSource);
         $this->source = $source;
 

@@ -8,8 +8,7 @@ use App\Entity\SourceInterface;
 use App\Entity\Suite;
 use App\Exception\EntityNotFoundException;
 use App\Exception\InvalidRequestException;
-use App\Repository\FileSourceRepository;
-use App\Repository\GitSourceRepository;
+use App\Repository\SourceRepository;
 use App\Request\SuiteRequest;
 use App\ResponseBody\InvalidField;
 use SmartAssert\YamlFile\Filename;
@@ -21,8 +20,7 @@ use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 class SuiteRequestResolver implements ValueResolverInterface
 {
     public function __construct(
-        private readonly FileSourceRepository $fileSourceRepository,
-        private readonly GitSourceRepository $gitSourceRepository,
+        private readonly SourceRepository $sourceRepository,
         private readonly YamlFilenameValidator $yamlFilenameValidator,
     ) {
     }
@@ -50,10 +48,7 @@ class SuiteRequestResolver implements ValueResolverInterface
         $sourceId = $request->request->get(SuiteRequest::PARAMETER_SOURCE_ID);
         $sourceId = is_string($sourceId) ? trim($sourceId) : '';
 
-        $source = $this->fileSourceRepository->find($sourceId);
-        if (null === $source) {
-            $source = $this->gitSourceRepository->find($sourceId);
-        }
+        $source = $this->sourceRepository->find($sourceId);
 
         if (null === $source) {
             throw new EntityNotFoundException($sourceId, 'Source');
