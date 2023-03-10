@@ -1,0 +1,8 @@
+---
+5a4e0f9bf1e7492b3f0556a828f8b45c:
+    - manifest.yaml
+...
+---
+- test1.yaml
+- test2.yaml
+...

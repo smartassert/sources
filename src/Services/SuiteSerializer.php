@@ -9,10 +9,12 @@ use App\Exception\SourceRepositoryCreationException;
 use App\Exception\SourceRepositoryReaderNotFoundException;
 use App\Exception\UnserializableSourceException;
 use App\Services\SourceRepository\Factory\Factory;
-use App\Services\SourceRepository\Serializer;
+use App\Services\SourceRepository\Reader\Provider;
+use App\Services\YamlFileCollection\Factory as YamlFileProviderFactory;
 use League\Flysystem\FilesystemException;
 use League\Flysystem\FilesystemReader;
 use League\Flysystem\FilesystemWriter;
+use SmartAssert\YamlFile\Collection\Serializer as YamlFileCollectionSerializer;
 use SmartAssert\YamlFile\Exception\Collection\SerializeException;
 
 class SuiteSerializer
@@ -20,10 +22,12 @@ class SuiteSerializer
     public const SERIALIZED_FILENAME = 'source.yaml';
 
     public function __construct(
-        private readonly Serializer $serializer,
         private readonly FilesystemReader $serializedSuiteReader,
         private readonly FilesystemWriter $serializedSuiteWriter,
         private readonly Factory $sourceRepositoryFactory,
+        private readonly Provider $readerProvider,
+        private readonly YamlFileProviderFactory $yamlFileProviderFactory,
+        private readonly YamlFileCollectionSerializer $yamlFileCollectionSerializer,
     ) {
     }
 
@@ -45,13 +49,16 @@ class SuiteSerializer
         }
 
         $targetPath = $serializedSuite->getDirectoryPath() . '/' . self::SERIALIZED_FILENAME;
-        $this->serializedSuiteWriter->write(
-            $targetPath,
-            $this->serializer->serialize(
-                $sourceRepository,
-                $suite->getTests(),
+
+        $content = $this->yamlFileCollectionSerializer->serializeUnreliableProvider(
+            $this->yamlFileProviderFactory->create(
+                $this->readerProvider->find($sourceRepository),
+                $sourceRepository->getRepositoryPath(),
+                $suite->getTests()
             )
         );
+
+        $this->serializedSuiteWriter->write($targetPath, $content);
         $this->sourceRepositoryFactory->remove($sourceRepository);
 
         return $targetPath;
