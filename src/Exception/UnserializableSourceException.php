@@ -4,17 +4,17 @@ declare(strict_types=1);
 
 namespace App\Exception;
 
-use App\Entity\SourceOriginInterface;
+use App\Entity\SourceInterface;
 
 class UnserializableSourceException extends \Exception
 {
     public function __construct(
-        private SourceOriginInterface $source
+        private readonly SourceInterface $source
     ) {
         parent::__construct();
     }
 
-    public function getOriginSource(): SourceOriginInterface
+    public function getOriginSource(): SourceInterface
     {
         return $this->source;
     }
