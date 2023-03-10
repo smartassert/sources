@@ -14,4 +14,9 @@ interface SourceInterface extends UserHeldEntityInterface
     public function setDeletedAt(\DateTimeImmutable $deletedAt): void;
 
     public function getDeletedAt(): ?\DateTimeImmutable;
+
+    /**
+     * @return string[]
+     */
+    public function getRunParameterNames(): array;
 }
