@@ -79,15 +79,14 @@ abstract class AbstractCreateSuiteTest extends AbstractSuiteTest
         ];
     }
 
-    public function testCreateIsIdempotent(): void
+    /**
+     * @dataProvider createIsIdempotentDataProvider
+     *
+     * @param array<mixed> $requestParameters
+     */
+    public function testCreateIsIdempotent(array $requestParameters): void
     {
-        $requestParameters = [
-            SuiteRequest::PARAMETER_SOURCE_ID => $this->sourceId,
-            SuiteRequest::PARAMETER_LABEL => 'label',
-            SuiteRequest::PARAMETER_TESTS => [
-                'Test/test' . md5((string) rand()) . '.yaml',
-            ],
-        ];
+        $requestParameters = array_merge([SuiteRequest::PARAMETER_SOURCE_ID => $this->sourceId], $requestParameters);
 
         $firstResponse = $this->applicationClient->makeCreateSuiteRequest(
             self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
@@ -103,6 +102,29 @@ abstract class AbstractCreateSuiteTest extends AbstractSuiteTest
 
         self::assertSame(200, $secondResponse->getStatusCode());
         self::assertSame($firstResponse->getBody()->getContents(), $secondResponse->getBody()->getContents());
+    }
+
+    /**
+     * @return array<mixed>
+     */
+    public function createIsIdempotentDataProvider(): array
+    {
+        return [
+            'has tests' => [
+                'requestParameters' => [
+                    SuiteRequest::PARAMETER_LABEL => 'label',
+                    SuiteRequest::PARAMETER_TESTS => [
+                        'Test/test' . md5((string) rand()) . '.yaml',
+                    ],
+                ],
+            ],
+            'no tests' => [
+                'requestParameters' => [
+                    SuiteRequest::PARAMETER_LABEL => 'label',
+                    SuiteRequest::PARAMETER_TESTS => [],
+                ],
+            ],
+        ];
     }
 
     public function testCreateMultipleSuitesForSameSource(): void
