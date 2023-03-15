@@ -26,10 +26,15 @@ class Factory
      */
     public function create(SuiteRequest $request): Suite
     {
+        $testsComparator = $request->tests;
+        if ([] === $testsComparator) {
+            $testsComparator = null;
+        }
+
         $suite = $this->repository->findOneBy([
             'source' => $request->source,
             'label' => $request->label,
-            'tests' => $request->tests,
+            'tests' => $testsComparator,
             'deletedAt' => null,
         ]);
 
