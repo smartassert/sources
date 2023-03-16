@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Repository;
 
+use App\Entity\SourceInterface;
 use App\Entity\Suite;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -66,5 +67,32 @@ class SuiteRepository extends ServiceEntityRepository
         }
 
         return $suites;
+    }
+
+    public function findOneBySourceOwnerAndLabel(SourceInterface $source, string $label): ?Suite
+    {
+        $queryBuilder = $this->createQueryBuilder('Suite');
+
+        $queryBuilder
+            ->join('Suite.source', 'Source')
+            ->where('Suite.label = :Label')
+            ->andWhere('Source.userId = :UserId')
+            ->andWhere('Suite.deletedAt IS NULL')
+            ->orderBy('Suite.label', 'ASC')
+            ->setMaxResults(1)
+            ->setParameters([
+                'Label' => $label,
+                'UserId' => $source->getUserId()
+            ])
+        ;
+
+        $query = $queryBuilder->getQuery();
+        $result = $query->getResult();
+
+        if (is_array($result) && 1 === count($result) && isset($result[0]) && $result[0] instanceof Suite) {
+            return $result[0];
+        }
+
+        return null;
     }
 }

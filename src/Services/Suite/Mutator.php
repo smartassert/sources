@@ -21,12 +21,7 @@ class Mutator
      */
     public function update(Suite $suite, SuiteRequest $request): Suite
     {
-        $foundSuite = $this->repository->findOneBy([
-            'source' => $request->source,
-            'label' => $request->label,
-            'deletedAt' => null,
-        ]);
-
+        $foundSuite = $this->repository->findOneBySourceOwnerAndLabel($request->source, $request->label);
         if ($foundSuite instanceof Suite && $foundSuite->id !== $suite->id) {
             throw new NonUniqueEntityLabelException();
         }
