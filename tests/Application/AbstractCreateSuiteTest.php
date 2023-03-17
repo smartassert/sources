@@ -162,11 +162,11 @@ abstract class AbstractCreateSuiteTest extends AbstractSuiteTest
         self::assertCount($createdSuiteCount, $labels);
     }
 
-    public function testCreateSuiteWithLabelOfNonDeletedSuite(): void
+    public function testCreateSuiteNonUniqueLabelSameSourceDifferentTests(): void
     {
         $label = md5((string) rand());
 
-        $successfulCreateResponse = $this->applicationClient->makeCreateSuiteRequest(
+        $firstResponse = $this->applicationClient->makeCreateSuiteRequest(
             self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
             [
                 SuiteRequest::PARAMETER_SOURCE_ID => $this->sourceId,
@@ -177,9 +177,9 @@ abstract class AbstractCreateSuiteTest extends AbstractSuiteTest
             ]
         );
 
-        self::assertSame(200, $successfulCreateResponse->getStatusCode());
+        self::assertSame(200, $firstResponse->getStatusCode());
 
-        $failedCreateResponse = $this->applicationClient->makeCreateSuiteRequest(
+        $secondResponse = $this->applicationClient->makeCreateSuiteRequest(
             self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
             [
                 SuiteRequest::PARAMETER_SOURCE_ID => $this->sourceId,
@@ -191,7 +191,7 @@ abstract class AbstractCreateSuiteTest extends AbstractSuiteTest
         );
 
         $this->responseAsserter->assertInvalidRequestJsonResponse(
-            $failedCreateResponse,
+            $secondResponse,
             [
                 'error' => [
                     'type' => 'invalid_request',
@@ -203,6 +203,76 @@ abstract class AbstractCreateSuiteTest extends AbstractSuiteTest
                 ],
             ]
         );
+    }
+
+    public function testCreateSuiteNonUniqueLabelDifferentSource(): void
+    {
+        $label = md5((string) rand());
+
+        $firstResponse = $this->applicationClient->makeCreateSuiteRequest(
+            self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
+            [
+                SuiteRequest::PARAMETER_SOURCE_ID => $this->createSource(self::USER_1_EMAIL),
+                SuiteRequest::PARAMETER_LABEL => $label,
+                SuiteRequest::PARAMETER_TESTS => [
+                    'Test/test' . md5((string) rand()) . '.yaml',
+                ],
+            ]
+        );
+
+        self::assertSame(200, $firstResponse->getStatusCode());
+
+        $secondResponse = $this->applicationClient->makeCreateSuiteRequest(
+            self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
+            [
+                SuiteRequest::PARAMETER_SOURCE_ID => $this->createSource(self::USER_1_EMAIL),
+                SuiteRequest::PARAMETER_LABEL => $label,
+                SuiteRequest::PARAMETER_TESTS => [
+                    'Test/test' . md5((string) rand()) . '.yaml',
+                ],
+            ]
+        );
+
+        $this->responseAsserter->assertInvalidRequestJsonResponse(
+            $secondResponse,
+            [
+                'error' => [
+                    'type' => 'invalid_request',
+                    'payload' => [
+                        'name' => 'label',
+                        'value' => $label,
+                        'message' => 'This label is being used by another suite belonging to this user',
+                    ],
+                ],
+            ]
+        );
+    }
+
+    public function testCreateSuiteNonUniqueLabelDifferentUser(): void
+    {
+        $label = md5((string) rand());
+
+        $firstResponse = $this->applicationClient->makeCreateSuiteRequest(
+            self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
+            [
+                SuiteRequest::PARAMETER_SOURCE_ID => $this->createSource(self::USER_1_EMAIL),
+                SuiteRequest::PARAMETER_LABEL => $label,
+                SuiteRequest::PARAMETER_TESTS => [],
+            ]
+        );
+
+        self::assertSame(200, $firstResponse->getStatusCode());
+
+        $secondResponse = $this->applicationClient->makeCreateSuiteRequest(
+            self::$authenticationConfiguration->getValidApiToken(self::USER_2_EMAIL),
+            [
+                SuiteRequest::PARAMETER_SOURCE_ID => $this->createSource(self::USER_2_EMAIL),
+                SuiteRequest::PARAMETER_LABEL => $label,
+                SuiteRequest::PARAMETER_TESTS => [],
+            ]
+        );
+
+        self::assertSame(200, $secondResponse->getStatusCode());
     }
 
     public function testCreateSuiteWithLabelOfDeletedSuite(): void

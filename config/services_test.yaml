@@ -19,6 +19,7 @@ services:
         arguments:
             $userCredentials:
                 'user1@example.com': 'password'
+                'user2@example.com': 'password'
 
     App\Tests\Services\DirectoryLister:
         public: true
