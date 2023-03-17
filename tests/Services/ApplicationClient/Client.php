@@ -190,7 +190,7 @@ class Client
         );
 
         return $this->client->makeRequest(
-            'POST',
+            'PUT',
             $this->router->generate('suite_update', ['suiteId' => $suiteId]),
             $headers,
             http_build_query($payload)

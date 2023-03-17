@@ -80,7 +80,7 @@ class SuiteController
      * @throws InvalidRequestException
      * @throws ModifyReadOnlyEntityException
      */
-    #[Route(SuiteRoutes::ROUTE_SUITE, name: 'suite_update', methods: ['POST'])]
+    #[Route(SuiteRoutes::ROUTE_SUITE, name: 'suite_update', methods: ['PUT'])]
     public function update(Suite $suite, SuiteRequest $request): Response
     {
         $this->entityAccessChecker->denyAccessUnlessGranted($suite);
