@@ -49,7 +49,7 @@ class SuiteRepository extends ServiceEntityRepository
             ->join('Suite.source', 'Source')
             ->where('Source.userId = :UserId')
             ->andWhere('Suite.deletedAt IS NULL')
-            ->orderBy('Suite.label', 'ASC')
+            ->orderBy('Suite.id', 'ASC')
             ->setParameter('UserId', $user->getUserIdentifier())
         ;
 

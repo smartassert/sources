@@ -172,7 +172,7 @@ abstract class AbstractListSuitesTest extends AbstractApplicationTest
                     ],
                 ],
             ],
-            'multiple suites, are ordered by label' => [
+            'multiple suites, are ordered by id' => [
                 'suitesCreator' => function (
                     AuthConfig $authenticationConfiguration,
                     SourceRepository $sourceRepository,
@@ -234,6 +234,10 @@ abstract class AbstractListSuitesTest extends AbstractApplicationTest
                     ];
                 },
                 'expectedResponseData' => [
+                    'zebra' => [
+                        'label' => 'zebra',
+                        'tests' => ['test1.yaml'],
+                    ],
                     'apple' => [
                         'label' => 'apple',
                         'tests' => ['test1.yaml', 'test2.yaml'],
@@ -241,10 +245,6 @@ abstract class AbstractListSuitesTest extends AbstractApplicationTest
                     'bat' => [
                         'label' => 'bat',
                         'tests' => ['test2.yaml', 'test3.yaml'],
-                    ],
-                    'zebra' => [
-                        'label' => 'zebra',
-                        'tests' => ['test1.yaml'],
                     ],
                 ],
             ],
