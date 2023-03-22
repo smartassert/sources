@@ -5,7 +5,6 @@
 !bin/console
 !build
 !composer.json
-!composer.lock
 !public/index.php
 !src
 !config
