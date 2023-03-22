@@ -112,3 +112,7 @@ services:
     SmartAssert\YamlFile\Validator\ContentValidator: ~
 
     SmartAssert\YamlFile\Validator\YamlFileValidator: ~
+
+    SmartAssert\WorkerJobSource\Factory\YamlFileFactory: ~
+
+    SmartAssert\WorkerJobSource\JobSourceSerializer: ~
