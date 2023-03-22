@@ -10,12 +10,15 @@ use App\Exception\SourceRepositoryReaderNotFoundException;
 use App\Exception\UnserializableSourceException;
 use App\Services\SourceRepository\Factory\Factory;
 use App\Services\SourceRepository\Reader\Provider;
-use App\Services\YamlFileCollection\Factory as YamlFileProviderFactory;
+use App\Services\YamlFileCollection\Provider as YamlFileCollectionProvider;
 use League\Flysystem\FilesystemException;
 use League\Flysystem\FilesystemReader;
 use League\Flysystem\FilesystemWriter;
-use SmartAssert\YamlFile\Collection\Serializer as YamlFileCollectionSerializer;
+use SmartAssert\WorkerJobSource\JobSourceSerializer;
+use SmartAssert\WorkerJobSource\Model\JobSource;
+use SmartAssert\WorkerJobSource\Model\Manifest;
 use SmartAssert\YamlFile\Exception\Collection\SerializeException;
+use Symfony\Component\Yaml\Parser as YamlParser;
 
 class SuiteSerializer
 {
@@ -26,8 +29,9 @@ class SuiteSerializer
         private readonly FilesystemWriter $serializedSuiteWriter,
         private readonly Factory $sourceRepositoryFactory,
         private readonly Provider $readerProvider,
-        private readonly YamlFileProviderFactory $yamlFileProviderFactory,
-        private readonly YamlFileCollectionSerializer $yamlFileCollectionSerializer,
+        private readonly JobSourceSerializer $jobSourceSerializer,
+        private readonly YamlParser $yamlParser,
+        private readonly DirectoryListingFilter $listingFilter,
     ) {
     }
 
@@ -50,13 +54,14 @@ class SuiteSerializer
 
         $targetPath = $serializedSuite->getDirectoryPath() . '/' . self::SERIALIZED_FILENAME;
 
-        $content = $this->yamlFileCollectionSerializer->serializeUnreliableProvider(
-            $this->yamlFileProviderFactory->create(
-                $this->readerProvider->find($sourceRepository),
-                $sourceRepository->getRepositoryPath(),
-                $suite->getTests()
-            )
+        $provider = new YamlFileCollectionProvider(
+            $this->yamlParser,
+            $this->listingFilter,
+            $this->readerProvider->find($sourceRepository),
+            $sourceRepository->getRepositoryPath()
         );
+
+        $content = $this->jobSourceSerializer->serialize(new JobSource(new Manifest($suite->getTests()), $provider));
 
         $this->serializedSuiteWriter->write($targetPath, $content);
         $this->sourceRepositoryFactory->remove($sourceRepository);

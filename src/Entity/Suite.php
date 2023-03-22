@@ -96,7 +96,7 @@ class Suite implements \JsonSerializable, UserHeldEntityInterface
     }
 
     /**
-     * @return array<int, string>
+     * @return array<int, non-empty-string>
      */
     public function getTests(): array
     {

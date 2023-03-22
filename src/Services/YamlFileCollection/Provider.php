@@ -8,33 +8,23 @@ use App\Exception\UnparseableSourceFileException;
 use App\Services\DirectoryListingFilter;
 use League\Flysystem\FilesystemException;
 use League\Flysystem\FilesystemReader;
-use SmartAssert\YamlFile\Collection\UnreliableProviderInterface;
+use SmartAssert\YamlFile\Collection\ProviderInterface;
 use SmartAssert\YamlFile\Exception\ProvisionException;
 use SmartAssert\YamlFile\YamlFile;
 use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Parser;
 
-class Provider implements UnreliableProviderInterface
+class Provider implements ProviderInterface
 {
     private string $path;
 
-    /**
-     * @var array<int, string>
-     */
-    private array $manifestPaths;
-
-    /**
-     * @param array<int, string> $manifestPaths
-     */
     public function __construct(
         private Parser $yamlParser,
         private DirectoryListingFilter $listingFilter,
         private FilesystemReader $reader,
         string $path,
-        array $manifestPaths = [],
     ) {
         $this->path = rtrim(ltrim($path, '/'), '/');
-        $this->manifestPaths = $manifestPaths;
     }
 
     /**
@@ -49,13 +39,6 @@ class Provider implements UnreliableProviderInterface
         } catch (FilesystemException $e) {
             throw new ProvisionException(sprintf('Listing contents failed for "%s"', $this->path), 0, $e);
         }
-
-        $manifestLines = [];
-        foreach ($this->manifestPaths as $manifestPath) {
-            $manifestLines[] = '- ' . $manifestPath;
-        }
-
-        yield YamlFile::create('manifest.yaml', implode("\n", $manifestLines));
 
         $files = $this->listingFilter->filter($sourceRepositoryDirectoryListing, $this->path, ['yaml', 'yml']);
 

@@ -7,19 +7,20 @@ namespace App\Tests\Functional\Services\SuiteSerializer;
 use App\Entity\GitSource;
 use App\Entity\SerializedSuite;
 use App\Model\UserGitRepository;
+use App\Services\DirectoryListingFilter;
 use App\Services\EntityIdFactory;
 use App\Services\SourceRepository\Factory\Factory as SourceRepositoryFactory;
 use App\Services\SourceRepository\Reader\Provider as SourceRepositoryReaderProvider;
 use App\Services\SuiteSerializer;
-use App\Services\YamlFileCollection\Factory as YamlFileProviderFactory;
 use App\Tests\Services\FileStoreFixtureCreator;
 use App\Tests\Services\SourceOriginFactory;
 use App\Tests\Services\SuiteFactory;
 use League\Flysystem\FilesystemOperator;
 use League\Flysystem\FilesystemReader;
 use League\Flysystem\FilesystemWriter;
-use SmartAssert\YamlFile\Collection\Serializer as YamlFileCollectionSerializer;
+use SmartAssert\WorkerJobSource\JobSourceSerializer;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Symfony\Component\Yaml\Parser as YamlParser;
 
 class SuiteSerializerGitSourceTest extends WebTestCase
 {
@@ -125,19 +126,23 @@ class SuiteSerializerGitSourceTest extends WebTestCase
         $sourceRepositoryReaderProvider = self::getContainer()->get(SourceRepositoryReaderProvider::class);
         \assert($sourceRepositoryReaderProvider instanceof SourceRepositoryReaderProvider);
 
-        $yamlFileProviderFactory = self::getContainer()->get(YamlFileProviderFactory::class);
-        assert($yamlFileProviderFactory instanceof YamlFileProviderFactory);
+        $jobSourceSerializer = self::getContainer()->get(JobSourceSerializer::class);
+        \assert($jobSourceSerializer instanceof JobSourceSerializer);
 
-        $yamlFileCollectionSerializer = self::getContainer()->get(YamlFileCollectionSerializer::class);
-        \assert($yamlFileCollectionSerializer instanceof YamlFileCollectionSerializer);
+        $yamlParser = self::getContainer()->get(YamlParser::class);
+        \assert($yamlParser instanceof YamlParser);
+
+        $listingFilter = self::getContainer()->get(DirectoryListingFilter::class);
+        \assert($listingFilter instanceof DirectoryListingFilter);
 
         return new SuiteSerializer(
             $serializedSuiteStorage,
             $serializedSuiteStorage,
             $sourceRepositoryFactory,
             $sourceRepositoryReaderProvider,
-            $yamlFileProviderFactory,
-            $yamlFileCollectionSerializer
+            $jobSourceSerializer,
+            $yamlParser,
+            $listingFilter
         );
     }
 }
