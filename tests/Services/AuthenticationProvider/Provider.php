@@ -15,15 +15,10 @@ class Provider
      */
     private array $apiTokens = [];
 
-    /**
-     * @var User[]
-     */
-    private array $users = [];
-
     public function __construct(
         private readonly Client $usersClient,
-        private readonly FrontendTokenProvider $frontendTokenProvider,
         private readonly ApiKeyProvider $apiKeyProvider,
+        private readonly UserProvider $userProvider,
     ) {
     }
 
@@ -51,18 +46,6 @@ class Provider
 
     public function getUser(string $userEmail): User
     {
-        if (!array_key_exists($userEmail, $this->users)) {
-            $user = $this->usersClient->verifyFrontendToken(
-                $this->frontendTokenProvider->get($userEmail)
-            );
-
-            if (null === $user) {
-                throw new \RuntimeException('User is null');
-            }
-
-            $this->users[$userEmail] = $user;
-        }
-
-        return $this->users[$userEmail];
+        return $this->userProvider->get($userEmail);
     }
 }

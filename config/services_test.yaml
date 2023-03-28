@@ -22,6 +22,8 @@ services:
 
     App\Tests\Services\AuthenticationProvider\ApiKeyProvider: ~
 
+    App\Tests\Services\AuthenticationProvider\UserProvider: ~
+
     App\Tests\Services\AuthenticationProvider\Provider:
         public: true
 
