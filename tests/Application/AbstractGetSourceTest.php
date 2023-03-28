@@ -8,8 +8,8 @@ use App\Entity\SourceInterface;
 use App\Repository\SourceRepository;
 use App\Services\EntityIdFactory;
 use App\Tests\DataProvider\GetSourceDataProviderTrait;
-use App\Tests\Services\AuthenticationConfiguration;
 use Doctrine\ORM\EntityManagerInterface;
+use SmartAssert\TestAuthenticationProviderBundle\UserProvider;
 
 abstract class AbstractGetSourceTest extends AbstractApplicationTest
 {
@@ -18,7 +18,7 @@ abstract class AbstractGetSourceTest extends AbstractApplicationTest
     public function testGetSourceNotFound(): void
     {
         $response = $this->applicationClient->makeGetSourceRequest(
-            self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
+            self::$apiTokens->get(self::USER_1_EMAIL),
             (new EntityIdFactory())->create()
         );
 
@@ -28,7 +28,7 @@ abstract class AbstractGetSourceTest extends AbstractApplicationTest
     /**
      * @dataProvider getSourceDataProvider
      *
-     * @param callable(AuthenticationConfiguration $authenticationConfiguration): SourceInterface $sourceCreator
+     * @param callable(UserProvider): SourceInterface $sourceCreator
      * @param callable(SourceInterface $source): array<mixed> $expectedResponseDataCreator
      */
     public function testGetSuccess(callable $sourceCreator, callable $expectedResponseDataCreator): void
@@ -36,11 +36,11 @@ abstract class AbstractGetSourceTest extends AbstractApplicationTest
         $sourceRepository = self::getContainer()->get(SourceRepository::class);
         \assert($sourceRepository instanceof SourceRepository);
 
-        $source = $sourceCreator(self::$authenticationConfiguration);
+        $source = $sourceCreator(self::$users);
         $sourceRepository->save($source);
 
         $response = $this->applicationClient->makeGetSourceRequest(
-            self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
+            self::$apiTokens->get(self::USER_1_EMAIL),
             $source->getId()
         );
 
@@ -56,7 +56,7 @@ abstract class AbstractGetSourceTest extends AbstractApplicationTest
     /**
      * @dataProvider getSourceDataProvider
      *
-     * @param callable(AuthenticationConfiguration $authenticationConfiguration): SourceInterface $sourceCreator
+     * @param callable(UserProvider): SourceInterface $sourceCreator
      * @param callable(SourceInterface $source): array<mixed> $expectedResponseDataCreator
      */
     public function testGetDeletedSourceSuccess(callable $sourceCreator, callable $expectedResponseDataCreator): void
@@ -64,12 +64,12 @@ abstract class AbstractGetSourceTest extends AbstractApplicationTest
         $sourceRepository = self::getContainer()->get(SourceRepository::class);
         \assert($sourceRepository instanceof SourceRepository);
 
-        $source = $sourceCreator(self::$authenticationConfiguration);
+        $source = $sourceCreator(self::$users);
         $sourceRepository->save($source);
         $sourceId = $source->getId();
 
         $this->applicationClient->makeDeleteSourceRequest(
-            self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
+            self::$apiTokens->get(self::USER_1_EMAIL),
             $source->getId()
         );
 
@@ -81,7 +81,7 @@ abstract class AbstractGetSourceTest extends AbstractApplicationTest
         \assert($source instanceof SourceInterface);
 
         $response = $this->applicationClient->makeGetSourceRequest(
-            self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
+            self::$apiTokens->get(self::USER_1_EMAIL),
             $source->getId()
         );
 

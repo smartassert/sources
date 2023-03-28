@@ -12,9 +12,9 @@ use App\Repository\SerializedSuiteRepository;
 use App\Repository\SourceRepository;
 use App\Repository\SuiteRepository;
 use App\Services\EntityIdFactory;
-use App\Tests\Services\AuthenticationConfiguration;
 use App\Tests\Services\SourceOriginFactory;
 use App\Tests\Services\SuiteFactory;
+use SmartAssert\TestAuthenticationProviderBundle\UserProvider;
 
 abstract class AbstractGetSerializedSuiteTest extends AbstractApplicationTest
 {
@@ -42,11 +42,11 @@ abstract class AbstractGetSerializedSuiteTest extends AbstractApplicationTest
     /**
      * @dataProvider serializeSuccessDataProvider
      *
-     * @param callable(AuthenticationConfiguration): SourceInterface $sourceCreator
-     * @param callable(SourceInterface): Suite                       $suiteCreator
-     * @param callable(Suite): SerializedSuite                       $serializedSuiteCreator
-     * @param array<string, string>                                  $payload
-     * @param callable(SerializedSuite): array<mixed>                $expectedResponseDataCreator
+     * @param callable(UserProvider): SourceInterface $sourceCreator
+     * @param callable(SourceInterface): Suite        $suiteCreator
+     * @param callable(Suite): SerializedSuite        $serializedSuiteCreator
+     * @param array<string, string>                   $payload
+     * @param callable(SerializedSuite): array<mixed> $expectedResponseDataCreator
      */
     public function testGetSuccess(
         callable $sourceCreator,
@@ -55,7 +55,7 @@ abstract class AbstractGetSerializedSuiteTest extends AbstractApplicationTest
         array $payload,
         callable $expectedResponseDataCreator,
     ): void {
-        $source = $sourceCreator(self::$authenticationConfiguration);
+        $source = $sourceCreator(self::$users);
         $this->sourceRepository->save($source);
 
         $suite = $suiteCreator($source);
@@ -65,7 +65,7 @@ abstract class AbstractGetSerializedSuiteTest extends AbstractApplicationTest
         $this->serializedSuiteRepository->save($serializedSuite);
 
         $response = $this->applicationClient->makeGetSerializedSuiteRequest(
-            self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
+            self::$apiTokens->get(self::USER_1_EMAIL),
             $serializedSuite->id,
         );
 
@@ -82,10 +82,10 @@ abstract class AbstractGetSerializedSuiteTest extends AbstractApplicationTest
     {
         return [
             'no parameters, state=requested' => [
-                'sourceCreator' => function (AuthenticationConfiguration $authenticationConfiguration) {
+                'sourceCreator' => function (UserProvider $users) {
                     return SourceOriginFactory::create(
                         type: 'file',
-                        userId: $authenticationConfiguration->getUser(self::USER_1_EMAIL)->id,
+                        userId: $users->get(self::USER_1_EMAIL)->id,
                     );
                 },
                 'suiteCreator' => function (SourceInterface $source) {
@@ -109,10 +109,10 @@ abstract class AbstractGetSerializedSuiteTest extends AbstractApplicationTest
                 },
             ],
             'has parameters, state=requested' => [
-                'sourceCreator' => function (AuthenticationConfiguration $authenticationConfiguration) {
+                'sourceCreator' => function (UserProvider $users) {
                     return SourceOriginFactory::create(
                         type: 'file',
-                        userId: $authenticationConfiguration->getUser(self::USER_1_EMAIL)->id,
+                        userId: $users->get(self::USER_1_EMAIL)->id,
                     );
                 },
                 'suiteCreator' => function (SourceInterface $source) {
@@ -142,10 +142,10 @@ abstract class AbstractGetSerializedSuiteTest extends AbstractApplicationTest
                 },
             ],
             'no parameters, state=prepared' => [
-                'sourceCreator' => function (AuthenticationConfiguration $authenticationConfiguration) {
+                'sourceCreator' => function (UserProvider $users) {
                     return SourceOriginFactory::create(
                         type: 'file',
-                        userId: $authenticationConfiguration->getUser(self::USER_1_EMAIL)->id,
+                        userId: $users->get(self::USER_1_EMAIL)->id,
                     );
                 },
                 'suiteCreator' => function (SourceInterface $source) {

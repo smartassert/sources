@@ -1,5 +1,8 @@
 parameters:
     fixtures_base_path: '%env(resolve:FIXTURES_BASE_PATH)%'
+    test_authentication_provider_bundle_frontend_token_provider_users:
+        'user1@example.com': 'password'
+        'user2@example.com': 'password'
 
 services:
     _defaults:
@@ -13,13 +16,6 @@ services:
         public: true
         arguments:
             $fixturesReader: '@test_fixtures.storage'
-
-    App\Tests\Services\AuthenticationConfiguration:
-        public: true
-        arguments:
-            $userCredentials:
-                'user1@example.com': 'password'
-                'user2@example.com': 'password'
 
     App\Tests\Services\DirectoryLister:
         public: true

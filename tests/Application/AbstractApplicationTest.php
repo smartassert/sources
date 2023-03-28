@@ -6,10 +6,11 @@ namespace App\Tests\Application;
 
 use App\Tests\Services\ApplicationClient\Client;
 use App\Tests\Services\ApplicationClient\ClientFactory;
-use App\Tests\Services\AuthenticationConfiguration;
 use App\Tests\Services\EntityRemover;
 use App\Tests\Services\ResponseAsserter;
 use SmartAssert\SymfonyTestClient\ClientInterface;
+use SmartAssert\TestAuthenticationProviderBundle\ApiTokenProvider;
+use SmartAssert\TestAuthenticationProviderBundle\UserProvider;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
@@ -18,10 +19,11 @@ abstract class AbstractApplicationTest extends WebTestCase
     protected const USER_1_EMAIL = 'user1@example.com';
     protected const USER_2_EMAIL = 'user2@example.com';
 
-    protected static AuthenticationConfiguration $authenticationConfiguration;
     protected ResponseAsserter $responseAsserter;
     protected static KernelBrowser $kernelBrowser;
     protected Client $applicationClient;
+    protected static ApiTokenProvider $apiTokens;
+    protected static UserProvider $users;
 
     public static function setUpBeforeClass(): void
     {
@@ -29,9 +31,13 @@ abstract class AbstractApplicationTest extends WebTestCase
 
         self::$kernelBrowser = self::createClient();
 
-        $authenticationConfiguration = self::getContainer()->get(AuthenticationConfiguration::class);
-        \assert($authenticationConfiguration instanceof AuthenticationConfiguration);
-        self::$authenticationConfiguration = $authenticationConfiguration;
+        $apiTokens = self::getContainer()->get(ApiTokenProvider::class);
+        \assert($apiTokens instanceof ApiTokenProvider);
+        self::$apiTokens = $apiTokens;
+
+        $users = self::getContainer()->get(UserProvider::class);
+        \assert($users instanceof UserProvider);
+        self::$users = $users;
     }
 
     protected function setUp(): void

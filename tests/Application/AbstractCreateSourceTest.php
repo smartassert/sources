@@ -21,7 +21,7 @@ abstract class AbstractCreateSourceTest extends AbstractApplicationTest
     public function testCreateInvalidSourceType(): void
     {
         $response = $this->applicationClient->makeCreateSourceRequest(
-            self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
+            self::$apiTokens->get(self::USER_1_EMAIL),
             [
                 OriginSourceRequest::PARAMETER_TYPE => 'invalid source type',
             ]
@@ -52,7 +52,7 @@ abstract class AbstractCreateSourceTest extends AbstractApplicationTest
     public function testCreateInvalidSourceRequest(array $requestParameters, array $expectedResponseData): void
     {
         $response = $this->applicationClient->makeCreateSourceRequest(
-            self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
+            self::$apiTokens->get(self::USER_1_EMAIL),
             $requestParameters
         );
 
@@ -69,7 +69,7 @@ abstract class AbstractCreateSourceTest extends AbstractApplicationTest
     public function testCreateSuccess(array $requestParameters, array $expected): void
     {
         $response = $this->applicationClient->makeCreateSourceRequest(
-            self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
+            self::$apiTokens->get(self::USER_1_EMAIL),
             $requestParameters
         );
 
@@ -86,7 +86,7 @@ abstract class AbstractCreateSourceTest extends AbstractApplicationTest
         self::assertInstanceOf(SourceInterface::class, $source);
 
         $expected['id'] = $source->getId();
-        $expected['user_id'] = self::$authenticationConfiguration->getUser(self::USER_1_EMAIL)->id;
+        $expected['user_id'] = self::$users->get(self::USER_1_EMAIL)->id;
 
         $this->responseAsserter->assertSuccessfulJsonResponse($response, $expected);
     }
@@ -166,14 +166,14 @@ abstract class AbstractCreateSourceTest extends AbstractApplicationTest
     public function testCreateIsIdempotent(array $requestParameters): void
     {
         $firstResponse = $this->applicationClient->makeCreateSourceRequest(
-            self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
+            self::$apiTokens->get(self::USER_1_EMAIL),
             $requestParameters
         );
 
         self::assertSame(200, $firstResponse->getStatusCode());
 
         $secondResponse = $this->applicationClient->makeCreateSourceRequest(
-            self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
+            self::$apiTokens->get(self::USER_1_EMAIL),
             $requestParameters
         );
 
@@ -190,7 +190,7 @@ abstract class AbstractCreateSourceTest extends AbstractApplicationTest
     public function testCreateWithLabelOfDeletedSource(array $requestParameters): void
     {
         $firstCreateResponse = $this->applicationClient->makeCreateSourceRequest(
-            self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
+            self::$apiTokens->get(self::USER_1_EMAIL),
             $requestParameters
         );
 
@@ -202,14 +202,14 @@ abstract class AbstractCreateSourceTest extends AbstractApplicationTest
         \assert(is_string($sourceId));
 
         $deleteResponse = $this->applicationClient->makeDeleteSourceRequest(
-            self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
+            self::$apiTokens->get(self::USER_1_EMAIL),
             $sourceId
         );
 
         self::assertSame(200, $deleteResponse->getStatusCode());
 
         $secondCreateResponse = $this->applicationClient->makeCreateSourceRequest(
-            self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
+            self::$apiTokens->get(self::USER_1_EMAIL),
             $requestParameters
         );
 
@@ -232,14 +232,14 @@ abstract class AbstractCreateSourceTest extends AbstractApplicationTest
         array $conflictCreateParameters,
     ): void {
         $firstRequestResponse = $this->applicationClient->makeCreateSourceRequest(
-            self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
+            self::$apiTokens->get(self::USER_1_EMAIL),
             $targetCreateParameters
         );
 
         self::assertSame(200, $firstRequestResponse->getStatusCode());
 
         $secondRequestResponse = $this->applicationClient->makeCreateSourceRequest(
-            self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
+            self::$apiTokens->get(self::USER_1_EMAIL),
             $conflictCreateParameters
         );
 

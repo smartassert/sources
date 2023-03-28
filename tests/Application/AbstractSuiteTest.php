@@ -19,12 +19,15 @@ abstract class AbstractSuiteTest extends AbstractApplicationTest
         $this->sourceId = $this->createSource(self::USER_1_EMAIL);
     }
 
+    /**
+     * @param non-empty-string $userEmail
+     */
     protected function createSource(string $userEmail, ?string $label = null): string
     {
         $label = is_string($label) ? $label : md5((string) rand());
 
         $createSourceResponse = $this->applicationClient->makeCreateSourceRequest(
-            self::$authenticationConfiguration->getValidApiToken($userEmail),
+            self::$apiTokens->get($userEmail),
             [
                 OriginSourceRequest::PARAMETER_TYPE => Type::FILE->value,
                 FileSourceRequest::PARAMETER_LABEL => $label,
