@@ -14,12 +14,14 @@ services:
         arguments:
             $fixturesReader: '@test_fixtures.storage'
 
-    App\Tests\Services\AuthenticationProvider\Provider:
-        public: true
+    App\Tests\Services\AuthenticationProvider\FrontendTokenProvider:
         arguments:
             $userCredentials:
                 'user1@example.com': 'password'
                 'user2@example.com': 'password'
+
+    App\Tests\Services\AuthenticationProvider\Provider:
+        public: true
 
     App\Tests\Services\DirectoryLister:
         public: true

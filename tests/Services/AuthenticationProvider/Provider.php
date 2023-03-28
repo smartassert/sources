@@ -6,17 +6,11 @@ namespace App\Tests\Services\AuthenticationProvider;
 
 use SmartAssert\UsersClient\Client;
 use SmartAssert\UsersClient\Model\ApiKey;
-use SmartAssert\UsersClient\Model\RefreshableToken;
 use SmartAssert\UsersClient\Model\Token;
 use SmartAssert\UsersClient\Model\User;
 
 class Provider
 {
-    /**
-     * @var RefreshableToken[]
-     */
-    private array $frontendTokens = [];
-
     /**
      * @var ApiKey[]
      */
@@ -32,12 +26,9 @@ class Provider
      */
     private array $users = [];
 
-    /**
-     * @param array{non-empty-string: non-empty-string} $userCredentials
-     */
     public function __construct(
-        private readonly array $userCredentials,
         private readonly Client $usersClient,
+        private readonly FrontendTokenProvider $frontendTokenProvider,
     ) {
     }
 
@@ -67,7 +58,7 @@ class Provider
     {
         if (!array_key_exists($userEmail, $this->users)) {
             $user = $this->usersClient->verifyFrontendToken(
-                $this->getFrontendToken($userEmail)
+                $this->frontendTokenProvider->get($userEmail)
             );
 
             if (null === $user) {
@@ -80,23 +71,11 @@ class Provider
         return $this->users[$userEmail];
     }
 
-    private function getFrontendToken(string $userEmail): RefreshableToken
-    {
-        if (!array_key_exists($userEmail, $this->frontendTokens)) {
-            $this->frontendTokens[$userEmail] = $this->usersClient->createFrontendToken(
-                $userEmail,
-                $this->userCredentials[$userEmail]
-            );
-        }
-
-        return $this->frontendTokens[$userEmail];
-    }
-
     private function getApiKey(string $userEmail): ApiKey
     {
         if (!array_key_exists($userEmail, $this->apiKeys)) {
             $apiKeys = $this->usersClient->listUserApiKeys(
-                $this->getFrontendToken($userEmail)
+                $this->frontendTokenProvider->get($userEmail)
             );
 
             $apiKey = $apiKeys->getDefault();
