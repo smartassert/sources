@@ -26,7 +26,7 @@ abstract class AbstractGetSuiteTest extends AbstractApplicationTest
         parent::setUp();
 
         $createSourceResponse = $this->applicationClient->makeCreateSourceRequest(
-            self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
+            self::$authenticationConfiguration->getApiToken(self::USER_1_EMAIL),
             [
                 OriginSourceRequest::PARAMETER_TYPE => Type::FILE->value,
                 FileSourceRequest::PARAMETER_LABEL => 'label',
@@ -51,7 +51,7 @@ abstract class AbstractGetSuiteTest extends AbstractApplicationTest
     public function testGetSuiteSuiteNotFound(): void
     {
         $response = $this->applicationClient->makeGetSuiteRequest(
-            self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
+            self::$authenticationConfiguration->getApiToken(self::USER_1_EMAIL),
             (new EntityIdFactory())->create()
         );
 
@@ -70,7 +70,7 @@ abstract class AbstractGetSuiteTest extends AbstractApplicationTest
         $this->suiteRepository->save($suite);
 
         $response = $this->applicationClient->makeGetSuiteRequest(
-            self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
+            self::$authenticationConfiguration->getApiToken(self::USER_1_EMAIL),
             $suite->id,
         );
 

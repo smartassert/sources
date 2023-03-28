@@ -35,7 +35,7 @@ abstract class AbstractListSourcesTest extends AbstractApplicationTest
         $expectedResponseData = $expectedResponseDataCreator($sources);
 
         $response = $this->applicationClient->makeListSourcesRequest(
-            self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL)
+            self::$authenticationConfiguration->getApiToken(self::USER_1_EMAIL)
         );
 
         self::assertSame(200, $response->getStatusCode());

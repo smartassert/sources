@@ -24,7 +24,7 @@ abstract class AbstractSuiteTest extends AbstractApplicationTest
         $label = is_string($label) ? $label : md5((string) rand());
 
         $createSourceResponse = $this->applicationClient->makeCreateSourceRequest(
-            self::$authenticationConfiguration->getValidApiToken($userEmail),
+            self::$authenticationConfiguration->getApiToken($userEmail),
             [
                 OriginSourceRequest::PARAMETER_TYPE => Type::FILE->value,
                 FileSourceRequest::PARAMETER_LABEL => $label,

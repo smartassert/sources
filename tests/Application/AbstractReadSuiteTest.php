@@ -80,7 +80,7 @@ abstract class AbstractReadSuiteTest extends AbstractApplicationTest
         );
 
         $response = $this->applicationClient->makeReadSerializedSuiteRequest(
-            self::$authenticationConfiguration->getValidApiToken(self::USER_1_EMAIL),
+            self::$authenticationConfiguration->getApiToken(self::USER_1_EMAIL),
             $serializedSuite->id
         );
 

@@ -14,7 +14,7 @@ class Provider
     ) {
     }
 
-    public function getValidApiToken(string $userEmail): string
+    public function getApiToken(string $userEmail): string
     {
         return $this->apiTokenProvider->get($userEmail);
     }
