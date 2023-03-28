@@ -6,7 +6,7 @@ namespace App\Tests\Application;
 
 use App\Tests\Services\ApplicationClient\Client;
 use App\Tests\Services\ApplicationClient\ClientFactory;
-use App\Tests\Services\AuthenticationConfiguration;
+use App\Tests\Services\AuthenticationProvider\Provider;
 use App\Tests\Services\EntityRemover;
 use App\Tests\Services\ResponseAsserter;
 use SmartAssert\SymfonyTestClient\ClientInterface;
@@ -18,7 +18,7 @@ abstract class AbstractApplicationTest extends WebTestCase
     protected const USER_1_EMAIL = 'user1@example.com';
     protected const USER_2_EMAIL = 'user2@example.com';
 
-    protected static AuthenticationConfiguration $authenticationConfiguration;
+    protected static Provider $authenticationConfiguration;
     protected ResponseAsserter $responseAsserter;
     protected static KernelBrowser $kernelBrowser;
     protected Client $applicationClient;
@@ -29,8 +29,8 @@ abstract class AbstractApplicationTest extends WebTestCase
 
         self::$kernelBrowser = self::createClient();
 
-        $authenticationConfiguration = self::getContainer()->get(AuthenticationConfiguration::class);
-        \assert($authenticationConfiguration instanceof AuthenticationConfiguration);
+        $authenticationConfiguration = self::getContainer()->get(Provider::class);
+        \assert($authenticationConfiguration instanceof Provider);
         self::$authenticationConfiguration = $authenticationConfiguration;
     }
 

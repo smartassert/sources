@@ -9,7 +9,7 @@ use App\Entity\GitSource;
 use App\Entity\SourceInterface;
 use App\Enum\Source\Type;
 use App\Repository\SourceRepository;
-use App\Tests\Services\AuthenticationConfiguration;
+use App\Tests\Services\AuthenticationProvider\Provider;
 use App\Tests\Services\SourceOriginFactory;
 
 abstract class AbstractListSourcesTest extends AbstractApplicationTest
@@ -17,7 +17,7 @@ abstract class AbstractListSourcesTest extends AbstractApplicationTest
     /**
      * @dataProvider listSuccessDataProvider
      *
-     * @param callable(AuthenticationConfiguration $authenticationConfiguration): SourceInterface[] $sourcesCreator
+     * @param callable(Provider $authenticationConfiguration): SourceInterface[] $sourcesCreator
      * @param callable(SourceInterface[] $sources): array<mixed> $expectedResponseDataCreator
      */
     public function testListSuccess(
@@ -73,7 +73,7 @@ abstract class AbstractListSourcesTest extends AbstractApplicationTest
                 },
             ],
             'has file and git sources for correct user only' => [
-                'sourcesCreator' => function (AuthenticationConfiguration $authenticationConfiguration) {
+                'sourcesCreator' => function (Provider $authenticationConfiguration) {
                     $fileSource = SourceOriginFactory::create(
                         type: 'file',
                         userId: $authenticationConfiguration->getUser(self::USER_1_EMAIL)->id,
@@ -115,7 +115,7 @@ abstract class AbstractListSourcesTest extends AbstractApplicationTest
                 },
             ],
             'has file and git sources for mixed users' => [
-                'sourcesCreator' => function (AuthenticationConfiguration $authenticationConfiguration) {
+                'sourcesCreator' => function (Provider $authenticationConfiguration) {
                     return [
                         SourceOriginFactory::create(
                             type: 'file',

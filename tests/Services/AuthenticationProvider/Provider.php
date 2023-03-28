@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Services;
+namespace App\Tests\Services\AuthenticationProvider;
 
 use SmartAssert\UsersClient\Client;
 use SmartAssert\UsersClient\Model\ApiKey;
@@ -10,7 +10,7 @@ use SmartAssert\UsersClient\Model\RefreshableToken;
 use SmartAssert\UsersClient\Model\Token;
 use SmartAssert\UsersClient\Model\User;
 
-class AuthenticationConfiguration
+class Provider
 {
     /**
      * @var RefreshableToken[]

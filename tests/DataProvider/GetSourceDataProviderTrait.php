@@ -7,7 +7,7 @@ namespace App\Tests\DataProvider;
 use App\Entity\FileSource;
 use App\Entity\GitSource;
 use App\Enum\Source\Type;
-use App\Tests\Services\AuthenticationConfiguration;
+use App\Tests\Services\AuthenticationProvider\Provider;
 use App\Tests\Services\SourceOriginFactory;
 
 trait GetSourceDataProviderTrait
@@ -19,7 +19,7 @@ trait GetSourceDataProviderTrait
     {
         return [
             'git source with credentials' => [
-                'sourceCreator' => function (AuthenticationConfiguration $authenticationConfiguration) {
+                'sourceCreator' => function (Provider $authenticationConfiguration) {
                     return SourceOriginFactory::create(
                         type: 'git',
                         userId: $authenticationConfiguration->getUser(self::USER_1_EMAIL)->id,
@@ -46,7 +46,7 @@ trait GetSourceDataProviderTrait
                 },
             ],
             'git source without credentials' => [
-                'sourceCreator' => function (AuthenticationConfiguration $authenticationConfiguration) {
+                'sourceCreator' => function (Provider $authenticationConfiguration) {
                     return SourceOriginFactory::create(
                         type: 'git',
                         userId: $authenticationConfiguration->getUser(self::USER_1_EMAIL)->id,
@@ -72,7 +72,7 @@ trait GetSourceDataProviderTrait
                 },
             ],
             'file' => [
-                'sourceCreator' => function (AuthenticationConfiguration $authenticationConfiguration) {
+                'sourceCreator' => function (Provider $authenticationConfiguration) {
                     return SourceOriginFactory::create(
                         type: 'file',
                         userId: $authenticationConfiguration->getUser(self::USER_1_EMAIL)->id,

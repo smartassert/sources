@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Application;
 
 use App\Services\EntityIdFactory;
-use App\Tests\Services\AuthenticationConfiguration;
+use App\Tests\Services\AuthenticationProvider\Provider;
 
 abstract class AbstractUnauthorizedUserTest extends AbstractApplicationTest
 {
@@ -255,7 +255,7 @@ abstract class AbstractUnauthorizedUserTest extends AbstractApplicationTest
                 }
             ],
             'non-empty invalid token' => [
-                'tokenCreator' => function (AuthenticationConfiguration $authenticationConfiguration) {
+                'tokenCreator' => function (Provider $authenticationConfiguration) {
                     return $authenticationConfiguration->getInvalidApiToken();
                 }
             ],

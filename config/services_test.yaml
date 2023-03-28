@@ -14,7 +14,7 @@ services:
         arguments:
             $fixturesReader: '@test_fixtures.storage'
 
-    App\Tests\Services\AuthenticationConfiguration:
+    App\Tests\Services\AuthenticationProvider\Provider:
         public: true
         arguments:
             $userCredentials:

@@ -8,7 +8,7 @@ use App\Entity\FileSource;
 use App\Entity\SourceInterface;
 use App\Repository\SourceRepository;
 use App\Tests\DataProvider\GetSourceDataProviderTrait;
-use App\Tests\Services\AuthenticationConfiguration;
+use App\Tests\Services\AuthenticationProvider\Provider;
 use App\Tests\Services\EntityRemover;
 use App\Tests\Services\SourceOriginFactory;
 use Doctrine\ORM\EntityManagerInterface;
@@ -42,7 +42,7 @@ abstract class AbstractDeleteSourceTest extends AbstractApplicationTest
     /**
      * @dataProvider getSourceDataProvider
      *
-     * @param callable(AuthenticationConfiguration $authenticationConfiguration): SourceInterface $sourceCreator
+     * @param callable(Provider $authenticationConfiguration): SourceInterface $sourceCreator
      * @param callable(SourceInterface $source): array<mixed> $expectedResponseDataCreator
      */
     public function testDeleteSuccess(callable $sourceCreator, callable $expectedResponseDataCreator): void

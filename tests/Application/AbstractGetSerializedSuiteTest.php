@@ -12,7 +12,7 @@ use App\Repository\SerializedSuiteRepository;
 use App\Repository\SourceRepository;
 use App\Repository\SuiteRepository;
 use App\Services\EntityIdFactory;
-use App\Tests\Services\AuthenticationConfiguration;
+use App\Tests\Services\AuthenticationProvider\Provider;
 use App\Tests\Services\SourceOriginFactory;
 use App\Tests\Services\SuiteFactory;
 
@@ -42,11 +42,11 @@ abstract class AbstractGetSerializedSuiteTest extends AbstractApplicationTest
     /**
      * @dataProvider serializeSuccessDataProvider
      *
-     * @param callable(AuthenticationConfiguration): SourceInterface $sourceCreator
-     * @param callable(SourceInterface): Suite                       $suiteCreator
-     * @param callable(Suite): SerializedSuite                       $serializedSuiteCreator
-     * @param array<string, string>                                  $payload
-     * @param callable(SerializedSuite): array<mixed>                $expectedResponseDataCreator
+     * @param callable(Provider): SourceInterface     $sourceCreator
+     * @param callable(SourceInterface): Suite        $suiteCreator
+     * @param callable(Suite): SerializedSuite        $serializedSuiteCreator
+     * @param array<string, string>                   $payload
+     * @param callable(SerializedSuite): array<mixed> $expectedResponseDataCreator
      */
     public function testGetSuccess(
         callable $sourceCreator,
@@ -82,7 +82,7 @@ abstract class AbstractGetSerializedSuiteTest extends AbstractApplicationTest
     {
         return [
             'no parameters, state=requested' => [
-                'sourceCreator' => function (AuthenticationConfiguration $authenticationConfiguration) {
+                'sourceCreator' => function (Provider $authenticationConfiguration) {
                     return SourceOriginFactory::create(
                         type: 'file',
                         userId: $authenticationConfiguration->getUser(self::USER_1_EMAIL)->id,
@@ -109,7 +109,7 @@ abstract class AbstractGetSerializedSuiteTest extends AbstractApplicationTest
                 },
             ],
             'has parameters, state=requested' => [
-                'sourceCreator' => function (AuthenticationConfiguration $authenticationConfiguration) {
+                'sourceCreator' => function (Provider $authenticationConfiguration) {
                     return SourceOriginFactory::create(
                         type: 'file',
                         userId: $authenticationConfiguration->getUser(self::USER_1_EMAIL)->id,
@@ -142,7 +142,7 @@ abstract class AbstractGetSerializedSuiteTest extends AbstractApplicationTest
                 },
             ],
             'no parameters, state=prepared' => [
-                'sourceCreator' => function (AuthenticationConfiguration $authenticationConfiguration) {
+                'sourceCreator' => function (Provider $authenticationConfiguration) {
                     return SourceOriginFactory::create(
                         type: 'file',
                         userId: $authenticationConfiguration->getUser(self::USER_1_EMAIL)->id,

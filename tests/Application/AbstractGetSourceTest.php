@@ -8,7 +8,7 @@ use App\Entity\SourceInterface;
 use App\Repository\SourceRepository;
 use App\Services\EntityIdFactory;
 use App\Tests\DataProvider\GetSourceDataProviderTrait;
-use App\Tests\Services\AuthenticationConfiguration;
+use App\Tests\Services\AuthenticationProvider\Provider;
 use Doctrine\ORM\EntityManagerInterface;
 
 abstract class AbstractGetSourceTest extends AbstractApplicationTest
@@ -28,7 +28,7 @@ abstract class AbstractGetSourceTest extends AbstractApplicationTest
     /**
      * @dataProvider getSourceDataProvider
      *
-     * @param callable(AuthenticationConfiguration $authenticationConfiguration): SourceInterface $sourceCreator
+     * @param callable(Provider $authenticationConfiguration): SourceInterface $sourceCreator
      * @param callable(SourceInterface $source): array<mixed> $expectedResponseDataCreator
      */
     public function testGetSuccess(callable $sourceCreator, callable $expectedResponseDataCreator): void
@@ -56,7 +56,7 @@ abstract class AbstractGetSourceTest extends AbstractApplicationTest
     /**
      * @dataProvider getSourceDataProvider
      *
-     * @param callable(AuthenticationConfiguration $authenticationConfiguration): SourceInterface $sourceCreator
+     * @param callable(Provider $authenticationConfiguration): SourceInterface $sourceCreator
      * @param callable(SourceInterface $source): array<mixed> $expectedResponseDataCreator
      */
     public function testGetDeletedSourceSuccess(callable $sourceCreator, callable $expectedResponseDataCreator): void
