@@ -26,9 +26,6 @@ services:
     App\Tests\Services\AuthenticationProvider\ApiTokenProvider:
         public: true
 
-    App\Tests\Services\AuthenticationProvider\Provider:
-        public: true
-
     App\Tests\Services\DirectoryLister:
         public: true
 
