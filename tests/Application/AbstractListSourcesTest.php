@@ -9,7 +9,7 @@ use App\Entity\GitSource;
 use App\Entity\SourceInterface;
 use App\Enum\Source\Type;
 use App\Repository\SourceRepository;
-use App\Tests\Services\AuthenticationProvider\Provider;
+use App\Tests\Services\AuthenticationProvider\UserProvider;
 use App\Tests\Services\SourceOriginFactory;
 
 abstract class AbstractListSourcesTest extends AbstractApplicationTest
@@ -17,7 +17,7 @@ abstract class AbstractListSourcesTest extends AbstractApplicationTest
     /**
      * @dataProvider listSuccessDataProvider
      *
-     * @param callable(Provider $authenticationConfiguration): SourceInterface[] $sourcesCreator
+     * @param callable(UserProvider): SourceInterface[] $sourcesCreator
      * @param callable(SourceInterface[] $sources): array<mixed> $expectedResponseDataCreator
      */
     public function testListSuccess(
@@ -27,7 +27,7 @@ abstract class AbstractListSourcesTest extends AbstractApplicationTest
         $sourceRepository = self::getContainer()->get(SourceRepository::class);
         \assert($sourceRepository instanceof SourceRepository);
 
-        $sources = $sourcesCreator(self::$authenticationConfiguration);
+        $sources = $sourcesCreator(self::$users);
         foreach ($sources as $source) {
             $sourceRepository->save($source);
         }
@@ -73,14 +73,14 @@ abstract class AbstractListSourcesTest extends AbstractApplicationTest
                 },
             ],
             'has file and git sources for correct user only' => [
-                'sourcesCreator' => function (Provider $authenticationConfiguration) {
+                'sourcesCreator' => function (UserProvider $users) {
                     $fileSource = SourceOriginFactory::create(
                         type: 'file',
-                        userId: $authenticationConfiguration->getUser(self::USER_1_EMAIL)->id,
+                        userId: $users->get(self::USER_1_EMAIL)->id,
                     );
                     $gitSource = SourceOriginFactory::create(
                         type: 'git',
-                        userId: $authenticationConfiguration->getUser(self::USER_1_EMAIL)->id,
+                        userId: $users->get(self::USER_1_EMAIL)->id,
                     );
 
                     return [
@@ -115,17 +115,17 @@ abstract class AbstractListSourcesTest extends AbstractApplicationTest
                 },
             ],
             'has file and git sources for mixed users' => [
-                'sourcesCreator' => function (Provider $authenticationConfiguration) {
+                'sourcesCreator' => function (UserProvider $users) {
                     return [
                         SourceOriginFactory::create(
                             type: 'file',
-                            userId: $authenticationConfiguration->getUser(self::USER_1_EMAIL)->id,
+                            userId: $users->get(self::USER_1_EMAIL)->id,
                         ),
                         SourceOriginFactory::create(type: 'file'),
                         SourceOriginFactory::create(type: 'file'),
                         SourceOriginFactory::create(
                             type: 'git',
-                            userId: $authenticationConfiguration->getUser(self::USER_1_EMAIL)->id,
+                            userId: $users->get(self::USER_1_EMAIL)->id,
                         ),
                         SourceOriginFactory::create(type: 'git'),
                         SourceOriginFactory::create(type: 'git'),

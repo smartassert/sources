@@ -8,6 +8,7 @@ use App\Tests\Services\ApplicationClient\Client;
 use App\Tests\Services\ApplicationClient\ClientFactory;
 use App\Tests\Services\AuthenticationProvider\ApiTokenProvider;
 use App\Tests\Services\AuthenticationProvider\Provider;
+use App\Tests\Services\AuthenticationProvider\UserProvider;
 use App\Tests\Services\EntityRemover;
 use App\Tests\Services\ResponseAsserter;
 use SmartAssert\SymfonyTestClient\ClientInterface;
@@ -24,6 +25,7 @@ abstract class AbstractApplicationTest extends WebTestCase
     protected static KernelBrowser $kernelBrowser;
     protected Client $applicationClient;
     protected static ApiTokenProvider $apiTokens;
+    protected static UserProvider $users;
 
     public static function setUpBeforeClass(): void
     {
@@ -38,6 +40,10 @@ abstract class AbstractApplicationTest extends WebTestCase
         $apiTokens = self::getContainer()->get(ApiTokenProvider::class);
         \assert($apiTokens instanceof ApiTokenProvider);
         self::$apiTokens = $apiTokens;
+
+        $users = self::getContainer()->get(UserProvider::class);
+        \assert($users instanceof UserProvider);
+        self::$users = $users;
     }
 
     protected function setUp(): void

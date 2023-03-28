@@ -8,7 +8,7 @@ use App\Entity\FileSource;
 use App\Entity\SourceInterface;
 use App\Repository\SourceRepository;
 use App\Tests\DataProvider\GetSourceDataProviderTrait;
-use App\Tests\Services\AuthenticationProvider\Provider;
+use App\Tests\Services\AuthenticationProvider\UserProvider;
 use App\Tests\Services\EntityRemover;
 use App\Tests\Services\SourceOriginFactory;
 use Doctrine\ORM\EntityManagerInterface;
@@ -42,12 +42,12 @@ abstract class AbstractDeleteSourceTest extends AbstractApplicationTest
     /**
      * @dataProvider getSourceDataProvider
      *
-     * @param callable(Provider $authenticationConfiguration): SourceInterface $sourceCreator
+     * @param callable(UserProvider): SourceInterface $sourceCreator
      * @param callable(SourceInterface $source): array<mixed> $expectedResponseDataCreator
      */
     public function testDeleteSuccess(callable $sourceCreator, callable $expectedResponseDataCreator): void
     {
-        $source = $sourceCreator(self::$authenticationConfiguration);
+        $source = $sourceCreator(self::$users);
         $this->sourceRepository->save($source);
         self::assertNull($source->getDeletedAt());
 
@@ -80,7 +80,7 @@ abstract class AbstractDeleteSourceTest extends AbstractApplicationTest
 
         $fileSource = SourceOriginFactory::create(
             type: 'file',
-            userId: self::$authenticationConfiguration->getUser(self::USER_1_EMAIL)->id,
+            userId: self::$users->get(self::USER_1_EMAIL)->id,
             label: 'file source label',
         );
         \assert($fileSource instanceof FileSource);
@@ -108,7 +108,7 @@ abstract class AbstractDeleteSourceTest extends AbstractApplicationTest
     {
         $source = SourceOriginFactory::create(
             type: 'file',
-            userId: self::$authenticationConfiguration->getUser(self::USER_1_EMAIL)->id,
+            userId: self::$users->get(self::USER_1_EMAIL)->id,
         );
         $this->sourceRepository->save($source);
 

@@ -7,7 +7,7 @@ namespace App\Tests\DataProvider;
 use App\Entity\FileSource;
 use App\Entity\GitSource;
 use App\Enum\Source\Type;
-use App\Tests\Services\AuthenticationProvider\Provider;
+use App\Tests\Services\AuthenticationProvider\UserProvider;
 use App\Tests\Services\SourceOriginFactory;
 
 trait GetSourceDataProviderTrait
@@ -19,10 +19,10 @@ trait GetSourceDataProviderTrait
     {
         return [
             'git source with credentials' => [
-                'sourceCreator' => function (Provider $authenticationConfiguration) {
+                'sourceCreator' => function (UserProvider $users) {
                     return SourceOriginFactory::create(
                         type: 'git',
-                        userId: $authenticationConfiguration->getUser(self::USER_1_EMAIL)->id,
+                        userId: $users->get(self::USER_1_EMAIL)->id,
                         credentials: md5((string) rand()),
                     );
                 },
@@ -46,10 +46,10 @@ trait GetSourceDataProviderTrait
                 },
             ],
             'git source without credentials' => [
-                'sourceCreator' => function (Provider $authenticationConfiguration) {
+                'sourceCreator' => function (UserProvider $users) {
                     return SourceOriginFactory::create(
                         type: 'git',
-                        userId: $authenticationConfiguration->getUser(self::USER_1_EMAIL)->id,
+                        userId: $users->get(self::USER_1_EMAIL)->id,
                     );
                 },
                 'expectedResponseDataCreator' => function (GitSource $source) {
@@ -72,10 +72,10 @@ trait GetSourceDataProviderTrait
                 },
             ],
             'file' => [
-                'sourceCreator' => function (Provider $authenticationConfiguration) {
+                'sourceCreator' => function (UserProvider $users) {
                     return SourceOriginFactory::create(
                         type: 'file',
-                        userId: $authenticationConfiguration->getUser(self::USER_1_EMAIL)->id,
+                        userId: $users->get(self::USER_1_EMAIL)->id,
                     );
                 },
                 'expectedResponseDataCreator' => function (FileSource $source) {

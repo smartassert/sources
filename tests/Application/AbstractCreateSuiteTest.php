@@ -39,7 +39,7 @@ abstract class AbstractCreateSuiteTest extends AbstractSuiteTest
         $suite = $suites[0];
         self::assertInstanceOf(Suite::class, $suite);
         self::assertSame(
-            self::$authenticationConfiguration->getUser(self::USER_1_EMAIL)->id,
+            self::$users->get(self::USER_1_EMAIL)->id,
             $suite->getUserId()
         );
 

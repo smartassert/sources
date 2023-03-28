@@ -8,7 +8,7 @@ use App\Entity\SourceInterface;
 use App\Repository\SourceRepository;
 use App\Services\EntityIdFactory;
 use App\Tests\DataProvider\GetSourceDataProviderTrait;
-use App\Tests\Services\AuthenticationProvider\Provider;
+use App\Tests\Services\AuthenticationProvider\UserProvider;
 use Doctrine\ORM\EntityManagerInterface;
 
 abstract class AbstractGetSourceTest extends AbstractApplicationTest
@@ -28,7 +28,7 @@ abstract class AbstractGetSourceTest extends AbstractApplicationTest
     /**
      * @dataProvider getSourceDataProvider
      *
-     * @param callable(Provider $authenticationConfiguration): SourceInterface $sourceCreator
+     * @param callable(UserProvider): SourceInterface $sourceCreator
      * @param callable(SourceInterface $source): array<mixed> $expectedResponseDataCreator
      */
     public function testGetSuccess(callable $sourceCreator, callable $expectedResponseDataCreator): void
@@ -36,7 +36,7 @@ abstract class AbstractGetSourceTest extends AbstractApplicationTest
         $sourceRepository = self::getContainer()->get(SourceRepository::class);
         \assert($sourceRepository instanceof SourceRepository);
 
-        $source = $sourceCreator(self::$authenticationConfiguration);
+        $source = $sourceCreator(self::$users);
         $sourceRepository->save($source);
 
         $response = $this->applicationClient->makeGetSourceRequest(
@@ -56,7 +56,7 @@ abstract class AbstractGetSourceTest extends AbstractApplicationTest
     /**
      * @dataProvider getSourceDataProvider
      *
-     * @param callable(Provider $authenticationConfiguration): SourceInterface $sourceCreator
+     * @param callable(UserProvider): SourceInterface $sourceCreator
      * @param callable(SourceInterface $source): array<mixed> $expectedResponseDataCreator
      */
     public function testGetDeletedSourceSuccess(callable $sourceCreator, callable $expectedResponseDataCreator): void
@@ -64,7 +64,7 @@ abstract class AbstractGetSourceTest extends AbstractApplicationTest
         $sourceRepository = self::getContainer()->get(SourceRepository::class);
         \assert($sourceRepository instanceof SourceRepository);
 
-        $source = $sourceCreator(self::$authenticationConfiguration);
+        $source = $sourceCreator(self::$users);
         $sourceRepository->save($source);
         $sourceId = $source->getId();
 

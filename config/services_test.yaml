@@ -20,7 +20,8 @@ services:
                 'user1@example.com': 'password'
                 'user2@example.com': 'password'
 
-    App\Tests\Services\AuthenticationProvider\UserProvider: ~
+    App\Tests\Services\AuthenticationProvider\UserProvider:
+        public: true
 
     App\Tests\Services\AuthenticationProvider\ApiTokenProvider:
         public: true

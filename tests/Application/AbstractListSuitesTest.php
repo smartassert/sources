@@ -6,7 +6,7 @@ namespace App\Tests\Application;
 
 use App\Repository\SourceRepository;
 use App\Repository\SuiteRepository;
-use App\Tests\Services\AuthenticationProvider\Provider as AuthConfig;
+use App\Tests\Services\AuthenticationProvider\UserProvider;
 use App\Tests\Services\SourceOriginFactory;
 use App\Tests\Services\SuiteFactory;
 
@@ -15,8 +15,8 @@ abstract class AbstractListSuitesTest extends AbstractApplicationTest
     /**
      * @dataProvider listSuccessDataProvider
      *
-     * @param callable(AuthConfig, SourceRepository, SuiteRepository): array<string, array<mixed>> $suitesCreator
-     * @param array<string, array<mixed>>                                                          $expectedResponseData
+     * @param callable(UserProvider, SourceRepository, SuiteRepository): array<mixed> $suitesCreator
+     * @param array<string, array<mixed>>                                             $expectedResponseData
      */
     public function testListSuccess(callable $suitesCreator, array $expectedResponseData): void
     {
@@ -26,11 +26,7 @@ abstract class AbstractListSuitesTest extends AbstractApplicationTest
         $suiteRepository = self::getContainer()->get(SuiteRepository::class);
         \assert($suiteRepository instanceof SuiteRepository);
 
-        $userSuitesData = $suitesCreator(
-            self::$authenticationConfiguration,
-            $sourceRepository,
-            $suiteRepository
-        );
+        $userSuitesData = $suitesCreator(self::$users, $sourceRepository, $suiteRepository);
 
         $response = $this->applicationClient->makeListSuitesRequest(
             self::$apiTokens->get(self::USER_1_EMAIL)
@@ -61,7 +57,7 @@ abstract class AbstractListSuitesTest extends AbstractApplicationTest
             ],
             'no user suites' => [
                 'suitesCreator' => function (
-                    AuthConfig $authenticationConfiguration,
+                    UserProvider $users,
                     SourceRepository $sourceRepository,
                     SuiteRepository $suiteRepository
                 ) {
@@ -78,13 +74,13 @@ abstract class AbstractListSuitesTest extends AbstractApplicationTest
             ],
             'single source, single suite with no tests' => [
                 'suitesCreator' => function (
-                    AuthConfig $authenticationConfiguration,
+                    UserProvider $users,
                     SourceRepository $sourceRepository,
                     SuiteRepository $suiteRepository
                 ) {
                     $source = SourceOriginFactory::create(
                         type: 'file',
-                        userId: $authenticationConfiguration->getUser(self::USER_1_EMAIL)->id,
+                        userId: $users->get(self::USER_1_EMAIL)->id,
                         label: 'source one',
                     );
 
@@ -109,13 +105,13 @@ abstract class AbstractListSuitesTest extends AbstractApplicationTest
             ],
             'two sources, one suite per source' => [
                 'suitesCreator' => function (
-                    AuthConfig $authenticationConfiguration,
+                    UserProvider $users,
                     SourceRepository $sourceRepository,
                     SuiteRepository $suiteRepository
                 ) {
                     $source1 = SourceOriginFactory::create(
                         type: 'file',
-                        userId: $authenticationConfiguration->getUser(self::USER_1_EMAIL)->id,
+                        userId: $users->get(self::USER_1_EMAIL)->id,
                         label: 'source one',
                     );
 
@@ -131,7 +127,7 @@ abstract class AbstractListSuitesTest extends AbstractApplicationTest
 
                     $source2 = SourceOriginFactory::create(
                         type: 'file',
-                        userId: $authenticationConfiguration->getUser(self::USER_1_EMAIL)->id,
+                        userId: $users->get(self::USER_1_EMAIL)->id,
                         label: 'source two',
                     );
 
@@ -174,13 +170,13 @@ abstract class AbstractListSuitesTest extends AbstractApplicationTest
             ],
             'multiple suites, are ordered by id' => [
                 'suitesCreator' => function (
-                    AuthConfig $authenticationConfiguration,
+                    UserProvider $users,
                     SourceRepository $sourceRepository,
                     SuiteRepository $suiteRepository
                 ) {
                     $zebraSource = SourceOriginFactory::create(
                         type: 'file',
-                        userId: $authenticationConfiguration->getUser(self::USER_1_EMAIL)->id,
+                        userId: $users->get(self::USER_1_EMAIL)->id,
                         label: 'zebra one',
                     );
 
@@ -196,7 +192,7 @@ abstract class AbstractListSuitesTest extends AbstractApplicationTest
 
                     $appleAndBatSource = SourceOriginFactory::create(
                         type: 'file',
-                        userId: $authenticationConfiguration->getUser(self::USER_1_EMAIL)->id,
+                        userId: $users->get(self::USER_1_EMAIL)->id,
                         label: 'apple and bat source',
                     );
 

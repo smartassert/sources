@@ -60,7 +60,7 @@ abstract class AbstractReadSuiteTest extends AbstractApplicationTest
 
         $fileSource = SourceOriginFactory::create(
             type: 'file',
-            userId: self::$authenticationConfiguration->getUser(self::USER_1_EMAIL)->id
+            userId: self::$users->get(self::USER_1_EMAIL)->id
         );
         $sourceRepository->save($fileSource);
 

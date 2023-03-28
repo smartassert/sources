@@ -11,7 +11,7 @@ use App\Enum\SerializedSuite\State;
 use App\Repository\SerializedSuiteRepository;
 use App\Repository\SourceRepository;
 use App\Repository\SuiteRepository;
-use App\Tests\Services\AuthenticationProvider\Provider;
+use App\Tests\Services\AuthenticationProvider\UserProvider;
 use App\Tests\Services\SourceOriginFactory;
 use App\Tests\Services\SuiteFactory;
 
@@ -41,10 +41,10 @@ abstract class AbstractCreateSerializedSuiteTest extends AbstractApplicationTest
     /**
      * @dataProvider serializeSuccessDataProvider
      *
-     * @param callable(Provider): SourceInterface $sourceCreator
-     * @param callable(SourceInterface): Suite    $suiteCreator
-     * @param array<string, string>               $payload
-     * @param array<string, string>               $expectedResponseParameters
+     * @param callable(UserProvider): SourceInterface $sourceCreator
+     * @param callable(SourceInterface): Suite        $suiteCreator
+     * @param array<string, string>                   $payload
+     * @param array<string, string>                   $expectedResponseParameters
      */
     public function testSerializeSuccess(
         callable $sourceCreator,
@@ -52,7 +52,7 @@ abstract class AbstractCreateSerializedSuiteTest extends AbstractApplicationTest
         array $payload,
         array $expectedResponseParameters,
     ): void {
-        $source = $sourceCreator(self::$authenticationConfiguration);
+        $source = $sourceCreator(self::$users);
         $this->sourceRepository->save($source);
 
         $suite = $suiteCreator($source);
@@ -87,10 +87,10 @@ abstract class AbstractCreateSerializedSuiteTest extends AbstractApplicationTest
     {
         return [
             'file, empty tests' => [
-                'sourceCreator' => function (Provider $authenticationConfiguration) {
+                'sourceCreator' => function (UserProvider $users) {
                     return SourceOriginFactory::create(
                         type: 'file',
-                        userId: $authenticationConfiguration->getUser(self::USER_1_EMAIL)->id,
+                        userId: $users->get(self::USER_1_EMAIL)->id,
                     );
                 },
                 'suiteCreator' => function (SourceInterface $source) {
@@ -100,10 +100,10 @@ abstract class AbstractCreateSerializedSuiteTest extends AbstractApplicationTest
                 'expectedResponseParameters' => [],
             ],
             'file, non-empty tests' => [
-                'sourceCreator' => function (Provider $authenticationConfiguration) {
+                'sourceCreator' => function (UserProvider $users) {
                     return SourceOriginFactory::create(
                         type: 'file',
-                        userId: $authenticationConfiguration->getUser(self::USER_1_EMAIL)->id,
+                        userId: $users->get(self::USER_1_EMAIL)->id,
                     );
                 },
                 'suiteCreator' => function (SourceInterface $source) {
@@ -113,10 +113,10 @@ abstract class AbstractCreateSerializedSuiteTest extends AbstractApplicationTest
                 'expectedResponseParameters' => [],
             ],
             'git' => [
-                'sourceCreator' => function (Provider $authenticationConfiguration) {
+                'sourceCreator' => function (UserProvider $users) {
                     return SourceOriginFactory::create(
                         type: 'git',
-                        userId: $authenticationConfiguration->getUser(self::USER_1_EMAIL)->id,
+                        userId: $users->get(self::USER_1_EMAIL)->id,
                     );
                 },
                 'suiteCreator' => function (SourceInterface $source) {
@@ -126,10 +126,10 @@ abstract class AbstractCreateSerializedSuiteTest extends AbstractApplicationTest
                 'expectedResponseParameters' => [],
             ],
             'git with ref request parameters' => [
-                'sourceCreator' => function (Provider $authenticationConfiguration) {
+                'sourceCreator' => function (UserProvider $users) {
                     return SourceOriginFactory::create(
                         type: 'git',
-                        userId: $authenticationConfiguration->getUser(self::USER_1_EMAIL)->id,
+                        userId: $users->get(self::USER_1_EMAIL)->id,
                     );
                 },
                 'suiteCreator' => function (SourceInterface $source) {
@@ -143,10 +143,10 @@ abstract class AbstractCreateSerializedSuiteTest extends AbstractApplicationTest
                 ],
             ],
             'git with request parameters including ref' => [
-                'sourceCreator' => function (Provider $authenticationConfiguration) {
+                'sourceCreator' => function (UserProvider $users) {
                     return SourceOriginFactory::create(
                         type: 'git',
-                        userId: $authenticationConfiguration->getUser(self::USER_1_EMAIL)->id,
+                        userId: $users->get(self::USER_1_EMAIL)->id,
                     );
                 },
                 'suiteCreator' => function (SourceInterface $source) {
@@ -168,7 +168,7 @@ abstract class AbstractCreateSerializedSuiteTest extends AbstractApplicationTest
     {
         $source = SourceOriginFactory::create(
             type: 'file',
-            userId: self::$authenticationConfiguration->getUser(self::USER_1_EMAIL)->id,
+            userId: self::$users->get(self::USER_1_EMAIL)->id,
         );
         $this->sourceRepository->save($source);
 
