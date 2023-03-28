@@ -19,6 +19,9 @@ abstract class AbstractSuiteTest extends AbstractApplicationTest
         $this->sourceId = $this->createSource(self::USER_1_EMAIL);
     }
 
+    /**
+     * @param non-empty-string $userEmail
+     */
     protected function createSource(string $userEmail, ?string $label = null): string
     {
         $label = is_string($label) ? $label : md5((string) rand());

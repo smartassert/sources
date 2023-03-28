@@ -26,6 +26,11 @@ class ApiTokenProvider
     ) {
     }
 
+    /**
+     * @param non-empty-string $userEmail
+     *
+     * @return non-empty-string
+     */
     public function get(string $userEmail): string
     {
         if (!array_key_exists($userEmail, $this->apiTokens)) {

@@ -14,6 +14,11 @@ class Provider
     ) {
     }
 
+    /**
+     * @param non-empty-string $userEmail
+     *
+     * @return non-empty-string
+     */
     public function getApiToken(string $userEmail): string
     {
         return $this->apiTokenProvider->get($userEmail);
