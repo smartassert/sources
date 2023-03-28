@@ -1,8 +1,5 @@
 parameters:
     fixtures_base_path: '%env(resolve:FIXTURES_BASE_PATH)%'
-#    frontend_token_provider_users:
-#        'user1@example.com': 'password'
-#        'user2@example.com': 'password'
     test_authentication_provider_bundle_frontend_token_provider_users:
         'user1@example.com': 'password'
         'user2@example.com': 'password'
