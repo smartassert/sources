@@ -5,17 +5,11 @@ declare(strict_types=1);
 namespace App\Tests\Services\AuthenticationProvider;
 
 use SmartAssert\UsersClient\Client;
-use SmartAssert\UsersClient\Model\ApiKey;
 use SmartAssert\UsersClient\Model\Token;
 use SmartAssert\UsersClient\Model\User;
 
 class Provider
 {
-    /**
-     * @var ApiKey[]
-     */
-    private array $apiKeys = [];
-
     /**
      * @var Token[]
      */
@@ -29,6 +23,7 @@ class Provider
     public function __construct(
         private readonly Client $usersClient,
         private readonly FrontendTokenProvider $frontendTokenProvider,
+        private readonly ApiKeyProvider $apiKeyProvider,
     ) {
     }
 
@@ -36,7 +31,7 @@ class Provider
     {
         if (!array_key_exists($userEmail, $this->apiTokens)) {
             $apiToken = $this->usersClient->createApiToken(
-                $this->getApiKey($userEmail)->key
+                $this->apiKeyProvider->get($userEmail)->key
             );
 
             if (null === $apiToken) {
@@ -69,23 +64,5 @@ class Provider
         }
 
         return $this->users[$userEmail];
-    }
-
-    private function getApiKey(string $userEmail): ApiKey
-    {
-        if (!array_key_exists($userEmail, $this->apiKeys)) {
-            $apiKeys = $this->usersClient->listUserApiKeys(
-                $this->frontendTokenProvider->get($userEmail)
-            );
-
-            $apiKey = $apiKeys->getDefault();
-            if (null === $apiKey) {
-                throw new \RuntimeException('API key is null');
-            }
-
-            $this->apiKeys[$userEmail] = $apiKey;
-        }
-
-        return $this->apiKeys[$userEmail];
     }
 }
