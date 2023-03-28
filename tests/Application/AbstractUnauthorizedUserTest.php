@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Tests\Application;
 
 use App\Services\EntityIdFactory;
-use App\Tests\Services\AuthenticationProvider\Provider;
 
 abstract class AbstractUnauthorizedUserTest extends AbstractApplicationTest
 {
@@ -14,10 +13,10 @@ abstract class AbstractUnauthorizedUserTest extends AbstractApplicationTest
     /**
      * @dataProvider unauthorizedUserDataProvider
      */
-    public function testAddFileUnauthorizedUser(callable $tokenCreator): void
+    public function testAddFileUnauthorizedUser(?string $token): void
     {
         $response = $this->applicationClient->makeAddFileRequest(
-            $tokenCreator(self::$authenticationConfiguration),
+            $token,
             (new EntityIdFactory())->create(),
             self::FILENAME,
             '- content'
@@ -29,10 +28,10 @@ abstract class AbstractUnauthorizedUserTest extends AbstractApplicationTest
     /**
      * @dataProvider unauthorizedUserDataProvider
      */
-    public function testRemoveFileUnauthorizedUser(callable $tokenCreator): void
+    public function testRemoveFileUnauthorizedUser(?string $token): void
     {
         $response = $this->applicationClient->makeRemoveFileRequest(
-            $tokenCreator(self::$authenticationConfiguration),
+            $token,
             (new EntityIdFactory())->create(),
             self::FILENAME
         );
@@ -43,10 +42,10 @@ abstract class AbstractUnauthorizedUserTest extends AbstractApplicationTest
     /**
      * @dataProvider unauthorizedUserDataProvider
      */
-    public function testReadFileUnauthorizedUser(callable $tokenCreator): void
+    public function testReadFileUnauthorizedUser(?string $token): void
     {
         $response = $this->applicationClient->makeRemoveFileRequest(
-            $tokenCreator(self::$authenticationConfiguration),
+            $token,
             (new EntityIdFactory())->create(),
             self::FILENAME
         );
@@ -57,10 +56,10 @@ abstract class AbstractUnauthorizedUserTest extends AbstractApplicationTest
     /**
      * @dataProvider unauthorizedUserDataProvider
      */
-    public function testCreateSourceUnauthorizedUser(callable $tokenCreator): void
+    public function testCreateSourceUnauthorizedUser(?string $token): void
     {
         $response = $this->applicationClient->makeCreateSourceRequest(
-            $tokenCreator(self::$authenticationConfiguration),
+            $token,
             []
         );
 
@@ -70,10 +69,10 @@ abstract class AbstractUnauthorizedUserTest extends AbstractApplicationTest
     /**
      * @dataProvider unauthorizedUserDataProvider
      */
-    public function testListUnauthorizedUser(callable $tokenCreator): void
+    public function testListUnauthorizedUser(?string $token): void
     {
         $response = $this->applicationClient->makeListSourcesRequest(
-            $tokenCreator(self::$authenticationConfiguration),
+            $token,
         );
 
         $this->responseAsserter->assertUnauthorizedResponse($response);
@@ -82,10 +81,10 @@ abstract class AbstractUnauthorizedUserTest extends AbstractApplicationTest
     /**
      * @dataProvider unauthorizedUserDataProvider
      */
-    public function testGetSourceUnauthorizedUser(callable $tokenCreator): void
+    public function testGetSourceUnauthorizedUser(?string $token): void
     {
         $response = $this->applicationClient->makeGetSourceRequest(
-            $tokenCreator(self::$authenticationConfiguration),
+            $token,
             (new EntityIdFactory())->create()
         );
 
@@ -95,10 +94,10 @@ abstract class AbstractUnauthorizedUserTest extends AbstractApplicationTest
     /**
      * @dataProvider unauthorizedUserDataProvider
      */
-    public function testUpdateFileSourceUnauthorizedUser(callable $tokenCreator): void
+    public function testUpdateFileSourceUnauthorizedUser(?string $token): void
     {
         $response = $this->applicationClient->makeUpdateSourceRequest(
-            $tokenCreator(self::$authenticationConfiguration),
+            $token,
             (new EntityIdFactory())->create(),
             []
         );
@@ -109,10 +108,10 @@ abstract class AbstractUnauthorizedUserTest extends AbstractApplicationTest
     /**
      * @dataProvider unauthorizedUserDataProvider
      */
-    public function testUpdateGitSourceUnauthorizedUser(callable $tokenCreator): void
+    public function testUpdateGitSourceUnauthorizedUser(?string $token): void
     {
         $response = $this->applicationClient->makeUpdateSourceRequest(
-            $tokenCreator(self::$authenticationConfiguration),
+            $token,
             (new EntityIdFactory())->create(),
             []
         );
@@ -123,10 +122,10 @@ abstract class AbstractUnauthorizedUserTest extends AbstractApplicationTest
     /**
      * @dataProvider unauthorizedUserDataProvider
      */
-    public function testDeleteSourceUnauthorizedUser(callable $tokenCreator): void
+    public function testDeleteSourceUnauthorizedUser(?string $token): void
     {
         $response = $this->applicationClient->makeDeleteSourceRequest(
-            $tokenCreator(self::$authenticationConfiguration),
+            $token,
             (new EntityIdFactory())->create()
         );
 
@@ -136,10 +135,10 @@ abstract class AbstractUnauthorizedUserTest extends AbstractApplicationTest
     /**
      * @dataProvider unauthorizedUserDataProvider
      */
-    public function testCreateSuiteUnauthorizedUser(callable $tokenCreator): void
+    public function testCreateSuiteUnauthorizedUser(?string $token): void
     {
         $response = $this->applicationClient->makeCreateSuiteRequest(
-            $tokenCreator(self::$authenticationConfiguration),
+            $token,
             []
         );
 
@@ -149,10 +148,10 @@ abstract class AbstractUnauthorizedUserTest extends AbstractApplicationTest
     /**
      * @dataProvider unauthorizedUserDataProvider
      */
-    public function testGetSuiteUnauthorizedUser(callable $tokenCreator): void
+    public function testGetSuiteUnauthorizedUser(?string $token): void
     {
         $response = $this->applicationClient->makeGetSuiteRequest(
-            $tokenCreator(self::$authenticationConfiguration),
+            $token,
             (new EntityIdFactory())->create()
         );
 
@@ -162,11 +161,9 @@ abstract class AbstractUnauthorizedUserTest extends AbstractApplicationTest
     /**
      * @dataProvider unauthorizedUserDataProvider
      */
-    public function testListSuitesUnauthorizedUser(callable $tokenCreator): void
+    public function testListSuitesUnauthorizedUser(?string $token): void
     {
-        $response = $this->applicationClient->makeListSuitesRequest(
-            $tokenCreator(self::$authenticationConfiguration)
-        );
+        $response = $this->applicationClient->makeListSuitesRequest($token);
 
         $this->responseAsserter->assertUnauthorizedResponse($response);
     }
@@ -174,10 +171,10 @@ abstract class AbstractUnauthorizedUserTest extends AbstractApplicationTest
     /**
      * @dataProvider unauthorizedUserDataProvider
      */
-    public function testUpdateSuiteUnauthorizedUser(callable $tokenCreator): void
+    public function testUpdateSuiteUnauthorizedUser(?string $token): void
     {
         $response = $this->applicationClient->makeUpdateSuiteRequest(
-            $tokenCreator(self::$authenticationConfiguration),
+            $token,
             (new EntityIdFactory())->create(),
             []
         );
@@ -188,10 +185,10 @@ abstract class AbstractUnauthorizedUserTest extends AbstractApplicationTest
     /**
      * @dataProvider unauthorizedUserDataProvider
      */
-    public function testDeleteSuiteUnauthorizedUser(callable $tokenCreator): void
+    public function testDeleteSuiteUnauthorizedUser(?string $token): void
     {
         $response = $this->applicationClient->makeDeleteSuiteRequest(
-            $tokenCreator(self::$authenticationConfiguration),
+            $token,
             (new EntityIdFactory())->create(),
         );
 
@@ -201,10 +198,10 @@ abstract class AbstractUnauthorizedUserTest extends AbstractApplicationTest
     /**
      * @dataProvider unauthorizedUserDataProvider
      */
-    public function testCreateSerializedSuiteUnauthorizedUser(callable $tokenCreator): void
+    public function testCreateSerializedSuiteUnauthorizedUser(?string $token): void
     {
         $response = $this->applicationClient->makeCreateSerializedSuiteRequest(
-            $tokenCreator(self::$authenticationConfiguration),
+            $token,
             (new EntityIdFactory())->create(),
             [],
         );
@@ -215,10 +212,10 @@ abstract class AbstractUnauthorizedUserTest extends AbstractApplicationTest
     /**
      * @dataProvider unauthorizedUserDataProvider
      */
-    public function testReadSerializedSuiteUnauthorizedUser(callable $tokenCreator): void
+    public function testReadSerializedSuiteUnauthorizedUser(?string $token): void
     {
         $response = $this->applicationClient->makeReadSerializedSuiteRequest(
-            $tokenCreator(self::$authenticationConfiguration),
+            $token,
             (new EntityIdFactory())->create(),
         );
 
@@ -228,10 +225,10 @@ abstract class AbstractUnauthorizedUserTest extends AbstractApplicationTest
     /**
      * @dataProvider unauthorizedUserDataProvider
      */
-    public function testGetSerializedSuiteUnauthorizedUser(callable $tokenCreator): void
+    public function testGetSerializedSuiteUnauthorizedUser(?string $token): void
     {
         $response = $this->applicationClient->makeGetSerializedSuiteRequest(
-            $tokenCreator(self::$authenticationConfiguration),
+            $token,
             (new EntityIdFactory())->create(),
         );
 
@@ -245,19 +242,13 @@ abstract class AbstractUnauthorizedUserTest extends AbstractApplicationTest
     {
         return [
             'no token' => [
-                'tokenCreator' => function () {
-                    return null;
-                }
+                'token' => null,
             ],
             'empty token' => [
-                'tokenCreator' => function () {
-                    return '';
-                }
+                'token' => '',
             ],
             'non-empty invalid token' => [
-                'tokenCreator' => function (Provider $authenticationConfiguration) {
-                    return $authenticationConfiguration->getInvalidApiToken();
-                }
+                'token' => 'invalid api token',
             ],
         ];
     }

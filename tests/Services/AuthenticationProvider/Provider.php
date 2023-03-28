@@ -19,11 +19,6 @@ class Provider
         return $this->apiTokenProvider->get($userEmail);
     }
 
-    public function getInvalidApiToken(): string
-    {
-        return 'invalid api token value';
-    }
-
     public function getUser(string $userEmail): User
     {
         return $this->userProvider->get($userEmail);
