@@ -33,7 +33,7 @@ abstract class AbstractListSuitesTest extends AbstractApplicationTest
         );
 
         $response = $this->applicationClient->makeListSuitesRequest(
-            self::$authenticationConfiguration->getApiToken(self::USER_1_EMAIL)
+            self::$apiTokens->get(self::USER_1_EMAIL)
         );
 
         foreach ($expectedResponseData as $label => $expectedSuiteData) {

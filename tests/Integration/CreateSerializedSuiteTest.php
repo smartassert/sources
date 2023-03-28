@@ -36,7 +36,7 @@ class CreateSerializedSuiteTest extends AbstractCreateSerializedSuiteTest
     public function testSerializeSuite(): void
     {
         $createSourceResponse = $this->applicationClient->makeCreateSourceRequest(
-            self::$authenticationConfiguration->getApiToken(self::USER_1_EMAIL),
+            self::$apiTokens->get(self::USER_1_EMAIL),
             [
                 OriginSourceRequest::PARAMETER_TYPE => Type::FILE->value,
                 FileSourceRequest::PARAMETER_LABEL => 'file source label',
@@ -56,7 +56,7 @@ class CreateSerializedSuiteTest extends AbstractCreateSerializedSuiteTest
 
         foreach ($sourceFiles as $sourceFilePath) {
             $addFileResponse = $this->applicationClient->makeAddFileRequest(
-                self::$authenticationConfiguration->getApiToken(self::USER_1_EMAIL),
+                self::$apiTokens->get(self::USER_1_EMAIL),
                 $fileSourceId,
                 $sourceFilePath,
                 trim($this->fixtureStorage->read($sourceIdentifier . '/' . $sourceFilePath))
@@ -66,7 +66,7 @@ class CreateSerializedSuiteTest extends AbstractCreateSerializedSuiteTest
         }
 
         $createSuiteResponse = $this->applicationClient->makeCreateSuiteRequest(
-            self::$authenticationConfiguration->getApiToken(self::USER_1_EMAIL),
+            self::$apiTokens->get(self::USER_1_EMAIL),
             [
                 SuiteRequest::PARAMETER_SOURCE_ID => $fileSourceId,
                 SuiteRequest::PARAMETER_LABEL => md5((string) rand()),
@@ -82,7 +82,7 @@ class CreateSerializedSuiteTest extends AbstractCreateSerializedSuiteTest
         $suiteId = $createSuiteResponseData['id'] ?? null;
 
         $createSerializedSuiteResponse = $this->applicationClient->makeCreateSerializedSuiteRequest(
-            self::$authenticationConfiguration->getApiToken(self::USER_1_EMAIL),
+            self::$apiTokens->get(self::USER_1_EMAIL),
             $suiteId,
             []
         );
@@ -97,7 +97,7 @@ class CreateSerializedSuiteTest extends AbstractCreateSerializedSuiteTest
         $this->waitUntilSuiteIsSerialized($serializedSuiteId);
 
         $readResponse = $this->applicationClient->makeReadSerializedSuiteRequest(
-            self::$authenticationConfiguration->getApiToken(self::USER_1_EMAIL),
+            self::$apiTokens->get(self::USER_1_EMAIL),
             $serializedSuiteId
         );
 
@@ -115,7 +115,7 @@ class CreateSerializedSuiteTest extends AbstractCreateSerializedSuiteTest
 
         while (State::PREPARED->value !== $state) {
             $getResponse = $this->applicationClient->makeGetSerializedSuiteRequest(
-                self::$authenticationConfiguration->getApiToken(self::USER_1_EMAIL),
+                self::$apiTokens->get(self::USER_1_EMAIL),
                 $serializedSuiteId
             );
 

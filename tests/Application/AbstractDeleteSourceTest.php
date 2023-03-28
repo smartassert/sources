@@ -56,7 +56,7 @@ abstract class AbstractDeleteSourceTest extends AbstractApplicationTest
         self::assertSame(1, $this->sourceRepository->count(['id' => $source->getId()]));
 
         $response = $this->applicationClient->makeDeleteSourceRequest(
-            self::$authenticationConfiguration->getApiToken(self::USER_1_EMAIL),
+            self::$apiTokens->get(self::USER_1_EMAIL),
             $source->getId()
         );
 
@@ -96,7 +96,7 @@ abstract class AbstractDeleteSourceTest extends AbstractApplicationTest
         self::assertTrue($fileSourceStorage->fileExists($fileRelativePath));
 
         $this->applicationClient->makeDeleteSourceRequest(
-            self::$authenticationConfiguration->getApiToken(self::USER_1_EMAIL),
+            self::$apiTokens->get(self::USER_1_EMAIL),
             $fileSource->getId()
         );
 
@@ -117,7 +117,7 @@ abstract class AbstractDeleteSourceTest extends AbstractApplicationTest
         $this->sourceRepository->save($source);
 
         $response = $this->applicationClient->makeDeleteSourceRequest(
-            self::$authenticationConfiguration->getApiToken(self::USER_1_EMAIL),
+            self::$apiTokens->get(self::USER_1_EMAIL),
             $source->getId()
         );
 

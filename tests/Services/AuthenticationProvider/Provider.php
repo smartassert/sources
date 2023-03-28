@@ -10,18 +10,7 @@ class Provider
 {
     public function __construct(
         private readonly UserProvider $userProvider,
-        private readonly ApiTokenProvider $apiTokenProvider,
     ) {
-    }
-
-    /**
-     * @param non-empty-string $userEmail
-     *
-     * @return non-empty-string
-     */
-    public function getApiToken(string $userEmail): string
-    {
-        return $this->apiTokenProvider->get($userEmail);
     }
 
     public function getUser(string $userEmail): User

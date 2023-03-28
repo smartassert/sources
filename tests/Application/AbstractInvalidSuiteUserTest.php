@@ -52,7 +52,7 @@ abstract class AbstractInvalidSuiteUserTest extends AbstractApplicationTest
     public function testGetSuite(): void
     {
         $response = $this->applicationClient->makeGetSuiteRequest(
-            self::$authenticationConfiguration->getApiToken(self::USER_1_EMAIL),
+            self::$apiTokens->get(self::USER_1_EMAIL),
             $this->suite->id,
         );
 
@@ -62,7 +62,7 @@ abstract class AbstractInvalidSuiteUserTest extends AbstractApplicationTest
     public function testUpdateSuite(): void
     {
         $response = $this->applicationClient->makeUpdateSuiteRequest(
-            self::$authenticationConfiguration->getApiToken(self::USER_1_EMAIL),
+            self::$apiTokens->get(self::USER_1_EMAIL),
             $this->suite->id,
             [
                 SuiteRequest::PARAMETER_SOURCE_ID => $this->suite->id,
@@ -77,7 +77,7 @@ abstract class AbstractInvalidSuiteUserTest extends AbstractApplicationTest
     public function testDeleteSuite(): void
     {
         $response = $this->applicationClient->makeDeleteSuiteRequest(
-            self::$authenticationConfiguration->getApiToken(self::USER_1_EMAIL),
+            self::$apiTokens->get(self::USER_1_EMAIL),
             $this->suite->id,
         );
 
@@ -87,7 +87,7 @@ abstract class AbstractInvalidSuiteUserTest extends AbstractApplicationTest
     public function testCreateSerializedSuite(): void
     {
         $response = $this->applicationClient->makeCreateSerializedSuiteRequest(
-            self::$authenticationConfiguration->getApiToken(self::USER_1_EMAIL),
+            self::$apiTokens->get(self::USER_1_EMAIL),
             $this->suite->id,
             [],
         );
@@ -98,7 +98,7 @@ abstract class AbstractInvalidSuiteUserTest extends AbstractApplicationTest
     public function testReadSerializedSuite(): void
     {
         $response = $this->applicationClient->makeReadSerializedSuiteRequest(
-            self::$authenticationConfiguration->getApiToken(self::USER_1_EMAIL),
+            self::$apiTokens->get(self::USER_1_EMAIL),
             $this->serializedSuite->id,
         );
 
@@ -108,7 +108,7 @@ abstract class AbstractInvalidSuiteUserTest extends AbstractApplicationTest
     public function testGetSerializedSuite(): void
     {
         $response = $this->applicationClient->makeGetSerializedSuiteRequest(
-            self::$authenticationConfiguration->getApiToken(self::USER_1_EMAIL),
+            self::$apiTokens->get(self::USER_1_EMAIL),
             $this->serializedSuite->id,
         );
 

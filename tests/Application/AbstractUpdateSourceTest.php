@@ -57,7 +57,7 @@ abstract class AbstractUpdateSourceTest extends AbstractApplicationTest
         $this->sourceRepository->save($source);
 
         $response = $this->applicationClient->makeUpdateSourceRequest(
-            self::$authenticationConfiguration->getApiToken(self::USER_1_EMAIL),
+            self::$apiTokens->get(self::USER_1_EMAIL),
             $source->getId(),
             $payload
         );
@@ -79,7 +79,7 @@ abstract class AbstractUpdateSourceTest extends AbstractApplicationTest
         array $updateParameters,
     ): void {
         $targetCreateResponse = $this->applicationClient->makeCreateSourceRequest(
-            self::$authenticationConfiguration->getApiToken(self::USER_1_EMAIL),
+            self::$apiTokens->get(self::USER_1_EMAIL),
             $targetCreateParameters
         );
 
@@ -90,14 +90,14 @@ abstract class AbstractUpdateSourceTest extends AbstractApplicationTest
         $sourceId = $targetCreateResponseData['id'] ?? null;
 
         $conflictCreateResponse = $this->applicationClient->makeCreateSourceRequest(
-            self::$authenticationConfiguration->getApiToken(self::USER_1_EMAIL),
+            self::$apiTokens->get(self::USER_1_EMAIL),
             $conflictCreateParameters
         );
 
         self::assertSame(200, $conflictCreateResponse->getStatusCode());
 
         $updateResponse = $this->applicationClient->makeUpdateSourceRequest(
-            self::$authenticationConfiguration->getApiToken(self::USER_1_EMAIL),
+            self::$apiTokens->get(self::USER_1_EMAIL),
             $sourceId,
             $updateParameters
         );
@@ -213,7 +213,7 @@ abstract class AbstractUpdateSourceTest extends AbstractApplicationTest
         $this->sourceRepository->save($source);
 
         $response = $this->applicationClient->makeUpdateSourceRequest(
-            self::$authenticationConfiguration->getApiToken(self::USER_1_EMAIL),
+            self::$apiTokens->get(self::USER_1_EMAIL),
             $source->getId(),
             $payload
         );
@@ -358,12 +358,12 @@ abstract class AbstractUpdateSourceTest extends AbstractApplicationTest
         $this->sourceRepository->save($deletedSource);
 
         $this->applicationClient->makeDeleteSourceRequest(
-            self::$authenticationConfiguration->getApiToken(self::USER_1_EMAIL),
+            self::$apiTokens->get(self::USER_1_EMAIL),
             $deletedSource->getId(),
         );
 
         $updateResponse = $this->applicationClient->makeUpdateSourceRequest(
-            self::$authenticationConfiguration->getApiToken(self::USER_1_EMAIL),
+            self::$apiTokens->get(self::USER_1_EMAIL),
             $source->getId(),
             array_merge(
                 [
@@ -470,7 +470,7 @@ abstract class AbstractUpdateSourceTest extends AbstractApplicationTest
         $this->sourceRepository->delete($source);
 
         $response = $this->applicationClient->makeUpdateSourceRequest(
-            self::$authenticationConfiguration->getApiToken(self::USER_1_EMAIL),
+            self::$apiTokens->get(self::USER_1_EMAIL),
             $source->getId(),
             [
                 FileSourceRequest::PARAMETER_LABEL => 'new label',

@@ -44,7 +44,7 @@ abstract class AbstractInvalidSourceUserTest extends AbstractApplicationTest
     public function testAddFileInvalidUser(): void
     {
         $response = $this->applicationClient->makeAddFileRequest(
-            self::$authenticationConfiguration->getApiToken(self::USER_1_EMAIL),
+            self::$apiTokens->get(self::USER_1_EMAIL),
             $this->fileSource->getId(),
             self::FILENAME,
             '- content'
@@ -56,7 +56,7 @@ abstract class AbstractInvalidSourceUserTest extends AbstractApplicationTest
     public function testRemoveFileInvalidUser(): void
     {
         $response = $this->applicationClient->makeRemoveFileRequest(
-            self::$authenticationConfiguration->getApiToken(self::USER_1_EMAIL),
+            self::$apiTokens->get(self::USER_1_EMAIL),
             $this->fileSource->getId(),
             self::FILENAME
         );
@@ -67,7 +67,7 @@ abstract class AbstractInvalidSourceUserTest extends AbstractApplicationTest
     public function testReadFileInvalidUser(): void
     {
         $response = $this->applicationClient->makeRemoveFileRequest(
-            self::$authenticationConfiguration->getApiToken(self::USER_1_EMAIL),
+            self::$apiTokens->get(self::USER_1_EMAIL),
             $this->fileSource->getId(),
             self::FILENAME
         );
@@ -78,7 +78,7 @@ abstract class AbstractInvalidSourceUserTest extends AbstractApplicationTest
     public function testGetSourceInvalidUser(): void
     {
         $response = $this->applicationClient->makeGetSourceRequest(
-            self::$authenticationConfiguration->getApiToken(self::USER_1_EMAIL),
+            self::$apiTokens->get(self::USER_1_EMAIL),
             $this->fileSource->getId()
         );
 
@@ -88,7 +88,7 @@ abstract class AbstractInvalidSourceUserTest extends AbstractApplicationTest
     public function testUpdateSourceInvalidUser(): void
     {
         $response = $this->applicationClient->makeUpdateSourceRequest(
-            self::$authenticationConfiguration->getApiToken(self::USER_1_EMAIL),
+            self::$apiTokens->get(self::USER_1_EMAIL),
             $this->fileSource->getId(),
             [
                 OriginSourceRequest::PARAMETER_TYPE => Type::FILE->value,
@@ -102,7 +102,7 @@ abstract class AbstractInvalidSourceUserTest extends AbstractApplicationTest
     public function testDeleteSourceInvalidUser(): void
     {
         $response = $this->applicationClient->makeDeleteSourceRequest(
-            self::$authenticationConfiguration->getApiToken(self::USER_1_EMAIL),
+            self::$apiTokens->get(self::USER_1_EMAIL),
             $this->fileSource->getId()
         );
 

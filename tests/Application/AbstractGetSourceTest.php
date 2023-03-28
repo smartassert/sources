@@ -18,7 +18,7 @@ abstract class AbstractGetSourceTest extends AbstractApplicationTest
     public function testGetSourceNotFound(): void
     {
         $response = $this->applicationClient->makeGetSourceRequest(
-            self::$authenticationConfiguration->getApiToken(self::USER_1_EMAIL),
+            self::$apiTokens->get(self::USER_1_EMAIL),
             (new EntityIdFactory())->create()
         );
 
@@ -40,7 +40,7 @@ abstract class AbstractGetSourceTest extends AbstractApplicationTest
         $sourceRepository->save($source);
 
         $response = $this->applicationClient->makeGetSourceRequest(
-            self::$authenticationConfiguration->getApiToken(self::USER_1_EMAIL),
+            self::$apiTokens->get(self::USER_1_EMAIL),
             $source->getId()
         );
 
@@ -69,7 +69,7 @@ abstract class AbstractGetSourceTest extends AbstractApplicationTest
         $sourceId = $source->getId();
 
         $this->applicationClient->makeDeleteSourceRequest(
-            self::$authenticationConfiguration->getApiToken(self::USER_1_EMAIL),
+            self::$apiTokens->get(self::USER_1_EMAIL),
             $source->getId()
         );
 
@@ -81,7 +81,7 @@ abstract class AbstractGetSourceTest extends AbstractApplicationTest
         \assert($source instanceof SourceInterface);
 
         $response = $this->applicationClient->makeGetSourceRequest(
-            self::$authenticationConfiguration->getApiToken(self::USER_1_EMAIL),
+            self::$apiTokens->get(self::USER_1_EMAIL),
             $source->getId()
         );
 

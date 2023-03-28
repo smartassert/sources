@@ -6,6 +6,7 @@ namespace App\Tests\Application;
 
 use App\Tests\Services\ApplicationClient\Client;
 use App\Tests\Services\ApplicationClient\ClientFactory;
+use App\Tests\Services\AuthenticationProvider\ApiTokenProvider;
 use App\Tests\Services\AuthenticationProvider\Provider;
 use App\Tests\Services\EntityRemover;
 use App\Tests\Services\ResponseAsserter;
@@ -22,6 +23,7 @@ abstract class AbstractApplicationTest extends WebTestCase
     protected ResponseAsserter $responseAsserter;
     protected static KernelBrowser $kernelBrowser;
     protected Client $applicationClient;
+    protected static ApiTokenProvider $apiTokens;
 
     public static function setUpBeforeClass(): void
     {
@@ -32,6 +34,10 @@ abstract class AbstractApplicationTest extends WebTestCase
         $authenticationConfiguration = self::getContainer()->get(Provider::class);
         \assert($authenticationConfiguration instanceof Provider);
         self::$authenticationConfiguration = $authenticationConfiguration;
+
+        $apiTokens = self::getContainer()->get(ApiTokenProvider::class);
+        \assert($apiTokens instanceof ApiTokenProvider);
+        self::$apiTokens = $apiTokens;
     }
 
     protected function setUp(): void

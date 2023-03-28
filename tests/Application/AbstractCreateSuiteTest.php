@@ -18,7 +18,7 @@ abstract class AbstractCreateSuiteTest extends AbstractSuiteTest
     public function testCreateSuccess(array $requestParameters): void
     {
         $response = $this->applicationClient->makeCreateSuiteRequest(
-            self::$authenticationConfiguration->getApiToken(self::USER_1_EMAIL),
+            self::$apiTokens->get(self::USER_1_EMAIL),
             array_merge(
                 [
                     SuiteRequest::PARAMETER_SOURCE_ID => $this->sourceId,
@@ -89,14 +89,14 @@ abstract class AbstractCreateSuiteTest extends AbstractSuiteTest
         $requestParameters = array_merge([SuiteRequest::PARAMETER_SOURCE_ID => $this->sourceId], $requestParameters);
 
         $firstResponse = $this->applicationClient->makeCreateSuiteRequest(
-            self::$authenticationConfiguration->getApiToken(self::USER_1_EMAIL),
+            self::$apiTokens->get(self::USER_1_EMAIL),
             $requestParameters
         );
 
         self::assertSame(200, $firstResponse->getStatusCode());
 
         $secondResponse = $this->applicationClient->makeCreateSuiteRequest(
-            self::$authenticationConfiguration->getApiToken(self::USER_1_EMAIL),
+            self::$apiTokens->get(self::USER_1_EMAIL),
             $requestParameters
         );
 
@@ -139,7 +139,7 @@ abstract class AbstractCreateSuiteTest extends AbstractSuiteTest
         $previousSuiteId = null;
         foreach ($labels as $label) {
             $response = $this->applicationClient->makeCreateSuiteRequest(
-                self::$authenticationConfiguration->getApiToken(self::USER_1_EMAIL),
+                self::$apiTokens->get(self::USER_1_EMAIL),
                 [
                     SuiteRequest::PARAMETER_SOURCE_ID => $this->sourceId,
                     SuiteRequest::PARAMETER_LABEL => $label,
@@ -167,7 +167,7 @@ abstract class AbstractCreateSuiteTest extends AbstractSuiteTest
         $label = md5((string) rand());
 
         $firstResponse = $this->applicationClient->makeCreateSuiteRequest(
-            self::$authenticationConfiguration->getApiToken(self::USER_1_EMAIL),
+            self::$apiTokens->get(self::USER_1_EMAIL),
             [
                 SuiteRequest::PARAMETER_SOURCE_ID => $this->sourceId,
                 SuiteRequest::PARAMETER_LABEL => $label,
@@ -180,7 +180,7 @@ abstract class AbstractCreateSuiteTest extends AbstractSuiteTest
         self::assertSame(200, $firstResponse->getStatusCode());
 
         $secondResponse = $this->applicationClient->makeCreateSuiteRequest(
-            self::$authenticationConfiguration->getApiToken(self::USER_1_EMAIL),
+            self::$apiTokens->get(self::USER_1_EMAIL),
             [
                 SuiteRequest::PARAMETER_SOURCE_ID => $this->sourceId,
                 SuiteRequest::PARAMETER_LABEL => $label,
@@ -210,7 +210,7 @@ abstract class AbstractCreateSuiteTest extends AbstractSuiteTest
         $label = md5((string) rand());
 
         $firstResponse = $this->applicationClient->makeCreateSuiteRequest(
-            self::$authenticationConfiguration->getApiToken(self::USER_1_EMAIL),
+            self::$apiTokens->get(self::USER_1_EMAIL),
             [
                 SuiteRequest::PARAMETER_SOURCE_ID => $this->createSource(self::USER_1_EMAIL),
                 SuiteRequest::PARAMETER_LABEL => $label,
@@ -223,7 +223,7 @@ abstract class AbstractCreateSuiteTest extends AbstractSuiteTest
         self::assertSame(200, $firstResponse->getStatusCode());
 
         $secondResponse = $this->applicationClient->makeCreateSuiteRequest(
-            self::$authenticationConfiguration->getApiToken(self::USER_1_EMAIL),
+            self::$apiTokens->get(self::USER_1_EMAIL),
             [
                 SuiteRequest::PARAMETER_SOURCE_ID => $this->createSource(self::USER_1_EMAIL),
                 SuiteRequest::PARAMETER_LABEL => $label,
@@ -253,7 +253,7 @@ abstract class AbstractCreateSuiteTest extends AbstractSuiteTest
         $label = md5((string) rand());
 
         $firstResponse = $this->applicationClient->makeCreateSuiteRequest(
-            self::$authenticationConfiguration->getApiToken(self::USER_1_EMAIL),
+            self::$apiTokens->get(self::USER_1_EMAIL),
             [
                 SuiteRequest::PARAMETER_SOURCE_ID => $this->createSource(self::USER_1_EMAIL),
                 SuiteRequest::PARAMETER_LABEL => $label,
@@ -264,7 +264,7 @@ abstract class AbstractCreateSuiteTest extends AbstractSuiteTest
         self::assertSame(200, $firstResponse->getStatusCode());
 
         $secondResponse = $this->applicationClient->makeCreateSuiteRequest(
-            self::$authenticationConfiguration->getApiToken(self::USER_2_EMAIL),
+            self::$apiTokens->get(self::USER_2_EMAIL),
             [
                 SuiteRequest::PARAMETER_SOURCE_ID => $this->createSource(self::USER_2_EMAIL),
                 SuiteRequest::PARAMETER_LABEL => $label,
@@ -280,7 +280,7 @@ abstract class AbstractCreateSuiteTest extends AbstractSuiteTest
         $label = md5((string) rand());
 
         $firstCreateResponse = $this->applicationClient->makeCreateSuiteRequest(
-            self::$authenticationConfiguration->getApiToken(self::USER_1_EMAIL),
+            self::$apiTokens->get(self::USER_1_EMAIL),
             [
                 SuiteRequest::PARAMETER_SOURCE_ID => $this->sourceId,
                 SuiteRequest::PARAMETER_LABEL => $label,
@@ -303,7 +303,7 @@ abstract class AbstractCreateSuiteTest extends AbstractSuiteTest
         $suiteRepository->delete($suite);
 
         $secondCreateResponse = $this->applicationClient->makeCreateSuiteRequest(
-            self::$authenticationConfiguration->getApiToken(self::USER_1_EMAIL),
+            self::$apiTokens->get(self::USER_1_EMAIL),
             [
                 SuiteRequest::PARAMETER_SOURCE_ID => $this->sourceId,
                 SuiteRequest::PARAMETER_LABEL => $label,

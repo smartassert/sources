@@ -33,7 +33,7 @@ abstract class AbstractUpdateSuiteTest extends AbstractSuiteTest
         self::assertSame(1, $suiteRepository->count(['label' => $suiteLabel1]));
 
         $updateResponse = $this->applicationClient->makeUpdateSuiteRequest(
-            self::$authenticationConfiguration->getApiToken(self::USER_1_EMAIL),
+            self::$apiTokens->get(self::USER_1_EMAIL),
             $suiteId,
             [
                 SuiteRequest::PARAMETER_SOURCE_ID => $this->sourceId,
@@ -76,7 +76,7 @@ abstract class AbstractUpdateSuiteTest extends AbstractSuiteTest
         $updateRequestParameters = $updateRequestParametersCreator($this->sourceId, $this->secondarySourceId);
 
         $response = $this->applicationClient->makeUpdateSuiteRequest(
-            self::$authenticationConfiguration->getApiToken(self::USER_1_EMAIL),
+            self::$apiTokens->get(self::USER_1_EMAIL),
             $suiteId,
             array_merge(['source_id' => $this->sourceId], $updateRequestParameters),
         );
@@ -196,7 +196,7 @@ abstract class AbstractUpdateSuiteTest extends AbstractSuiteTest
         ];
 
         $firstUpdateResponse = $this->applicationClient->makeUpdateSuiteRequest(
-            self::$authenticationConfiguration->getApiToken(self::USER_1_EMAIL),
+            self::$apiTokens->get(self::USER_1_EMAIL),
             $suiteId,
             $updateParameters,
         );
@@ -204,7 +204,7 @@ abstract class AbstractUpdateSuiteTest extends AbstractSuiteTest
         self::assertSame(200, $firstUpdateResponse->getStatusCode());
 
         $secondUpdateResponse = $this->applicationClient->makeUpdateSuiteRequest(
-            self::$authenticationConfiguration->getApiToken(self::USER_1_EMAIL),
+            self::$apiTokens->get(self::USER_1_EMAIL),
             $suiteId,
             $updateParameters,
         );
@@ -221,12 +221,12 @@ abstract class AbstractUpdateSuiteTest extends AbstractSuiteTest
         $suiteId = $this->createSuite($this->sourceId, 'label', []);
 
         $this->applicationClient->makeDeleteSuiteRequest(
-            self::$authenticationConfiguration->getApiToken(self::USER_1_EMAIL),
+            self::$apiTokens->get(self::USER_1_EMAIL),
             $suiteId
         );
 
         $response = $this->applicationClient->makeUpdateSuiteRequest(
-            self::$authenticationConfiguration->getApiToken(self::USER_1_EMAIL),
+            self::$apiTokens->get(self::USER_1_EMAIL),
             $suiteId,
             [
                 SuiteRequest::PARAMETER_SOURCE_ID => $this->sourceId,
@@ -264,7 +264,7 @@ abstract class AbstractUpdateSuiteTest extends AbstractSuiteTest
         $suiteId = $this->createSuite($this->sourceId, md5((string) rand()), []);
 
         $updateResponse = $this->applicationClient->makeUpdateSuiteRequest(
-            self::$authenticationConfiguration->getApiToken(self::USER_1_EMAIL),
+            self::$apiTokens->get(self::USER_1_EMAIL),
             $suiteId,
             [
                 SuiteRequest::PARAMETER_SOURCE_ID => $this->sourceId,
@@ -282,7 +282,7 @@ abstract class AbstractUpdateSuiteTest extends AbstractSuiteTest
     private function createSuite(string $sourceId, string $label, array $tests): string
     {
         $response = $this->applicationClient->makeCreateSuiteRequest(
-            self::$authenticationConfiguration->getApiToken(self::USER_1_EMAIL),
+            self::$apiTokens->get(self::USER_1_EMAIL),
             [
                 SuiteRequest::PARAMETER_SOURCE_ID => $sourceId,
                 SuiteRequest::PARAMETER_LABEL => $label,

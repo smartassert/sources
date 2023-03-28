@@ -28,7 +28,7 @@ abstract class AbstractDeleteSuiteTest extends AbstractApplicationTest
         parent::setUp();
 
         $createSourceResponse = $this->applicationClient->makeCreateSourceRequest(
-            self::$authenticationConfiguration->getApiToken(self::USER_1_EMAIL),
+            self::$apiTokens->get(self::USER_1_EMAIL),
             [
                 OriginSourceRequest::PARAMETER_TYPE => Type::FILE->value,
                 FileSourceRequest::PARAMETER_LABEL => 'label',
@@ -53,7 +53,7 @@ abstract class AbstractDeleteSuiteTest extends AbstractApplicationTest
     public function testDeleteSuiteSuiteNotFound(): void
     {
         $response = $this->applicationClient->makeDeleteSuiteRequest(
-            self::$authenticationConfiguration->getApiToken(self::USER_1_EMAIL),
+            self::$apiTokens->get(self::USER_1_EMAIL),
             (new EntityIdFactory())->create()
         );
 
@@ -73,7 +73,7 @@ abstract class AbstractDeleteSuiteTest extends AbstractApplicationTest
         $suiteId = $suite->id;
 
         $response = $this->applicationClient->makeDeleteSuiteRequest(
-            self::$authenticationConfiguration->getApiToken(self::USER_1_EMAIL),
+            self::$apiTokens->get(self::USER_1_EMAIL),
             $suite->id,
         );
 
@@ -99,7 +99,7 @@ abstract class AbstractDeleteSuiteTest extends AbstractApplicationTest
         $this->suiteRepository->save($suite);
 
         $response = $this->applicationClient->makeDeleteSuiteRequest(
-            self::$authenticationConfiguration->getApiToken(self::USER_1_EMAIL),
+            self::$apiTokens->get(self::USER_1_EMAIL),
             $suite->id
         );
 

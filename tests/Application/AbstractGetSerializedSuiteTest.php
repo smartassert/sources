@@ -65,7 +65,7 @@ abstract class AbstractGetSerializedSuiteTest extends AbstractApplicationTest
         $this->serializedSuiteRepository->save($serializedSuite);
 
         $response = $this->applicationClient->makeGetSerializedSuiteRequest(
-            self::$authenticationConfiguration->getApiToken(self::USER_1_EMAIL),
+            self::$apiTokens->get(self::USER_1_EMAIL),
             $serializedSuite->id,
         );
 
