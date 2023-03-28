@@ -11,9 +11,9 @@ use App\Enum\SerializedSuite\State;
 use App\Repository\SerializedSuiteRepository;
 use App\Repository\SourceRepository;
 use App\Repository\SuiteRepository;
-use App\Tests\Services\AuthenticationProvider\UserProvider;
 use App\Tests\Services\SourceOriginFactory;
 use App\Tests\Services\SuiteFactory;
+use SmartAssert\TestAuthenticationProviderBundle\UserProvider;
 
 abstract class AbstractCreateSerializedSuiteTest extends AbstractApplicationTest
 {

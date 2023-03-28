@@ -8,11 +8,11 @@ use App\Entity\FileSource;
 use App\Entity\SourceInterface;
 use App\Repository\SourceRepository;
 use App\Tests\DataProvider\GetSourceDataProviderTrait;
-use App\Tests\Services\AuthenticationProvider\UserProvider;
 use App\Tests\Services\EntityRemover;
 use App\Tests\Services\SourceOriginFactory;
 use Doctrine\ORM\EntityManagerInterface;
 use League\Flysystem\FilesystemOperator;
+use SmartAssert\TestAuthenticationProviderBundle\UserProvider;
 
 abstract class AbstractDeleteSourceTest extends AbstractApplicationTest
 {

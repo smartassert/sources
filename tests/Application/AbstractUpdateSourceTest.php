@@ -14,9 +14,9 @@ use App\Request\GitSourceRequest;
 use App\Request\OriginSourceRequest;
 use App\Tests\DataProvider\CreateUpdateFileSourceDataProviderTrait;
 use App\Tests\DataProvider\CreateUpdateGitSourceDataProviderTrait;
-use App\Tests\Services\AuthenticationProvider\UserProvider;
 use App\Tests\Services\EntityRemover;
 use App\Tests\Services\SourceOriginFactory;
+use SmartAssert\TestAuthenticationProviderBundle\UserProvider;
 
 abstract class AbstractUpdateSourceTest extends AbstractApplicationTest
 {

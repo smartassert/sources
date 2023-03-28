@@ -265,6 +265,9 @@
     "smartassert/service-status-inspector": {
         "version": "3.0"
     },
+    "smartassert/test-authenticaton-provider-bundle": {
+        "version": "dev-github-5"
+    },
     "smartassert/users-client": {
         "version": "0.1"
     },

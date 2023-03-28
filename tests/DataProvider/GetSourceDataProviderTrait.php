@@ -7,8 +7,8 @@ namespace App\Tests\DataProvider;
 use App\Entity\FileSource;
 use App\Entity\GitSource;
 use App\Enum\Source\Type;
-use App\Tests\Services\AuthenticationProvider\UserProvider;
 use App\Tests\Services\SourceOriginFactory;
+use SmartAssert\TestAuthenticationProviderBundle\UserProvider;
 
 trait GetSourceDataProviderTrait
 {

@@ -8,8 +8,8 @@ use App\Entity\SourceInterface;
 use App\Repository\SourceRepository;
 use App\Services\EntityIdFactory;
 use App\Tests\DataProvider\GetSourceDataProviderTrait;
-use App\Tests\Services\AuthenticationProvider\UserProvider;
 use Doctrine\ORM\EntityManagerInterface;
+use SmartAssert\TestAuthenticationProviderBundle\UserProvider;
 
 abstract class AbstractGetSourceTest extends AbstractApplicationTest
 {

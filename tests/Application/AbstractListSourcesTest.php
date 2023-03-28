@@ -9,8 +9,8 @@ use App\Entity\GitSource;
 use App\Entity\SourceInterface;
 use App\Enum\Source\Type;
 use App\Repository\SourceRepository;
-use App\Tests\Services\AuthenticationProvider\UserProvider;
 use App\Tests\Services\SourceOriginFactory;
+use SmartAssert\TestAuthenticationProviderBundle\UserProvider;
 
 abstract class AbstractListSourcesTest extends AbstractApplicationTest
 {

@@ -6,9 +6,9 @@ namespace App\Tests\Application;
 
 use App\Repository\SourceRepository;
 use App\Repository\SuiteRepository;
-use App\Tests\Services\AuthenticationProvider\UserProvider;
 use App\Tests\Services\SourceOriginFactory;
 use App\Tests\Services\SuiteFactory;
+use SmartAssert\TestAuthenticationProviderBundle\UserProvider;
 
 abstract class AbstractListSuitesTest extends AbstractApplicationTest
 {
