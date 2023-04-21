@@ -52,9 +52,9 @@ class WorkerMessageFailedEventHandler implements EventSubscriberInterface
             return;
         }
 
-        //        if ($event->willRetry()) {
-        //            return;
-        //        }
+        if ($event->willRetry()) {
+            return;
+        }
 
         $handlerFailedException = $event->getThrowable();
         if (!$handlerFailedException instanceof HandlerFailedException) {
