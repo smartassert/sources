@@ -116,3 +116,8 @@ services:
     SmartAssert\WorkerJobSource\Factory\YamlFileFactory: ~
 
     SmartAssert\WorkerJobSource\JobSourceSerializer: ~
+
+    App\MessageFailureHandler\WorkerMessageFailedEventHandler:
+        arguments:
+            $exceptionHandlers:
+                - '@App\MessageFailureHandler\SuiteSerializationExceptionHandler'
