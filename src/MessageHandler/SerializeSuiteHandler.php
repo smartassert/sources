@@ -6,6 +6,7 @@ namespace App\MessageHandler;
 
 use App\Entity\SerializedSuite;
 use App\Enum\SerializedSuite\State;
+use App\Exception\MessageHandler\SuiteSerializationException;
 use App\Message\SerializeSuite;
 use App\Repository\SerializedSuiteRepository;
 use App\Services\SuiteSerializer;
@@ -21,7 +22,7 @@ class SerializeSuiteHandler
     }
 
     /**
-     * @throws \Throwable
+     * @throws SuiteSerializationException
      */
     public function __invoke(SerializeSuite $message): void
     {
@@ -42,7 +43,7 @@ class SerializeSuiteHandler
             $serializedSuite->setState(State::PREPARING_HALTED);
             $this->serializedSuiteRepository->save($serializedSuite);
 
-            throw $e;
+            throw new SuiteSerializationException($e);
         }
 
         $serializedSuite->setState(State::PREPARED);
