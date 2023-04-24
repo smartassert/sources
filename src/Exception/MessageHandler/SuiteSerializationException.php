@@ -10,13 +10,8 @@ class SuiteSerializationException extends \Exception
 {
     public function __construct(
         public readonly SerializedSuite $serializedSuite,
-        private \Throwable $exception,
+        public readonly \Throwable $handlerException,
     ) {
-        parent::__construct($exception->getMessage(), $exception->getCode(), $exception);
-    }
-
-    public function getHandlerException(): \Throwable
-    {
-        return $this->exception;
+        parent::__construct($handlerException->getMessage(), $handlerException->getCode(), $handlerException);
     }
 }
