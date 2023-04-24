@@ -11,6 +11,8 @@ parameters:
     git_repository_store_directory: '%env(resolve:GIT_REPOSITORY_STORE_DIRECTORY)%'
     health_check_bundle_enable_status_readiness_inspector: true
     health_check_bundle_status_is_ready: '%env(bool:IS_READY)%'
+    messenger_retry_strategy_delay_default: 1000
+    messenger_retry_strategy_delay: '%env(int:default:messenger_retry_strategy_delay_default:int:MESSENGER_RETRY_STRATEGY_DELAY)%'
 
 services:
     # default configuration for services in *this* file
