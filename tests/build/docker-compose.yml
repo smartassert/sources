@@ -67,6 +67,7 @@ services:
         REMOTE_STORAGE_ENDPOINT: http://s3-mock:9090
         REMOTE_STORAGE_KEY_ID: remote_storage_key_id
         APP_ENV: integration
+        MESSENGER_RETRY_STRATEGY_DELAY: 1
     container_name: smartassert-sources
     restart: unless-stopped
     links:
