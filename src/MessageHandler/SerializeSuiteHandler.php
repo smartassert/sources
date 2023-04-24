@@ -43,7 +43,7 @@ class SerializeSuiteHandler
             $serializedSuite->setState(State::PREPARING_HALTED);
             $this->serializedSuiteRepository->save($serializedSuite);
 
-            throw new SuiteSerializationException($e);
+            throw new SuiteSerializationException($serializedSuite, $e);
         }
 
         $serializedSuite->setState(State::PREPARED);

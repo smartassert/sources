@@ -4,16 +4,14 @@ declare(strict_types=1);
 
 namespace App\Exception\MessageHandler;
 
+use App\Entity\SerializedSuite;
+
 class SuiteSerializationException extends \Exception
 {
     public function __construct(
-        private \Throwable $exception,
+        public readonly SerializedSuite $serializedSuite,
+        public readonly \Throwable $handlerException,
     ) {
-        parent::__construct($exception->getMessage(), $exception->getCode(), $exception);
-    }
-
-    public function getHandlerException(): \Throwable
-    {
-        return $this->exception;
+        parent::__construct($handlerException->getMessage(), $handlerException->getCode(), $handlerException);
     }
 }
