@@ -66,6 +66,7 @@ services:
         AUTHENTICATION_BASE_URL: http://caddy-users-service
         REMOTE_STORAGE_ENDPOINT: http://s3-mock:9090
         REMOTE_STORAGE_KEY_ID: remote_storage_key_id
+        APP_ENV: integration
     container_name: smartassert-sources
     restart: unless-stopped
     links:

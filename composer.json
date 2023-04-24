@@ -110,7 +110,7 @@
         "static-analysis": "XDEBUG_MODE=off ./vendor/bin/phpstan analyse --ansi",
         "test-unit": "XDEBUG_MODE=off ./vendor/bin/phpunit --colors=always tests/Unit",
         "test-functional": "XDEBUG_MODE=off ./vendor/bin/phpunit --colors=always tests/Functional",
-        "test-integration": "XDEBUG_MODE=off ./vendor/bin/phpunit -c phpunit.integration.xml --colors=always tests/Integration",
+        "test-integration": "XDEBUG_MODE=off ./vendor/bin/phpunit --colors=always tests/Integration",
         "test": [
             "@test-unit",
             "@test-functional"
