@@ -64,7 +64,12 @@ class SuiteSerializer
         $content = $this->jobSourceSerializer->serialize(new JobSource(new Manifest($suite->getTests()), $provider));
 
         $this->serializedSuiteWriter->write($targetPath, $content);
-        $this->sourceRepositoryFactory->remove($sourceRepository);
+        try {
+            $this->sourceRepositoryFactory->remove($sourceRepository);
+        } catch (FilesystemException) {
+            // Intentionally empty catch block.
+            // We don't want to fail hard if the temporary local source directory cannot be removed.
+        }
 
         return $targetPath;
     }
