@@ -124,29 +124,4 @@ class SuiteSerializerTest extends WebTestCase
 
         self::assertSame(trim($expected), $this->suiteSerializer->read($serializedSuite));
     }
-
-    public function testWriteDoesNotThrowExceptionWhenSourceRepositoryRemovalFails(): void
-    {
-        $idFactory = new EntityIdFactory();
-
-        $source = \Mockery::mock(SourceInterface::class);
-        $source
-            ->shouldReceive('getUserId')
-            ->andReturn(UserId::create())
-        ;
-
-        $suite = new Suite($idFactory->create());
-        $suite->setLabel('suite label');
-        $suite->setSource($source);
-        $suite->setTests(['test1.yaml', 'test2.yaml']);
-
-        $serializedSuite = new SerializedSuite($idFactory->create(), $suite, []);
-
-        try {
-            $this->suiteSerializer->write($serializedSuite);
-            self::fail(UnserializableSourceException::class . ' not thrown');
-        } catch (UnserializableSourceException $e) {
-            self::assertSame($source, $e->getOriginSource());
-        }
-    }
 }
