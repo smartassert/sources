@@ -119,7 +119,12 @@ services:
 
     SmartAssert\WorkerJobSource\JobSourceSerializer: ~
 
-    App\MessageFailureHandler\WorkerMessageFailedEventHandler:
+    App\MessageFailureHandler\SuiteSerializationExceptionHandler:
         arguments:
             $exceptionHandlers:
+                - '@App\MessageFailureHandler\SourceRepositoryCreationExceptionHandler'
+
+    App\MessageFailureHandler\WorkerMessageFailedEventHandler:
+        arguments:
+            $exceptionCollectionHandlers:
                 - '@App\MessageFailureHandler\SuiteSerializationExceptionHandler'
