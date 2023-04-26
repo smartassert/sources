@@ -64,6 +64,7 @@ class SuiteSerializer
         $content = $this->jobSourceSerializer->serialize(new JobSource(new Manifest($suite->getTests()), $provider));
 
         $this->serializedSuiteWriter->write($targetPath, $content);
+
         try {
             $this->sourceRepositoryFactory->remove($sourceRepository);
         } catch (FilesystemException) {
