@@ -136,11 +136,11 @@ class WorkerMessageFailedEventHandlerTest extends WebTestCase
         string $expectedFailureMessage,
     ): void {
         $serializedSuite = $this->createSerializedSuite();
-        self::assertSame(State::REQUESTED, $serializedSuite->getState());
+        self::assertSame(State::REQUESTED->value, $serializedSuite->getState()->value);
 
         $returnState = $this->foo($serializedSuite, $handlerFailedExceptionNestedExceptionsCreator);
         self::assertSame(WorkerMessageFailedEventHandler::STATE_SUCCESS, $returnState);
-        self::assertSame(State::FAILED, $serializedSuite->getState());
+        self::assertSame(State::FAILED->value, $serializedSuite->getState()->value);
 
         $serializedSuiteData = $serializedSuite->jsonSerialize();
         self::assertArrayHasKey('failure_reason', $serializedSuiteData);
@@ -173,6 +173,25 @@ class WorkerMessageFailedEventHandlerTest extends WebTestCase
                 },
                 'expectedFailureReason' => 'git/clone',
                 'expectedFailureMessage' => 'fatal: repository \'https://example.com/repository.git/\' not found',
+            ],
+            'git checkout failure' => [
+                'handlerFailedExceptionNestedExceptionsCreator' => function (SerializedSuite $serializedSuite) {
+                    return [
+                        new SuiteSerializationException(
+                            $serializedSuite,
+                            new SourceRepositoryCreationException(
+                                new GitRepositoryException(
+                                    new GitActionException(
+                                        GitActionException::ACTION_CHECKOUT,
+                                        'error: pathspec \'7712df\' did not match any file(s) known to git'
+                                    ),
+                                ),
+                            )
+                        ),
+                    ];
+                },
+                'expectedFailureReason' => 'git/checkout',
+                'expectedFailureMessage' => 'error: pathspec \'7712df\' did not match any file(s) known to git',
             ],
         ];
     }
