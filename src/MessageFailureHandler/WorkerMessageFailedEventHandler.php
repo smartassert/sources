@@ -11,26 +11,31 @@ use Symfony\Component\Messenger\Exception\HandlerFailedException;
 
 class WorkerMessageFailedEventHandler implements EventSubscriberInterface
 {
-    /**
-     * @var ExceptionHandlerInterface[]
-     */
-    private readonly array $exceptionHandlers;
+    public const STATE_SUCCESS = 0;
+    public const STATE_INCORRECT_MESSAGE_TYPE = 1;
+    public const STATE_EVENT_WILL_RETRY = 2;
+    public const STATE_EVENT_EXCEPTION_INCORRECT_TYPE = 3;
 
     /**
-     * @param array<mixed> $exceptionHandlers
+     * @var ExceptionCollectionHandlerInterface[]
+     */
+    private readonly array $handlers;
+
+    /**
+     * @param array<mixed> $exceptionCollectionHandlers
      */
     public function __construct(
-        array $exceptionHandlers,
+        array $exceptionCollectionHandlers,
     ) {
         $handlers = [];
 
-        foreach ($exceptionHandlers as $exceptionHandler) {
-            if ($exceptionHandler instanceof ExceptionHandlerInterface) {
-                $handlers[] = $exceptionHandler;
+        foreach ($exceptionCollectionHandlers as $exceptionCollectionHandler) {
+            if ($exceptionCollectionHandler instanceof ExceptionCollectionHandlerInterface) {
+                $handlers[] = $exceptionCollectionHandler;
             }
         }
 
-        $this->exceptionHandlers = $handlers;
+        $this->handlers = $handlers;
     }
 
     /**
@@ -40,29 +45,31 @@ class WorkerMessageFailedEventHandler implements EventSubscriberInterface
     {
         return [
             WorkerMessageFailedEvent::class => [
-                ['handleWorkerMessageFailedEvent', 0],
+                ['handle', 0],
             ],
         ];
     }
 
-    public function handleWorkerMessageFailedEvent(WorkerMessageFailedEvent $event): void
+    public function handle(WorkerMessageFailedEvent $event): int
     {
         $message = $event->getEnvelope()->getMessage();
         if (!$message instanceof SerializeSuite) {
-            return;
+            return self::STATE_INCORRECT_MESSAGE_TYPE;
         }
 
         if ($event->willRetry()) {
-            return;
+            return self::STATE_EVENT_WILL_RETRY;
         }
 
         $handlerFailedException = $event->getThrowable();
         if (!$handlerFailedException instanceof HandlerFailedException) {
-            return;
+            return self::STATE_EVENT_EXCEPTION_INCORRECT_TYPE;
         }
 
-        foreach ($this->exceptionHandlers as $exceptionHandler) {
-            $exceptionHandler->handle($handlerFailedException->getNestedExceptions());
+        foreach ($this->handlers as $handler) {
+            $handler->handle($handlerFailedException->getNestedExceptions());
         }
+
+        return self::STATE_SUCCESS;
     }
 }
