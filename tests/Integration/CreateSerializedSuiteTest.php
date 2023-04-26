@@ -16,6 +16,7 @@ use League\Flysystem\FilesystemOperator;
 class CreateSerializedSuiteTest extends AbstractCreateSerializedSuiteTest
 {
     use GetClientAdapterTrait;
+    use WaitUntilSerializedSuiteStateTrait;
 
     private FilesystemOperator $fixtureStorage;
     private DirectoryListingFilter $listingFilter;
@@ -94,7 +95,7 @@ class CreateSerializedSuiteTest extends AbstractCreateSerializedSuiteTest
         \assert(is_array($createSerializedSuiteResponseData));
         $serializedSuiteId = $createSerializedSuiteResponseData['id'] ?? null;
 
-        $this->waitUntilSuiteIsSerialized($serializedSuiteId);
+        $this->waitUntilSuiteStateIs($serializedSuiteId, State::PREPARED);
 
         $readResponse = $this->applicationClient->makeReadSerializedSuiteRequest(
             self::$apiTokens->get(self::USER_1_EMAIL),
@@ -104,38 +105,5 @@ class CreateSerializedSuiteTest extends AbstractCreateSerializedSuiteTest
         $expectedReadResponseBody = trim($this->fixtureStorage->read('SerializedSuite/suite_yaml_entire.yaml'));
 
         $this->responseAsserter->assertReadSerializedSuiteSuccessResponse($readResponse, $expectedReadResponseBody);
-    }
-
-    private function waitUntilSuiteIsSerialized(string $serializedSuiteId): void
-    {
-        $timeout = 30000;
-        $duration = 0;
-        $period = 1000;
-        $state = null;
-
-        while (State::PREPARED->value !== $state) {
-            $getResponse = $this->applicationClient->makeGetSerializedSuiteRequest(
-                self::$apiTokens->get(self::USER_1_EMAIL),
-                $serializedSuiteId
-            );
-
-            if (200 === $getResponse->getStatusCode()) {
-                $responseData = json_decode($getResponse->getBody()->getContents(), true);
-
-                if (is_array($responseData)) {
-                    $state = $responseData['state'] ?? null;
-                }
-
-                if (State::PREPARED->value !== $state) {
-                    $duration += $period;
-
-                    if ($duration >= $timeout) {
-                        throw new \RuntimeException('Timed out waiting for "' . $serializedSuiteId . '" to prepare');
-                    }
-
-                    usleep($period);
-                }
-            }
-        }
     }
 }

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\MessageFailureHandler;
 
-interface ExceptionHandlerInterface
+interface ExceptionCollectionHandlerInterface
 {
     /**
      * @param \Throwable[] $exceptions
