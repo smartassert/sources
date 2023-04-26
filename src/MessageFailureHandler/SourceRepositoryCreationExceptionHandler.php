@@ -35,5 +35,13 @@ class SourceRepositoryCreationExceptionHandler implements SuiteSerializationExce
             );
             $this->serializedSuiteRepository->save($serializedSuite);
         }
+
+        if (GitRepositoryException::CODE_GIT_CHECKOUT_FAILED === $sourceHandlerException->getCode()) {
+            $serializedSuite->setPreparationFailed(
+                FailureReason::GIT_CHECKOUT,
+                $sourceHandlerException->getMessage()
+            );
+            $this->serializedSuiteRepository->save($serializedSuite);
+        }
     }
 }
