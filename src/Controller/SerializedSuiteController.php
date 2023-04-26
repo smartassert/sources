@@ -7,6 +7,7 @@ namespace App\Controller;
 use App\Entity\SerializedSuite;
 use App\Entity\Suite;
 use App\Exception\EmptyEntityIdException;
+use App\Exception\SerializedSuiteSourceDoesNotExistException;
 use App\Message\SerializeSuite;
 use App\Response\YamlResponse;
 use App\Security\EntityAccessChecker;
@@ -52,11 +53,17 @@ class SerializedSuiteController
      * @throws FilesystemException
      */
     #[Route(SerializedSuiteRoutes::ROUTE_SERIALIZED_SUITE . '/read', name: 'serialized_suite_read', methods: ['GET'])]
-    public function read(SerializedSuite $serializedSuite, SuiteSerializer $suiteSerializer): Response
-    {
+    public function read(
+        SerializedSuite $serializedSuite,
+        SuiteSerializer $suiteSerializer,
+    ): Response {
         $this->entityAccessChecker->denyAccessUnlessGranted($serializedSuite);
 
-        return new YamlResponse($suiteSerializer->read($serializedSuite));
+        try {
+            return new YamlResponse($suiteSerializer->read($serializedSuite));
+        } catch (SerializedSuiteSourceDoesNotExistException) {
+            return new Response(null, 404);
+        }
     }
 
     /**

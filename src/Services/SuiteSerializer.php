@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Entity\SerializedSuite;
+use App\Exception\SerializedSuiteSourceDoesNotExistException;
 use App\Exception\SourceRepositoryCreationException;
 use App\Exception\SourceRepositoryReaderNotFoundException;
 use App\Exception\UnserializableSourceException;
@@ -77,11 +78,16 @@ class SuiteSerializer
 
     /**
      * @throws FilesystemException
+     * @throws SerializedSuiteSourceDoesNotExistException
      */
     public function read(SerializedSuite $serializedSuite): string
     {
-        return trim($this->serializedSuiteReader->read(
-            $serializedSuite->getDirectoryPath() . '/' . self::SERIALIZED_FILENAME
-        ));
+        $path = $serializedSuite->getDirectoryPath() . '/' . self::SERIALIZED_FILENAME;
+
+        if (false === $this->serializedSuiteReader->fileExists($path)) {
+            throw new SerializedSuiteSourceDoesNotExistException($serializedSuite);
+        }
+
+        return trim($this->serializedSuiteReader->read($path));
     }
 }
