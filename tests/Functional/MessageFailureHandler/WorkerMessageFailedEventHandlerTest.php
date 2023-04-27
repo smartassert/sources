@@ -13,6 +13,7 @@ use App\Exception\GitRepositoryException;
 use App\Exception\MessageHandler\SuiteSerializationException;
 use App\Exception\NoSourceRepositoryCreatorException;
 use App\Exception\SourceRepositoryCreationException;
+use App\Exception\UnableToWriteSerializedSuiteException;
 use App\Message\SerializeSuite;
 use App\MessageFailureHandler\WorkerMessageFailedEventHandler;
 use App\Repository\SerializedSuiteRepository;
@@ -20,6 +21,7 @@ use App\Repository\SourceRepository;
 use App\Repository\SuiteRepository;
 use App\Tests\Services\EntityRemover;
 use League\Flysystem\PathTraversalDetected;
+use League\Flysystem\UnableToWriteFile;
 use SmartAssert\YamlFile\Exception\Collection\SerializeException;
 use SmartAssert\YamlFile\Exception\ProvisionException;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -224,6 +226,22 @@ class WorkerMessageFailedEventHandlerTest extends WebTestCase
                 },
                 'expectedFailureReason' => 'source/unserializable-type',
                 'expectedFailureMessage' => 'git',
+            ],
+            'unable to write to target' => [
+                'handlerFailedExceptionNestedExceptionsCreator' => function (SerializedSuite $serializedSuite) {
+                    return [
+                        new SuiteSerializationException(
+                            $serializedSuite,
+                            new UnableToWriteSerializedSuiteException(
+                                '/path/that/cannot/be/written/to',
+                                'content',
+                                new UnableToWriteFile()
+                            )
+                        ),
+                    ];
+                },
+                'expectedFailureReason' => 'target/write',
+                'expectedFailureMessage' => '/path/that/cannot/be/written/to',
             ],
         ];
     }

@@ -15,4 +15,5 @@ enum FailureReason: string
     case GIT_CLONE = 'git/clone';
     case GIT_CHECKOUT = 'git/checkout';
     case UNSERIALIZABLE_SOURCE_TYPE = 'source/unserializable-type';
+    case UNABLE_TO_WRITE_TO_TARGET = 'target/write';
 }
