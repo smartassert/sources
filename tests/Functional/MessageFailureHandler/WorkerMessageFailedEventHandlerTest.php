@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\MessageFailureHandler;
 
-use App\Entity\FileSource;
+use App\Entity\GitSource;
 use App\Entity\SerializedSuite;
 use App\Entity\Suite;
 use App\Enum\SerializedSuite\State;
@@ -18,6 +18,9 @@ use App\Repository\SerializedSuiteRepository;
 use App\Repository\SourceRepository;
 use App\Repository\SuiteRepository;
 use App\Tests\Services\EntityRemover;
+use League\Flysystem\PathTraversalDetected;
+use SmartAssert\YamlFile\Exception\Collection\SerializeException;
+use SmartAssert\YamlFile\Exception\ProvisionException;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Event\WorkerMessageFailedEvent;
@@ -98,7 +101,7 @@ class WorkerMessageFailedEventHandlerTest extends WebTestCase
         $serializedSuite = $this->createSerializedSuite();
         self::assertSame(State::REQUESTED, $serializedSuite->getState());
 
-        $returnState = $this->foo($serializedSuite, $handlerFailedExceptionNestedExceptionsCreator);
+        $returnState = $this->handleEvent($serializedSuite, $handlerFailedExceptionNestedExceptionsCreator);
 
         self::assertSame(WorkerMessageFailedEventHandler::STATE_SUCCESS, $returnState);
         self::assertSame(State::REQUESTED, $serializedSuite->getState());
@@ -138,7 +141,7 @@ class WorkerMessageFailedEventHandlerTest extends WebTestCase
         $serializedSuite = $this->createSerializedSuite();
         self::assertSame(State::REQUESTED->value, $serializedSuite->getState()->value);
 
-        $returnState = $this->foo($serializedSuite, $handlerFailedExceptionNestedExceptionsCreator);
+        $returnState = $this->handleEvent($serializedSuite, $handlerFailedExceptionNestedExceptionsCreator);
         self::assertSame(WorkerMessageFailedEventHandler::STATE_SUCCESS, $returnState);
         self::assertSame(State::FAILED->value, $serializedSuite->getState()->value);
 
@@ -193,13 +196,37 @@ class WorkerMessageFailedEventHandlerTest extends WebTestCase
                 'expectedFailureReason' => 'git/checkout',
                 'expectedFailureMessage' => 'error: pathspec \'7712df\' did not match any file(s) known to git',
             ],
+            'local git repository out of scope' => [
+                'handlerFailedExceptionNestedExceptionsCreator' => function (SerializedSuite $serializedSuite) {
+                    return [
+                        new SuiteSerializationException(
+                            $serializedSuite,
+                            new SerializeException(
+                                new ProvisionException(
+                                    new PathTraversalDetected(),
+                                ),
+                            )
+                        ),
+                    ];
+                },
+                'expectedFailureReason' => 'local-git-repository/out-of-scope',
+                'expectedFailureMessage' => '/out-of-scope/../../../',
+            ],
         ];
     }
 
     private function createSerializedSuite(): SerializedSuite
     {
-        $source = new FileSource(md5((string) rand()), md5((string) rand()));
+        $source = new GitSource(
+            md5((string) rand()),
+            md5((string) rand())
+        );
         $source = $source->setLabel(md5((string) rand()));
+        if ($source instanceof GitSource) {
+            $source->setHostUrl('https://example.com/repository.git');
+            $source->setPath('/out-of-scope/../../../');
+        }
+
         $sourceRepository = self::getContainer()->get(SourceRepository::class);
         \assert($sourceRepository instanceof SourceRepository);
         $sourceRepository->save($source);
@@ -219,8 +246,10 @@ class WorkerMessageFailedEventHandlerTest extends WebTestCase
         return $serializedSuite;
     }
 
-    private function foo(SerializedSuite $serializedSuite, callable $handlerFailedExceptionNestedExceptionsCreator): int
-    {
+    private function handleEvent(
+        SerializedSuite $serializedSuite,
+        callable $handlerFailedExceptionNestedExceptionsCreator
+    ): int {
         $handlerFailedException = new HandlerFailedException(
             new Envelope(
                 new SerializeSuite($serializedSuite->id, [])
