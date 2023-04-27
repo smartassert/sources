@@ -14,4 +14,5 @@ enum FailureReason: string
     case GIT_REPOSITORY_OUT_OF_SCOPE = 'local-git-repository/out-of-scope';
     case GIT_CLONE = 'git/clone';
     case GIT_CHECKOUT = 'git/checkout';
+    case UNSERIALIZABLE_SOURCE_TYPE = 'source/unserializable-type';
 }
