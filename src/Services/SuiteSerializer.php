@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Entity\SerializedSuite;
+use App\Exception\NoSourceRepositoryCreatorException;
 use App\Exception\SerializedSuiteSourceDoesNotExistException;
 use App\Exception\SourceRepositoryCreationException;
 use App\Exception\SourceRepositoryReaderNotFoundException;
-use App\Exception\UnserializableSourceException;
 use App\Services\SourceRepository\Factory\Factory;
 use App\Services\SourceRepository\Reader\Provider;
 use App\Services\YamlFileCollection\Provider as YamlFileCollectionProvider;
@@ -38,10 +38,10 @@ class SuiteSerializer
 
     /**
      * @throws FilesystemException
-     * @throws UnserializableSourceException
      * @throws SourceRepositoryCreationException
      * @throws SourceRepositoryReaderNotFoundException
      * @throws SerializeException
+     * @throws NoSourceRepositoryCreatorException
      */
     public function write(SerializedSuite $serializedSuite): ?string
     {
@@ -49,9 +49,6 @@ class SuiteSerializer
         $source = $suite->getSource();
 
         $sourceRepository = $this->sourceRepositoryFactory->create($source, $serializedSuite->getParameters());
-        if (null === $sourceRepository) {
-            throw new UnserializableSourceException($source);
-        }
 
         $targetPath = $serializedSuite->getDirectoryPath() . '/' . self::SERIALIZED_FILENAME;
 

@@ -8,11 +8,11 @@ use App\Entity\FileSource;
 use App\Entity\SerializedSuite;
 use App\Entity\SourceInterface;
 use App\Entity\Suite;
+use App\Enum\Source\Type;
+use App\Exception\NoSourceRepositoryCreatorException;
 use App\Exception\UnparseableSourceFileException;
-use App\Exception\UnserializableSourceException;
 use App\Services\EntityIdFactory;
 use App\Services\SuiteSerializer;
-use App\Tests\Model\UserId;
 use App\Tests\Services\FileStoreFixtureCreator;
 use App\Tests\Services\SourceOriginFactory;
 use App\Tests\Services\SuiteFactory;
@@ -55,22 +55,24 @@ class SuiteSerializerTest extends WebTestCase
 
         $source = \Mockery::mock(SourceInterface::class);
         $source
-            ->shouldReceive('getUserId')
-            ->andReturn(UserId::create())
+            ->shouldReceive('getId')
+            ->andReturn(md5((string) rand()))
+        ;
+        $source
+            ->shouldReceive('getType')
+            ->andReturn(Type::FILE)
         ;
 
         $suite = new Suite($idFactory->create());
-        $suite->setLabel('suite label');
         $suite->setSource($source);
-        $suite->setTests(['test1.yaml', 'test2.yaml']);
 
         $serializedSuite = new SerializedSuite($idFactory->create(), $suite, []);
 
         try {
             $this->suiteSerializer->write($serializedSuite);
-            self::fail(UnserializableSourceException::class . ' not thrown');
-        } catch (UnserializableSourceException $e) {
-            self::assertSame($source, $e->getOriginSource());
+            self::fail(NoSourceRepositoryCreatorException::class . ' not thrown');
+        } catch (NoSourceRepositoryCreatorException $e) {
+            self::assertSame($source, $e->source);
         }
     }
 
