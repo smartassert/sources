@@ -11,7 +11,6 @@ enum FailureReason: string
     case TARGET_REMOVE = 'target/remove';
     case TARGET_OUT_OF_SCOPE = 'target/out-of-scope';
     case MIRROR = 'mirror';
-    case SOURCE_NOT_EXISTS = 'source/not-exists';
     case GIT_REPOSITORY_OUT_OF_SCOPE = 'local-git-repository/out-of-scope';
     case GIT_CLONE = 'git/clone';
     case GIT_CHECKOUT = 'git/checkout';
