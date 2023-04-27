@@ -18,6 +18,7 @@ class SuiteSerializationExceptionHandler implements ExceptionCollectionHandlerIn
      */
     public function __construct(
         array $exceptionHandlers,
+        private readonly UnknownExceptionHandler $unknownExceptionHandler,
     ) {
         $handlers = [];
 
@@ -30,15 +31,26 @@ class SuiteSerializationExceptionHandler implements ExceptionCollectionHandlerIn
         $this->handlers = $handlers;
     }
 
-    public function handle(array $exceptions): void
+    public function handle(array $exceptions): bool
     {
         $exception = $exceptions[0] ?? null;
         if (!$exception instanceof SuiteSerializationException) {
-            return;
+            return false;
         }
 
+        $result = false;
         foreach ($this->handlers as $handler) {
-            $handler->handle($exception->serializedSuite, $exception->handlerException);
+            $handlerResult = $handler->handle($exception->serializedSuite, $exception->handlerException);
+
+            if ($handlerResult) {
+                $result = true;
+            }
         }
+
+        if (false === $result) {
+            $result = $this->unknownExceptionHandler->handle($exception->serializedSuite, $exception->handlerException);
+        }
+
+        return $result;
     }
 }
