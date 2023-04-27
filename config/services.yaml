@@ -119,10 +119,22 @@ services:
 
     SmartAssert\WorkerJobSource\JobSourceSerializer: ~
 
+    App\MessageFailureHandler\ProvisionExceptionHandler:
+        arguments:
+            $exceptionHandlers:
+                - '@App\MessageFailureHandler\PathTraversalDetectedExceptionHandler'
+
+
+    App\MessageFailureHandler\SerializeExceptionHandler:
+        arguments:
+            $exceptionHandlers:
+                - '@App\MessageFailureHandler\ProvisionExceptionHandler'
+
     App\MessageFailureHandler\SuiteSerializationExceptionHandler:
         arguments:
             $exceptionHandlers:
                 - '@App\MessageFailureHandler\SourceRepositoryCreationExceptionHandler'
+                - '@App\MessageFailureHandler\SerializeExceptionHandler'
 
     App\MessageFailureHandler\WorkerMessageFailedEventHandler:
         arguments:
