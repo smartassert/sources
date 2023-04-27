@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
+use App\Enum\Source\Type;
+
 interface SourceInterface extends UserHeldEntityInterface
 {
     /**
@@ -19,4 +21,6 @@ interface SourceInterface extends UserHeldEntityInterface
      * @return string[]
      */
     public function getRunParameterNames(): array;
+
+    public function getType(): Type;
 }

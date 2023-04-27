@@ -31,7 +31,7 @@ class FileSource extends AbstractSource implements DirectoryLocatorInterface, So
         );
     }
 
-    protected function getType(): Type
+    public function getType(): Type
     {
         return Type::FILE;
     }

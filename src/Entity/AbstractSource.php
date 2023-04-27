@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
-use App\Enum\Source\Type;
 use App\Repository\SourceRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
@@ -130,6 +129,4 @@ abstract class AbstractSource implements SourceInterface, \JsonSerializable
 
         return $data;
     }
-
-    abstract protected function getType(): Type;
 }

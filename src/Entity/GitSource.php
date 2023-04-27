@@ -98,7 +98,7 @@ class GitSource extends AbstractSource
         ]);
     }
 
-    protected function getType(): Type
+    public function getType(): Type
     {
         return Type::GIT;
     }
