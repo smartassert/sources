@@ -13,9 +13,11 @@ use App\Exception\GitRepositoryException;
 use App\Exception\MessageHandler\SuiteSerializationException;
 use App\Exception\NoSourceRepositoryCreatorException;
 use App\Exception\SourceRepositoryCreationException;
+use App\Exception\SourceRepositoryReaderNotFoundException;
 use App\Exception\UnableToWriteSerializedSuiteException;
 use App\Message\SerializeSuite;
 use App\MessageFailureHandler\WorkerMessageFailedEventHandler;
+use App\Model\SourceRepositoryInterface;
 use App\Repository\SerializedSuiteRepository;
 use App\Repository\SourceRepository;
 use App\Repository\SuiteRepository;
@@ -242,6 +244,24 @@ class WorkerMessageFailedEventHandlerTest extends WebTestCase
                 },
                 'expectedFailureReason' => 'target/write',
                 'expectedFailureMessage' => '/path/that/cannot/be/written/to',
+            ],
+            'unable to read from target' => [
+                'handlerFailedExceptionNestedExceptionsCreator' => function (SerializedSuite $serializedSuite) {
+                    $unreadableSourceRepository = \Mockery::mock(SourceRepositoryInterface::class);
+                    $unreadableSourceRepository
+                        ->shouldReceive('getRepositoryPath')
+                        ->andReturn('/path/that/cannot/be/read/from')
+                    ;
+
+                    return [
+                        new SuiteSerializationException(
+                            $serializedSuite,
+                            new SourceRepositoryReaderNotFoundException($unreadableSourceRepository)
+                        ),
+                    ];
+                },
+                'expectedFailureReason' => 'source-repository/read',
+                'expectedFailureMessage' => '/path/that/cannot/be/read/from',
             ],
         ];
     }

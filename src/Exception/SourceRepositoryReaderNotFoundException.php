@@ -9,13 +9,8 @@ use App\Model\SourceRepositoryInterface;
 class SourceRepositoryReaderNotFoundException extends \Exception
 {
     public function __construct(
-        private SourceRepositoryInterface $source
+        public readonly SourceRepositoryInterface $source
     ) {
         parent::__construct();
-    }
-
-    public function getSourceRepository(): SourceRepositoryInterface
-    {
-        return $this->source;
     }
 }
