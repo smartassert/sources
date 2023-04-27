@@ -16,10 +16,10 @@ class NoSourceRepositoryCreatorExceptionHandler implements SuiteSerializationExc
     ) {
     }
 
-    public function handle(SerializedSuite $serializedSuite, \Throwable $exception): void
+    public function handle(SerializedSuite $serializedSuite, \Throwable $exception): bool
     {
         if (!$exception instanceof NoSourceRepositoryCreatorException) {
-            return;
+            return false;
         }
 
         $serializedSuite->setPreparationFailed(
@@ -27,5 +27,7 @@ class NoSourceRepositoryCreatorExceptionHandler implements SuiteSerializationExc
             $exception->source->getType()->value
         );
         $this->serializedSuiteRepository->save($serializedSuite);
+
+        return true;
     }
 }

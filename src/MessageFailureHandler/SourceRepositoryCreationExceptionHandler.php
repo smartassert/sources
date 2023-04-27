@@ -17,15 +17,15 @@ class SourceRepositoryCreationExceptionHandler implements SuiteSerializationExce
     ) {
     }
 
-    public function handle(SerializedSuite $serializedSuite, \Throwable $exception): void
+    public function handle(SerializedSuite $serializedSuite, \Throwable $exception): bool
     {
         if (!$exception instanceof SourceRepositoryCreationException) {
-            return;
+            return false;
         }
 
         $sourceHandlerException = $exception->getPrevious();
         if (!$sourceHandlerException instanceof GitRepositoryException) {
-            return;
+            return false;
         }
 
         if (GitRepositoryException::CODE_GIT_CLONE_FAILED === $sourceHandlerException->getCode()) {
@@ -34,6 +34,8 @@ class SourceRepositoryCreationExceptionHandler implements SuiteSerializationExce
                 $sourceHandlerException->getMessage()
             );
             $this->serializedSuiteRepository->save($serializedSuite);
+
+            return true;
         }
 
         if (GitRepositoryException::CODE_GIT_CHECKOUT_FAILED === $sourceHandlerException->getCode()) {
@@ -42,6 +44,10 @@ class SourceRepositoryCreationExceptionHandler implements SuiteSerializationExce
                 $sourceHandlerException->getMessage()
             );
             $this->serializedSuiteRepository->save($serializedSuite);
+
+            return true;
         }
+
+        return false;
     }
 }

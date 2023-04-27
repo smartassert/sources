@@ -16,13 +16,15 @@ class UnableToWriteSerializedSuiteExceptionHandler implements SuiteSerialization
     ) {
     }
 
-    public function handle(SerializedSuite $serializedSuite, \Throwable $exception): void
+    public function handle(SerializedSuite $serializedSuite, \Throwable $exception): bool
     {
         if (!$exception instanceof UnableToWriteSerializedSuiteException) {
-            return;
+            return false;
         }
 
         $serializedSuite->setPreparationFailed(FailureReason::UNABLE_TO_WRITE_TO_TARGET, $exception->path);
         $this->serializedSuiteRepository->save($serializedSuite);
+
+        return true;
     }
 }

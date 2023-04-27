@@ -109,7 +109,7 @@ class WorkerMessageFailedEventHandlerTest extends WebTestCase
         $returnState = $this->handleEvent($serializedSuite, $handlerFailedExceptionNestedExceptionsCreator);
 
         self::assertSame(WorkerMessageFailedEventHandler::STATE_SUCCESS, $returnState);
-        self::assertSame(State::REQUESTED, $serializedSuite->getState());
+        self::assertSame(State::REQUESTED->value, $serializedSuite->getState()->value);
     }
 
     /**
@@ -121,13 +121,6 @@ class WorkerMessageFailedEventHandlerTest extends WebTestCase
             'no relevant nested exceptions' => [
                 'handlerFailedExceptionNestedExceptionsCreator' => function () {
                     return [new \Exception()];
-                },
-            ],
-            'no relevant suite serialization exception' => [
-                'handlerFailedExceptionNestedExceptionsCreator' => function (SerializedSuite $serializedSuite) {
-                    return [
-                        new SuiteSerializationException($serializedSuite, new \Exception()),
-                    ];
                 },
             ],
         ];
@@ -262,6 +255,24 @@ class WorkerMessageFailedEventHandlerTest extends WebTestCase
                 },
                 'expectedFailureReason' => 'source-repository/read',
                 'expectedFailureMessage' => '/path/that/cannot/be/read/from',
+            ],
+            'unknown' => [
+                'handlerFailedExceptionNestedExceptionsCreator' => function (SerializedSuite $serializedSuite) {
+                    $unreadableSourceRepository = \Mockery::mock(SourceRepositoryInterface::class);
+                    $unreadableSourceRepository
+                        ->shouldReceive('getRepositoryPath')
+                        ->andReturn('/path/that/cannot/be/read/from')
+                    ;
+
+                    return [
+                        new SuiteSerializationException(
+                            $serializedSuite,
+                            new \RuntimeException('An unexpected error occurred')
+                        ),
+                    ];
+                },
+                'expectedFailureReason' => 'unknown',
+                'expectedFailureMessage' => 'An unexpected error occurred',
             ],
         ];
     }
