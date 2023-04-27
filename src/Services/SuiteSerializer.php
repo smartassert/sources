@@ -9,6 +9,7 @@ use App\Exception\NoSourceRepositoryCreatorException;
 use App\Exception\SerializedSuiteSourceDoesNotExistException;
 use App\Exception\SourceRepositoryCreationException;
 use App\Exception\SourceRepositoryReaderNotFoundException;
+use App\Exception\UnableToWriteSerializedSuiteException;
 use App\Services\SourceRepository\Factory\Factory;
 use App\Services\SourceRepository\Reader\Provider;
 use App\Services\YamlFileCollection\Provider as YamlFileCollectionProvider;
@@ -37,11 +38,11 @@ class SuiteSerializer
     }
 
     /**
-     * @throws FilesystemException
      * @throws SourceRepositoryCreationException
      * @throws SourceRepositoryReaderNotFoundException
      * @throws SerializeException
      * @throws NoSourceRepositoryCreatorException
+     * @throws UnableToWriteSerializedSuiteException
      */
     public function write(SerializedSuite $serializedSuite): ?string
     {
@@ -61,7 +62,11 @@ class SuiteSerializer
 
         $content = $this->jobSourceSerializer->serialize(new JobSource(new Manifest($suite->getTests()), $provider));
 
-        $this->serializedSuiteWriter->write($targetPath, $content);
+        try {
+            $this->serializedSuiteWriter->write($targetPath, $content);
+        } catch (\Throwable $e) {
+            throw new UnableToWriteSerializedSuiteException($targetPath, $content, $e);
+        }
 
         try {
             $this->sourceRepositoryFactory->remove($sourceRepository);

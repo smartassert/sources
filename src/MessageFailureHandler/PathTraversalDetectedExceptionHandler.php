@@ -1,0 +1,38 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\MessageFailureHandler;
+
+use App\Entity\GitSource;
+use App\Entity\SerializedSuite;
+use App\Enum\SerializedSuite\FailureReason;
+use App\Repository\SerializedSuiteRepository;
+use League\Flysystem\PathTraversalDetected;
+
+class PathTraversalDetectedExceptionHandler implements SuiteSerializationExceptionHandlerInterface
+{
+    public function __construct(
+        private readonly SerializedSuiteRepository $serializedSuiteRepository,
+    ) {
+    }
+
+    public function handle(SerializedSuite $serializedSuite, \Throwable $exception): bool
+    {
+        if (!$exception instanceof PathTraversalDetected) {
+            return false;
+        }
+
+        $suite = $serializedSuite->suite;
+        $source = $suite->getSource();
+
+        if (!$source instanceof GitSource) {
+            return false;
+        }
+
+        $serializedSuite->setPreparationFailed(FailureReason::GIT_REPOSITORY_OUT_OF_SCOPE, $source->getPath());
+        $this->serializedSuiteRepository->save($serializedSuite);
+
+        return true;
+    }
+}

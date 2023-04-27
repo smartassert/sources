@@ -118,3 +118,27 @@ services:
     SmartAssert\WorkerJobSource\Factory\YamlFileFactory: ~
 
     SmartAssert\WorkerJobSource\JobSourceSerializer: ~
+
+    App\MessageFailureHandler\ProvisionExceptionHandler:
+        arguments:
+            $exceptionHandlers:
+                - '@App\MessageFailureHandler\PathTraversalDetectedExceptionHandler'
+
+    App\MessageFailureHandler\SerializeExceptionHandler:
+        arguments:
+            $exceptionHandlers:
+                - '@App\MessageFailureHandler\ProvisionExceptionHandler'
+
+    App\MessageFailureHandler\SuiteSerializationExceptionHandler:
+        arguments:
+            $exceptionHandlers:
+                - '@App\MessageFailureHandler\SourceRepositoryCreationExceptionHandler'
+                - '@App\MessageFailureHandler\SerializeExceptionHandler'
+                - '@App\MessageFailureHandler\NoSourceRepositoryCreatorExceptionHandler'
+                - '@App\MessageFailureHandler\UnableToWriteSerializedSuiteExceptionHandler'
+                - '@App\MessageFailureHandler\SourceRepositoryReaderNotFoundExceptionHandler'
+
+    App\MessageFailureHandler\WorkerMessageFailedEventHandler:
+        arguments:
+            $exceptionCollectionHandlers:
+                - '@App\MessageFailureHandler\SuiteSerializationExceptionHandler'
