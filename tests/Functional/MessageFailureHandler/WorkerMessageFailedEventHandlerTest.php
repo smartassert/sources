@@ -11,6 +11,7 @@ use App\Enum\SerializedSuite\State;
 use App\Exception\GitActionException;
 use App\Exception\GitRepositoryException;
 use App\Exception\MessageHandler\SuiteSerializationException;
+use App\Exception\NoSourceRepositoryCreatorException;
 use App\Exception\SourceRepositoryCreationException;
 use App\Message\SerializeSuite;
 use App\MessageFailureHandler\WorkerMessageFailedEventHandler;
@@ -211,6 +212,18 @@ class WorkerMessageFailedEventHandlerTest extends WebTestCase
                 },
                 'expectedFailureReason' => 'local-git-repository/out-of-scope',
                 'expectedFailureMessage' => '/out-of-scope/../../../',
+            ],
+            'unserializable source type' => [
+                'handlerFailedExceptionNestedExceptionsCreator' => function (SerializedSuite $serializedSuite) {
+                    return [
+                        new SuiteSerializationException(
+                            $serializedSuite,
+                            new NoSourceRepositoryCreatorException($serializedSuite->suite->getSource())
+                        ),
+                    ];
+                },
+                'expectedFailureReason' => 'source/unserializable-type',
+                'expectedFailureMessage' => 'git',
             ],
         ];
     }

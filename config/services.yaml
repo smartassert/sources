@@ -124,7 +124,6 @@ services:
             $exceptionHandlers:
                 - '@App\MessageFailureHandler\PathTraversalDetectedExceptionHandler'
 
-
     App\MessageFailureHandler\SerializeExceptionHandler:
         arguments:
             $exceptionHandlers:
@@ -135,6 +134,7 @@ services:
             $exceptionHandlers:
                 - '@App\MessageFailureHandler\SourceRepositoryCreationExceptionHandler'
                 - '@App\MessageFailureHandler\SerializeExceptionHandler'
+                - '@App\MessageFailureHandler\NoSourceRepositoryCreatorExceptionHandler'
 
     App\MessageFailureHandler\WorkerMessageFailedEventHandler:
         arguments:
