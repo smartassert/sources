@@ -136,6 +136,7 @@ services:
                 - '@App\MessageFailureHandler\SerializeExceptionHandler'
                 - '@App\MessageFailureHandler\NoSourceRepositoryCreatorExceptionHandler'
                 - '@App\MessageFailureHandler\UnableToWriteSerializedSuiteExceptionHandler'
+                - '@App\MessageFailureHandler\SourceRepositoryReaderNotFoundExceptionHandler'
 
     App\MessageFailureHandler\WorkerMessageFailedEventHandler:
         arguments:

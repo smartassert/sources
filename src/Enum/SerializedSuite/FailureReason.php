@@ -16,4 +16,5 @@ enum FailureReason: string
     case GIT_CHECKOUT = 'git/checkout';
     case UNSERIALIZABLE_SOURCE_TYPE = 'source/unserializable-type';
     case UNABLE_TO_WRITE_TO_TARGET = 'target/write';
+    case UNABLE_TO_READ_FROM_SOURCE_REPOSITORY = 'source-repository/read';
 }
