@@ -37,7 +37,7 @@ class Provider implements ProviderInterface
         try {
             $sourceRepositoryDirectoryListing = $this->reader->listContents($this->path, true);
         } catch (FilesystemException $e) {
-            throw new ProvisionException(sprintf('Listing contents failed for "%s"', $this->path), 0, $e);
+            throw new ProvisionException($e, sprintf('Listing contents failed for "%s"', $this->path));
         }
 
         $files = $this->listingFilter->filter($sourceRepositoryDirectoryListing, $this->path, ['yaml', 'yml']);
@@ -48,16 +48,15 @@ class Provider implements ProviderInterface
             try {
                 $content = rtrim($this->reader->read($readPath));
             } catch (FilesystemException $e) {
-                throw new ProvisionException(sprintf('File read failed for "%s"', $readPath), 0, $e);
+                throw new ProvisionException($e, sprintf('File read failed for "%s"', $readPath));
             }
 
             try {
                 $this->yamlParser->parse($content);
             } catch (ParseException $parseException) {
                 throw new ProvisionException(
+                    new UnparseableSourceFileException($file, $parseException),
                     sprintf('Unable to parse content for "%s"', $readPath),
-                    0,
-                    new UnparseableSourceFileException($file, $parseException)
                 );
             }
 
