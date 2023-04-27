@@ -7,16 +7,18 @@ namespace App\Tests\Functional\Services\SourceRepository\Factory;
 use App\Entity\FileSource;
 use App\Entity\GitSource;
 use App\Entity\SourceInterface;
+use App\Enum\Source\Type;
+use App\Exception\NoSourceRepositoryCreatorException;
 use App\Model\SourceRepositoryInterface;
 use App\Model\UserGitRepository;
 use App\Services\EntityIdFactory;
 use App\Services\SourceRepository\Factory\Factory;
+use App\Services\SourceRepository\Factory\FileSourceHandler;
 use App\Services\SourceRepository\Factory\GitSourceHandler;
 use App\Tests\Services\FileStoreFixtureCreator;
 use App\Tests\Services\SourceOriginFactory;
 use League\Flysystem\FilesystemOperator;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-use webignition\ObjectReflector\ObjectReflector;
 
 class FactoryTest extends WebTestCase
 {
@@ -31,69 +33,41 @@ class FactoryTest extends WebTestCase
         $this->factory = $factory;
     }
 
-    /**
-     * @dataProvider createsForDataProvider
-     */
-    public function testCreatesFor(SourceInterface $source, bool $expected): void
+    public function testHasFileSourceAndGitSourceHandlers(): void
     {
-        self::assertSame($expected, $this->factory->createsFor($source));
-    }
+        $foo = new \ReflectionClass(Factory::class);
+        $bar = $foo->getProperty('handlers');
 
-    /**
-     * @return array<mixed>
-     */
-    public function createsForDataProvider(): array
-    {
-        return [
-            FileSource::class => [
-                'source' => \Mockery::mock(FileSource::class),
-                'expected' => true,
-            ],
-            GitSource::class => [
-                'source' => \Mockery::mock(GitSource::class),
-                'expected' => true,
-            ],
-            SourceInterface::class => [
-                'source' => \Mockery::mock(SourceInterface::class),
-                'expected' => false,
-            ],
-        ];
-    }
+        $handlers = $bar->getValue($this->factory);
+        self::assertIsArray($handlers);
 
-    /**
-     * @dataProvider removesDataProvider
-     */
-    public function testRemoves(SourceRepositoryInterface $source, bool $expected): void
-    {
-        self::assertSame($expected, $this->factory->removes($source));
-    }
-
-    /**
-     * @return array<mixed>
-     */
-    public function removesDataProvider(): array
-    {
-        return [
-            FileSource::class => [
-                'source' => \Mockery::mock(FileSource::class),
-                'expected' => false,
-            ],
-            UserGitRepository::class => [
-                'source' => \Mockery::mock(UserGitRepository::class),
-                'expected' => true,
-            ],
-            SourceRepositoryInterface::class => [
-                'source' => \Mockery::mock(SourceRepositoryInterface::class),
-                'expected' => false,
-            ],
-        ];
+        self::assertInstanceOf(FileSourceHandler::class, $handlers[0]);
+        self::assertInstanceOf(GitSourceHandler::class, $handlers[1]);
     }
 
     public function testCreateForUnknownSource(): void
     {
-        self::assertNull(
-            $this->factory->create(\Mockery::mock(SourceInterface::class), [])
-        );
+        $sourceId = md5((string) rand());
+        $sourceType = Type::FILE;
+
+        $source = \Mockery::mock(SourceInterface::class);
+        $source
+            ->shouldReceive('getId')
+            ->andReturn($sourceId)
+        ;
+        $source
+            ->shouldReceive('getType')
+            ->andReturn($sourceType)
+        ;
+
+        self::expectException(NoSourceRepositoryCreatorException::class);
+        self::expectExceptionMessage(sprintf(
+            'No source repository creator is available for source "%s" of type "%s"',
+            $sourceId,
+            $sourceType->value,
+        ));
+
+        $this->factory->create($source, []);
     }
 
     public function testCreateForFileSource(): void
@@ -121,23 +95,9 @@ class FactoryTest extends WebTestCase
             ->andReturn($userGitRepository)
         ;
 
-        $factoryHandlers = ObjectReflector::getProperty(
-            $this->factory,
-            'handlers'
-        );
-        \assert(is_array($factoryHandlers));
-        \assert($factoryHandlers[1] instanceof GitSourceHandler);
+        $factory = new Factory([$gitSourceHandler]);
 
-        $factoryHandlers[1] = $gitSourceHandler;
-
-        ObjectReflector::setProperty(
-            $this->factory,
-            $this->factory::class,
-            'handlers',
-            $factoryHandlers
-        );
-
-        self::assertSame($userGitRepository, $this->factory->create($gitSource, $parameters));
+        self::assertSame($userGitRepository, $factory->create($gitSource, $parameters));
     }
 
     public function testRemoveForUnknownSource(): void

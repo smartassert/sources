@@ -5,40 +5,40 @@ declare(strict_types=1);
 namespace App\Services\SourceRepository\Factory;
 
 use App\Entity\SourceInterface;
+use App\Exception\NoSourceRepositoryCreatorException;
 use App\Exception\SourceRepositoryCreationException;
 use App\Model\SourceRepositoryInterface;
 use League\Flysystem\FilesystemException;
 
-class Factory implements CreatorInterface, DestructorInterface
+class Factory
 {
     /**
      * @param object[] $handlers
      */
     public function __construct(
-        private array $handlers,
+        private readonly array $handlers,
     ) {
     }
 
-    public function createsFor(SourceInterface $source): bool
-    {
-        return $this->findCreator($source) instanceof CreatorInterface;
-    }
-
     /**
+     * @param array<string, string> $parameters
+     *
      * @throws SourceRepositoryCreationException
+     * @throws NoSourceRepositoryCreatorException
      */
-    public function create(SourceInterface $source, array $parameters): ?SourceRepositoryInterface
+    public function create(SourceInterface $source, array $parameters): SourceRepositoryInterface
     {
-        $creator = $this->findCreator($source);
+        foreach ($this->handlers as $handler) {
+            if ($handler instanceof CreatorInterface && $handler->createsFor($source)) {
+                $sourceRepository = $handler->create($source, $parameters);
 
-        return $creator instanceof CreatorInterface
-            ? $creator->create($source, $parameters)
-            : null;
-    }
+                if ($sourceRepository instanceof SourceRepositoryInterface) {
+                    return $sourceRepository;
+                }
+            }
+        }
 
-    public function removes(SourceRepositoryInterface $sourceRepository): bool
-    {
-        return $this->findDestructor($sourceRepository) instanceof DestructorInterface;
+        throw new NoSourceRepositoryCreatorException($source);
     }
 
     /**
@@ -46,38 +46,10 @@ class Factory implements CreatorInterface, DestructorInterface
      */
     public function remove(SourceRepositoryInterface $sourceRepository): void
     {
-        $destructor = $this->findDestructor($sourceRepository);
-
-        if ($destructor instanceof DestructorInterface) {
-            $destructor->remove($sourceRepository);
-        }
-    }
-
-    private function findCreator(SourceInterface $source): ?CreatorInterface
-    {
         foreach ($this->handlers as $handler) {
-            if (
-                $handler instanceof CreatorInterface
-                && $handler->createsFor($source)
-            ) {
-                return $handler;
+            if ($handler instanceof DestructorInterface && $handler->removes($sourceRepository)) {
+                $handler->remove($sourceRepository);
             }
         }
-
-        return null;
-    }
-
-    private function findDestructor(SourceRepositoryInterface $sourceRepository): ?DestructorInterface
-    {
-        foreach ($this->handlers as $handler) {
-            if (
-                $handler instanceof DestructorInterface
-                && $handler->removes($sourceRepository)
-            ) {
-                return $handler;
-            }
-        }
-
-        return null;
     }
 }
