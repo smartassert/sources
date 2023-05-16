@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\MessageFailureHandler;
 
-use App\Message\SerializeSuite;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Messenger\Event\WorkerMessageFailedEvent;
 use Symfony\Component\Messenger\Exception\HandlerFailedException;
@@ -12,9 +11,8 @@ use Symfony\Component\Messenger\Exception\HandlerFailedException;
 class WorkerMessageFailedEventHandler implements EventSubscriberInterface
 {
     public const STATE_SUCCESS = 0;
-    public const STATE_INCORRECT_MESSAGE_TYPE = 1;
-    public const STATE_EVENT_WILL_RETRY = 2;
-    public const STATE_EVENT_EXCEPTION_INCORRECT_TYPE = 3;
+    public const STATE_EVENT_WILL_RETRY = 1;
+    public const STATE_EVENT_EXCEPTION_INCORRECT_TYPE = 2;
 
     /**
      * @var ExceptionCollectionHandlerInterface[]
@@ -52,7 +50,6 @@ class WorkerMessageFailedEventHandler implements EventSubscriberInterface
 
     public function handle(WorkerMessageFailedEvent $event): int
     {
-        $message = $event->getEnvelope()->getMessage();
         if ($event->willRetry()) {
             return self::STATE_EVENT_WILL_RETRY;
         }
@@ -60,10 +57,6 @@ class WorkerMessageFailedEventHandler implements EventSubscriberInterface
         $handlerFailedException = $event->getThrowable();
         if (!$handlerFailedException instanceof HandlerFailedException) {
             return self::STATE_EVENT_EXCEPTION_INCORRECT_TYPE;
-        }
-
-        if (!$message instanceof SerializeSuite) {
-            return self::STATE_INCORRECT_MESSAGE_TYPE;
         }
 
         foreach ($this->handlers as $handler) {

@@ -63,14 +63,6 @@ class WorkerMessageFailedEventHandlerTest extends WebTestCase
     public function handleDoesNotHandleDataProvider(): array
     {
         return [
-            'incorrect message type' => [
-                'event' => new WorkerMessageFailedEvent(
-                    new Envelope(new \stdClass()),
-                    'async',
-                    \Mockery::mock(HandlerFailedException::class),
-                ),
-                'expectedReturnState' => WorkerMessageFailedEventHandler::STATE_INCORRECT_MESSAGE_TYPE,
-            ],
             'event will retry' => [
                 'event' => (function () {
                     $event = new WorkerMessageFailedEvent(
