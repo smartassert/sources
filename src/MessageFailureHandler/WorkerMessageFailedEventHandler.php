@@ -4,11 +4,10 @@ declare(strict_types=1);
 
 namespace App\MessageFailureHandler;
 
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Messenger\Event\WorkerMessageFailedEvent;
 use Symfony\Component\Messenger\Exception\HandlerFailedException;
 
-class WorkerMessageFailedEventHandler implements EventSubscriberInterface
+class WorkerMessageFailedEventHandler
 {
     public const STATE_SUCCESS = 0;
     public const STATE_EVENT_WILL_RETRY = 1;
@@ -36,19 +35,7 @@ class WorkerMessageFailedEventHandler implements EventSubscriberInterface
         $this->handlers = $handlers;
     }
 
-    /**
-     * @return array<string, array<int, array<int, int|string>>>
-     */
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            WorkerMessageFailedEvent::class => [
-                ['handle', 0],
-            ],
-        ];
-    }
-
-    public function handle(WorkerMessageFailedEvent $event): int
+    public function __invoke(WorkerMessageFailedEvent $event): int
     {
         if ($event->willRetry()) {
             return self::STATE_EVENT_WILL_RETRY;

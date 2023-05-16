@@ -139,6 +139,8 @@ services:
                 - '@App\MessageFailureHandler\SourceRepositoryReaderNotFoundExceptionHandler'
 
     App\MessageFailureHandler\WorkerMessageFailedEventHandler:
+        tags:
+            - { name: kernel.event_listener, event: Symfony\Component\Messenger\Event\WorkerMessageFailedEvent }
         arguments:
             $exceptionCollectionHandlers:
                 - '@App\MessageFailureHandler\SuiteSerializationExceptionHandler'

@@ -54,7 +54,7 @@ class WorkerMessageFailedEventHandlerTest extends WebTestCase
      */
     public function testHandleDoesNotHandle(WorkerMessageFailedEvent $event, int $expectedReturnState): void
     {
-        self::assertSame($expectedReturnState, $this->handler->handle($event));
+        self::assertSame($expectedReturnState, ($this->handler)($event));
     }
 
     /**
@@ -317,6 +317,6 @@ class WorkerMessageFailedEventHandlerTest extends WebTestCase
             $handlerFailedException
         );
 
-        return $this->handler->handle($event);
+        return ($this->handler)($event);
     }
 }
