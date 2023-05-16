@@ -27,6 +27,10 @@ services:
             $serializedSuiteReader: '@serialized_suite.storage'
             $serializedSuiteWriter: '@serialized_suite.storage'
 
+    _instanceof:
+        App\MessageFailureHandler\ExceptionCollectionHandlerInterface:
+            tags: ['app.message_failure_handler.exception_collection_handler']
+
     # makes classes in src/ available to be used as services
     # this creates a service per class whose id is the fully-qualified class name
     App\:
@@ -142,5 +146,4 @@ services:
         tags:
             - { name: kernel.event_listener, event: Symfony\Component\Messenger\Event\WorkerMessageFailedEvent }
         arguments:
-            $exceptionCollectionHandlers:
-                - '@App\MessageFailureHandler\SuiteSerializationExceptionHandler'
+            $handlers: !tagged_iterator app.message_failure_handler.exception_collection_handler

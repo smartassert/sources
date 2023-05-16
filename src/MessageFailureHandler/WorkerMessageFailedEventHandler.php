@@ -14,25 +14,11 @@ class WorkerMessageFailedEventHandler
     public const STATE_EVENT_EXCEPTION_INCORRECT_TYPE = 2;
 
     /**
-     * @var ExceptionCollectionHandlerInterface[]
-     */
-    private readonly array $handlers;
-
-    /**
-     * @param array<mixed> $exceptionCollectionHandlers
+     * @param iterable<ExceptionCollectionHandlerInterface> $handlers
      */
     public function __construct(
-        array $exceptionCollectionHandlers,
+        private readonly iterable $handlers,
     ) {
-        $handlers = [];
-
-        foreach ($exceptionCollectionHandlers as $exceptionCollectionHandler) {
-            if ($exceptionCollectionHandler instanceof ExceptionCollectionHandlerInterface) {
-                $handlers[] = $exceptionCollectionHandler;
-            }
-        }
-
-        $this->handlers = $handlers;
     }
 
     public function __invoke(WorkerMessageFailedEvent $event): int
