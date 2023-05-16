@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\MessageFailureHandler;
 
-use App\Exception\MessageHandler\SuiteSerializationException;
+use App\Exception\MessageHandler\SerializeSuiteException;
 
-class SuiteSerializationExceptionHandler implements ExceptionCollectionHandlerInterface
+class SerializeSuiteExceptionHandler implements ExceptionCollectionHandlerInterface
 {
     /**
      * @var SuiteSerializationExceptionHandlerInterface[]
@@ -34,7 +34,7 @@ class SuiteSerializationExceptionHandler implements ExceptionCollectionHandlerIn
     public function handle(array $exceptions): bool
     {
         $exception = $exceptions[0] ?? null;
-        if (!$exception instanceof SuiteSerializationException) {
+        if (!$exception instanceof SerializeSuiteException) {
             return false;
         }
 

@@ -133,7 +133,7 @@ services:
             $exceptionHandlers:
                 - '@App\MessageFailureHandler\ProvisionExceptionHandler'
 
-    App\MessageFailureHandler\SuiteSerializationExceptionHandler:
+    App\MessageFailureHandler\SerializeSuiteExceptionHandler:
         arguments:
             $exceptionHandlers:
                 - '@App\MessageFailureHandler\SourceRepositoryCreationExceptionHandler'

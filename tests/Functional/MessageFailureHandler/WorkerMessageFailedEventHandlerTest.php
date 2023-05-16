@@ -10,7 +10,7 @@ use App\Entity\Suite;
 use App\Enum\SerializedSuite\State;
 use App\Exception\GitActionException;
 use App\Exception\GitRepositoryException;
-use App\Exception\MessageHandler\SuiteSerializationException;
+use App\Exception\MessageHandler\SerializeSuiteException;
 use App\Exception\NoSourceRepositoryCreatorException;
 use App\Exception\SourceRepositoryCreationException;
 use App\Exception\SourceRepositoryReaderNotFoundException;
@@ -151,7 +151,7 @@ class WorkerMessageFailedEventHandlerTest extends WebTestCase
             'git clone failure' => [
                 'handlerFailedExceptionNestedExceptionsCreator' => function (SerializedSuite $serializedSuite) {
                     return [
-                        new SuiteSerializationException(
+                        new SerializeSuiteException(
                             $serializedSuite,
                             new SourceRepositoryCreationException(
                                 new GitRepositoryException(
@@ -170,7 +170,7 @@ class WorkerMessageFailedEventHandlerTest extends WebTestCase
             'git checkout failure' => [
                 'handlerFailedExceptionNestedExceptionsCreator' => function (SerializedSuite $serializedSuite) {
                     return [
-                        new SuiteSerializationException(
+                        new SerializeSuiteException(
                             $serializedSuite,
                             new SourceRepositoryCreationException(
                                 new GitRepositoryException(
@@ -189,7 +189,7 @@ class WorkerMessageFailedEventHandlerTest extends WebTestCase
             'local git repository out of scope' => [
                 'handlerFailedExceptionNestedExceptionsCreator' => function (SerializedSuite $serializedSuite) {
                     return [
-                        new SuiteSerializationException(
+                        new SerializeSuiteException(
                             $serializedSuite,
                             new SerializeException(
                                 new ProvisionException(
@@ -205,7 +205,7 @@ class WorkerMessageFailedEventHandlerTest extends WebTestCase
             'unserializable source type' => [
                 'handlerFailedExceptionNestedExceptionsCreator' => function (SerializedSuite $serializedSuite) {
                     return [
-                        new SuiteSerializationException(
+                        new SerializeSuiteException(
                             $serializedSuite,
                             new NoSourceRepositoryCreatorException($serializedSuite->suite->getSource())
                         ),
@@ -217,7 +217,7 @@ class WorkerMessageFailedEventHandlerTest extends WebTestCase
             'unable to write to target' => [
                 'handlerFailedExceptionNestedExceptionsCreator' => function (SerializedSuite $serializedSuite) {
                     return [
-                        new SuiteSerializationException(
+                        new SerializeSuiteException(
                             $serializedSuite,
                             new UnableToWriteSerializedSuiteException(
                                 '/path/that/cannot/be/written/to',
@@ -239,7 +239,7 @@ class WorkerMessageFailedEventHandlerTest extends WebTestCase
                     ;
 
                     return [
-                        new SuiteSerializationException(
+                        new SerializeSuiteException(
                             $serializedSuite,
                             new SourceRepositoryReaderNotFoundException($unreadableSourceRepository)
                         ),
@@ -257,7 +257,7 @@ class WorkerMessageFailedEventHandlerTest extends WebTestCase
                     ;
 
                     return [
-                        new SuiteSerializationException(
+                        new SerializeSuiteException(
                             $serializedSuite,
                             new \RuntimeException('An unexpected error occurred')
                         ),
