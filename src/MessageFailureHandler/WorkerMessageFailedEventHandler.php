@@ -53,12 +53,12 @@ class WorkerMessageFailedEventHandler implements EventSubscriberInterface
     public function handle(WorkerMessageFailedEvent $event): int
     {
         $message = $event->getEnvelope()->getMessage();
-        if (!$message instanceof SerializeSuite) {
-            return self::STATE_INCORRECT_MESSAGE_TYPE;
-        }
-
         if ($event->willRetry()) {
             return self::STATE_EVENT_WILL_RETRY;
+        }
+
+        if (!$message instanceof SerializeSuite) {
+            return self::STATE_INCORRECT_MESSAGE_TYPE;
         }
 
         $handlerFailedException = $event->getThrowable();
