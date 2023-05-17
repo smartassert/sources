@@ -80,13 +80,13 @@ class SerializedSuite implements UserHeldEntityInterface, DirectoryLocatorInterf
         return $this->suite->getUserId();
     }
 
-    public function setPreparationFailed(
-        FailureReason $failureReason,
-        string $failureMessage
-    ): self {
-        $this->state = State::FAILED;
-        $this->failureReason = $failureReason;
-        $this->failureMessage = $failureMessage;
+    public function setPreparationFailed(FailureReason $failureReason, string $failureMessage): self
+    {
+        if (State::FAILED !== $this->state) {
+            $this->state = State::FAILED;
+            $this->failureReason = $failureReason;
+            $this->failureMessage = $failureMessage;
+        }
 
         return $this;
     }
