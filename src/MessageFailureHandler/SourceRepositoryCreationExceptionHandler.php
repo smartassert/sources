@@ -12,20 +12,22 @@ use App\Repository\SerializedSuiteRepository;
 
 class SourceRepositoryCreationExceptionHandler implements SerializeSuiteSubExceptionHandlerInterface
 {
+    use HighPriorityTrait;
+
     public function __construct(
         private readonly SerializedSuiteRepository $serializedSuiteRepository,
     ) {
     }
 
-    public function handle(SerializedSuite $serializedSuite, \Throwable $exception): bool
+    public function handle(SerializedSuite $serializedSuite, \Throwable $exception): void
     {
         if (!$exception instanceof SourceRepositoryCreationException) {
-            return false;
+            return;
         }
 
         $sourceHandlerException = $exception->getPrevious();
         if (!$sourceHandlerException instanceof GitRepositoryException) {
-            return false;
+            return;
         }
 
         if (GitRepositoryException::CODE_GIT_CLONE_FAILED === $sourceHandlerException->getCode()) {
@@ -34,8 +36,6 @@ class SourceRepositoryCreationExceptionHandler implements SerializeSuiteSubExcep
                 $sourceHandlerException->getMessage()
             );
             $this->serializedSuiteRepository->save($serializedSuite);
-
-            return true;
         }
 
         if (GitRepositoryException::CODE_GIT_CHECKOUT_FAILED === $sourceHandlerException->getCode()) {
@@ -44,10 +44,6 @@ class SourceRepositoryCreationExceptionHandler implements SerializeSuiteSubExcep
                 $sourceHandlerException->getMessage()
             );
             $this->serializedSuiteRepository->save($serializedSuite);
-
-            return true;
         }
-
-        return false;
     }
 }

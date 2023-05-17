@@ -17,22 +17,20 @@ class PathTraversalDetectedExceptionHandler implements SuiteSerializationExcepti
     ) {
     }
 
-    public function handle(SerializedSuite $serializedSuite, \Throwable $exception): bool
+    public function handle(SerializedSuite $serializedSuite, \Throwable $exception): void
     {
         if (!$exception instanceof PathTraversalDetected) {
-            return false;
+            return;
         }
 
         $suite = $serializedSuite->suite;
         $source = $suite->getSource();
 
         if (!$source instanceof GitSource) {
-            return false;
+            return;
         }
 
         $serializedSuite->setPreparationFailed(FailureReason::GIT_REPOSITORY_OUT_OF_SCOPE, $source->getPath());
         $this->serializedSuiteRepository->save($serializedSuite);
-
-        return true;
     }
 }

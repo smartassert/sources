@@ -13,7 +13,6 @@ class SerializeSuiteExceptionHandler implements ExceptionCollectionHandlerInterf
      */
     public function __construct(
         private readonly iterable $handlers,
-        private readonly UnknownExceptionHandler $unknownExceptionHandler,
     ) {
     }
 
@@ -24,17 +23,8 @@ class SerializeSuiteExceptionHandler implements ExceptionCollectionHandlerInterf
             return;
         }
 
-        $result = false;
         foreach ($this->handlers as $handler) {
-            $handlerResult = $handler->handle($exception->serializedSuite, $exception->handlerException);
-
-            if ($handlerResult) {
-                $result = true;
-            }
-        }
-
-        if (false === $result) {
-            $this->unknownExceptionHandler->handle($exception->serializedSuite, $exception->handlerException);
+            $handler->handle($exception->serializedSuite, $exception->handlerException);
         }
     }
 }

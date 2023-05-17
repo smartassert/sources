@@ -8,5 +8,5 @@ use App\Entity\SerializedSuite;
 
 interface SuiteSerializationExceptionHandlerInterface
 {
-    public function handle(SerializedSuite $serializedSuite, \Throwable $exception): bool;
+    public function handle(SerializedSuite $serializedSuite, \Throwable $exception): void;
 }

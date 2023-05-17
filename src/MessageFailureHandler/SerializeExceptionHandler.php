@@ -9,6 +9,8 @@ use SmartAssert\YamlFile\Exception\Collection\SerializeException;
 
 class SerializeExceptionHandler implements SerializeSuiteSubExceptionHandlerInterface
 {
+    use HighPriorityTrait;
+
     /**
      * @var SuiteSerializationExceptionHandlerInterface[]
      */
@@ -31,21 +33,14 @@ class SerializeExceptionHandler implements SerializeSuiteSubExceptionHandlerInte
         $this->handlers = $handlers;
     }
 
-    public function handle(SerializedSuite $serializedSuite, \Throwable $exception): bool
+    public function handle(SerializedSuite $serializedSuite, \Throwable $exception): void
     {
         if (!$exception instanceof SerializeException) {
-            return false;
+            return;
         }
 
-        $result = false;
         foreach ($this->handlers as $handler) {
-            $handlerResult = $handler->handle($serializedSuite, $exception->getPreviousException());
-
-            if ($handlerResult) {
-                $result = true;
-            }
+            $handler->handle($serializedSuite, $exception->getPreviousException());
         }
-
-        return $result;
     }
 }

@@ -31,21 +31,14 @@ class ProvisionExceptionHandler implements SuiteSerializationExceptionHandlerInt
         $this->handlers = $handlers;
     }
 
-    public function handle(SerializedSuite $serializedSuite, \Throwable $exception): bool
+    public function handle(SerializedSuite $serializedSuite, \Throwable $exception): void
     {
         if (!$exception instanceof ProvisionException) {
-            return false;
+            return;
         }
 
-        $result = false;
         foreach ($this->handlers as $handler) {
-            $handlerResult = $handler->handle($serializedSuite, $exception->getPreviousException());
-
-            if ($handlerResult) {
-                $result = true;
-            }
+            $handler->handle($serializedSuite, $exception->getPreviousException());
         }
-
-        return $result;
     }
 }
