@@ -9,26 +9,12 @@ use App\Exception\MessageHandler\SerializeSuiteException;
 class SerializeSuiteExceptionHandler implements ExceptionCollectionHandlerInterface
 {
     /**
-     * @var SuiteSerializationExceptionHandlerInterface[]
-     */
-    private readonly array $handlers;
-
-    /**
-     * @param array<mixed> $exceptionHandlers
+     * @param iterable<SerializeSuiteSubExceptionHandlerInterface> $handlers
      */
     public function __construct(
-        array $exceptionHandlers,
+        private readonly iterable $handlers,
         private readonly UnknownExceptionHandler $unknownExceptionHandler,
     ) {
-        $handlers = [];
-
-        foreach ($exceptionHandlers as $exceptionCollectionHandler) {
-            if ($exceptionCollectionHandler instanceof SuiteSerializationExceptionHandlerInterface) {
-                $handlers[] = $exceptionCollectionHandler;
-            }
-        }
-
-        $this->handlers = $handlers;
     }
 
     public function handle(array $exceptions): bool

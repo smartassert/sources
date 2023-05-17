@@ -9,7 +9,7 @@ use App\Enum\SerializedSuite\FailureReason;
 use App\Exception\UnableToWriteSerializedSuiteException;
 use App\Repository\SerializedSuiteRepository;
 
-class UnableToWriteSerializedSuiteExceptionHandler implements SuiteSerializationExceptionHandlerInterface
+class UnableToWriteSerializedSuiteExceptionHandler implements SerializeSuiteSubExceptionHandlerInterface
 {
     public function __construct(
         private readonly SerializedSuiteRepository $serializedSuiteRepository,

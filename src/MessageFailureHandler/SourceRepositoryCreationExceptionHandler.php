@@ -10,7 +10,7 @@ use App\Exception\GitRepositoryException;
 use App\Exception\SourceRepositoryCreationException;
 use App\Repository\SerializedSuiteRepository;
 
-class SourceRepositoryCreationExceptionHandler implements SuiteSerializationExceptionHandlerInterface
+class SourceRepositoryCreationExceptionHandler implements SerializeSuiteSubExceptionHandlerInterface
 {
     public function __construct(
         private readonly SerializedSuiteRepository $serializedSuiteRepository,

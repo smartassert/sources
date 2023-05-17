@@ -9,7 +9,7 @@ use App\Enum\SerializedSuite\FailureReason;
 use App\Exception\SourceRepositoryReaderNotFoundException;
 use App\Repository\SerializedSuiteRepository;
 
-class SourceRepositoryReaderNotFoundExceptionHandler implements SuiteSerializationExceptionHandlerInterface
+class SourceRepositoryReaderNotFoundExceptionHandler implements SerializeSuiteSubExceptionHandlerInterface
 {
     public function __construct(
         private readonly SerializedSuiteRepository $serializedSuiteRepository,

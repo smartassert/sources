@@ -5,16 +5,10 @@ declare(strict_types=1);
 namespace App\MessageFailureHandler;
 
 use App\Entity\SerializedSuite;
-use App\Repository\SerializedSuiteRepository;
 use SmartAssert\YamlFile\Exception\Collection\SerializeException;
 
-class SerializeExceptionHandler implements SuiteSerializationExceptionHandlerInterface
+class SerializeExceptionHandler implements SerializeSuiteSubExceptionHandlerInterface
 {
-    //    public function __construct(
-    //        private readonly SerializedSuiteRepository $serializedSuiteRepository,
-    //    ) {
-    //    }
-
     /**
      * @var SuiteSerializationExceptionHandlerInterface[]
      */
