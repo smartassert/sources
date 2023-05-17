@@ -28,12 +28,6 @@ services:
             $serializedSuiteWriter: '@serialized_suite.storage'
 
     _instanceof:
-        App\MessageFailureHandler\ExceptionHandlerInterface:
-            tags: ['app.message_failure_handler.exception_handler']
-
-        App\MessageFailureHandler\ExceptionCollectionHandlerInterface:
-            tags: ['app.message_failure_handler.exception_collection_handler']
-
         App\MessageFailureHandler\SuiteSerializationExceptionHandlerInterface:
             tags: ['app.message_failure_handler.serialize_suite_sub_exception_handler']
 
@@ -142,13 +136,3 @@ services:
     App\MessageFailureHandler\SerializeSuiteExceptionHandler:
         arguments:
             $handlers: !tagged_iterator app.message_failure_handler.serialize_suite_sub_exception_handler
-
-    App\MessageFailureHandler\HandlerFailedExceptionHandler:
-        arguments:
-            $handlers: !tagged_iterator app.message_failure_handler.exception_collection_handler
-
-    App\MessageFailureHandler\WorkerMessageFailedEventHandler:
-        tags:
-            - { name: kernel.event_listener, event: Symfony\Component\Messenger\Event\WorkerMessageFailedEvent }
-        arguments:
-            $handlers: !tagged_iterator app.message_failure_handler.exception_handler

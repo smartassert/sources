@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\EventListener;
 
-use App\MessageFailureHandler\WorkerMessageFailedEventHandler;
 use PHPUnit\Framework\TestCase;
+use SmartAssert\WorkerMessageFailedEventBundle\WorkerMessageFailedEventHandler;
 use Symfony\Component\Messenger\Event\WorkerMessageFailedEvent;
 use Symfony\Component\Process\Process;
 
