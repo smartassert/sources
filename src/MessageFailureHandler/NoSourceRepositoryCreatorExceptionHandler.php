@@ -9,7 +9,7 @@ use App\Enum\SerializedSuite\FailureReason;
 use App\Exception\NoSourceRepositoryCreatorException;
 use App\Repository\SerializedSuiteRepository;
 
-class NoSourceRepositoryCreatorExceptionHandler implements SerializeSuiteSubExceptionHandlerInterface
+class NoSourceRepositoryCreatorExceptionHandler implements SuiteSerializationExceptionHandlerInterface
 {
     use HighPriorityTrait;
 

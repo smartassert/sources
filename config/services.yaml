@@ -31,7 +31,7 @@ services:
         App\MessageFailureHandler\ExceptionCollectionHandlerInterface:
             tags: ['app.message_failure_handler.exception_collection_handler']
 
-        App\MessageFailureHandler\SerializeSuiteSubExceptionHandlerInterface:
+        App\MessageFailureHandler\SuiteSerializationExceptionHandlerInterface:
             tags: ['app.message_failure_handler.serialize_suite_sub_exception_handler']
 
     # makes classes in src/ available to be used as services

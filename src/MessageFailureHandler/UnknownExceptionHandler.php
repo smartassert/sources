@@ -8,7 +8,7 @@ use App\Entity\SerializedSuite;
 use App\Enum\SerializedSuite\FailureReason;
 use App\Repository\SerializedSuiteRepository;
 
-class UnknownExceptionHandler implements SerializeSuiteSubExceptionHandlerInterface
+class UnknownExceptionHandler implements SuiteSerializationExceptionHandlerInterface
 {
     public function __construct(
         private readonly SerializedSuiteRepository $serializedSuiteRepository,

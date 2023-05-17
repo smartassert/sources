@@ -7,7 +7,7 @@ namespace App\MessageFailureHandler;
 use App\Entity\SerializedSuite;
 use SmartAssert\YamlFile\Exception\Collection\SerializeException;
 
-class SerializeExceptionHandler implements SerializeSuiteSubExceptionHandlerInterface
+class SerializeExceptionHandler implements SuiteSerializationExceptionHandlerInterface
 {
     use HighPriorityTrait;
 

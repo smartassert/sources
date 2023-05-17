@@ -9,7 +9,7 @@ use App\Enum\SerializedSuite\FailureReason;
 use App\Exception\UnableToWriteSerializedSuiteException;
 use App\Repository\SerializedSuiteRepository;
 
-class UnableToWriteSerializedSuiteExceptionHandler implements SerializeSuiteSubExceptionHandlerInterface
+class UnableToWriteSerializedSuiteExceptionHandler implements SuiteSerializationExceptionHandlerInterface
 {
     use HighPriorityTrait;
 

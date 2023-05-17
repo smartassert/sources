@@ -10,7 +10,7 @@ use App\Exception\GitRepositoryException;
 use App\Exception\SourceRepositoryCreationException;
 use App\Repository\SerializedSuiteRepository;
 
-class SourceRepositoryCreationExceptionHandler implements SerializeSuiteSubExceptionHandlerInterface
+class SourceRepositoryCreationExceptionHandler implements SuiteSerializationExceptionHandlerInterface
 {
     use HighPriorityTrait;
 

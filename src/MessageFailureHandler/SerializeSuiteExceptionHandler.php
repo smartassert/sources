@@ -9,7 +9,7 @@ use App\Exception\MessageHandler\SerializeSuiteException;
 class SerializeSuiteExceptionHandler implements ExceptionCollectionHandlerInterface
 {
     /**
-     * @param iterable<SerializeSuiteSubExceptionHandlerInterface> $handlers
+     * @param iterable<SuiteSerializationExceptionHandlerInterface> $handlers
      */
     public function __construct(
         private readonly iterable $handlers,

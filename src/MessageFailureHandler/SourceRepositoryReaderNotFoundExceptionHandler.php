@@ -9,7 +9,7 @@ use App\Enum\SerializedSuite\FailureReason;
 use App\Exception\SourceRepositoryReaderNotFoundException;
 use App\Repository\SerializedSuiteRepository;
 
-class SourceRepositoryReaderNotFoundExceptionHandler implements SerializeSuiteSubExceptionHandlerInterface
+class SourceRepositoryReaderNotFoundExceptionHandler implements SuiteSerializationExceptionHandlerInterface
 {
     use HighPriorityTrait;
 
