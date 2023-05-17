@@ -16,7 +16,7 @@ use App\Exception\SourceRepositoryCreationException;
 use App\Exception\SourceRepositoryReaderNotFoundException;
 use App\Exception\UnableToWriteSerializedSuiteException;
 use App\Message\SerializeSuite;
-use App\MessageFailureHandler\ExceptionCollectionHandlerInterface;
+use App\MessageFailureHandler\ExceptionHandlerInterface;
 use App\MessageFailureHandler\WorkerMessageFailedEventHandler;
 use App\Model\SourceRepositoryInterface;
 use App\Repository\SerializedSuiteRepository;
@@ -58,7 +58,7 @@ class WorkerMessageFailedEventHandlerTest extends WebTestCase
      */
     public function testInvokeDoesNotHandle(WorkerMessageFailedEvent $event): void
     {
-        $exceptionCollectionHandler = \Mockery::mock(ExceptionCollectionHandlerInterface::class);
+        $exceptionCollectionHandler = \Mockery::mock(ExceptionHandlerInterface::class);
         $exceptionCollectionHandler
             ->shouldNotReceive('handle')
         ;
@@ -83,13 +83,6 @@ class WorkerMessageFailedEventHandlerTest extends WebTestCase
 
                     return $event;
                 })(),
-            ],
-            'incorrect exception type' => [
-                'event' => new WorkerMessageFailedEvent(
-                    new Envelope(new SerializeSuite(md5((string) rand()), [])),
-                    'async',
-                    new \Exception()
-                ),
             ],
         ];
     }
