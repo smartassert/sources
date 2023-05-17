@@ -4,29 +4,19 @@ declare(strict_types=1);
 
 namespace App\MessageFailureHandler;
 
-use App\Entity\SerializedSuite;
 use SmartAssert\YamlFile\Exception\Collection\SerializeException;
 
-class SerializeExceptionHandler implements SuiteSerializationExceptionHandlerInterface
+class SerializeExceptionHandler extends AbstractSpecificExceptionDelegatingHandler
 {
     use HighPriorityTrait;
 
-    /**
-     * @param iterable<SuiteSerializationExceptionHandlerInterface> $handlers
-     */
-    public function __construct(
-        private readonly iterable $handlers,
-    ) {
+    protected function handles(\Throwable $throwable): bool
+    {
+        return $throwable instanceof SerializeException;
     }
 
-    public function handle(SerializedSuite $serializedSuite, \Throwable $exception): void
+    protected function getExceptionToHandle(\Throwable $throwable): \Throwable
     {
-        if (!$exception instanceof SerializeException) {
-            return;
-        }
-
-        foreach ($this->handlers as $handler) {
-            $handler->handle($serializedSuite, $exception->getPreviousException());
-        }
+        return $throwable instanceof SerializeException ? $throwable->getPreviousException() : $throwable;
     }
 }
