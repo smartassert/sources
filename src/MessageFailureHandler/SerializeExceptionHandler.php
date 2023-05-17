@@ -12,25 +12,11 @@ class SerializeExceptionHandler implements SuiteSerializationExceptionHandlerInt
     use HighPriorityTrait;
 
     /**
-     * @var SuiteSerializationExceptionHandlerInterface[]
-     */
-    private readonly array $handlers;
-
-    /**
-     * @param array<mixed> $exceptionHandlers
+     * @param iterable<SuiteSerializationExceptionHandlerInterface> $handlers
      */
     public function __construct(
-        array $exceptionHandlers,
+        private readonly iterable $handlers,
     ) {
-        $handlers = [];
-
-        foreach ($exceptionHandlers as $exceptionCollectionHandler) {
-            if ($exceptionCollectionHandler instanceof SuiteSerializationExceptionHandlerInterface) {
-                $handlers[] = $exceptionCollectionHandler;
-            }
-        }
-
-        $this->handlers = $handlers;
     }
 
     public function handle(SerializedSuite $serializedSuite, \Throwable $exception): void

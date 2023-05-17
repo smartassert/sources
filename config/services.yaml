@@ -128,12 +128,12 @@ services:
 
     App\MessageFailureHandler\ProvisionExceptionHandler:
         arguments:
-            $exceptionHandlers:
+            $handlers:
                 - '@App\MessageFailureHandler\PathTraversalDetectedExceptionHandler'
 
     App\MessageFailureHandler\SerializeExceptionHandler:
         arguments:
-            $exceptionHandlers:
+            $handlers:
                 - '@App\MessageFailureHandler\ProvisionExceptionHandler'
 
     App\MessageFailureHandler\SerializeSuiteExceptionHandler:
