@@ -27,6 +27,16 @@ services:
             $serializedSuiteReader: '@serialized_suite.storage'
             $serializedSuiteWriter: '@serialized_suite.storage'
 
+    _instanceof:
+        App\MessageFailureHandler\ExceptionHandlerInterface:
+            tags: ['app.message_failure_handler.exception_handler']
+
+        App\MessageFailureHandler\ExceptionCollectionHandlerInterface:
+            tags: ['app.message_failure_handler.exception_collection_handler']
+
+        App\MessageFailureHandler\SuiteSerializationExceptionHandlerInterface:
+            tags: ['app.message_failure_handler.serialize_suite_sub_exception_handler']
+
     # makes classes in src/ available to be used as services
     # this creates a service per class whose id is the fully-qualified class name
     App\:
@@ -121,24 +131,24 @@ services:
 
     App\MessageFailureHandler\ProvisionExceptionHandler:
         arguments:
-            $exceptionHandlers:
+            $handlers:
                 - '@App\MessageFailureHandler\PathTraversalDetectedExceptionHandler'
 
     App\MessageFailureHandler\SerializeExceptionHandler:
         arguments:
-            $exceptionHandlers:
+            $handlers:
                 - '@App\MessageFailureHandler\ProvisionExceptionHandler'
 
-    App\MessageFailureHandler\SuiteSerializationExceptionHandler:
+    App\MessageFailureHandler\SerializeSuiteExceptionHandler:
         arguments:
-            $exceptionHandlers:
-                - '@App\MessageFailureHandler\SourceRepositoryCreationExceptionHandler'
-                - '@App\MessageFailureHandler\SerializeExceptionHandler'
-                - '@App\MessageFailureHandler\NoSourceRepositoryCreatorExceptionHandler'
-                - '@App\MessageFailureHandler\UnableToWriteSerializedSuiteExceptionHandler'
-                - '@App\MessageFailureHandler\SourceRepositoryReaderNotFoundExceptionHandler'
+            $handlers: !tagged_iterator app.message_failure_handler.serialize_suite_sub_exception_handler
+
+    App\MessageFailureHandler\HandlerFailedExceptionHandler:
+        arguments:
+            $handlers: !tagged_iterator app.message_failure_handler.exception_collection_handler
 
     App\MessageFailureHandler\WorkerMessageFailedEventHandler:
+        tags:
+            - { name: kernel.event_listener, event: Symfony\Component\Messenger\Event\WorkerMessageFailedEvent }
         arguments:
-            $exceptionCollectionHandlers:
-                - '@App\MessageFailureHandler\SuiteSerializationExceptionHandler'
+            $handlers: !tagged_iterator app.message_failure_handler.exception_handler

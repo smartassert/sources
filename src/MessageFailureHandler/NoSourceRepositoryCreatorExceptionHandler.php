@@ -11,15 +11,17 @@ use App\Repository\SerializedSuiteRepository;
 
 class NoSourceRepositoryCreatorExceptionHandler implements SuiteSerializationExceptionHandlerInterface
 {
+    use HighPriorityTrait;
+
     public function __construct(
         private readonly SerializedSuiteRepository $serializedSuiteRepository,
     ) {
     }
 
-    public function handle(SerializedSuite $serializedSuite, \Throwable $exception): bool
+    public function handle(SerializedSuite $serializedSuite, \Throwable $exception): void
     {
         if (!$exception instanceof NoSourceRepositoryCreatorException) {
-            return false;
+            return;
         }
 
         $serializedSuite->setPreparationFailed(
@@ -27,7 +29,5 @@ class NoSourceRepositoryCreatorExceptionHandler implements SuiteSerializationExc
             $exception->source->getType()->value
         );
         $this->serializedSuiteRepository->save($serializedSuite);
-
-        return true;
     }
 }

@@ -4,54 +4,19 @@ declare(strict_types=1);
 
 namespace App\MessageFailureHandler;
 
-use App\Entity\SerializedSuite;
-use App\Repository\SerializedSuiteRepository;
 use SmartAssert\YamlFile\Exception\Collection\SerializeException;
 
-class SerializeExceptionHandler implements SuiteSerializationExceptionHandlerInterface
+class SerializeExceptionHandler extends AbstractSpecificExceptionDelegatingHandler
 {
-    //    public function __construct(
-    //        private readonly SerializedSuiteRepository $serializedSuiteRepository,
-    //    ) {
-    //    }
+    use HighPriorityTrait;
 
-    /**
-     * @var SuiteSerializationExceptionHandlerInterface[]
-     */
-    private readonly array $handlers;
-
-    /**
-     * @param array<mixed> $exceptionHandlers
-     */
-    public function __construct(
-        array $exceptionHandlers,
-    ) {
-        $handlers = [];
-
-        foreach ($exceptionHandlers as $exceptionCollectionHandler) {
-            if ($exceptionCollectionHandler instanceof SuiteSerializationExceptionHandlerInterface) {
-                $handlers[] = $exceptionCollectionHandler;
-            }
-        }
-
-        $this->handlers = $handlers;
+    protected function handles(\Throwable $throwable): bool
+    {
+        return $throwable instanceof SerializeException;
     }
 
-    public function handle(SerializedSuite $serializedSuite, \Throwable $exception): bool
+    protected function getExceptionToHandle(\Throwable $throwable): \Throwable
     {
-        if (!$exception instanceof SerializeException) {
-            return false;
-        }
-
-        $result = false;
-        foreach ($this->handlers as $handler) {
-            $handlerResult = $handler->handle($serializedSuite, $exception->getPreviousException());
-
-            if ($handlerResult) {
-                $result = true;
-            }
-        }
-
-        return $result;
+        return $throwable instanceof SerializeException ? $throwable->getPreviousException() : $throwable;
     }
 }

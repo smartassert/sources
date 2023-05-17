@@ -11,15 +11,17 @@ use App\Repository\SerializedSuiteRepository;
 
 class SourceRepositoryReaderNotFoundExceptionHandler implements SuiteSerializationExceptionHandlerInterface
 {
+    use HighPriorityTrait;
+
     public function __construct(
         private readonly SerializedSuiteRepository $serializedSuiteRepository,
     ) {
     }
 
-    public function handle(SerializedSuite $serializedSuite, \Throwable $exception): bool
+    public function handle(SerializedSuite $serializedSuite, \Throwable $exception): void
     {
         if (!$exception instanceof SourceRepositoryReaderNotFoundException) {
-            return false;
+            return;
         }
 
         $serializedSuite->setPreparationFailed(
@@ -27,7 +29,5 @@ class SourceRepositoryReaderNotFoundExceptionHandler implements SuiteSerializati
             $exception->source->getRepositoryPath()
         );
         $this->serializedSuiteRepository->save($serializedSuite);
-
-        return true;
     }
 }

@@ -10,12 +10,13 @@ use App\Entity\Suite;
 use App\Enum\SerializedSuite\State;
 use App\Exception\GitActionException;
 use App\Exception\GitRepositoryException;
-use App\Exception\MessageHandler\SuiteSerializationException;
+use App\Exception\MessageHandler\SerializeSuiteException;
 use App\Exception\NoSourceRepositoryCreatorException;
 use App\Exception\SourceRepositoryCreationException;
 use App\Exception\SourceRepositoryReaderNotFoundException;
 use App\Exception\UnableToWriteSerializedSuiteException;
 use App\Message\SerializeSuite;
+use App\MessageFailureHandler\ExceptionHandlerInterface;
 use App\MessageFailureHandler\WorkerMessageFailedEventHandler;
 use App\Model\SourceRepositoryInterface;
 use App\Repository\SerializedSuiteRepository;
@@ -24,6 +25,7 @@ use App\Repository\SuiteRepository;
 use App\Tests\Services\EntityRemover;
 use League\Flysystem\PathTraversalDetected;
 use League\Flysystem\UnableToWriteFile;
+use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use SmartAssert\YamlFile\Exception\Collection\SerializeException;
 use SmartAssert\YamlFile\Exception\ProvisionException;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -33,6 +35,8 @@ use Symfony\Component\Messenger\Exception\HandlerFailedException;
 
 class WorkerMessageFailedEventHandlerTest extends WebTestCase
 {
+    use MockeryPHPUnitIntegration;
+
     private WorkerMessageFailedEventHandler $handler;
 
     protected function setUp(): void
@@ -50,27 +54,24 @@ class WorkerMessageFailedEventHandlerTest extends WebTestCase
     }
 
     /**
-     * @dataProvider handleDoesNotHandleDataProvider
+     * @dataProvider invokeDoesNotHandleDataProvider
      */
-    public function testHandleDoesNotHandle(WorkerMessageFailedEvent $event, int $expectedReturnState): void
+    public function testInvokeDoesNotHandle(WorkerMessageFailedEvent $event): void
     {
-        self::assertSame($expectedReturnState, $this->handler->handle($event));
+        $exceptionCollectionHandler = \Mockery::mock(ExceptionHandlerInterface::class);
+        $exceptionCollectionHandler
+            ->shouldNotReceive('handle')
+        ;
+
+        (new WorkerMessageFailedEventHandler([$exceptionCollectionHandler]))($event);
     }
 
     /**
      * @return array<mixed>
      */
-    public function handleDoesNotHandleDataProvider(): array
+    public function invokeDoesNotHandleDataProvider(): array
     {
         return [
-            'incorrect message type' => [
-                'event' => new WorkerMessageFailedEvent(
-                    new Envelope(new \stdClass()),
-                    'async',
-                    \Mockery::mock(HandlerFailedException::class),
-                ),
-                'expectedReturnState' => WorkerMessageFailedEventHandler::STATE_INCORRECT_MESSAGE_TYPE,
-            ],
             'event will retry' => [
                 'event' => (function () {
                     $event = new WorkerMessageFailedEvent(
@@ -82,15 +83,6 @@ class WorkerMessageFailedEventHandlerTest extends WebTestCase
 
                     return $event;
                 })(),
-                'expectedReturnState' => WorkerMessageFailedEventHandler::STATE_EVENT_WILL_RETRY,
-            ],
-            'incorrect exception type' => [
-                'event' => new WorkerMessageFailedEvent(
-                    new Envelope(new SerializeSuite(md5((string) rand()), [])),
-                    'async',
-                    new \Exception()
-                ),
-                'expectedReturnState' => WorkerMessageFailedEventHandler::STATE_EVENT_EXCEPTION_INCORRECT_TYPE,
             ],
         ];
     }
@@ -106,9 +98,8 @@ class WorkerMessageFailedEventHandlerTest extends WebTestCase
         $serializedSuite = $this->createSerializedSuite();
         self::assertSame(State::REQUESTED, $serializedSuite->getState());
 
-        $returnState = $this->handleEvent($serializedSuite, $handlerFailedExceptionNestedExceptionsCreator);
+        $this->handleEvent($serializedSuite, $handlerFailedExceptionNestedExceptionsCreator);
 
-        self::assertSame(WorkerMessageFailedEventHandler::STATE_SUCCESS, $returnState);
         self::assertSame(State::REQUESTED->value, $serializedSuite->getState()->value);
     }
 
@@ -139,8 +130,7 @@ class WorkerMessageFailedEventHandlerTest extends WebTestCase
         $serializedSuite = $this->createSerializedSuite();
         self::assertSame(State::REQUESTED->value, $serializedSuite->getState()->value);
 
-        $returnState = $this->handleEvent($serializedSuite, $handlerFailedExceptionNestedExceptionsCreator);
-        self::assertSame(WorkerMessageFailedEventHandler::STATE_SUCCESS, $returnState);
+        $this->handleEvent($serializedSuite, $handlerFailedExceptionNestedExceptionsCreator);
         self::assertSame(State::FAILED->value, $serializedSuite->getState()->value);
 
         $serializedSuiteData = $serializedSuite->jsonSerialize();
@@ -159,7 +149,7 @@ class WorkerMessageFailedEventHandlerTest extends WebTestCase
             'git clone failure' => [
                 'handlerFailedExceptionNestedExceptionsCreator' => function (SerializedSuite $serializedSuite) {
                     return [
-                        new SuiteSerializationException(
+                        new SerializeSuiteException(
                             $serializedSuite,
                             new SourceRepositoryCreationException(
                                 new GitRepositoryException(
@@ -178,7 +168,7 @@ class WorkerMessageFailedEventHandlerTest extends WebTestCase
             'git checkout failure' => [
                 'handlerFailedExceptionNestedExceptionsCreator' => function (SerializedSuite $serializedSuite) {
                     return [
-                        new SuiteSerializationException(
+                        new SerializeSuiteException(
                             $serializedSuite,
                             new SourceRepositoryCreationException(
                                 new GitRepositoryException(
@@ -197,7 +187,7 @@ class WorkerMessageFailedEventHandlerTest extends WebTestCase
             'local git repository out of scope' => [
                 'handlerFailedExceptionNestedExceptionsCreator' => function (SerializedSuite $serializedSuite) {
                     return [
-                        new SuiteSerializationException(
+                        new SerializeSuiteException(
                             $serializedSuite,
                             new SerializeException(
                                 new ProvisionException(
@@ -213,7 +203,7 @@ class WorkerMessageFailedEventHandlerTest extends WebTestCase
             'unserializable source type' => [
                 'handlerFailedExceptionNestedExceptionsCreator' => function (SerializedSuite $serializedSuite) {
                     return [
-                        new SuiteSerializationException(
+                        new SerializeSuiteException(
                             $serializedSuite,
                             new NoSourceRepositoryCreatorException($serializedSuite->suite->getSource())
                         ),
@@ -225,7 +215,7 @@ class WorkerMessageFailedEventHandlerTest extends WebTestCase
             'unable to write to target' => [
                 'handlerFailedExceptionNestedExceptionsCreator' => function (SerializedSuite $serializedSuite) {
                     return [
-                        new SuiteSerializationException(
+                        new SerializeSuiteException(
                             $serializedSuite,
                             new UnableToWriteSerializedSuiteException(
                                 '/path/that/cannot/be/written/to',
@@ -247,7 +237,7 @@ class WorkerMessageFailedEventHandlerTest extends WebTestCase
                     ;
 
                     return [
-                        new SuiteSerializationException(
+                        new SerializeSuiteException(
                             $serializedSuite,
                             new SourceRepositoryReaderNotFoundException($unreadableSourceRepository)
                         ),
@@ -265,7 +255,7 @@ class WorkerMessageFailedEventHandlerTest extends WebTestCase
                     ;
 
                     return [
-                        new SuiteSerializationException(
+                        new SerializeSuiteException(
                             $serializedSuite,
                             new \RuntimeException('An unexpected error occurred')
                         ),
@@ -311,7 +301,7 @@ class WorkerMessageFailedEventHandlerTest extends WebTestCase
     private function handleEvent(
         SerializedSuite $serializedSuite,
         callable $handlerFailedExceptionNestedExceptionsCreator
-    ): int {
+    ): void {
         $handlerFailedException = new HandlerFailedException(
             new Envelope(
                 new SerializeSuite($serializedSuite->id, [])
@@ -325,6 +315,6 @@ class WorkerMessageFailedEventHandlerTest extends WebTestCase
             $handlerFailedException
         );
 
-        return $this->handler->handle($event);
+        ($this->handler)($event);
     }
 }

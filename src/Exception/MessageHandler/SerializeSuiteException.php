@@ -6,7 +6,7 @@ namespace App\Exception\MessageHandler;
 
 use App\Entity\SerializedSuite;
 
-class SuiteSerializationException extends \Exception
+class SerializeSuiteException extends \Exception
 {
     public function __construct(
         public readonly SerializedSuite $serializedSuite,

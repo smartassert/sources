@@ -15,11 +15,14 @@ class UnknownExceptionHandler implements SuiteSerializationExceptionHandlerInter
     ) {
     }
 
-    public function handle(SerializedSuite $serializedSuite, \Throwable $exception): bool
+    public function handle(SerializedSuite $serializedSuite, \Throwable $exception): void
     {
         $serializedSuite->setPreparationFailed(FailureReason::UNKNOWN, $exception->getMessage());
         $this->serializedSuiteRepository->save($serializedSuite);
+    }
 
-        return true;
+    public static function getDefaultPriority(): int
+    {
+        return -100;
     }
 }
