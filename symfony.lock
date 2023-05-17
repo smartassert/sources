@@ -274,6 +274,9 @@
     "smartassert/users-security-bundle": {
         "version": "0.1"
     },
+    "smartassert/worker-message-failed-event-bundle": {
+        "version": "dev-github-1"
+    },
     "smartassert/yaml-file": {
         "version": "dev-main"
     },

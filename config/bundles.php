@@ -11,4 +11,5 @@ return [
     League\FlysystemBundle\FlysystemBundle::class => ['all' => true],
     SmartAssert\HealthCheckBundle\HealthCheckBundle::class => ['all' => true],
     SmartAssert\TestAuthenticationProviderBundle\TestAuthenticationProviderBundle::class => ['test' => true],
+    SmartAssert\WorkerMessageFailedEventBundle\WorkerMessageFailedEventBundle::class => ['all' => true],
 ];
