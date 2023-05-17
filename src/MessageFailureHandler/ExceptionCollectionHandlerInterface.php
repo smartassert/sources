@@ -9,5 +9,5 @@ interface ExceptionCollectionHandlerInterface
     /**
      * @param \Throwable[] $exceptions
      */
-    public function handle(array $exceptions): bool;
+    public function handle(array $exceptions): void;
 }

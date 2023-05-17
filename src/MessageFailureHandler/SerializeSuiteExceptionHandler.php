@@ -17,11 +17,11 @@ class SerializeSuiteExceptionHandler implements ExceptionCollectionHandlerInterf
     ) {
     }
 
-    public function handle(array $exceptions): bool
+    public function handle(array $exceptions): void
     {
         $exception = $exceptions[0] ?? null;
         if (!$exception instanceof SerializeSuiteException) {
-            return false;
+            return;
         }
 
         $result = false;
@@ -34,9 +34,7 @@ class SerializeSuiteExceptionHandler implements ExceptionCollectionHandlerInterf
         }
 
         if (false === $result) {
-            $result = $this->unknownExceptionHandler->handle($exception->serializedSuite, $exception->handlerException);
+            $this->unknownExceptionHandler->handle($exception->serializedSuite, $exception->handlerException);
         }
-
-        return $result;
     }
 }
