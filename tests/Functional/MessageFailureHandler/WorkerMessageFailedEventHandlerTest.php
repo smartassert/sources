@@ -16,6 +16,7 @@ use App\Exception\SourceRepositoryCreationException;
 use App\Exception\SourceRepositoryReaderNotFoundException;
 use App\Exception\UnableToWriteSerializedSuiteException;
 use App\Message\SerializeSuite;
+use App\MessageFailureHandler\ExceptionCollectionHandlerInterface;
 use App\MessageFailureHandler\WorkerMessageFailedEventHandler;
 use App\Model\SourceRepositoryInterface;
 use App\Repository\SerializedSuiteRepository;
@@ -24,6 +25,7 @@ use App\Repository\SuiteRepository;
 use App\Tests\Services\EntityRemover;
 use League\Flysystem\PathTraversalDetected;
 use League\Flysystem\UnableToWriteFile;
+use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use SmartAssert\YamlFile\Exception\Collection\SerializeException;
 use SmartAssert\YamlFile\Exception\ProvisionException;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -33,6 +35,8 @@ use Symfony\Component\Messenger\Exception\HandlerFailedException;
 
 class WorkerMessageFailedEventHandlerTest extends WebTestCase
 {
+    use MockeryPHPUnitIntegration;
+
     private WorkerMessageFailedEventHandler $handler;
 
     protected function setUp(): void
@@ -50,17 +54,22 @@ class WorkerMessageFailedEventHandlerTest extends WebTestCase
     }
 
     /**
-     * @dataProvider handleDoesNotHandleDataProvider
+     * @dataProvider invokeDoesNotHandleDataProvider
      */
-    public function testHandleDoesNotHandle(WorkerMessageFailedEvent $event, int $expectedReturnState): void
+    public function testInvokeDoesNotHandle(WorkerMessageFailedEvent $event): void
     {
-        self::assertSame($expectedReturnState, ($this->handler)($event));
+        $exceptionCollectionHandler = \Mockery::mock(ExceptionCollectionHandlerInterface::class);
+        $exceptionCollectionHandler
+            ->shouldNotReceive('handle')
+        ;
+
+        (new WorkerMessageFailedEventHandler([$exceptionCollectionHandler]))($event);
     }
 
     /**
      * @return array<mixed>
      */
-    public function handleDoesNotHandleDataProvider(): array
+    public function invokeDoesNotHandleDataProvider(): array
     {
         return [
             'event will retry' => [
@@ -74,7 +83,6 @@ class WorkerMessageFailedEventHandlerTest extends WebTestCase
 
                     return $event;
                 })(),
-                'expectedReturnState' => WorkerMessageFailedEventHandler::STATE_EVENT_WILL_RETRY,
             ],
             'incorrect exception type' => [
                 'event' => new WorkerMessageFailedEvent(
@@ -82,7 +90,6 @@ class WorkerMessageFailedEventHandlerTest extends WebTestCase
                     'async',
                     new \Exception()
                 ),
-                'expectedReturnState' => WorkerMessageFailedEventHandler::STATE_EVENT_EXCEPTION_INCORRECT_TYPE,
             ],
         ];
     }
@@ -98,9 +105,8 @@ class WorkerMessageFailedEventHandlerTest extends WebTestCase
         $serializedSuite = $this->createSerializedSuite();
         self::assertSame(State::REQUESTED, $serializedSuite->getState());
 
-        $returnState = $this->handleEvent($serializedSuite, $handlerFailedExceptionNestedExceptionsCreator);
+        $this->handleEvent($serializedSuite, $handlerFailedExceptionNestedExceptionsCreator);
 
-        self::assertSame(WorkerMessageFailedEventHandler::STATE_SUCCESS, $returnState);
         self::assertSame(State::REQUESTED->value, $serializedSuite->getState()->value);
     }
 
@@ -131,8 +137,7 @@ class WorkerMessageFailedEventHandlerTest extends WebTestCase
         $serializedSuite = $this->createSerializedSuite();
         self::assertSame(State::REQUESTED->value, $serializedSuite->getState()->value);
 
-        $returnState = $this->handleEvent($serializedSuite, $handlerFailedExceptionNestedExceptionsCreator);
-        self::assertSame(WorkerMessageFailedEventHandler::STATE_SUCCESS, $returnState);
+        $this->handleEvent($serializedSuite, $handlerFailedExceptionNestedExceptionsCreator);
         self::assertSame(State::FAILED->value, $serializedSuite->getState()->value);
 
         $serializedSuiteData = $serializedSuite->jsonSerialize();
@@ -303,7 +308,7 @@ class WorkerMessageFailedEventHandlerTest extends WebTestCase
     private function handleEvent(
         SerializedSuite $serializedSuite,
         callable $handlerFailedExceptionNestedExceptionsCreator
-    ): int {
+    ): void {
         $handlerFailedException = new HandlerFailedException(
             new Envelope(
                 new SerializeSuite($serializedSuite->id, [])
@@ -317,6 +322,6 @@ class WorkerMessageFailedEventHandlerTest extends WebTestCase
             $handlerFailedException
         );
 
-        return ($this->handler)($event);
+        ($this->handler)($event);
     }
 }

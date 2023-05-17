@@ -9,10 +9,6 @@ use Symfony\Component\Messenger\Exception\HandlerFailedException;
 
 class WorkerMessageFailedEventHandler
 {
-    public const STATE_SUCCESS = 0;
-    public const STATE_EVENT_WILL_RETRY = 1;
-    public const STATE_EVENT_EXCEPTION_INCORRECT_TYPE = 2;
-
     /**
      * @param iterable<ExceptionCollectionHandlerInterface> $handlers
      */
@@ -21,21 +17,19 @@ class WorkerMessageFailedEventHandler
     ) {
     }
 
-    public function __invoke(WorkerMessageFailedEvent $event): int
+    public function __invoke(WorkerMessageFailedEvent $event): void
     {
         if ($event->willRetry()) {
-            return self::STATE_EVENT_WILL_RETRY;
+            return;
         }
 
         $handlerFailedException = $event->getThrowable();
         if (!$handlerFailedException instanceof HandlerFailedException) {
-            return self::STATE_EVENT_EXCEPTION_INCORRECT_TYPE;
+            return;
         }
 
         foreach ($this->handlers as $handler) {
             $handler->handle($handlerFailedException->getNestedExceptions());
         }
-
-        return self::STATE_SUCCESS;
     }
 }
