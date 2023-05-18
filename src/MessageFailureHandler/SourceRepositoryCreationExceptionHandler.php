@@ -4,13 +4,14 @@ declare(strict_types=1);
 
 namespace App\MessageFailureHandler;
 
-use App\Entity\SerializedSuite;
 use App\Enum\SerializedSuite\FailureReason;
 use App\Exception\GitRepositoryException;
+use App\Exception\MessageHandler\SerializeSuiteException;
 use App\Exception\SourceRepositoryCreationException;
 use App\Repository\SerializedSuiteRepository;
+use SmartAssert\WorkerMessageFailedEventBundle\ExceptionHandlerInterface;
 
-class SourceRepositoryCreationExceptionHandler implements SuiteSerializationExceptionHandlerInterface
+class SourceRepositoryCreationExceptionHandler implements ExceptionHandlerInterface
 {
     use HighPriorityTrait;
 
@@ -19,13 +20,20 @@ class SourceRepositoryCreationExceptionHandler implements SuiteSerializationExce
     ) {
     }
 
-    public function handle(SerializedSuite $serializedSuite, \Throwable $exception): void
+    public function handle(\Throwable $throwable): void
     {
-        if (!$exception instanceof SourceRepositoryCreationException) {
+        if (!$throwable instanceof SerializeSuiteException) {
             return;
         }
 
-        $sourceHandlerException = $exception->getPrevious();
+        $handlerException = $throwable->handlerException;
+        $serializedSuite = $throwable->serializedSuite;
+
+        if (!$handlerException instanceof SourceRepositoryCreationException) {
+            return;
+        }
+
+        $sourceHandlerException = $handlerException->getPrevious();
         if (!$sourceHandlerException instanceof GitRepositoryException) {
             return;
         }

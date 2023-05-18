@@ -5,21 +5,40 @@ declare(strict_types=1);
 namespace App\MessageFailureHandler;
 
 use App\Entity\GitSource;
-use App\Entity\SerializedSuite;
 use App\Enum\SerializedSuite\FailureReason;
+use App\Exception\MessageHandler\SerializeSuiteException;
 use App\Repository\SerializedSuiteRepository;
 use League\Flysystem\PathTraversalDetected;
+use SmartAssert\WorkerMessageFailedEventBundle\ExceptionHandlerInterface;
+use SmartAssert\YamlFile\Exception\Collection\SerializeException;
+use SmartAssert\YamlFile\Exception\ProvisionException;
 
-class PathTraversalDetectedExceptionHandler implements SuiteSerializationExceptionHandlerInterface
+class PathTraversalDetectedExceptionHandler implements ExceptionHandlerInterface
 {
     public function __construct(
         private readonly SerializedSuiteRepository $serializedSuiteRepository,
     ) {
     }
 
-    public function handle(SerializedSuite $serializedSuite, \Throwable $exception): void
+    public function handle(\Throwable $throwable): void
     {
-        if (!$exception instanceof PathTraversalDetected) {
+        if (!$throwable instanceof SerializeSuiteException) {
+            return;
+        }
+
+        $serializedSuite = $throwable->serializedSuite;
+        $throwable = $throwable->handlerException;
+
+        if ($throwable instanceof SerializeException) {
+            $throwable = $throwable->getPreviousException();
+        }
+
+        if (!$throwable instanceof ProvisionException) {
+            return;
+        }
+
+        $previousException = $throwable->getPreviousException();
+        if (!$previousException instanceof PathTraversalDetected) {
             return;
         }
 
