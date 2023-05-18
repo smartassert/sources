@@ -27,10 +27,6 @@ services:
             $serializedSuiteReader: '@serialized_suite.storage'
             $serializedSuiteWriter: '@serialized_suite.storage'
 
-    _instanceof:
-        App\MessageFailureHandler\SuiteSerializationExceptionHandlerInterface:
-            tags: ['app.message_failure_handler.serialize_suite_sub_exception_handler']
-
     # makes classes in src/ available to be used as services
     # this creates a service per class whose id is the fully-qualified class name
     App\:
@@ -135,4 +131,4 @@ services:
 
     App\MessageFailureHandler\SerializeSuiteExceptionHandler:
         arguments:
-            $handlers: !tagged_iterator app.message_failure_handler.serialize_suite_sub_exception_handler
+            $handlers: !tagged_iterator !php/const:SmartAssert\WorkerMessageFailedEventBundle\WorkerMessageFailedEventBundle::EXCEPTION_HANDLER_TAG

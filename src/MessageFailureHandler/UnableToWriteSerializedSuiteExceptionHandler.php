@@ -8,8 +8,9 @@ use App\Enum\SerializedSuite\FailureReason;
 use App\Exception\MessageHandler\SerializeSuiteException;
 use App\Exception\UnableToWriteSerializedSuiteException;
 use App\Repository\SerializedSuiteRepository;
+use SmartAssert\WorkerMessageFailedEventBundle\ExceptionHandlerInterface;
 
-class UnableToWriteSerializedSuiteExceptionHandler implements SuiteSerializationExceptionHandlerInterface
+class UnableToWriteSerializedSuiteExceptionHandler implements ExceptionHandlerInterface
 {
     use HighPriorityTrait;
 
@@ -18,14 +19,14 @@ class UnableToWriteSerializedSuiteExceptionHandler implements SuiteSerialization
     ) {
     }
 
-    public function handle(\Throwable $exception): void
+    public function handle(\Throwable $throwable): void
     {
-        if (!$exception instanceof SerializeSuiteException) {
+        if (!$throwable instanceof SerializeSuiteException) {
             return;
         }
 
-        $handlerException = $exception->handlerException;
-        $serializedSuite = $exception->serializedSuite;
+        $handlerException = $throwable->handlerException;
+        $serializedSuite = $throwable->serializedSuite;
 
         if (!$handlerException instanceof UnableToWriteSerializedSuiteException) {
             return;

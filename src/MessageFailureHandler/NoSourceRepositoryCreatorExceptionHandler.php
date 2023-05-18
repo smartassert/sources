@@ -8,8 +8,9 @@ use App\Enum\SerializedSuite\FailureReason;
 use App\Exception\MessageHandler\SerializeSuiteException;
 use App\Exception\NoSourceRepositoryCreatorException;
 use App\Repository\SerializedSuiteRepository;
+use SmartAssert\WorkerMessageFailedEventBundle\ExceptionHandlerInterface;
 
-class NoSourceRepositoryCreatorExceptionHandler implements SuiteSerializationExceptionHandlerInterface
+class NoSourceRepositoryCreatorExceptionHandler implements ExceptionHandlerInterface
 {
     use HighPriorityTrait;
 
@@ -18,14 +19,14 @@ class NoSourceRepositoryCreatorExceptionHandler implements SuiteSerializationExc
     ) {
     }
 
-    public function handle(\Throwable $exception): void
+    public function handle(\Throwable $throwable): void
     {
-        if (!$exception instanceof SerializeSuiteException) {
+        if (!$throwable instanceof SerializeSuiteException) {
             return;
         }
 
-        $handlerException = $exception->handlerException;
-        $serializedSuite = $exception->serializedSuite;
+        $handlerException = $throwable->handlerException;
+        $serializedSuite = $throwable->serializedSuite;
 
         if (!$handlerException instanceof NoSourceRepositoryCreatorException) {
             return;

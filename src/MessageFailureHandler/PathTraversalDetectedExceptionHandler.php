@@ -9,34 +9,35 @@ use App\Enum\SerializedSuite\FailureReason;
 use App\Exception\MessageHandler\SerializeSuiteException;
 use App\Repository\SerializedSuiteRepository;
 use League\Flysystem\PathTraversalDetected;
+use SmartAssert\WorkerMessageFailedEventBundle\ExceptionHandlerInterface;
 use SmartAssert\YamlFile\Exception\Collection\SerializeException;
 use SmartAssert\YamlFile\Exception\ProvisionException;
 
-class PathTraversalDetectedExceptionHandler implements SuiteSerializationExceptionHandlerInterface
+class PathTraversalDetectedExceptionHandler implements ExceptionHandlerInterface
 {
     public function __construct(
         private readonly SerializedSuiteRepository $serializedSuiteRepository,
     ) {
     }
 
-    public function handle(\Throwable $exception): void
+    public function handle(\Throwable $throwable): void
     {
-        if (!$exception instanceof SerializeSuiteException) {
+        if (!$throwable instanceof SerializeSuiteException) {
             return;
         }
 
-        $serializedSuite = $exception->serializedSuite;
-        $exception = $exception->handlerException;
+        $serializedSuite = $throwable->serializedSuite;
+        $throwable = $throwable->handlerException;
 
-        if ($exception instanceof SerializeException) {
-            $exception = $exception->getPreviousException();
+        if ($throwable instanceof SerializeException) {
+            $throwable = $throwable->getPreviousException();
         }
 
-        if (!$exception instanceof ProvisionException) {
+        if (!$throwable instanceof ProvisionException) {
             return;
         }
 
-        $previousException = $exception->getPreviousException();
+        $previousException = $throwable->getPreviousException();
         if (!$previousException instanceof PathTraversalDetected) {
             return;
         }

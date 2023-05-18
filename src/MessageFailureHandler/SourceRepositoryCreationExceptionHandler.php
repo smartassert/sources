@@ -9,8 +9,9 @@ use App\Exception\GitRepositoryException;
 use App\Exception\MessageHandler\SerializeSuiteException;
 use App\Exception\SourceRepositoryCreationException;
 use App\Repository\SerializedSuiteRepository;
+use SmartAssert\WorkerMessageFailedEventBundle\ExceptionHandlerInterface;
 
-class SourceRepositoryCreationExceptionHandler implements SuiteSerializationExceptionHandlerInterface
+class SourceRepositoryCreationExceptionHandler implements ExceptionHandlerInterface
 {
     use HighPriorityTrait;
 
@@ -19,14 +20,14 @@ class SourceRepositoryCreationExceptionHandler implements SuiteSerializationExce
     ) {
     }
 
-    public function handle(\Throwable $exception): void
+    public function handle(\Throwable $throwable): void
     {
-        if (!$exception instanceof SerializeSuiteException) {
+        if (!$throwable instanceof SerializeSuiteException) {
             return;
         }
 
-        $handlerException = $exception->handlerException;
-        $serializedSuite = $exception->serializedSuite;
+        $handlerException = $throwable->handlerException;
+        $serializedSuite = $throwable->serializedSuite;
 
         if (!$handlerException instanceof SourceRepositoryCreationException) {
             return;
