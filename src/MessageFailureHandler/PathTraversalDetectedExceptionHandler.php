@@ -27,18 +27,18 @@ class PathTraversalDetectedExceptionHandler implements ExceptionHandlerInterface
         }
 
         $serializedSuite = $throwable->serializedSuite;
-        $throwable = $throwable->handlerException;
+        $throwable = $throwable->getPrevious();
 
         if ($throwable instanceof SerializeException) {
-            $throwable = $throwable->getPreviousException();
+            $throwable = $throwable->getPrevious();
         }
 
         if (!$throwable instanceof ProvisionException) {
             return;
         }
 
-        $previousException = $throwable->getPreviousException();
-        if (!$previousException instanceof PathTraversalDetected) {
+        $throwable = $throwable->getPreviousException();
+        if (!$throwable instanceof PathTraversalDetected) {
             return;
         }
 
