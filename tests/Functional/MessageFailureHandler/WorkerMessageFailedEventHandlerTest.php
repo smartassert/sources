@@ -7,27 +7,18 @@ namespace App\Tests\Functional\MessageFailureHandler;
 use App\Entity\GitSource;
 use App\Entity\SerializedSuite;
 use App\Entity\Suite;
+use App\Enum\SerializedSuite\FailureReason;
 use App\Enum\SerializedSuite\State;
-use App\Exception\GitActionException;
-use App\Exception\GitRepositoryException;
 use App\Exception\MessageHandler\SerializeSuiteException;
 use App\Exception\NoSourceRepositoryCreatorException;
-use App\Exception\SourceRepositoryCreationException;
-use App\Exception\SourceRepositoryReaderNotFoundException;
-use App\Exception\UnableToWriteSerializedSuiteException;
 use App\Message\SerializeSuite;
-use App\Model\SourceRepositoryInterface;
 use App\Repository\SerializedSuiteRepository;
 use App\Repository\SourceRepository;
 use App\Repository\SuiteRepository;
 use App\Tests\Services\EntityRemover;
-use League\Flysystem\PathTraversalDetected;
-use League\Flysystem\UnableToWriteFile;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use SmartAssert\WorkerMessageFailedEventBundle\ExceptionHandlerInterface;
 use SmartAssert\WorkerMessageFailedEventBundle\WorkerMessageFailedEventHandler;
-use SmartAssert\YamlFile\Exception\Collection\SerializeException;
-use SmartAssert\YamlFile\Exception\ProvisionException;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Event\WorkerMessageFailedEvent;
@@ -117,16 +108,24 @@ class WorkerMessageFailedEventHandlerTest extends WebTestCase
         ];
     }
 
-    /**
-     * @dataProvider handleHasSerializedSuiteStateChangeDataProvider
-     *
-     * @param callable(SerializedSuite): \Exception[] $handlerFailedExceptionNestedExceptionsCreator
-     */
-    public function testHandleHasSerializedSuiteStateChange(
-        callable $handlerFailedExceptionNestedExceptionsCreator,
-        string $expectedFailureReason,
-        string $expectedFailureMessage,
-    ): void {
+    public function testHandleHasSerializedSuiteStateChange(): void
+    {
+        $type = md5((string) rand());
+
+        $handlerFailedExceptionNestedExceptionsCreator = function (SerializedSuite $serializedSuite) use ($type) {
+            return [
+                new SerializeSuiteException(
+                    $serializedSuite,
+                    new NoSourceRepositoryCreatorException($serializedSuite->suite->getSource()),
+                    FailureReason::UNSERIALIZABLE_SOURCE_TYPE,
+                    $type
+                ),
+            ];
+        };
+
+        $expectedFailureReason = 'source/unserializable-type';
+        $expectedFailureMessage = $type;
+
         $serializedSuite = $this->createSerializedSuite();
         self::assertSame(State::REQUESTED->value, $serializedSuite->getState()->value);
 
@@ -138,133 +137,6 @@ class WorkerMessageFailedEventHandlerTest extends WebTestCase
         self::assertArrayHasKey('failure_message', $serializedSuiteData);
         self::assertSame($expectedFailureReason, $serializedSuiteData['failure_reason']);
         self::assertSame($expectedFailureMessage, $serializedSuiteData['failure_message']);
-    }
-
-    /**
-     * @return array<mixed>
-     */
-    public function handleHasSerializedSuiteStateChangeDataProvider(): array
-    {
-        return [
-            'git clone failure' => [
-                'handlerFailedExceptionNestedExceptionsCreator' => function (SerializedSuite $serializedSuite) {
-                    return [
-                        new SerializeSuiteException(
-                            $serializedSuite,
-                            new SourceRepositoryCreationException(
-                                new GitRepositoryException(
-                                    new GitActionException(
-                                        GitActionException::ACTION_CLONE,
-                                        'fatal: repository \'https://example.com/repository.git/\' not found'
-                                    ),
-                                ),
-                            )
-                        ),
-                    ];
-                },
-                'expectedFailureReason' => 'git/clone',
-                'expectedFailureMessage' => 'fatal: repository \'https://example.com/repository.git/\' not found',
-            ],
-            'git checkout failure' => [
-                'handlerFailedExceptionNestedExceptionsCreator' => function (SerializedSuite $serializedSuite) {
-                    return [
-                        new SerializeSuiteException(
-                            $serializedSuite,
-                            new SourceRepositoryCreationException(
-                                new GitRepositoryException(
-                                    new GitActionException(
-                                        GitActionException::ACTION_CHECKOUT,
-                                        'error: pathspec \'7712df\' did not match any file(s) known to git'
-                                    ),
-                                ),
-                            )
-                        ),
-                    ];
-                },
-                'expectedFailureReason' => 'git/checkout',
-                'expectedFailureMessage' => 'error: pathspec \'7712df\' did not match any file(s) known to git',
-            ],
-            'local git repository out of scope' => [
-                'handlerFailedExceptionNestedExceptionsCreator' => function (SerializedSuite $serializedSuite) {
-                    return [
-                        new SerializeSuiteException(
-                            $serializedSuite,
-                            new SerializeException(
-                                new ProvisionException(
-                                    new PathTraversalDetected(),
-                                ),
-                            )
-                        ),
-                    ];
-                },
-                'expectedFailureReason' => 'local-git-repository/out-of-scope',
-                'expectedFailureMessage' => '/out-of-scope/../../../',
-            ],
-            'unserializable source type' => [
-                'handlerFailedExceptionNestedExceptionsCreator' => function (SerializedSuite $serializedSuite) {
-                    return [
-                        new SerializeSuiteException(
-                            $serializedSuite,
-                            new NoSourceRepositoryCreatorException($serializedSuite->suite->getSource())
-                        ),
-                    ];
-                },
-                'expectedFailureReason' => 'source/unserializable-type',
-                'expectedFailureMessage' => 'git',
-            ],
-            'unable to write to target' => [
-                'handlerFailedExceptionNestedExceptionsCreator' => function (SerializedSuite $serializedSuite) {
-                    return [
-                        new SerializeSuiteException(
-                            $serializedSuite,
-                            new UnableToWriteSerializedSuiteException(
-                                '/path/that/cannot/be/written/to',
-                                'content',
-                                new UnableToWriteFile()
-                            )
-                        ),
-                    ];
-                },
-                'expectedFailureReason' => 'target/write',
-                'expectedFailureMessage' => '/path/that/cannot/be/written/to',
-            ],
-            'unable to read from target' => [
-                'handlerFailedExceptionNestedExceptionsCreator' => function (SerializedSuite $serializedSuite) {
-                    $unreadableSourceRepository = \Mockery::mock(SourceRepositoryInterface::class);
-                    $unreadableSourceRepository
-                        ->shouldReceive('getRepositoryPath')
-                        ->andReturn('/path/that/cannot/be/read/from')
-                    ;
-
-                    return [
-                        new SerializeSuiteException(
-                            $serializedSuite,
-                            new SourceRepositoryReaderNotFoundException($unreadableSourceRepository)
-                        ),
-                    ];
-                },
-                'expectedFailureReason' => 'source-repository/read',
-                'expectedFailureMessage' => '/path/that/cannot/be/read/from',
-            ],
-            'unknown' => [
-                'handlerFailedExceptionNestedExceptionsCreator' => function (SerializedSuite $serializedSuite) {
-                    $unreadableSourceRepository = \Mockery::mock(SourceRepositoryInterface::class);
-                    $unreadableSourceRepository
-                        ->shouldReceive('getRepositoryPath')
-                        ->andReturn('/path/that/cannot/be/read/from')
-                    ;
-
-                    return [
-                        new SerializeSuiteException(
-                            $serializedSuite,
-                            new \RuntimeException('An unexpected error occurred')
-                        ),
-                    ];
-                },
-                'expectedFailureReason' => 'unknown',
-                'expectedFailureMessage' => 'An unexpected error occurred',
-            ],
-        ];
     }
 
     private function createSerializedSuite(): SerializedSuite
