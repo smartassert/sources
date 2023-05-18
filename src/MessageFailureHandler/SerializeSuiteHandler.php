@@ -17,11 +17,7 @@ class SerializeSuiteHandler implements ExceptionHandlerInterface
 
     public function handle(\Throwable $throwable): void
     {
-        if (
-            !$throwable instanceof SerializeSuiteException
-            || null === $throwable->failureReason
-            || null == $throwable->failureMessage
-        ) {
+        if (!$throwable instanceof SerializeSuiteException) {
             return;
         }
 

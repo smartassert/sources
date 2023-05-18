@@ -12,8 +12,8 @@ class SerializeSuiteException extends \Exception
     public function __construct(
         public readonly SerializedSuite $serializedSuite,
         public readonly \Throwable $handlerException,
-        public readonly ?FailureReason $failureReason = null,
-        public readonly ?string $failureMessage = null,
+        public readonly FailureReason $failureReason,
+        public readonly string $failureMessage,
     ) {
         parent::__construct($handlerException->getMessage(), $handlerException->getCode(), $handlerException);
     }
