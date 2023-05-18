@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Functional\Services;
+namespace App\Tests\Functional\Services\SerializeSuiteExceptionFactory;
 
 use App\Entity\FileSource;
 use App\Entity\GitSource;
@@ -17,7 +17,7 @@ use App\Exception\SourceRepositoryCreationException;
 use App\Exception\SourceRepositoryReaderNotFoundException;
 use App\Exception\UnableToWriteSerializedSuiteException;
 use App\Model\SourceRepositoryInterface;
-use App\Services\SerializeSuiteExceptionFactory;
+use App\Services\SerializeSuiteExceptionFactory\SerializeSuiteExceptionFactory;
 use League\Flysystem\PathTraversalDetected;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 

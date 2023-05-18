@@ -9,7 +9,7 @@ use App\Enum\SerializedSuite\State;
 use App\Exception\MessageHandler\SerializeSuiteException;
 use App\Message\SerializeSuite;
 use App\Repository\SerializedSuiteRepository;
-use App\Services\SerializeSuiteExceptionFactory;
+use App\Services\SerializeSuiteExceptionFactory\SerializeSuiteExceptionFactory;
 use App\Services\SuiteSerializer;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
