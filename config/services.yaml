@@ -119,16 +119,6 @@ services:
 
     SmartAssert\WorkerJobSource\JobSourceSerializer: ~
 
-    App\MessageFailureHandler\ProvisionExceptionHandler:
-        arguments:
-            $handlers:
-                - '@App\MessageFailureHandler\PathTraversalDetectedExceptionHandler'
-
-    App\MessageFailureHandler\SerializeExceptionHandler:
-        arguments:
-            $handlers:
-                - '@App\MessageFailureHandler\ProvisionExceptionHandler'
-
     App\MessageFailureHandler\SerializeSuiteExceptionHandler:
         arguments:
             $handlers: !tagged_iterator !php/const:SmartAssert\WorkerMessageFailedEventBundle\WorkerMessageFailedEventBundle::EXCEPTION_HANDLER_TAG
