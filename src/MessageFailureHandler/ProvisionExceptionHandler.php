@@ -18,8 +18,6 @@ class ProvisionExceptionHandler implements SuiteSerializationExceptionHandlerInt
 
     public function handle(SerializeSuiteException $exception): void
     {
-        $serializedSuite = $exception->serializedSuite;
-
         foreach ($this->handlers as $handler) {
             $handler->handle($exception);
         }
