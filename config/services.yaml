@@ -118,7 +118,3 @@ services:
     SmartAssert\WorkerJobSource\Factory\YamlFileFactory: ~
 
     SmartAssert\WorkerJobSource\JobSourceSerializer: ~
-
-    App\MessageFailureHandler\SerializeSuiteExceptionHandler:
-        arguments:
-            $handlers: !tagged_iterator !php/const:SmartAssert\WorkerMessageFailedEventBundle\WorkerMessageFailedEventBundle::EXCEPTION_HANDLER_TAG
