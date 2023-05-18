@@ -7,6 +7,7 @@ namespace App\Tests\Functional\MessageFailureHandler;
 use App\Entity\GitSource;
 use App\Entity\SerializedSuite;
 use App\Entity\Suite;
+use App\Enum\SerializedSuite\FailureReason;
 use App\Enum\SerializedSuite\State;
 use App\Exception\GitActionException;
 use App\Exception\GitRepositoryException;
@@ -158,7 +159,9 @@ class WorkerMessageFailedEventHandlerTest extends WebTestCase
                                         'fatal: repository \'https://example.com/repository.git/\' not found'
                                     ),
                                 ),
-                            )
+                            ),
+                            FailureReason::GIT_CLONE,
+                            'fatal: repository \'https://example.com/repository.git/\' not found'
                         ),
                     ];
                 },
@@ -177,7 +180,9 @@ class WorkerMessageFailedEventHandlerTest extends WebTestCase
                                         'error: pathspec \'7712df\' did not match any file(s) known to git'
                                     ),
                                 ),
-                            )
+                            ),
+                            FailureReason::GIT_CHECKOUT,
+                            'error: pathspec \'7712df\' did not match any file(s) known to git'
                         ),
                     ];
                 },
@@ -193,7 +198,9 @@ class WorkerMessageFailedEventHandlerTest extends WebTestCase
                                 new ProvisionException(
                                     new PathTraversalDetected(),
                                 ),
-                            )
+                            ),
+                            FailureReason::GIT_REPOSITORY_OUT_OF_SCOPE,
+                            '/out-of-scope/../../../'
                         ),
                     ];
                 },
@@ -205,7 +212,9 @@ class WorkerMessageFailedEventHandlerTest extends WebTestCase
                     return [
                         new SerializeSuiteException(
                             $serializedSuite,
-                            new NoSourceRepositoryCreatorException($serializedSuite->suite->getSource())
+                            new NoSourceRepositoryCreatorException($serializedSuite->suite->getSource()),
+                            FailureReason::UNSERIALIZABLE_SOURCE_TYPE,
+                            'git'
                         ),
                     ];
                 },
@@ -221,7 +230,9 @@ class WorkerMessageFailedEventHandlerTest extends WebTestCase
                                 '/path/that/cannot/be/written/to',
                                 'content',
                                 new UnableToWriteFile()
-                            )
+                            ),
+                            FailureReason::UNABLE_TO_WRITE_TO_TARGET,
+                            '/path/that/cannot/be/written/to',
                         ),
                     ];
                 },
@@ -239,7 +250,9 @@ class WorkerMessageFailedEventHandlerTest extends WebTestCase
                     return [
                         new SerializeSuiteException(
                             $serializedSuite,
-                            new SourceRepositoryReaderNotFoundException($unreadableSourceRepository)
+                            new SourceRepositoryReaderNotFoundException($unreadableSourceRepository),
+                            FailureReason::UNABLE_TO_READ_FROM_SOURCE_REPOSITORY,
+                            '/path/that/cannot/be/read/from'
                         ),
                     ];
                 },
@@ -257,7 +270,9 @@ class WorkerMessageFailedEventHandlerTest extends WebTestCase
                     return [
                         new SerializeSuiteException(
                             $serializedSuite,
-                            new \RuntimeException('An unexpected error occurred')
+                            new \RuntimeException('An unexpected error occurred'),
+                            FailureReason::UNKNOWN,
+                            'An unexpected error occurred'
                         ),
                     ];
                 },

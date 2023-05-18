@@ -10,8 +10,6 @@ use SmartAssert\WorkerMessageFailedEventBundle\ExceptionHandlerInterface;
 
 class SerializeSuiteHandler implements ExceptionHandlerInterface
 {
-    use HighPriorityTrait;
-
     public function __construct(
         private readonly SerializedSuiteRepository $serializedSuiteRepository,
     ) {
