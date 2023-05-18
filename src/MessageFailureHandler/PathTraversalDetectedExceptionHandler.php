@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\MessageFailureHandler;
 
 use App\Entity\GitSource;
-use App\Entity\SerializedSuite;
 use App\Enum\SerializedSuite\FailureReason;
 use App\Exception\MessageHandler\SerializeSuiteException;
 use App\Repository\SerializedSuiteRepository;
