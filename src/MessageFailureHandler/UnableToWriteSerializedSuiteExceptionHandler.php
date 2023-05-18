@@ -10,7 +10,7 @@ use App\Exception\MessageHandler\SerializeSuiteException;
 use App\Exception\UnableToWriteSerializedSuiteException;
 use App\Repository\SerializedSuiteRepository;
 
-class UnableToWriteSerializedSuiteExceptionHandler implements FooInterface
+class UnableToWriteSerializedSuiteExceptionHandler implements SuiteSerializationExceptionHandlerInterface
 {
     use HighPriorityTrait;
 

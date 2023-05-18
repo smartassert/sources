@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace App\MessageFailureHandler;
 
-use App\Entity\SerializedSuite;
-use SmartAssert\YamlFile\Exception\Collection\SerializeException;
-use SmartAssert\YamlFile\Exception\ProvisionException;
+use App\Exception\MessageHandler\SerializeSuiteException;
 
 class ProvisionExceptionHandler implements SuiteSerializationExceptionHandlerInterface
 {
@@ -18,18 +16,12 @@ class ProvisionExceptionHandler implements SuiteSerializationExceptionHandlerInt
     ) {
     }
 
-    public function handle(SerializedSuite $serializedSuite, \Throwable $exception): void
+    public function handle(SerializeSuiteException $exception): void
     {
-        if ($exception instanceof SerializeException) {
-            $exception = $exception->getPreviousException();
-        }
-
-        if (!$exception instanceof ProvisionException) {
-            return;
-        }
+        $serializedSuite = $exception->serializedSuite;
 
         foreach ($this->handlers as $handler) {
-            $handler->handle($serializedSuite, $exception);
+            $handler->handle($exception);
         }
     }
 }

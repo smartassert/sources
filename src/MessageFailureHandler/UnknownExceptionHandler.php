@@ -9,7 +9,7 @@ use App\Enum\SerializedSuite\FailureReason;
 use App\Exception\MessageHandler\SerializeSuiteException;
 use App\Repository\SerializedSuiteRepository;
 
-class UnknownExceptionHandler implements FooInterface
+class UnknownExceptionHandler implements SuiteSerializationExceptionHandlerInterface
 {
     public function __construct(
         private readonly SerializedSuiteRepository $serializedSuiteRepository,

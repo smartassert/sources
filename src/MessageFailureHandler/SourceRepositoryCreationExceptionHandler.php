@@ -11,7 +11,7 @@ use App\Exception\MessageHandler\SerializeSuiteException;
 use App\Exception\SourceRepositoryCreationException;
 use App\Repository\SerializedSuiteRepository;
 
-class SourceRepositoryCreationExceptionHandler implements FooInterface
+class SourceRepositoryCreationExceptionHandler implements SuiteSerializationExceptionHandlerInterface
 {
     use HighPriorityTrait;
 

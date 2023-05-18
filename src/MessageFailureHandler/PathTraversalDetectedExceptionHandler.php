@@ -7,8 +7,10 @@ namespace App\MessageFailureHandler;
 use App\Entity\GitSource;
 use App\Entity\SerializedSuite;
 use App\Enum\SerializedSuite\FailureReason;
+use App\Exception\MessageHandler\SerializeSuiteException;
 use App\Repository\SerializedSuiteRepository;
 use League\Flysystem\PathTraversalDetected;
+use SmartAssert\YamlFile\Exception\Collection\SerializeException;
 use SmartAssert\YamlFile\Exception\ProvisionException;
 
 class PathTraversalDetectedExceptionHandler implements SuiteSerializationExceptionHandlerInterface
@@ -18,8 +20,15 @@ class PathTraversalDetectedExceptionHandler implements SuiteSerializationExcepti
     ) {
     }
 
-    public function handle(SerializedSuite $serializedSuite, \Throwable $exception): void
+    public function handle(SerializeSuiteException $exception): void
     {
+        $serializedSuite = $exception->serializedSuite;
+        $exception = $exception->handlerException;
+
+        if ($exception instanceof SerializeException) {
+            $exception = $exception->getPreviousException();
+        }
+
         if (!$exception instanceof ProvisionException) {
             return;
         }

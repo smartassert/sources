@@ -10,7 +10,7 @@ use App\Exception\MessageHandler\SerializeSuiteException;
 use App\Exception\SourceRepositoryReaderNotFoundException;
 use App\Repository\SerializedSuiteRepository;
 
-class SourceRepositoryReaderNotFoundExceptionHandler implements FooInterface
+class SourceRepositoryReaderNotFoundExceptionHandler implements SuiteSerializationExceptionHandlerInterface
 {
     use HighPriorityTrait;
 

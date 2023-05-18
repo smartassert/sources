@@ -10,7 +10,7 @@ use SmartAssert\WorkerMessageFailedEventBundle\ExceptionCollectionHandlerInterfa
 class SerializeSuiteExceptionHandler implements ExceptionCollectionHandlerInterface
 {
     /**
-     * @param iterable<SuiteSerializationExceptionHandlerInterface|FooInterface> $handlers
+     * @param iterable<SuiteSerializationExceptionHandlerInterface> $handlers
      */
     public function __construct(
         private readonly iterable $handlers,
@@ -25,11 +25,7 @@ class SerializeSuiteExceptionHandler implements ExceptionCollectionHandlerInterf
         }
 
         foreach ($this->handlers as $handler) {
-            if ($handler instanceof FooInterface) {
-                $handler->handle($exception);
-            } else {
-                $handler->handle($exception->serializedSuite, $exception->handlerException);
-            }
+            $handler->handle($exception);
         }
     }
 }

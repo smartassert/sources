@@ -10,7 +10,7 @@ use App\Exception\MessageHandler\SerializeSuiteException;
 use App\Exception\NoSourceRepositoryCreatorException;
 use App\Repository\SerializedSuiteRepository;
 
-class NoSourceRepositoryCreatorExceptionHandler implements FooInterface
+class NoSourceRepositoryCreatorExceptionHandler implements SuiteSerializationExceptionHandlerInterface
 {
     use HighPriorityTrait;
 
