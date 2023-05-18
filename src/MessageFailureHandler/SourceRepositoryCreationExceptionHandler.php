@@ -7,10 +7,11 @@ namespace App\MessageFailureHandler;
 use App\Entity\SerializedSuite;
 use App\Enum\SerializedSuite\FailureReason;
 use App\Exception\GitRepositoryException;
+use App\Exception\MessageHandler\SerializeSuiteException;
 use App\Exception\SourceRepositoryCreationException;
 use App\Repository\SerializedSuiteRepository;
 
-class SourceRepositoryCreationExceptionHandler implements SuiteSerializationExceptionHandlerInterface
+class SourceRepositoryCreationExceptionHandler implements FooInterface
 {
     use HighPriorityTrait;
 
@@ -19,13 +20,16 @@ class SourceRepositoryCreationExceptionHandler implements SuiteSerializationExce
     ) {
     }
 
-    public function handle(SerializedSuite $serializedSuite, \Throwable $exception): void
+    public function handle(SerializeSuiteException $exception): void
     {
-        if (!$exception instanceof SourceRepositoryCreationException) {
+        $handlerException = $exception->handlerException;
+        $serializedSuite = $exception->serializedSuite;
+
+        if (!$handlerException instanceof SourceRepositoryCreationException) {
             return;
         }
 
-        $sourceHandlerException = $exception->getPrevious();
+        $sourceHandlerException = $handlerException->getPrevious();
         if (!$sourceHandlerException instanceof GitRepositoryException) {
             return;
         }

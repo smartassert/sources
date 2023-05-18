@@ -6,10 +6,11 @@ namespace App\MessageFailureHandler;
 
 use App\Entity\SerializedSuite;
 use App\Enum\SerializedSuite\FailureReason;
+use App\Exception\MessageHandler\SerializeSuiteException;
 use App\Exception\UnableToWriteSerializedSuiteException;
 use App\Repository\SerializedSuiteRepository;
 
-class UnableToWriteSerializedSuiteExceptionHandler implements SuiteSerializationExceptionHandlerInterface
+class UnableToWriteSerializedSuiteExceptionHandler implements FooInterface
 {
     use HighPriorityTrait;
 
@@ -18,13 +19,16 @@ class UnableToWriteSerializedSuiteExceptionHandler implements SuiteSerialization
     ) {
     }
 
-    public function handle(SerializedSuite $serializedSuite, \Throwable $exception): void
+    public function handle(SerializeSuiteException $exception): void
     {
-        if (!$exception instanceof UnableToWriteSerializedSuiteException) {
+        $handlerException = $exception->handlerException;
+        $serializedSuite = $exception->serializedSuite;
+
+        if (!$handlerException instanceof UnableToWriteSerializedSuiteException) {
             return;
         }
 
-        $serializedSuite->setPreparationFailed(FailureReason::UNABLE_TO_WRITE_TO_TARGET, $exception->path);
+        $serializedSuite->setPreparationFailed(FailureReason::UNABLE_TO_WRITE_TO_TARGET, $handlerException->path);
         $this->serializedSuiteRepository->save($serializedSuite);
     }
 }

@@ -6,10 +6,11 @@ namespace App\MessageFailureHandler;
 
 use App\Entity\SerializedSuite;
 use App\Enum\SerializedSuite\FailureReason;
+use App\Exception\MessageHandler\SerializeSuiteException;
 use App\Exception\SourceRepositoryReaderNotFoundException;
 use App\Repository\SerializedSuiteRepository;
 
-class SourceRepositoryReaderNotFoundExceptionHandler implements SuiteSerializationExceptionHandlerInterface
+class SourceRepositoryReaderNotFoundExceptionHandler implements FooInterface
 {
     use HighPriorityTrait;
 
@@ -18,15 +19,18 @@ class SourceRepositoryReaderNotFoundExceptionHandler implements SuiteSerializati
     ) {
     }
 
-    public function handle(SerializedSuite $serializedSuite, \Throwable $exception): void
+    public function handle(SerializeSuiteException $exception): void
     {
-        if (!$exception instanceof SourceRepositoryReaderNotFoundException) {
+        $handlerException = $exception->handlerException;
+        $serializedSuite = $exception->serializedSuite;
+
+        if (!$handlerException instanceof SourceRepositoryReaderNotFoundException) {
             return;
         }
 
         $serializedSuite->setPreparationFailed(
             FailureReason::UNABLE_TO_READ_FROM_SOURCE_REPOSITORY,
-            $exception->source->getRepositoryPath()
+            $handlerException->source->getRepositoryPath()
         );
         $this->serializedSuiteRepository->save($serializedSuite);
     }
