@@ -19,8 +19,12 @@ class PathTraversalDetectedExceptionHandler implements SuiteSerializationExcepti
     ) {
     }
 
-    public function handle(SerializeSuiteException $exception): void
+    public function handle(\Throwable $exception): void
     {
+        if (!$exception instanceof SerializeSuiteException) {
+            return;
+        }
+
         $serializedSuite = $exception->serializedSuite;
         $exception = $exception->handlerException;
 

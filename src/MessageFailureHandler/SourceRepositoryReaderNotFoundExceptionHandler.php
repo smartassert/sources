@@ -18,8 +18,12 @@ class SourceRepositoryReaderNotFoundExceptionHandler implements SuiteSerializati
     ) {
     }
 
-    public function handle(SerializeSuiteException $exception): void
+    public function handle(\Throwable $exception): void
     {
+        if (!$exception instanceof SerializeSuiteException) {
+            return;
+        }
+
         $handlerException = $exception->handlerException;
         $serializedSuite = $exception->serializedSuite;
 
