@@ -25,16 +25,16 @@ class NoSourceRepositoryCreatorExceptionHandler implements ExceptionHandlerInter
             return;
         }
 
-        $handlerException = $throwable->handlerException;
         $serializedSuite = $throwable->serializedSuite;
+        $throwable = $throwable->getPrevious();
 
-        if (!$handlerException instanceof NoSourceRepositoryCreatorException) {
+        if (!$throwable instanceof NoSourceRepositoryCreatorException) {
             return;
         }
 
         $serializedSuite->setPreparationFailed(
             FailureReason::UNSERIALIZABLE_SOURCE_TYPE,
-            $handlerException->source->getType()->value
+            $throwable->source->getType()->value
         );
         $this->serializedSuiteRepository->save($serializedSuite);
     }

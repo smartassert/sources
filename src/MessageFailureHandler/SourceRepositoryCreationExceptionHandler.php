@@ -26,30 +26,30 @@ class SourceRepositoryCreationExceptionHandler implements ExceptionHandlerInterf
             return;
         }
 
-        $handlerException = $throwable->handlerException;
         $serializedSuite = $throwable->serializedSuite;
+        $throwable = $throwable->getPrevious();
 
-        if (!$handlerException instanceof SourceRepositoryCreationException) {
+        if (!$throwable instanceof SourceRepositoryCreationException) {
             return;
         }
 
-        $sourceHandlerException = $handlerException->getPrevious();
-        if (!$sourceHandlerException instanceof GitRepositoryException) {
+        $throwable = $throwable->getPrevious();
+        if (!$throwable instanceof GitRepositoryException) {
             return;
         }
 
-        if (GitRepositoryException::CODE_GIT_CLONE_FAILED === $sourceHandlerException->getCode()) {
+        if (GitRepositoryException::CODE_GIT_CLONE_FAILED === $throwable->getCode()) {
             $serializedSuite->setPreparationFailed(
                 FailureReason::GIT_CLONE,
-                $sourceHandlerException->getMessage()
+                $throwable->getMessage()
             );
             $this->serializedSuiteRepository->save($serializedSuite);
         }
 
-        if (GitRepositoryException::CODE_GIT_CHECKOUT_FAILED === $sourceHandlerException->getCode()) {
+        if (GitRepositoryException::CODE_GIT_CHECKOUT_FAILED === $throwable->getCode()) {
             $serializedSuite->setPreparationFailed(
                 FailureReason::GIT_CHECKOUT,
-                $sourceHandlerException->getMessage()
+                $throwable->getMessage()
             );
             $this->serializedSuiteRepository->save($serializedSuite);
         }

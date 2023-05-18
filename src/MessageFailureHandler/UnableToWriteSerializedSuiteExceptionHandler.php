@@ -25,14 +25,14 @@ class UnableToWriteSerializedSuiteExceptionHandler implements ExceptionHandlerIn
             return;
         }
 
-        $handlerException = $throwable->handlerException;
         $serializedSuite = $throwable->serializedSuite;
+        $throwable = $throwable->handlerException;
 
-        if (!$handlerException instanceof UnableToWriteSerializedSuiteException) {
+        if (!$throwable instanceof UnableToWriteSerializedSuiteException) {
             return;
         }
 
-        $serializedSuite->setPreparationFailed(FailureReason::UNABLE_TO_WRITE_TO_TARGET, $handlerException->path);
+        $serializedSuite->setPreparationFailed(FailureReason::UNABLE_TO_WRITE_TO_TARGET, $throwable->path);
         $this->serializedSuiteRepository->save($serializedSuite);
     }
 }

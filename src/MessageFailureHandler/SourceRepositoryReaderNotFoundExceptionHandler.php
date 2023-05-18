@@ -25,8 +25,8 @@ class SourceRepositoryReaderNotFoundExceptionHandler implements ExceptionHandler
             return;
         }
 
-        $handlerException = $throwable->handlerException;
         $serializedSuite = $throwable->serializedSuite;
+        $handlerException = $throwable->handlerException;
 
         if (!$handlerException instanceof SourceRepositoryReaderNotFoundException) {
             return;

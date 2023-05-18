@@ -22,10 +22,10 @@ class UnknownExceptionHandler implements ExceptionHandlerInterface
             return;
         }
 
-        $handlerException = $throwable->handlerException;
         $serializedSuite = $throwable->serializedSuite;
+        $throwable = $throwable->handlerException;
 
-        $serializedSuite->setPreparationFailed(FailureReason::UNKNOWN, $handlerException->getMessage());
+        $serializedSuite->setPreparationFailed(FailureReason::UNKNOWN, $throwable->getMessage());
         $this->serializedSuiteRepository->save($serializedSuite);
     }
 
