@@ -4,17 +4,32 @@ declare(strict_types=1);
 
 namespace App\MessageFailureHandler;
 
+use App\Entity\SerializedSuite;
+use SmartAssert\YamlFile\Exception\Collection\SerializeException;
 use SmartAssert\YamlFile\Exception\ProvisionException;
 
-class ProvisionExceptionHandler extends AbstractSpecificExceptionDelegatingHandler
+class ProvisionExceptionHandler implements SuiteSerializationExceptionHandlerInterface
 {
-    protected function handles(\Throwable $throwable): bool
-    {
-        return $throwable instanceof ProvisionException;
+    /**
+     * @param iterable<SuiteSerializationExceptionHandlerInterface> $handlers
+     */
+    public function __construct(
+        private readonly iterable $handlers,
+    ) {
     }
 
-    protected function getExceptionToHandle(\Throwable $throwable): \Throwable
+    public function handle(SerializedSuite $serializedSuite, \Throwable $exception): void
     {
-        return $throwable instanceof ProvisionException ? $throwable->getPreviousException() : $throwable;
+        if ($exception instanceof SerializeException) {
+            $exception = $exception->getPreviousException();
+        }
+
+        if (!$exception instanceof ProvisionException) {
+            return;
+        }
+
+        foreach ($this->handlers as $handler) {
+            $handler->handle($serializedSuite, $exception);
+        }
     }
 }

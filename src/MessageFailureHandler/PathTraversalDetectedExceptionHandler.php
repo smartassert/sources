@@ -9,6 +9,7 @@ use App\Entity\SerializedSuite;
 use App\Enum\SerializedSuite\FailureReason;
 use App\Repository\SerializedSuiteRepository;
 use League\Flysystem\PathTraversalDetected;
+use SmartAssert\YamlFile\Exception\ProvisionException;
 
 class PathTraversalDetectedExceptionHandler implements SuiteSerializationExceptionHandlerInterface
 {
@@ -19,7 +20,12 @@ class PathTraversalDetectedExceptionHandler implements SuiteSerializationExcepti
 
     public function handle(SerializedSuite $serializedSuite, \Throwable $exception): void
     {
-        if (!$exception instanceof PathTraversalDetected) {
+        if (!$exception instanceof ProvisionException) {
+            return;
+        }
+
+        $previousException = $exception->getPreviousException();
+        if (!$previousException instanceof PathTraversalDetected) {
             return;
         }
 
