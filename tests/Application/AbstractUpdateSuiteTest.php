@@ -94,7 +94,7 @@ abstract class AbstractUpdateSuiteTest extends AbstractSuiteTest
     /**
      * @return array<mixed>
      */
-    public function updateSuccessDataProvider(): array
+    public static function updateSuccessDataProvider(): array
     {
         $primarySourceIdSelector = function (string $sourceId): string {
             return $sourceId;

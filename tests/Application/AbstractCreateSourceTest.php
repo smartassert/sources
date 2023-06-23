@@ -94,7 +94,7 @@ abstract class AbstractCreateSourceTest extends AbstractApplicationTest
     /**
      * @return array<mixed>
      */
-    public function createFileSourceSuccessDataProvider(): array
+    public static function createFileSourceSuccessDataProvider(): array
     {
         $label = md5((string) rand());
 
@@ -115,7 +115,7 @@ abstract class AbstractCreateSourceTest extends AbstractApplicationTest
     /**
      * @return array<mixed>
      */
-    public function createGitSourceSuccessDataProvider(): array
+    public static function createGitSourceSuccessDataProvider(): array
     {
         $label = md5((string) rand());
         $hostUrl = 'https://example.com/' . md5((string) rand()) . '.git';
@@ -261,7 +261,7 @@ abstract class AbstractCreateSourceTest extends AbstractApplicationTest
     /**
      * @return array<mixed>
      */
-    public function createSourceWithNonUniqueLabelDataProvider(): array
+    public static function createSourceWithNonUniqueLabelDataProvider(): array
     {
         $label = md5((string) rand());
 

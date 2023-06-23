@@ -77,7 +77,7 @@ class SuiteSerializerFileSourceTest extends WebTestCase
     /**
      * @return array<mixed>
      */
-    public function writeSuccessDataProvider(): array
+    public static function writeSuccessDataProvider(): array
     {
         return [
             'empty source, empty manifest' => [

@@ -60,7 +60,7 @@ class WorkerMessageFailedEventHandlerTest extends WebTestCase
     /**
      * @return array<mixed>
      */
-    public function invokeDoesNotHandleDataProvider(): array
+    public static function invokeDoesNotHandleDataProvider(): array
     {
         return [
             'event will retry' => [
@@ -97,7 +97,7 @@ class WorkerMessageFailedEventHandlerTest extends WebTestCase
     /**
      * @return array<mixed>
      */
-    public function handleNoSerializedSuiteStateChangeDataProvider(): array
+    public static function handleNoSerializedSuiteStateChangeDataProvider(): array
     {
         return [
             'no relevant nested exceptions' => [

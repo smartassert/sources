@@ -22,7 +22,7 @@ class DirectoryListingTest extends TestCase
     /**
      * @return array<mixed>
      */
-    public function getPathsDataProvider(): array
+    public static function getPathsDataProvider(): array
     {
         return [
             'empty' => [

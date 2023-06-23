@@ -50,7 +50,7 @@ abstract class AbstractListSourcesTest extends AbstractApplicationTest
     /**
      * @return array<mixed>
      */
-    public function listSuccessDataProvider(): array
+    public static function listSuccessDataProvider(): array
     {
         return [
             'no sources' => [

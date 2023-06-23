@@ -83,7 +83,7 @@ abstract class AbstractCreateSerializedSuiteTest extends AbstractApplicationTest
     /**
      * @return array<mixed>
      */
-    public function serializeSuccessDataProvider(): array
+    public static function serializeSuccessDataProvider(): array
     {
         return [
             'file, empty tests' => [

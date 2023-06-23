@@ -15,7 +15,7 @@ trait CreateUpdateGitSourceDataProviderTrait
     /**
      * @return array<mixed>
      */
-    public function createUpdateGitSourceInvalidRequestDataProvider(): array
+    public static function createUpdateGitSourceInvalidRequestDataProvider(): array
     {
         $label = 'label value';
         $hostUrl = 'https://example.com/repository.git';

@@ -69,7 +69,7 @@ class ExecutorTest extends TestCase
     /**
      * @return array<mixed>
      */
-    public function executeSuccessDataProvider(): array
+    public static function executeSuccessDataProvider(): array
     {
         return [
             'command exits with no errors' => [

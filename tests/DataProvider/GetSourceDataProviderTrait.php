@@ -15,7 +15,7 @@ trait GetSourceDataProviderTrait
     /**
      * @return array<mixed>
      */
-    public function getSourceDataProvider(): array
+    public static function getSourceDataProvider(): array
     {
         return [
             'git source with credentials' => [

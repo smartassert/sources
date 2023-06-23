@@ -120,7 +120,7 @@ abstract class AbstractUpdateSourceTest extends AbstractApplicationTest
     /**
      * @return array<mixed>
      */
-    public function updateNewLabelNotUniqueDataProvider(): array
+    public static function updateNewLabelNotUniqueDataProvider(): array
     {
         $targetSourceLabel = md5((string) rand());
         $conflictSourceLabel = md5((string) rand());
@@ -226,7 +226,7 @@ abstract class AbstractUpdateSourceTest extends AbstractApplicationTest
     /**
      * @return array<mixed>
      */
-    public function updateSourceSuccessDataProvider(): array
+    public static function updateSourceSuccessDataProvider(): array
     {
         return [
             'git source, credentials present and empty' => [
@@ -379,7 +379,7 @@ abstract class AbstractUpdateSourceTest extends AbstractApplicationTest
     /**
      * @return array<mixed>
      */
-    public function updateNewLabelUsedByDeletedSourceDataProvider(): array
+    public static function updateNewLabelUsedByDeletedSourceDataProvider(): array
     {
         return [
             'file source using label of deleted file source' => [

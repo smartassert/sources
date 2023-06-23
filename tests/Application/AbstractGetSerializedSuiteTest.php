@@ -78,7 +78,7 @@ abstract class AbstractGetSerializedSuiteTest extends AbstractApplicationTest
     /**
      * @return array<mixed>
      */
-    public function serializeSuccessDataProvider(): array
+    public static function serializeSuccessDataProvider(): array
     {
         return [
             'no parameters, state=requested' => [

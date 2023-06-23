@@ -85,7 +85,7 @@ abstract class AbstractListFileSourceFilenamesTest extends AbstractApplicationTe
     /**
      * @return array<mixed>
      */
-    public function listSuccessDataProvider(): array
+    public static function listSuccessDataProvider(): array
     {
         return [
             'no files' => [

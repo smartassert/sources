@@ -13,7 +13,7 @@ trait GetSuiteDataProviderTrait
     /**
      * @return array<mixed>
      */
-    public function getSuiteDataProvider(): array
+    public static function getSuiteDataProvider(): array
     {
         $label = md5((string) rand());
         $tests = [

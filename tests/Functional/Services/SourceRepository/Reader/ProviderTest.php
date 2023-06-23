@@ -53,7 +53,7 @@ class ProviderTest extends WebTestCase
     /**
      * @return array<mixed>
      */
-    public function findSuccessDataProvider(): array
+    public static function findSuccessDataProvider(): array
     {
         return [
             'file source' => [
