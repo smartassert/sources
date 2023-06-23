@@ -55,7 +55,7 @@ class SourceRepositoryTest extends WebTestCase
     /**
      * @return array<mixed>
      */
-    public function findNonDeletedByUserAndTypeDataProvider(): array
+    public static function findNonDeletedByUserAndTypeDataProvider(): array
     {
         $userId = UserId::create();
         $user = new User($userId, 'non-empty string');

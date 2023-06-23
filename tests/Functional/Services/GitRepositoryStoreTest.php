@@ -145,7 +145,7 @@ class GitRepositoryStoreTest extends WebTestCase
     /**
      * @return array<mixed>
      */
-    public function initializeThrowsGitActionExceptionDataProvider(): array
+    public static function initializeThrowsGitActionExceptionDataProvider(): array
     {
         return [
             'clone process throws exception' => [
@@ -181,12 +181,17 @@ class GitRepositoryStoreTest extends WebTestCase
                     ?object $checkoutOutcome,
                     RepositoryException $exception
                 ) {
-                    self::assertStringEndsWith($exception->getMessage(), $cloneOutcome->getErrorOutput());
+                    $exceptionMessage = $exception->getMessage();
+                    self::assertNotEmpty($exceptionMessage);
+                    self::assertStringEndsWith($exceptionMessage, $cloneOutcome->getErrorOutput());
 
                     $gitActionException = $exception->getPrevious();
                     self::assertInstanceOf(GitActionException::class, $gitActionException);
                     self::assertSame(GitActionException::ACTION_CLONE, $gitActionException->getAction());
-                    self::assertStringEndsWith($gitActionException->getMessage(), $cloneOutcome->getErrorOutput());
+
+                    $gitActionExceptionMessage = $gitActionException->getMessage();
+                    self::assertNotEmpty($gitActionExceptionMessage);
+                    self::assertStringEndsWith($gitActionExceptionMessage, $cloneOutcome->getErrorOutput());
                 },
             ],
             'checkout process throws exception' => [

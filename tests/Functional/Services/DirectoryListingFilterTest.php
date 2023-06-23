@@ -61,7 +61,7 @@ class DirectoryListingFilterTest extends WebTestCase
     /**
      * @return array<mixed>
      */
-    public function listDataProvider(): array
+    public static function listDataProvider(): array
     {
         $source = SourceOriginFactory::create(type: 'file');
         \assert($source instanceof FileSource);

@@ -36,7 +36,7 @@ class ProcessExecutorExceptionTest extends TestCase
     /**
      * @return array<mixed>
      */
-    public function getPropertiesDataProvider(): array
+    public static function getPropertiesDataProvider(): array
     {
         $unableToLaunchRuntimeException = new RuntimeException('Unable to launch a new process');
         $cwdDoesNotExistRuntimeException = new RuntimeException('The provided cwd "/foo" does not exist');

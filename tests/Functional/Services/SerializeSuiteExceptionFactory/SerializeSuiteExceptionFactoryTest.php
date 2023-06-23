@@ -48,7 +48,7 @@ class SerializeSuiteExceptionFactoryTest extends WebTestCase
     /**
      * @return array<mixed>
      */
-    public function createDataProvider(): array
+    public static function createDataProvider(): array
     {
         $fileSource = new FileSource(md5((string) rand()), md5((string) rand()));
         $fileSourceSuite = new Suite(md5((string) rand()));

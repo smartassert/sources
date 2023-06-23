@@ -35,7 +35,7 @@ class GitRepositoryCheckoutHandlerTest extends WebTestCase
     /**
      * @return array<mixed>
      */
-    public function checkoutDataProvider(): array
+    public static function checkoutDataProvider(): array
     {
         return [
             'without ref' => [

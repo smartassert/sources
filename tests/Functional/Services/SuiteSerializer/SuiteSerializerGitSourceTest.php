@@ -90,7 +90,7 @@ class SuiteSerializerGitSourceTest extends WebTestCase
     /**
      * @return array<mixed>
      */
-    public function writeSuccessDataProvider(): array
+    public static function writeSuccessDataProvider(): array
     {
         return [
             'full' => [

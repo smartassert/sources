@@ -71,7 +71,7 @@ class ProviderTest extends WebTestCase
     /**
      * @return array<mixed>
      */
-    public function getYamlFilesSuccessDataProvider(): array
+    public static function getYamlFilesSuccessDataProvider(): array
     {
         $source = SourceOriginFactory::create(type: 'file');
         \assert($source instanceof FileSource);

@@ -45,7 +45,7 @@
         "phpstan/phpstan-mockery": "^1.1",
         "phpstan/phpstan-phpunit": "^1.3",
         "phpstan/phpstan-symfony": "^1.3",
-        "phpunit/phpunit": "^9.6",
+        "phpunit/phpunit": "^10.2",
         "smartassert/symfony-test-client": "^0.1.0",
         "smartassert/test-authenticaton-provider-bundle": ">=0.1,<1",
         "squizlabs/php_codesniffer": "dev-master#498a939c8ff49f0b00769144bdd07933352d77e8",

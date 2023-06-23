@@ -21,7 +21,7 @@ class DefinitionTest extends TestCase
     /**
      * @return array<mixed>
      */
-    public function buildDataProvider(): array
+    public static function buildDataProvider(): array
     {
         return [
             'no options, no arguments' => [

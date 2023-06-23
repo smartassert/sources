@@ -57,7 +57,7 @@ abstract class AbstractCreateSuiteTest extends AbstractSuiteTest
     /**
      * @return array<mixed>
      */
-    public function createSuccessDataProvider(): array
+    public static function createSuccessDataProvider(): array
     {
         return [
             'no tests' => [
@@ -107,7 +107,7 @@ abstract class AbstractCreateSuiteTest extends AbstractSuiteTest
     /**
      * @return array<mixed>
      */
-    public function createIsIdempotentDataProvider(): array
+    public static function createIsIdempotentDataProvider(): array
     {
         return [
             'has tests' => [

@@ -55,7 +55,7 @@ abstract class AbstractFileSourceFileTest extends AbstractApplicationTest
     /**
      * @return array<mixed>
      */
-    public function addFileInvalidRequestDataProvider(): array
+    public static function addFileInvalidRequestDataProvider(): array
     {
         return [
             'name empty with .yaml extension, content non-empty' => [
@@ -149,7 +149,7 @@ abstract class AbstractFileSourceFileTest extends AbstractApplicationTest
     /**
      * @return array<mixed>
      */
-    public function yamlFileInvalidRequestDataProvider(): array
+    public static function yamlFileInvalidRequestDataProvider(): array
     {
         return [
             'name empty with .yaml extension' => [

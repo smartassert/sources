@@ -238,7 +238,7 @@ abstract class AbstractUnauthorizedUserTest extends AbstractApplicationTest
     /**
      * @return array<mixed>
      */
-    public function unauthorizedUserDataProvider(): array
+    public static function unauthorizedUserDataProvider(): array
     {
         return [
             'no token' => [

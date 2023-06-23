@@ -53,7 +53,7 @@ class MutatorTest extends WebTestCase
     /**
      * @return array<mixed>
      */
-    public function updateFileNoChangesDataProvider(): array
+    public static function updateFileNoChangesDataProvider(): array
     {
         $userId = UserId::create();
         $label = 'file source label';
@@ -83,7 +83,7 @@ class MutatorTest extends WebTestCase
     /**
      * @return array<mixed>
      */
-    public function updateGitNoChangesDataProvider(): array
+    public static function updateGitNoChangesDataProvider(): array
     {
         $userId = UserId::create();
         $label = 'git source label';
@@ -119,7 +119,7 @@ class MutatorTest extends WebTestCase
     /**
      * @return array<mixed>
      */
-    public function updateFileDataProvider(): array
+    public static function updateFileDataProvider(): array
     {
         $userId = UserId::create();
         $label = 'file source label';
@@ -155,7 +155,7 @@ class MutatorTest extends WebTestCase
     /**
      * @return array<mixed>
      */
-    public function updateGitDataProvider(): array
+    public static function updateGitDataProvider(): array
     {
         $userId = UserId::create();
         $label = 'label';
