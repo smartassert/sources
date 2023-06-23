@@ -21,21 +21,21 @@
         "smartassert/worker-job-source": "^1.0",
         "smartassert/worker-message-failed-event-bundle": ">=0.6,<1",
         "smartassert/yaml-file": "^6.0",
-        "symfony/console": "6.2.*",
-        "symfony/doctrine-messenger": "6.2.*",
-        "symfony/dotenv": "6.2.*",
-        "symfony/finder": "6.2.*",
+        "symfony/console": "6.3.*",
+        "symfony/doctrine-messenger": "6.3.*",
+        "symfony/dotenv": "6.3.*",
+        "symfony/finder": "6.3.*",
         "symfony/flex": "^2",
-        "symfony/framework-bundle": "6.2.*",
-        "symfony/messenger": "6.2.*",
+        "symfony/framework-bundle": "6.3.*",
+        "symfony/messenger": "6.3.*",
         "symfony/monolog-bundle": "^3.7",
-        "symfony/process": "6.2.*",
-        "symfony/proxy-manager-bridge": "6.2.*",
-        "symfony/runtime": "6.2.*",
-        "symfony/security-bundle": "6.2.*",
-        "symfony/string": "6.2.*",
-        "symfony/uid": "6.2.*",
-        "symfony/yaml": "6.2.*"
+        "symfony/process": "6.3.*",
+        "symfony/proxy-manager-bridge": "6.3.*",
+        "symfony/runtime": "6.3.*",
+        "symfony/security-bundle": "6.3.*",
+        "symfony/string": "6.3.*",
+        "symfony/uid": "6.3.*",
+        "symfony/yaml": "6.3.*"
     },
     "require-dev": {
         "mockery/mockery": "^1.4",
@@ -49,8 +49,8 @@
         "smartassert/symfony-test-client": "^1.0",
         "smartassert/test-authenticaton-provider-bundle": ">=0.4,<1",
         "squizlabs/php_codesniffer": "dev-master#498a939c8ff49f0b00769144bdd07933352d77e8",
-        "symfony/browser-kit": "6.2.*",
-        "symfony/expression-language": "6.2.*",
+        "symfony/browser-kit": "6.3.*",
+        "symfony/expression-language": "6.3.*",
         "symfony/maker-bundle": "^1.36",
         "symfony/phpunit-bridge": "^6.0",
         "symfony/psr-http-message-bridge": "^2.1",
@@ -162,7 +162,7 @@
     "extra": {
         "symfony": {
             "allow-contrib": false,
-            "require": "6.2.*"
+            "require": "6.3.*"
         }
     }
 }
