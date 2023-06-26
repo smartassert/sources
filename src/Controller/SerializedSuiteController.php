@@ -5,16 +5,16 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use App\Entity\SerializedSuite;
-use App\Entity\Suite;
 use App\Exception\EmptyEntityIdException;
 use App\Exception\SerializedSuiteSourceDoesNotExistException;
 use App\Message\SerializeSuite;
+use App\Repository\SerializedSuiteRepository;
+use App\Request\CreateSerializedSuiteRequest;
 use App\Response\YamlResponse;
-use App\Services\Suite\SerializedSuiteFactory;
+use App\Services\EntityIdFactory;
 use App\Services\SuiteSerializer;
 use League\Flysystem\FilesystemException;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Routing\Annotation\Route;
@@ -26,12 +26,13 @@ class SerializedSuiteController
      */
     #[Route(SuiteRoutes::ROUTE_SUITE . '/serialize', name: 'serialized_suite_create', methods: ['POST'])]
     public function create(
-        Request $request,
-        Suite $suite,
+        CreateSerializedSuiteRequest $request,
+        EntityIdFactory $entityIdFactory,
+        SerializedSuiteRepository $repository,
         MessageBusInterface $messageBus,
-        SerializedSuiteFactory $serializedSuiteFactory,
     ): Response {
-        $serializedSuite = $serializedSuiteFactory->create($suite, $request);
+        $serializedSuite = new SerializedSuite($entityIdFactory->create(), $request->suite, $request->runParameters);
+        $repository->save($serializedSuite);
 
         $messageBus->dispatch(SerializeSuite::createFromSerializedSuite($serializedSuite));
 
