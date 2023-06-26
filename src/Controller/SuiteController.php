@@ -53,14 +53,9 @@ class SuiteController
         }
     }
 
-    /**
-     * @throws AccessDeniedException
-     */
     #[Route(SuiteRoutes::ROUTE_SUITE, name: 'suite_get', methods: ['GET'])]
     public function get(Suite $suite): Response
     {
-        $this->entityAccessChecker->denyAccessUnlessGranted($suite);
-
         return new JsonResponse($suite);
     }
 
@@ -76,15 +71,12 @@ class SuiteController
     }
 
     /**
-     * @throws AccessDeniedException
      * @throws InvalidRequestException
      * @throws ModifyReadOnlyEntityException
      */
     #[Route(SuiteRoutes::ROUTE_SUITE, name: 'suite_update', methods: ['PUT'])]
     public function update(Suite $suite, SuiteRequest $request): Response
     {
-        $this->entityAccessChecker->denyAccessUnlessGranted($suite);
-
         if (null !== $suite->getDeletedAt()) {
             throw new ModifyReadOnlyEntityException($suite->id, 'suite');
         }
@@ -100,14 +92,9 @@ class SuiteController
         }
     }
 
-    /**
-     * @throws AccessDeniedException
-     */
     #[Route(SuiteRoutes::ROUTE_SUITE, name: 'suite_delete', methods: ['DELETE'])]
     public function delete(Suite $suite): Response
     {
-        $this->entityAccessChecker->denyAccessUnlessGranted($suite);
-
         if (null === $suite->getDeletedAt()) {
             $this->repository->delete($suite);
         }

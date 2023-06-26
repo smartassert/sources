@@ -29,7 +29,6 @@ class SerializedSuiteController
     }
 
     /**
-     * @throws AccessDeniedException
      * @throws EmptyEntityIdException
      */
     #[Route(SuiteRoutes::ROUTE_SUITE . '/serialize', name: 'serialized_suite_create', methods: ['POST'])]
@@ -39,8 +38,6 @@ class SerializedSuiteController
         MessageBusInterface $messageBus,
         SerializedSuiteFactory $serializedSuiteFactory,
     ): Response {
-        $this->entityAccessChecker->denyAccessUnlessGranted($suite);
-
         $serializedSuite = $serializedSuiteFactory->create($suite, $request);
 
         $messageBus->dispatch(SerializeSuite::createFromSerializedSuite($serializedSuite));

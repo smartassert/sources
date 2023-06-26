@@ -71,7 +71,7 @@ abstract class AbstractInvalidSuiteUserTest extends AbstractApplicationTest
             ]
         );
 
-        $this->responseAsserter->assertNotFoundResponse($response);
+        $this->responseAsserter->assertForbiddenResponse($response);
     }
 
     public function testDeleteSuite(): void
