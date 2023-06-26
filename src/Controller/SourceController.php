@@ -15,7 +15,6 @@ use App\Exception\NonUniqueEntityLabelException;
 use App\Repository\SourceRepository;
 use App\Request\FileSourceRequest;
 use App\Request\GitSourceRequest;
-use App\Security\EntityAccessChecker;
 use App\Services\ExceptionFactory;
 use App\Services\Source\FileSourceFactory;
 use App\Services\Source\GitSourceFactory;
@@ -26,7 +25,6 @@ use SmartAssert\UsersSecurityBundle\Security\User;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 class SourceController
@@ -34,7 +32,6 @@ class SourceController
     public function __construct(
         private readonly SourceRepository $repository,
         private readonly ExceptionFactory $exceptionFactory,
-        private readonly EntityAccessChecker $entityAccessChecker,
     ) {
     }
 
@@ -70,19 +67,13 @@ class SourceController
         return new JsonResponse($this->repository->findNonDeletedByUserAndType($user, [Type::FILE, Type::GIT]));
     }
 
-    /**
-     * @throws AccessDeniedException
-     */
     #[Route(SourceRoutes::ROUTE_SOURCE, name: 'user_source_get', methods: ['GET'])]
     public function get(SourceInterface $source): Response
     {
-        $this->entityAccessChecker->denyAccessUnlessGranted($source);
-
         return new JsonResponse($source);
     }
 
     /**
-     * @throws AccessDeniedException
      * @throws InvalidRequestException
      * @throws ModifyReadOnlyEntityException
      */
@@ -93,8 +84,6 @@ class SourceController
         FileSourceRequest|GitSourceRequest $request,
         ExceptionFactory $exceptionFactory,
     ): Response {
-        $this->entityAccessChecker->denyAccessUnlessGranted($source);
-
         if (null !== $source->getDeletedAt()) {
             throw new ModifyReadOnlyEntityException($source->getId(), 'source');
         }
@@ -119,14 +108,11 @@ class SourceController
     }
 
     /**
-     * @throws AccessDeniedException
      * @throws FilesystemException
      */
     #[Route(SourceRoutes::ROUTE_SOURCE, name: 'user_source_delete', methods: ['DELETE'])]
     public function delete(SourceInterface $source, FilesystemWriter $fileSourceWriter): Response
     {
-        $this->entityAccessChecker->denyAccessUnlessGranted($source);
-
         if (null === $source->getDeletedAt()) {
             $this->repository->delete($source);
 

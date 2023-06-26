@@ -9,6 +9,7 @@ use App\Entity\GitSource;
 use App\Enum\Source\Type;
 use App\Repository\SourceRepository;
 use App\Request\OriginSourceRequest;
+use App\Request\SuiteRequest;
 use App\Tests\Services\SourceOriginFactory;
 
 abstract class AbstractInvalidSourceUserTest extends AbstractApplicationTest
@@ -104,6 +105,29 @@ abstract class AbstractInvalidSourceUserTest extends AbstractApplicationTest
         $response = $this->applicationClient->makeDeleteSourceRequest(
             self::$apiTokens->get(self::USER_1_EMAIL),
             $this->fileSource->getId()
+        );
+
+        $this->responseAsserter->assertForbiddenResponse($response);
+    }
+
+    public function testListFileSourceFilenamesInvalidUser(): void
+    {
+        $response = $this->applicationClient->makeGetFileSourceFilenamesRequest(
+            self::$apiTokens->get(self::USER_1_EMAIL),
+            $this->fileSource->getId()
+        );
+
+        $this->responseAsserter->assertForbiddenResponse($response);
+    }
+
+    public function testCreateSuiteInvalidUser(): void
+    {
+        $response = $this->applicationClient->makeCreateSuiteRequest(
+            self::$apiTokens->get(self::USER_1_EMAIL),
+            [
+                SuiteRequest::PARAMETER_SOURCE_ID => $this->fileSource->getId(),
+                SuiteRequest::PARAMETER_LABEL => md5((string) rand()),
+            ]
         );
 
         $this->responseAsserter->assertForbiddenResponse($response);
