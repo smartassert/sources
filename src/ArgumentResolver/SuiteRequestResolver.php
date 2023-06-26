@@ -11,23 +11,27 @@ use App\Exception\InvalidRequestException;
 use App\Repository\SourceRepository;
 use App\Request\SuiteRequest;
 use App\ResponseBody\InvalidField;
+use App\Security\EntityAccessChecker;
 use SmartAssert\YamlFile\Filename;
 use SmartAssert\YamlFile\Validator\YamlFilenameValidator;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Controller\ValueResolverInterface;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 class SuiteRequestResolver implements ValueResolverInterface
 {
     public function __construct(
         private readonly SourceRepository $sourceRepository,
         private readonly YamlFilenameValidator $yamlFilenameValidator,
+        private readonly EntityAccessChecker $entityAccessChecker,
     ) {
     }
 
     /**
      * @return SuiteRequest[]
      *
+     * @throws AccessDeniedException
      * @throws InvalidRequestException
      * @throws EntityNotFoundException
      */
@@ -41,6 +45,7 @@ class SuiteRequestResolver implements ValueResolverInterface
     }
 
     /**
+     * @throws AccessDeniedException
      * @throws EntityNotFoundException
      */
     private function getSource(Request $request): SourceInterface
@@ -53,6 +58,8 @@ class SuiteRequestResolver implements ValueResolverInterface
         if (null === $source) {
             throw new EntityNotFoundException($sourceId, 'Source');
         }
+
+        $this->entityAccessChecker->denyAccessUnlessGranted($source);
 
         return $source;
     }
