@@ -89,7 +89,7 @@ class SourceRepository extends ServiceEntityRepository
     /**
      * @param Type[] $types
      *
-     * @return string[]
+     * @return array<value-of<Type>>
      */
     private function createTypeParameters(array $types): array
     {

@@ -105,8 +105,8 @@ class SerializedSuite implements UserHeldEntityInterface, DirectoryLocatorInterf
      *     "id": string,
      *     "suite_id": string,
      *     "parameters": array<string, string>,
-     *     "state": string,
-     *     "failure_reason"?: string,
+     *     "state": value-of<State>,
+     *     "failure_reason"?: value-of<FailureReason>,
      *     "failure_message"?: string
      * }
      */
