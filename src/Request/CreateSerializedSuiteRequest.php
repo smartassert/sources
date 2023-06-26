@@ -9,7 +9,7 @@ use App\Entity\Suite;
 class CreateSerializedSuiteRequest
 {
     /**
-     * @param array<non-empty-string, scalar> $runParameters
+     * @param array<non-empty-string, string> $runParameters
      */
     public function __construct(
         public readonly Suite $suite,
