@@ -14,6 +14,7 @@ use App\Request\SuiteRequest;
 use App\Services\EntityIdFactory;
 use App\Tests\Services\SourceOriginFactory;
 use App\Tests\Services\SuiteFactory;
+use Symfony\Component\Uid\Ulid;
 
 abstract class AbstractInvalidSuiteUserTest extends AbstractApplicationTest
 {
@@ -88,6 +89,7 @@ abstract class AbstractInvalidSuiteUserTest extends AbstractApplicationTest
     {
         $response = $this->applicationClient->makeCreateSerializedSuiteRequest(
             self::$apiTokens->get(self::USER_1_EMAIL),
+            (string) new Ulid(),
             $this->suite->id,
             [],
         );

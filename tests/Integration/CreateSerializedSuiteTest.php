@@ -12,6 +12,7 @@ use App\Request\SuiteRequest;
 use App\Services\DirectoryListingFilter;
 use App\Tests\Application\AbstractCreateSerializedSuiteTest;
 use League\Flysystem\FilesystemOperator;
+use Symfony\Component\Uid\Ulid;
 
 class CreateSerializedSuiteTest extends AbstractCreateSerializedSuiteTest
 {
@@ -82,18 +83,14 @@ class CreateSerializedSuiteTest extends AbstractCreateSerializedSuiteTest
         \assert(is_array($createSuiteResponseData));
         $suiteId = $createSuiteResponseData['id'] ?? null;
 
+        $serializedSuiteId = (string) (new Ulid());
+
         $createSerializedSuiteResponse = $this->applicationClient->makeCreateSerializedSuiteRequest(
             self::$apiTokens->get(self::USER_1_EMAIL),
+            $serializedSuiteId,
             $suiteId,
             []
         );
-
-        $createSerializedSuiteResponseData = json_decode(
-            $createSerializedSuiteResponse->getBody()->getContents(),
-            true
-        );
-        \assert(is_array($createSerializedSuiteResponseData));
-        $serializedSuiteId = $createSerializedSuiteResponseData['id'] ?? null;
 
         $this->waitUntilSuiteStateIs($serializedSuiteId, State::PREPARED);
 

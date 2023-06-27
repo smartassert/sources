@@ -11,6 +11,7 @@ use App\Enum\SerializedSuite\State;
 use App\Repository\SerializedSuiteRepository;
 use App\Repository\SourceRepository;
 use App\Repository\SuiteRepository;
+use App\Services\EntityIdFactory;
 use App\Tests\Services\SourceOriginFactory;
 use App\Tests\Services\SuiteFactory;
 use SmartAssert\TestAuthenticationProviderBundle\UserProvider;
@@ -52,6 +53,7 @@ abstract class AbstractCreateSerializedSuiteTest extends AbstractApplicationTest
         array $payload,
         array $expectedResponseParameters,
     ): void {
+        $serializedSuiteId = (new EntityIdFactory())->create();
         $source = $sourceCreator(self::$users);
         $this->sourceRepository->save($source);
 
@@ -62,6 +64,7 @@ abstract class AbstractCreateSerializedSuiteTest extends AbstractApplicationTest
 
         $response = $this->applicationClient->makeCreateSerializedSuiteRequest(
             self::$apiTokens->get(self::USER_1_EMAIL),
+            $serializedSuiteId,
             $suite->id,
             $payload
         );
@@ -72,7 +75,7 @@ abstract class AbstractCreateSerializedSuiteTest extends AbstractApplicationTest
         $this->responseAsserter->assertSerializeSuiteSuccessResponse(
             $response,
             [
-                'id' => $serializedSuite->id,
+                'id' => $serializedSuiteId,
                 'suite_id' => $suite->id,
                 'parameters' => $expectedResponseParameters,
                 'state' => State::REQUESTED->value,
@@ -164,8 +167,10 @@ abstract class AbstractCreateSerializedSuiteTest extends AbstractApplicationTest
         ];
     }
 
-    public function testSerializeIsNotIdempotent(): void
+    public function testSerializeIsIdempotent(): void
     {
+        $serializedSuiteId = (new EntityIdFactory())->create();
+
         $source = SourceOriginFactory::create(
             type: 'file',
             userId: self::$users->get(self::USER_1_EMAIL)->id,
@@ -179,6 +184,7 @@ abstract class AbstractCreateSerializedSuiteTest extends AbstractApplicationTest
 
         $firstResponse = $this->applicationClient->makeCreateSerializedSuiteRequest(
             self::$apiTokens->get(self::USER_1_EMAIL),
+            $serializedSuiteId,
             $suite->id,
             []
         );
@@ -188,6 +194,7 @@ abstract class AbstractCreateSerializedSuiteTest extends AbstractApplicationTest
 
         $secondResponse = $this->applicationClient->makeCreateSerializedSuiteRequest(
             self::$apiTokens->get(self::USER_1_EMAIL),
+            $serializedSuiteId,
             $suite->id,
             []
         );
@@ -195,9 +202,6 @@ abstract class AbstractCreateSerializedSuiteTest extends AbstractApplicationTest
         $secondResponseData = json_decode($secondResponse->getBody()->getContents(), true);
         self::assertIsArray($secondResponseData);
 
-        self::assertNotSame($firstResponseData['id'], $secondResponseData['id']);
-        self::assertSame($firstResponseData['suite_id'], $secondResponseData['suite_id']);
-        self::assertSame($firstResponseData['parameters'], $secondResponseData['parameters']);
-        self::assertSame($firstResponseData['state'], $secondResponseData['state']);
+        self::assertSame($firstResponseData, $secondResponseData);
     }
 }

@@ -203,6 +203,7 @@ abstract class AbstractUnauthorizedUserTest extends AbstractApplicationTest
         $response = $this->applicationClient->makeCreateSerializedSuiteRequest(
             $token,
             (new EntityIdFactory())->create(),
+            (new EntityIdFactory())->create(),
             [],
         );
 
