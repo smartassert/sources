@@ -10,6 +10,7 @@ use App\Request\GitSourceRequest;
 use App\Request\OriginSourceRequest;
 use App\Request\SuiteRequest;
 use App\Tests\Application\AbstractApplicationTest;
+use Symfony\Component\Uid\Ulid;
 
 class SerializeSuiteFailureTest extends AbstractApplicationTest
 {
@@ -52,18 +53,14 @@ class SerializeSuiteFailureTest extends AbstractApplicationTest
         \assert(is_array($createSuiteResponseData));
         $suiteId = $createSuiteResponseData['id'] ?? null;
 
+        $serializedSuiteId = (string) (new Ulid());
+
         $createSerializedSuiteResponse = $this->applicationClient->makeCreateSerializedSuiteRequest(
             self::$apiTokens->get(self::USER_1_EMAIL),
+            $serializedSuiteId,
             $suiteId,
             []
         );
-
-        $createSerializedSuiteResponseData = json_decode(
-            $createSerializedSuiteResponse->getBody()->getContents(),
-            true
-        );
-        \assert(is_array($createSerializedSuiteResponseData));
-        $serializedSuiteId = $createSerializedSuiteResponseData['id'] ?? null;
 
         $this->waitUntilSuiteStateIs($serializedSuiteId, State::FAILED);
 

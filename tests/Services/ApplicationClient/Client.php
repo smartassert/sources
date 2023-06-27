@@ -219,7 +219,7 @@ class Client
     {
         return $this->client->makeRequest(
             'GET',
-            $this->router->generate('serialized_suite_read', ['suiteId' => $suiteId]),
+            $this->router->generate('serialized_suite_read', ['serializedSuiteId' => $suiteId]),
             $this->createAuthorizationHeader($authenticationToken),
         );
     }
@@ -229,6 +229,7 @@ class Client
      */
     public function makeCreateSerializedSuiteRequest(
         ?string $authenticationToken,
+        string $serializedSuiteId,
         string $suiteId,
         array $payload
     ): ResponseInterface {
@@ -241,17 +242,25 @@ class Client
 
         return $this->client->makeRequest(
             'POST',
-            $this->router->generate('serialized_suite_create', ['suiteId' => $suiteId]),
+            $this->router->generate(
+                'serialized_suite_create',
+                [
+                    'suiteId' => $suiteId,
+                    'serializedSuiteId' => $serializedSuiteId,
+                ]
+            ),
             $headers,
             http_build_query($payload)
         );
     }
 
-    public function makeGetSerializedSuiteRequest(?string $authenticationToken, string $suiteId): ResponseInterface
-    {
+    public function makeGetSerializedSuiteRequest(
+        ?string $authenticationToken,
+        string $serializedSuiteId
+    ): ResponseInterface {
         return $this->client->makeRequest(
             'GET',
-            $this->router->generate('serialized_suite_get', ['suiteId' => $suiteId]),
+            $this->router->generate('serialized_suite_get', ['serializedSuiteId' => $serializedSuiteId]),
             $this->createAuthorizationHeader($authenticationToken),
         );
     }

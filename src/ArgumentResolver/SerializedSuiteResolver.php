@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\ArgumentResolver;
 
-use App\Controller\SuiteRoutes;
+use App\Controller\SerializedSuiteRoutes;
 use App\Entity\SerializedSuite;
 use App\Exception\EntityNotFoundException;
 use App\Repository\SerializedSuiteRepository;
@@ -34,7 +34,7 @@ class SerializedSuiteResolver implements ValueResolverInterface
             return [];
         }
 
-        $suiteId = $request->attributes->get(SuiteRoutes::ATTRIBUTE_SUITE_ID);
+        $suiteId = $request->attributes->get(SerializedSuiteRoutes::ATTRIBUTE_SUITE_ID);
         if (!is_string($suiteId)) {
             $suiteId = '';
         }
