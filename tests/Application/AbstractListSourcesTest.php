@@ -17,7 +17,7 @@ abstract class AbstractListSourcesTest extends AbstractApplicationTest
     /**
      * @dataProvider listSuccessDataProvider
      *
-     * @param callable(UserProvider): SourceInterface[] $sourcesCreator
+     * @param callable(UserProvider): SourceInterface[]          $sourcesCreator
      * @param callable(SourceInterface[] $sources): array<mixed> $expectedResponseDataCreator
      */
     public function testListSuccess(
