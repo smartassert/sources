@@ -28,7 +28,7 @@ abstract class AbstractGetSourceTest extends AbstractApplicationTest
     /**
      * @dataProvider getSourceDataProvider
      *
-     * @param callable(UserProvider): SourceInterface $sourceCreator
+     * @param callable(UserProvider): SourceInterface         $sourceCreator
      * @param callable(SourceInterface $source): array<mixed> $expectedResponseDataCreator
      */
     public function testGetSuccess(callable $sourceCreator, callable $expectedResponseDataCreator): void
@@ -56,7 +56,7 @@ abstract class AbstractGetSourceTest extends AbstractApplicationTest
     /**
      * @dataProvider getSourceDataProvider
      *
-     * @param callable(UserProvider): SourceInterface $sourceCreator
+     * @param callable(UserProvider): SourceInterface         $sourceCreator
      * @param callable(SourceInterface $source): array<mixed> $expectedResponseDataCreator
      */
     public function testGetDeletedSourceSuccess(callable $sourceCreator, callable $expectedResponseDataCreator): void

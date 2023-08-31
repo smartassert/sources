@@ -42,7 +42,7 @@ abstract class AbstractDeleteSourceTest extends AbstractApplicationTest
     /**
      * @dataProvider getSourceDataProvider
      *
-     * @param callable(UserProvider): SourceInterface $sourceCreator
+     * @param callable(UserProvider): SourceInterface         $sourceCreator
      * @param callable(SourceInterface $source): array<mixed> $expectedResponseDataCreator
      */
     public function testDeleteSuccess(callable $sourceCreator, callable $expectedResponseDataCreator): void
