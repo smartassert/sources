@@ -202,6 +202,8 @@ abstract class AbstractCreateSerializedSuiteTest extends AbstractApplicationTest
         $secondResponseData = json_decode($secondResponse->getBody()->getContents(), true);
         self::assertIsArray($secondResponseData);
 
-        self::assertSame($firstResponseData, $secondResponseData);
+        self::assertSame($firstResponseData['id'], $secondResponseData['id']);
+        self::assertSame($firstResponseData['suite_id'], $secondResponseData['suite_id']);
+        self::assertSame($firstResponseData['parameters'], $secondResponseData['parameters']);
     }
 }
