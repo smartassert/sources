@@ -21,15 +21,15 @@ class EntityRemover
 
     public function removeAll(): void
     {
+        foreach ($this->serializedSuiteRepository->findAll() as $entity) {
+            $this->entityManager->remove($entity);
+        }
+
         foreach ($this->suiteRepository->findAll() as $entity) {
             $this->entityManager->remove($entity);
         }
 
         foreach ($this->sourceRepository->findAll() as $entity) {
-            $this->entityManager->remove($entity);
-        }
-
-        foreach ($this->serializedSuiteRepository->findAll() as $entity) {
             $this->entityManager->remove($entity);
         }
 
