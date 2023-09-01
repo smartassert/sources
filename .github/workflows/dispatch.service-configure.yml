@@ -31,7 +31,7 @@ jobs:
           event-type: service-configure
           client-payload: |
             {
-              "service_id": "${{ env.service_id }}",
+              "service_id": "${{ needs.setup.outputs.service_id }}",
               "build_configuration": "{\"version\": \"${{ github.event.inputs.version }}\"}"
             }
 
@@ -48,7 +48,7 @@ jobs:
           event-type: service-configure
           client-payload: |
             {
-              "service_id": "${{ env.service_id }}",
+              "service_id": "${{ needs.setup.outputs.service_id }}",
               "state_url": "http://{{ host }}/status",
               "health_check_url": "http://{{ host }}/health-check"
             }        
@@ -71,6 +71,6 @@ jobs:
           event-type: service-set-env
           client-payload: |
             {
-              "service_id": "${{ env.service_id }}",
+              "service_id": "${{ needs.setup.outputs.service_id }}",
               "env_vars": ${{ env.service_env_vars }}
             }  
