@@ -117,8 +117,8 @@ class GitRepositoryStoreTest extends WebTestCase
      * @param callable(\Exception|ProcessOutput, null|\Exception|ProcessOutput, RepositoryException): void $assertions
      */
     public function testInitializeThrowsGitActionException(
-        ProcessOutput|\Exception $cloneProcessOutcome,
-        null|ProcessOutput|\Exception $checkoutProcessOutcome,
+        \Exception|ProcessOutput $cloneProcessOutcome,
+        null|\Exception|ProcessOutput $checkoutProcessOutcome,
         callable $assertions
     ): void {
         $this->setGitRepositoryClonerOutcome($cloneProcessOutcome);
@@ -259,7 +259,7 @@ class GitRepositoryStoreTest extends WebTestCase
         self::assertSame($expectedListing->toArray(), $actualListing->toArray());
     }
 
-    private function setGitRepositoryClonerOutcome(ProcessOutput|\Exception $outcome): void
+    private function setGitRepositoryClonerOutcome(\Exception|ProcessOutput $outcome): void
     {
         ObjectReflector::setProperty(
             $this->gitRepositoryStore,
@@ -270,7 +270,7 @@ class GitRepositoryStoreTest extends WebTestCase
     }
 
     private function setGitRepositoryCheckoutHandlerOutcome(
-        ProcessOutput|\Exception $outcome,
+        \Exception|ProcessOutput $outcome,
         ?string $fixtureSetIdentifier = null,
     ): void {
         ObjectReflector::setProperty(
@@ -282,7 +282,7 @@ class GitRepositoryStoreTest extends WebTestCase
     }
 
     private function createGitRepositoryCloner(
-        ProcessOutput|\Exception $outcome
+        \Exception|ProcessOutput $outcome
     ): GitRepositoryCloner {
         $mock = \Mockery::mock(GitRepositoryCloner::class);
         $expectation = $mock
