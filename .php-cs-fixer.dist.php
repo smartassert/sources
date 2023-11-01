@@ -51,6 +51,7 @@ return (new PhpCsFixer\Config())
                 'yield_from',
             ],
         ],
+        'single_line_empty_body' => false,
     ])
     ->setFinder($finder)
     ;
