@@ -133,8 +133,8 @@
         ],
         "users-generate-jwt-keys": "docker-compose -f tests/build/docker-compose.yml exec -T users-service php bin/console lexik:jwt:generate-keypair --overwrite --no-interaction",
         "users-create-user": [
-            "curl --header 'Authorization: primary_admin_token' --data 'email=user1@example.com&password=password' http://localhost:9080/admin/user/create",
-            "curl --header 'Authorization: primary_admin_token' --data 'email=user2@example.com&password=password' http://localhost:9080/admin/user/create",
+            "curl --header 'Authorization: primary_admin_token' --data 'email=user1@example.com&password=password' http://localhost:9080/user/create",
+            "curl --header 'Authorization: primary_admin_token' --data 'email=user2@example.com&password=password' http://localhost:9080/user/create",
             ""
         ],
         "users-setup": [
