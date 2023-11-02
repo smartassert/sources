@@ -25,6 +25,7 @@ class SourceOriginFactory
         ?string $hostUrl = null,
         ?string $path = null,
         ?string $credentials = null,
+        ?\DateTimeImmutable $deletedAt = null,
     ): FileSource|GitSource {
         $userId = is_string($userId) ? $userId : UserId::create();
 
@@ -46,6 +47,10 @@ class SourceOriginFactory
 
             $credentials = is_string($credentials) ? $credentials : '';
             $source->setCredentials($credentials);
+        }
+
+        if ($deletedAt instanceof \DateTimeImmutable) {
+            $source->setDeletedAt($deletedAt);
         }
 
         return $source;
