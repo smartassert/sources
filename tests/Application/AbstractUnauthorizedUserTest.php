@@ -136,7 +136,7 @@ abstract class AbstractUnauthorizedUserTest extends AbstractApplicationTest
      */
     public function testUpdateGitSourceUnauthorizedUser(?string $token): void
     {
-        $response = $this->applicationClient->makeUpdateSourceRequest(
+        $response = $this->applicationClient->makeUpdateGitSourceRequest(
             $token,
             (new EntityIdFactory())->create(),
             []

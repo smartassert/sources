@@ -178,6 +178,29 @@ class Client
         );
     }
 
+    /**
+     * @param array<string, string> $payload
+     */
+    public function makeUpdateGitSourceRequest(
+        ?string $authenticationToken,
+        string $sourceId,
+        array $payload
+    ): ResponseInterface {
+        $headers = array_merge(
+            $this->createAuthorizationHeader($authenticationToken),
+            [
+                'content-type' => 'application/x-www-form-urlencoded',
+            ]
+        );
+
+        return $this->client->makeRequest(
+            'PUT',
+            $this->router->generate('git_source_update', ['sourceId' => $sourceId]),
+            $headers,
+            http_build_query($payload)
+        );
+    }
+
     public function makeDeleteSourceRequest(?string $authenticationToken, string $sourceId): ResponseInterface
     {
         return $this->client->makeRequest(
