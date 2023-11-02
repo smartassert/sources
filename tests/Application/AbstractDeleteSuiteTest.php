@@ -27,7 +27,7 @@ abstract class AbstractDeleteSuiteTest extends AbstractApplicationTest
     {
         parent::setUp();
 
-        $createSourceResponse = $this->applicationClient->makeCreateSourceRequest(
+        $createSourceResponse = $this->applicationClient->makeCreateFileSourceRequest(
             self::$apiTokens->get(self::USER_1_EMAIL),
             [
                 OriginSourceRequest::PARAMETER_TYPE => Type::FILE->value,
