@@ -122,7 +122,7 @@ abstract class AbstractUnauthorizedUserTest extends AbstractApplicationTest
      */
     public function testUpdateFileSourceUnauthorizedUser(?string $token): void
     {
-        $response = $this->applicationClient->makeUpdateSourceRequest(
+        $response = $this->applicationClient->makeUpdateFileSourceRequest(
             $token,
             (new EntityIdFactory())->create(),
             []
