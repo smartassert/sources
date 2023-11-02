@@ -11,6 +11,7 @@ use App\Request\FileSourceRequest;
 use App\Request\GitSourceRequest;
 use App\Request\OriginSourceRequest;
 use App\Tests\DataProvider\CreateUpdateFileSourceDataProviderTrait;
+use App\Tests\Services\SourceRequestTypeMatcher;
 
 abstract class AbstractCreateFileSourceTest extends AbstractApplicationTest
 {
@@ -156,10 +157,17 @@ abstract class AbstractCreateFileSourceTest extends AbstractApplicationTest
         array $targetCreateParameters,
         array $conflictCreateParameters,
     ): void {
-        $firstRequestResponse = $this->applicationClient->makeCreateSourceRequest(
-            self::$apiTokens->get(self::USER_1_EMAIL),
-            $targetCreateParameters
-        );
+        if (SourceRequestTypeMatcher::matchesGitSourceRequest($targetCreateParameters)) {
+            $firstRequestResponse = $this->applicationClient->makeCreateGitSourceRequest(
+                self::$apiTokens->get(self::USER_1_EMAIL),
+                $targetCreateParameters
+            );
+        } else {
+            $firstRequestResponse = $this->applicationClient->makeCreateFileSourceRequest(
+                self::$apiTokens->get(self::USER_1_EMAIL),
+                $targetCreateParameters
+            );
+        }
 
         self::assertSame(200, $firstRequestResponse->getStatusCode());
 
