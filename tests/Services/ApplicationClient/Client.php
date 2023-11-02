@@ -74,6 +74,26 @@ class Client
         );
     }
 
+    /**
+     * @param array<string, string> $payload
+     */
+    public function makeCreateFileSourceRequest(?string $authenticationToken, array $payload): ResponseInterface
+    {
+        $headers = array_merge(
+            $this->createAuthorizationHeader($authenticationToken),
+            [
+                'content-type' => 'application/x-www-form-urlencoded',
+            ]
+        );
+
+        return $this->client->makeRequest(
+            'POST',
+            $this->router->generate('file_source_create'),
+            $headers,
+            http_build_query($payload)
+        );
+    }
+
     public function makeListSourcesRequest(?string $authenticationToken): ResponseInterface
     {
         return $this->client->makeRequest(
