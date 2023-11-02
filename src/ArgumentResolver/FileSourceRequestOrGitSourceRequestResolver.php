@@ -43,7 +43,7 @@ class FileSourceRequestOrGitSourceRequestResolver implements ValueResolverInterf
         $argumentTypeIsFileSourceRequest = str_contains($argumentType, FileSourceRequest::class);
         $argumentTypeIsGitSourceRequest = str_contains($argumentType, GitSourceRequest::class);
 
-        if (!$argumentTypeIsFileSourceRequest && !$argumentTypeIsGitSourceRequest) {
+        if (!($argumentTypeIsFileSourceRequest && $argumentTypeIsGitSourceRequest)) {
             return [];
         }
 
