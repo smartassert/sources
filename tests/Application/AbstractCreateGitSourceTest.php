@@ -10,6 +10,7 @@ use App\Repository\SourceRepository;
 use App\Request\GitSourceRequest;
 use App\Request\OriginSourceRequest;
 use App\Tests\DataProvider\CreateUpdateGitSourceDataProviderTrait;
+use App\Tests\Services\SourceRequestTypeMatcher;
 
 abstract class AbstractCreateGitSourceTest extends AbstractApplicationTest
 {
@@ -137,7 +138,7 @@ abstract class AbstractCreateGitSourceTest extends AbstractApplicationTest
      */
     public function testCreateWithLabelOfDeletedSource(array $requestParameters): void
     {
-        $firstCreateResponse = $this->applicationClient->makeCreateSourceRequest(
+        $firstCreateResponse = $this->applicationClient->makeCreateGitSourceRequest(
             self::$apiTokens->get(self::USER_1_EMAIL),
             $requestParameters
         );
@@ -179,14 +180,21 @@ abstract class AbstractCreateGitSourceTest extends AbstractApplicationTest
         array $targetCreateParameters,
         array $conflictCreateParameters,
     ): void {
-        $firstRequestResponse = $this->applicationClient->makeCreateSourceRequest(
-            self::$apiTokens->get(self::USER_1_EMAIL),
-            $targetCreateParameters
-        );
+        if (SourceRequestTypeMatcher::matchesGitSourceRequest($targetCreateParameters)) {
+            $firstRequestResponse = $this->applicationClient->makeCreateGitSourceRequest(
+                self::$apiTokens->get(self::USER_1_EMAIL),
+                $targetCreateParameters
+            );
+        } else {
+            $firstRequestResponse = $this->applicationClient->makeCreateFileSourceRequest(
+                self::$apiTokens->get(self::USER_1_EMAIL),
+                $targetCreateParameters
+            );
+        }
 
         self::assertSame(200, $firstRequestResponse->getStatusCode());
 
-        $secondRequestResponse = $this->applicationClient->makeCreateSourceRequest(
+        $secondRequestResponse = $this->applicationClient->makeCreateGitSourceRequest(
             self::$apiTokens->get(self::USER_1_EMAIL),
             $conflictCreateParameters
         );

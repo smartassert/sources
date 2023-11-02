@@ -14,6 +14,7 @@ use App\Request\OriginSourceRequest;
 use App\Tests\DataProvider\CreateUpdateGitSourceDataProviderTrait;
 use App\Tests\Services\EntityRemover;
 use App\Tests\Services\SourceOriginFactory;
+use App\Tests\Services\SourceRequestTypeMatcher;
 use SmartAssert\TestAuthenticationProviderBundle\UserProvider;
 
 abstract class AbstractUpdateGitSourceTest extends AbstractApplicationTest
@@ -85,10 +86,17 @@ abstract class AbstractUpdateGitSourceTest extends AbstractApplicationTest
         \assert(is_array($targetCreateResponseData));
         $sourceId = $targetCreateResponseData['id'] ?? null;
 
-        $conflictCreateResponse = $this->applicationClient->makeCreateSourceRequest(
-            self::$apiTokens->get(self::USER_1_EMAIL),
-            $conflictCreateParameters
-        );
+        if (SourceRequestTypeMatcher::matchesGitSourceRequest($conflictCreateParameters)) {
+            $conflictCreateResponse = $this->applicationClient->makeCreateGitSourceRequest(
+                self::$apiTokens->get(self::USER_1_EMAIL),
+                $conflictCreateParameters
+            );
+        } else {
+            $conflictCreateResponse = $this->applicationClient->makeCreateFileSourceRequest(
+                self::$apiTokens->get(self::USER_1_EMAIL),
+                $conflictCreateParameters
+            );
+        }
 
         self::assertSame(200, $conflictCreateResponse->getStatusCode());
 
