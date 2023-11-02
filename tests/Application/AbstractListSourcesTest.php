@@ -156,7 +156,79 @@ abstract class AbstractListSourcesTest extends AbstractApplicationTest
                         ],
                     ];
                 },
-            ]
+            ],
+            'has single file source for current user, is deleted' => [
+                'sourcesCreator' => function (UserProvider $users) {
+                    $fileSource = SourceOriginFactory::create(
+                        type: 'file',
+                        userId: $users->get(self::USER_1_EMAIL)->id,
+                        deletedAt: new \DateTimeImmutable('-1 second'),
+                    );
+
+                    return [
+                        $fileSource,
+                    ];
+                },
+                'expectedResponseDataCreator' => function () {
+                    return [];
+                },
+            ],
+            'has file sources for current user, all but two deleted' => [
+                'sourcesCreator' => function (UserProvider $users) {
+                    return [
+                        SourceOriginFactory::create(
+                            type: 'file',
+                            userId: $users->get(self::USER_1_EMAIL)->id,
+                            deletedAt: new \DateTimeImmutable('-1 second'),
+                        ),
+                        SourceOriginFactory::create(
+                            type: 'file',
+                            userId: $users->get(self::USER_1_EMAIL)->id,
+                            deletedAt: new \DateTimeImmutable('-10 second'),
+                        ),
+                        SourceOriginFactory::create(
+                            type: 'file',
+                            userId: $users->get(self::USER_1_EMAIL)->id,
+                        ),
+                        SourceOriginFactory::create(
+                            type: 'file',
+                            userId: $users->get(self::USER_1_EMAIL)->id,
+                        ),
+                        SourceOriginFactory::create(
+                            type: 'file',
+                            userId: $users->get(self::USER_1_EMAIL)->id,
+                            deletedAt: new \DateTimeImmutable('+1 second'),
+                        ),
+                        SourceOriginFactory::create(
+                            type: 'file',
+                            userId: $users->get(self::USER_1_EMAIL)->id,
+                            deletedAt: new \DateTimeImmutable('+10 second'),
+                        ),
+                    ];
+                },
+                'expectedResponseDataCreator' => function (array $sources) {
+                    $fileSource1 = $sources[2] ?? null;
+                    \assert($fileSource1 instanceof FileSource);
+
+                    $fileSource2 = $sources[3] ?? null;
+                    \assert($fileSource2 instanceof FileSource);
+
+                    return [
+                        [
+                            'id' => $fileSource1->getId(),
+                            'user_id' => $fileSource1->getUserId(),
+                            'type' => Type::FILE->value,
+                            'label' => $fileSource1->getLabel(),
+                        ],
+                        [
+                            'id' => $fileSource2->getId(),
+                            'user_id' => $fileSource2->getUserId(),
+                            'type' => Type::FILE->value,
+                            'label' => $fileSource2->getLabel(),
+                        ],
+                    ];
+                },
+            ],
         ];
     }
 }
