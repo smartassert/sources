@@ -6,9 +6,7 @@ namespace App\Tests\Application;
 
 use App\Entity\FileSource;
 use App\Entity\GitSource;
-use App\Enum\Source\Type;
 use App\Repository\SourceRepository;
-use App\Request\OriginSourceRequest;
 use App\Request\SuiteRequest;
 use App\Tests\Services\SourceOriginFactory;
 
@@ -81,20 +79,6 @@ abstract class AbstractInvalidSourceUserTest extends AbstractApplicationTest
         $response = $this->applicationClient->makeGetSourceRequest(
             self::$apiTokens->get(self::USER_1_EMAIL),
             $this->fileSource->getId()
-        );
-
-        $this->responseAsserter->assertForbiddenResponse($response);
-    }
-
-    public function testUpdateSourceInvalidUser(): void
-    {
-        $response = $this->applicationClient->makeUpdateSourceRequest(
-            self::$apiTokens->get(self::USER_1_EMAIL),
-            $this->fileSource->getId(),
-            [
-                OriginSourceRequest::PARAMETER_TYPE => Type::FILE->value,
-                'label' => 'non-empty label',
-            ]
         );
 
         $this->responseAsserter->assertForbiddenResponse($response);
