@@ -24,7 +24,7 @@ class SerializeSuiteFailureTest extends AbstractApplicationTest
         $hostUrl = 'https://app:' . $hostUrlPort . '/repository.git';
         $path = '/';
 
-        $createSourceResponse = $this->applicationClient->makeCreateSourceRequest(
+        $createSourceResponse = $this->applicationClient->makeCreateGitSourceRequest(
             self::$apiTokens->get(self::USER_1_EMAIL),
             [
                 OriginSourceRequest::PARAMETER_TYPE => Type::GIT->value,
