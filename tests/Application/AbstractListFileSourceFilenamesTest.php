@@ -22,14 +22,12 @@ abstract class AbstractListFileSourceFilenamesTest extends AbstractApplicationTe
 
         $label = 'file source label';
 
-        $requestParameters = [
-            OriginSourceRequest::PARAMETER_TYPE => Type::FILE->value,
-            FileSourceRequest::PARAMETER_LABEL => $label
-        ];
-
-        $createFileSourceResponse = $this->applicationClient->makeCreateSourceRequest(
+        $createFileSourceResponse = $this->applicationClient->makeCreateFileSourceRequest(
             self::$apiTokens->get(self::USER_1_EMAIL),
-            $requestParameters
+            [
+                OriginSourceRequest::PARAMETER_TYPE => Type::FILE->value,
+                FileSourceRequest::PARAMETER_LABEL => $label
+            ]
         );
 
         self::assertSame(200, $createFileSourceResponse->getStatusCode());
