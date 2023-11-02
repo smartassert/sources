@@ -48,7 +48,7 @@
         "phpunit/phpunit": "^10.2",
         "smartassert/symfony-test-client": "^1.0",
         "smartassert/test-authenticaton-provider-bundle": "^3.0",
-        "squizlabs/php_codesniffer": "dev-master#498a939c8ff49f0b00769144bdd07933352d77e8",
+        "squizlabs/php_codesniffer": "dev-master#7c452b0ff35ab2cf1d0c60965fea3e79f621b2d2",
         "symfony/browser-kit": "6.3.*",
         "symfony/expression-language": "6.3.*",
         "symfony/maker-bundle": "^1.36",
