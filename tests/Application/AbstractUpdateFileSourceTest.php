@@ -11,7 +11,6 @@ use App\Enum\Source\Type;
 use App\Repository\SourceRepository;
 use App\Request\FileSourceRequest;
 use App\Request\GitSourceRequest;
-use App\Request\OriginSourceRequest;
 use App\Tests\DataProvider\CreateUpdateFileSourceDataProviderTrait;
 use App\Tests\Services\EntityRemover;
 use App\Tests\Services\SourceOriginFactory;
@@ -134,11 +133,9 @@ abstract class AbstractUpdateFileSourceTest extends AbstractApplicationTest
             'file source with label of git source' => [
                 'conflictSourceLabel' => $conflictSourceLabel,
                 'targetCreateParameters' => [
-                    OriginSourceRequest::PARAMETER_TYPE => Type::FILE->value,
                     GitSourceRequest::PARAMETER_LABEL => $targetSourceLabel,
                 ],
                 'conflictCreateParameters' => [
-                    OriginSourceRequest::PARAMETER_TYPE => Type::GIT->value,
                     GitSourceRequest::PARAMETER_LABEL => $conflictSourceLabel,
                     GitSourceRequest::PARAMETER_HOST_URL => md5((string) rand()),
                     GitSourceRequest::PARAMETER_PATH => md5((string) rand()),
@@ -150,11 +147,9 @@ abstract class AbstractUpdateFileSourceTest extends AbstractApplicationTest
             'file source with label of file source' => [
                 'conflictSourceLabel' => $conflictSourceLabel,
                 'targetCreateParameters' => [
-                    OriginSourceRequest::PARAMETER_TYPE => Type::FILE->value,
                     GitSourceRequest::PARAMETER_LABEL => $targetSourceLabel,
                 ],
                 'conflictCreateParameters' => [
-                    OriginSourceRequest::PARAMETER_TYPE => Type::FILE->value,
                     GitSourceRequest::PARAMETER_LABEL => $conflictSourceLabel,
                 ],
                 'updateParameters' => [

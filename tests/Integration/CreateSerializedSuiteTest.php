@@ -5,9 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Integration;
 
 use App\Enum\SerializedSuite\State;
-use App\Enum\Source\Type;
 use App\Request\FileSourceRequest;
-use App\Request\OriginSourceRequest;
 use App\Request\SuiteRequest;
 use App\Services\DirectoryListingFilter;
 use App\Tests\Application\AbstractCreateSerializedSuiteTest;
@@ -40,7 +38,6 @@ class CreateSerializedSuiteTest extends AbstractCreateSerializedSuiteTest
         $createSourceResponse = $this->applicationClient->makeCreateFileSourceRequest(
             self::$apiTokens->get(self::USER_1_EMAIL),
             [
-                OriginSourceRequest::PARAMETER_TYPE => Type::FILE->value,
                 FileSourceRequest::PARAMETER_LABEL => 'file source label',
             ]
         );

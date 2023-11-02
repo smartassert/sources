@@ -9,7 +9,6 @@ use App\Enum\Source\Type;
 use App\Repository\SourceRepository;
 use App\Request\FileSourceRequest;
 use App\Request\GitSourceRequest;
-use App\Request\OriginSourceRequest;
 use App\Tests\DataProvider\CreateUpdateFileSourceDataProviderTrait;
 use App\Tests\Services\SourceRequestTypeMatcher;
 
@@ -74,7 +73,6 @@ abstract class AbstractCreateFileSourceTest extends AbstractApplicationTest
         return [
             'file source' => [
                 'requestParameters' => [
-                    OriginSourceRequest::PARAMETER_TYPE => Type::FILE->value,
                     FileSourceRequest::PARAMETER_LABEL => $label
                 ],
                 'expected' => [
@@ -202,13 +200,11 @@ abstract class AbstractCreateFileSourceTest extends AbstractApplicationTest
             'file source with label of git source' => [
                 'label' => $label,
                 'targetCreateParameters' => [
-                    OriginSourceRequest::PARAMETER_TYPE => Type::GIT->value,
                     GitSourceRequest::PARAMETER_LABEL => $label,
                     GitSourceRequest::PARAMETER_HOST_URL => md5((string) rand()),
                     GitSourceRequest::PARAMETER_PATH => md5((string) rand()),
                 ],
                 'conflictCreateParameters' => [
-                    OriginSourceRequest::PARAMETER_TYPE => Type::FILE->value,
                     GitSourceRequest::PARAMETER_LABEL => $label,
                 ],
             ],
