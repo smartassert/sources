@@ -8,7 +8,6 @@ use App\Entity\SourceInterface;
 use App\Enum\Source\Type;
 use App\Repository\SourceRepository;
 use App\Request\GitSourceRequest;
-use App\Request\OriginSourceRequest;
 use App\Tests\DataProvider\CreateUpdateGitSourceDataProviderTrait;
 use App\Tests\Services\SourceRequestTypeMatcher;
 
@@ -76,7 +75,6 @@ abstract class AbstractCreateGitSourceTest extends AbstractApplicationTest
         return [
             'git source, credentials missing' => [
                 'requestParameters' => [
-                    OriginSourceRequest::PARAMETER_TYPE => Type::GIT->value,
                     GitSourceRequest::PARAMETER_LABEL => $label,
                     GitSourceRequest::PARAMETER_HOST_URL => $hostUrl,
                     GitSourceRequest::PARAMETER_PATH => $path
@@ -91,7 +89,6 @@ abstract class AbstractCreateGitSourceTest extends AbstractApplicationTest
             ],
             'git source, credentials present' => [
                 'requestParameters' => [
-                    OriginSourceRequest::PARAMETER_TYPE => Type::GIT->value,
                     GitSourceRequest::PARAMETER_LABEL => $label,
                     GitSourceRequest::PARAMETER_HOST_URL => $hostUrl,
                     GitSourceRequest::PARAMETER_PATH => $path,
@@ -225,11 +222,9 @@ abstract class AbstractCreateGitSourceTest extends AbstractApplicationTest
             'git source with label of file source' => [
                 'label' => $label,
                 'targetCreateParameters' => [
-                    OriginSourceRequest::PARAMETER_TYPE => Type::FILE->value,
                     GitSourceRequest::PARAMETER_LABEL => $label,
                 ],
                 'conflictCreateParameters' => [
-                    OriginSourceRequest::PARAMETER_TYPE => Type::GIT->value,
                     GitSourceRequest::PARAMETER_LABEL => $label,
                     GitSourceRequest::PARAMETER_HOST_URL => md5((string) rand()),
                     GitSourceRequest::PARAMETER_PATH => md5((string) rand()),
@@ -238,13 +233,11 @@ abstract class AbstractCreateGitSourceTest extends AbstractApplicationTest
             'git source with label of git source' => [
                 'label' => $label,
                 'targetCreateParameters' => [
-                    OriginSourceRequest::PARAMETER_TYPE => Type::GIT->value,
                     GitSourceRequest::PARAMETER_LABEL => $label,
                     GitSourceRequest::PARAMETER_HOST_URL => md5((string) rand()),
                     GitSourceRequest::PARAMETER_PATH => md5((string) rand()),
                 ],
                 'conflictCreateParameters' => [
-                    OriginSourceRequest::PARAMETER_TYPE => Type::GIT->value,
                     GitSourceRequest::PARAMETER_LABEL => $label,
                     GitSourceRequest::PARAMETER_HOST_URL => md5((string) rand()),
                     GitSourceRequest::PARAMETER_PATH => md5((string) rand()),

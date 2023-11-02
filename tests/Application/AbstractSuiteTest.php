@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Application;
 
-use App\Enum\Source\Type;
 use App\Request\FileSourceRequest;
-use App\Request\OriginSourceRequest;
 
 abstract class AbstractSuiteTest extends AbstractApplicationTest
 {
@@ -29,7 +27,6 @@ abstract class AbstractSuiteTest extends AbstractApplicationTest
         $createSourceResponse = $this->applicationClient->makeCreateFileSourceRequest(
             self::$apiTokens->get($userEmail),
             [
-                OriginSourceRequest::PARAMETER_TYPE => Type::FILE->value,
                 FileSourceRequest::PARAMETER_LABEL => $label,
             ]
         );
