@@ -19,13 +19,13 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
-class SuiteController
+readonly class SuiteController
 {
     public function __construct(
-        private readonly Factory $factory,
-        private readonly SuiteRepository $repository,
-        private readonly Mutator $mutator,
-        private readonly InvalidRequestExceptionFactory $invalidRequestExceptionFactory,
+        private Factory $factory,
+        private SuiteRepository $repository,
+        private Mutator $mutator,
+        private InvalidRequestExceptionFactory $invalidRequestExceptionFactory,
     ) {
     }
 
@@ -38,8 +38,8 @@ class SuiteController
     {
         try {
             return new JsonResponse($this->factory->create($request));
-        } catch (NonUniqueEntityLabelException) {
-            throw $this->invalidRequestExceptionFactory->createFromLabelledObjectRequest($request);
+        } catch (NonUniqueEntityLabelException $exception) {
+            throw $this->invalidRequestExceptionFactory->createFromLabelledObjectRequest($exception);
         }
     }
 
@@ -70,8 +70,8 @@ class SuiteController
 
         try {
             return new JsonResponse($this->mutator->update($suite, $request));
-        } catch (NonUniqueEntityLabelException) {
-            throw $this->invalidRequestExceptionFactory->createFromLabelledObjectRequest($request);
+        } catch (NonUniqueEntityLabelException $exception) {
+            throw $this->invalidRequestExceptionFactory->createFromLabelledObjectRequest($exception);
         }
     }
 
