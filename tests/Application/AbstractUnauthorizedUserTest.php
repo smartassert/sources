@@ -56,9 +56,22 @@ abstract class AbstractUnauthorizedUserTest extends AbstractApplicationTest
     /**
      * @dataProvider unauthorizedUserDataProvider
      */
-    public function testCreateSourceUnauthorizedUser(?string $token): void
+    public function testCreateFileSourceUnauthorizedUser(?string $token): void
     {
-        $response = $this->applicationClient->makeCreateSourceRequest(
+        $response = $this->applicationClient->makeCreateFileSourceRequest(
+            $token,
+            []
+        );
+
+        $this->responseAsserter->assertUnauthorizedResponse($response);
+    }
+
+    /**
+     * @dataProvider unauthorizedUserDataProvider
+     */
+    public function testCreateGitSourceUnauthorizedUser(?string $token): void
+    {
+        $response = $this->applicationClient->makeCreateGitSourceRequest(
             $token,
             []
         );
@@ -96,7 +109,7 @@ abstract class AbstractUnauthorizedUserTest extends AbstractApplicationTest
      */
     public function testUpdateFileSourceUnauthorizedUser(?string $token): void
     {
-        $response = $this->applicationClient->makeUpdateSourceRequest(
+        $response = $this->applicationClient->makeUpdateFileSourceRequest(
             $token,
             (new EntityIdFactory())->create(),
             []
@@ -110,7 +123,7 @@ abstract class AbstractUnauthorizedUserTest extends AbstractApplicationTest
      */
     public function testUpdateGitSourceUnauthorizedUser(?string $token): void
     {
-        $response = $this->applicationClient->makeUpdateSourceRequest(
+        $response = $this->applicationClient->makeUpdateGitSourceRequest(
             $token,
             (new EntityIdFactory())->create(),
             []

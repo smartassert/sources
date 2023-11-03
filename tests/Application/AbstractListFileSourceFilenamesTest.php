@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Application;
 
-use App\Enum\Source\Type;
 use App\Request\FileSourceRequest;
-use App\Request\OriginSourceRequest;
 use Symfony\Component\Uid\Ulid;
 
 abstract class AbstractListFileSourceFilenamesTest extends AbstractApplicationTest
@@ -22,14 +20,11 @@ abstract class AbstractListFileSourceFilenamesTest extends AbstractApplicationTe
 
         $label = 'file source label';
 
-        $requestParameters = [
-            OriginSourceRequest::PARAMETER_TYPE => Type::FILE->value,
-            FileSourceRequest::PARAMETER_LABEL => $label
-        ];
-
-        $createFileSourceResponse = $this->applicationClient->makeCreateSourceRequest(
+        $createFileSourceResponse = $this->applicationClient->makeCreateFileSourceRequest(
             self::$apiTokens->get(self::USER_1_EMAIL),
-            $requestParameters
+            [
+                FileSourceRequest::PARAMETER_LABEL => $label
+            ]
         );
 
         self::assertSame(200, $createFileSourceResponse->getStatusCode());

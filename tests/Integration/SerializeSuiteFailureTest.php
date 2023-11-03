@@ -5,9 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Integration;
 
 use App\Enum\SerializedSuite\State;
-use App\Enum\Source\Type;
 use App\Request\GitSourceRequest;
-use App\Request\OriginSourceRequest;
 use App\Request\SuiteRequest;
 use App\Tests\Application\AbstractApplicationTest;
 use Symfony\Component\Uid\Ulid;
@@ -24,10 +22,9 @@ class SerializeSuiteFailureTest extends AbstractApplicationTest
         $hostUrl = 'https://app:' . $hostUrlPort . '/repository.git';
         $path = '/';
 
-        $createSourceResponse = $this->applicationClient->makeCreateSourceRequest(
+        $createSourceResponse = $this->applicationClient->makeCreateGitSourceRequest(
             self::$apiTokens->get(self::USER_1_EMAIL),
             [
-                OriginSourceRequest::PARAMETER_TYPE => Type::GIT->value,
                 GitSourceRequest::PARAMETER_LABEL => $label,
                 GitSourceRequest::PARAMETER_HOST_URL => $hostUrl,
                 GitSourceRequest::PARAMETER_PATH => $path
