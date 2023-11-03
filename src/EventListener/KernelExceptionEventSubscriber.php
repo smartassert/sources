@@ -7,8 +7,10 @@ namespace App\EventListener;
 use App\Exception\HasHttpErrorCodeInterface;
 use App\Exception\InvalidRequestException;
 use App\Exception\ModifyReadOnlyEntityException;
+use App\Exception\NonUniqueEntityLabelException;
 use App\ResponseBody\ErrorResponse;
 use App\ResponseBody\FilesystemExceptionResponse;
+use App\ResponseBody\InvalidField;
 use App\ResponseBody\InvalidRequestResponse;
 use App\Services\ResponseFactory;
 use League\Flysystem\FilesystemException;
@@ -16,7 +18,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 
-class KernelExceptionEventSubscriber implements EventSubscriberInterface
+readonly class KernelExceptionEventSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private ResponseFactory $responseFactory,
@@ -56,6 +58,10 @@ class KernelExceptionEventSubscriber implements EventSubscriberInterface
             $response = $this->handleModifyReadOnlyEntityException($throwable);
         }
 
+        if ($throwable instanceof NonUniqueEntityLabelException) {
+            $response = $this->handleNonUniqueEntityLabelException($throwable);
+        }
+
         if ($response instanceof Response) {
             $event->setResponse($response);
             $event->stopPropagation();
@@ -91,6 +97,22 @@ class KernelExceptionEventSubscriber implements EventSubscriberInterface
                 ]
             ),
             $throwable->getErrorCode()
+        );
+    }
+
+    private function handleNonUniqueEntityLabelException(NonUniqueEntityLabelException $throwable): Response
+    {
+        $request = $throwable->request;
+
+        $invalidField = new InvalidField(
+            'label',
+            $request->getLabel(),
+            sprintf('This label is being used by another %s belonging to this user', $request->getObjectType())
+        );
+
+        return $this->responseFactory->createErrorResponse(
+            new InvalidRequestResponse($invalidField),
+            400
         );
     }
 }

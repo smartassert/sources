@@ -6,11 +6,9 @@ namespace App\Controller;
 
 use App\Entity\GitSource;
 use App\Exception\EmptyEntityIdException;
-use App\Exception\InvalidRequestException;
 use App\Exception\ModifyReadOnlyEntityException;
 use App\Exception\NonUniqueEntityLabelException;
 use App\Request\GitSourceRequest;
-use App\Services\ExceptionFactory;
 use App\Services\Source\GitSourceFactory;
 use App\Services\Source\Mutator;
 use SmartAssert\UsersSecurityBundle\Security\User;
@@ -22,7 +20,6 @@ use Symfony\Component\Routing\Annotation\Route;
 readonly class GitSourceController
 {
     public function __construct(
-        private ExceptionFactory $exceptionFactory,
         private GitSourceFactory $gitSourceFactory,
         private Mutator $mutator,
     ) {
@@ -30,25 +27,17 @@ readonly class GitSourceController
 
     /**
      * @throws EmptyEntityIdException
-     * @throws InvalidRequestException
+     * @throws NonUniqueEntityLabelException
      */
     #[Route(name: 'create', methods: ['POST'])]
     public function create(User $user, GitSourceRequest $request): JsonResponse
     {
-        try {
-            return new JsonResponse($this->gitSourceFactory->create($user, $request));
-        } catch (NonUniqueEntityLabelException) {
-            throw $this->exceptionFactory->createInvalidRequestExceptionForNonUniqueEntityLabel(
-                $request,
-                $request->label,
-                'source'
-            );
-        }
+        return new JsonResponse($this->gitSourceFactory->create($user, $request));
     }
 
     /**
-     * @throws InvalidRequestException
      * @throws ModifyReadOnlyEntityException
+     * @throws NonUniqueEntityLabelException
      */
     #[Route(path: '/' . SourceRoutes::ROUTE_SOURCE_ID_PATTERN, name: 'update', methods: ['PUT'])]
     public function update(GitSource $source, GitSourceRequest $request): Response
@@ -57,16 +46,6 @@ readonly class GitSourceController
             throw new ModifyReadOnlyEntityException($source->getId(), 'source');
         }
 
-        try {
-            $source = $this->mutator->updateGit($source, $request);
-        } catch (NonUniqueEntityLabelException) {
-            throw $this->exceptionFactory->createInvalidRequestExceptionForNonUniqueEntityLabel(
-                $request,
-                $request->label,
-                'source'
-            );
-        }
-
-        return new JsonResponse($source);
+        return new JsonResponse($this->mutator->updateGit($source, $request));
     }
 }

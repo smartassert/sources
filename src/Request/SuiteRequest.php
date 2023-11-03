@@ -6,7 +6,7 @@ namespace App\Request;
 
 use App\Entity\SourceInterface;
 
-class SuiteRequest
+class SuiteRequest implements LabelledObjectRequestInterface, ObjectRequestInterface
 {
     public const PARAMETER_SOURCE_ID = 'source_id';
     public const PARAMETER_LABEL = 'label';
@@ -21,5 +21,15 @@ class SuiteRequest
         public readonly string $label,
         public readonly array $tests,
     ) {
+    }
+
+    public function getLabel(): string
+    {
+        return $this->label;
+    }
+
+    public function getObjectType(): string
+    {
+        return 'suite';
     }
 }
