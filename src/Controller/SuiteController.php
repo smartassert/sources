@@ -6,12 +6,10 @@ namespace App\Controller;
 
 use App\Entity\Suite;
 use App\Exception\EmptyEntityIdException;
-use App\Exception\InvalidRequestException;
 use App\Exception\ModifyReadOnlyEntityException;
 use App\Exception\NonUniqueEntityLabelException;
 use App\Repository\SuiteRepository;
 use App\Request\SuiteRequest;
-use App\Services\InvalidRequestExceptionFactory;
 use App\Services\Suite\Factory;
 use App\Services\Suite\Mutator;
 use SmartAssert\UsersSecurityBundle\Security\User;
@@ -25,22 +23,17 @@ readonly class SuiteController
         private Factory $factory,
         private SuiteRepository $repository,
         private Mutator $mutator,
-        private InvalidRequestExceptionFactory $invalidRequestExceptionFactory,
     ) {
     }
 
     /**
      * @throws EmptyEntityIdException
-     * @throws InvalidRequestException
+     * @throws NonUniqueEntityLabelException
      */
     #[Route(SuiteRoutes::ROUTE_SUITE_BASE, name: 'suite_create', methods: ['POST'])]
     public function create(SuiteRequest $request): Response
     {
-        try {
-            return new JsonResponse($this->factory->create($request));
-        } catch (NonUniqueEntityLabelException $exception) {
-            throw $this->invalidRequestExceptionFactory->createFromLabelledObjectRequest($exception);
-        }
+        return new JsonResponse($this->factory->create($request));
     }
 
     #[Route(SuiteRoutes::ROUTE_SUITE, name: 'suite_get', methods: ['GET'])]
@@ -58,8 +51,8 @@ readonly class SuiteController
     }
 
     /**
-     * @throws InvalidRequestException
      * @throws ModifyReadOnlyEntityException
+     * @throws NonUniqueEntityLabelException
      */
     #[Route(SuiteRoutes::ROUTE_SUITE, name: 'suite_update', methods: ['PUT'])]
     public function update(Suite $suite, SuiteRequest $request): Response
@@ -68,11 +61,7 @@ readonly class SuiteController
             throw new ModifyReadOnlyEntityException($suite->id, 'suite');
         }
 
-        try {
-            return new JsonResponse($this->mutator->update($suite, $request));
-        } catch (NonUniqueEntityLabelException $exception) {
-            throw $this->invalidRequestExceptionFactory->createFromLabelledObjectRequest($exception);
-        }
+        return new JsonResponse($this->mutator->update($suite, $request));
     }
 
     #[Route(SuiteRoutes::ROUTE_SUITE, name: 'suite_delete', methods: ['DELETE'])]

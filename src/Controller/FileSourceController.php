@@ -6,11 +6,9 @@ namespace App\Controller;
 
 use App\Entity\FileSource;
 use App\Exception\EmptyEntityIdException;
-use App\Exception\InvalidRequestException;
 use App\Exception\ModifyReadOnlyEntityException;
 use App\Exception\NonUniqueEntityLabelException;
 use App\Request\FileSourceRequest;
-use App\Services\InvalidRequestExceptionFactory;
 use App\Services\Source\FileSourceFactory;
 use App\Services\Source\Mutator;
 use SmartAssert\UsersSecurityBundle\Security\User;
@@ -22,7 +20,6 @@ use Symfony\Component\Routing\Annotation\Route;
 readonly class FileSourceController
 {
     public function __construct(
-        private InvalidRequestExceptionFactory $invalidRequestExceptionFactory,
         private FileSourceFactory $sourceFactory,
         private Mutator $sourceMutator,
     ) {
@@ -30,21 +27,17 @@ readonly class FileSourceController
 
     /**
      * @throws EmptyEntityIdException
-     * @throws InvalidRequestException
+     * @throws NonUniqueEntityLabelException
      */
     #[Route(name: 'create', methods: ['POST'])]
     public function create(User $user, FileSourceRequest $request): JsonResponse
     {
-        try {
-            return new JsonResponse($this->sourceFactory->create($user, $request));
-        } catch (NonUniqueEntityLabelException $exception) {
-            throw $this->invalidRequestExceptionFactory->createFromLabelledObjectRequest($exception);
-        }
+        return new JsonResponse($this->sourceFactory->create($user, $request));
     }
 
     /**
-     * @throws InvalidRequestException
      * @throws ModifyReadOnlyEntityException
+     * @throws NonUniqueEntityLabelException
      */
     #[Route(path: '/' . SourceRoutes::ROUTE_SOURCE_ID_PATTERN, name: 'update', methods: ['PUT'])]
     public function update(FileSource $source, FileSourceRequest $request): Response
@@ -53,12 +46,6 @@ readonly class FileSourceController
             throw new ModifyReadOnlyEntityException($source->getId(), 'source');
         }
 
-        try {
-            $source = $this->sourceMutator->updateFile($source, $request);
-        } catch (NonUniqueEntityLabelException $exception) {
-            throw $this->invalidRequestExceptionFactory->createFromLabelledObjectRequest($exception);
-        }
-
-        return new JsonResponse($source);
+        return new JsonResponse($this->sourceMutator->updateFile($source, $request));
     }
 }
