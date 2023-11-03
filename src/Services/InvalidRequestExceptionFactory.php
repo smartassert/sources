@@ -7,7 +7,7 @@ namespace App\Services;
 use App\Exception\InvalidRequestException;
 use App\ResponseBody\InvalidField;
 
-class ExceptionFactory
+class InvalidRequestExceptionFactory
 {
     public function createInvalidRequestExceptionForNonUniqueEntityLabel(
         object $request,

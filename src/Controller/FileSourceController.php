@@ -10,7 +10,7 @@ use App\Exception\InvalidRequestException;
 use App\Exception\ModifyReadOnlyEntityException;
 use App\Exception\NonUniqueEntityLabelException;
 use App\Request\FileSourceRequest;
-use App\Services\ExceptionFactory;
+use App\Services\InvalidRequestExceptionFactory;
 use App\Services\Source\FileSourceFactory;
 use App\Services\Source\Mutator;
 use SmartAssert\UsersSecurityBundle\Security\User;
@@ -22,7 +22,7 @@ use Symfony\Component\Routing\Annotation\Route;
 readonly class FileSourceController
 {
     public function __construct(
-        private ExceptionFactory $exceptionFactory,
+        private InvalidRequestExceptionFactory $invalidRequestExceptionFactory,
         private FileSourceFactory $sourceFactory,
         private Mutator $sourceMutator,
     ) {
@@ -38,7 +38,7 @@ readonly class FileSourceController
         try {
             return new JsonResponse($this->sourceFactory->create($user, $request));
         } catch (NonUniqueEntityLabelException $exception) {
-            throw $this->exceptionFactory->createInvalidRequestExceptionForNonUniqueEntityLabel(
+            throw $this->invalidRequestExceptionFactory->createInvalidRequestExceptionForNonUniqueEntityLabel(
                 $request,
                 $request->label,
                 $exception->objectType
@@ -60,7 +60,7 @@ readonly class FileSourceController
         try {
             $source = $this->sourceMutator->updateFile($source, $request);
         } catch (NonUniqueEntityLabelException $exception) {
-            throw $this->exceptionFactory->createInvalidRequestExceptionForNonUniqueEntityLabel(
+            throw $this->invalidRequestExceptionFactory->createInvalidRequestExceptionForNonUniqueEntityLabel(
                 $request,
                 $request->label,
                 $exception->objectType

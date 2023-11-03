@@ -10,7 +10,7 @@ use App\Exception\InvalidRequestException;
 use App\Exception\ModifyReadOnlyEntityException;
 use App\Exception\NonUniqueEntityLabelException;
 use App\Request\GitSourceRequest;
-use App\Services\ExceptionFactory;
+use App\Services\InvalidRequestExceptionFactory;
 use App\Services\Source\GitSourceFactory;
 use App\Services\Source\Mutator;
 use SmartAssert\UsersSecurityBundle\Security\User;
@@ -22,7 +22,7 @@ use Symfony\Component\Routing\Annotation\Route;
 readonly class GitSourceController
 {
     public function __construct(
-        private ExceptionFactory $exceptionFactory,
+        private InvalidRequestExceptionFactory $invalidRequestExceptionFactory,
         private GitSourceFactory $gitSourceFactory,
         private Mutator $mutator,
     ) {
@@ -38,7 +38,7 @@ readonly class GitSourceController
         try {
             return new JsonResponse($this->gitSourceFactory->create($user, $request));
         } catch (NonUniqueEntityLabelException $exception) {
-            throw $this->exceptionFactory->createInvalidRequestExceptionForNonUniqueEntityLabel(
+            throw $this->invalidRequestExceptionFactory->createInvalidRequestExceptionForNonUniqueEntityLabel(
                 $request,
                 $request->label,
                 $exception->objectType,
@@ -60,7 +60,7 @@ readonly class GitSourceController
         try {
             $source = $this->mutator->updateGit($source, $request);
         } catch (NonUniqueEntityLabelException $exception) {
-            throw $this->exceptionFactory->createInvalidRequestExceptionForNonUniqueEntityLabel(
+            throw $this->invalidRequestExceptionFactory->createInvalidRequestExceptionForNonUniqueEntityLabel(
                 $request,
                 $request->label,
                 $exception->objectType,

@@ -11,7 +11,7 @@ use App\Exception\ModifyReadOnlyEntityException;
 use App\Exception\NonUniqueEntityLabelException;
 use App\Repository\SuiteRepository;
 use App\Request\SuiteRequest;
-use App\Services\ExceptionFactory;
+use App\Services\InvalidRequestExceptionFactory;
 use App\Services\Suite\Factory;
 use App\Services\Suite\Mutator;
 use SmartAssert\UsersSecurityBundle\Security\User;
@@ -25,7 +25,7 @@ class SuiteController
         private readonly Factory $factory,
         private readonly SuiteRepository $repository,
         private readonly Mutator $mutator,
-        private readonly ExceptionFactory $exceptionFactory,
+        private readonly InvalidRequestExceptionFactory $invalidRequestExceptionFactory,
     ) {
     }
 
@@ -39,7 +39,7 @@ class SuiteController
         try {
             return new JsonResponse($this->factory->create($request));
         } catch (NonUniqueEntityLabelException $exception) {
-            throw $this->exceptionFactory->createInvalidRequestExceptionForNonUniqueEntityLabel(
+            throw $this->invalidRequestExceptionFactory->createInvalidRequestExceptionForNonUniqueEntityLabel(
                 $request,
                 $request->label,
                 $exception->objectType,
@@ -75,7 +75,7 @@ class SuiteController
         try {
             return new JsonResponse($this->mutator->update($suite, $request));
         } catch (NonUniqueEntityLabelException $exception) {
-            throw $this->exceptionFactory->createInvalidRequestExceptionForNonUniqueEntityLabel(
+            throw $this->invalidRequestExceptionFactory->createInvalidRequestExceptionForNonUniqueEntityLabel(
                 $request,
                 $request->label,
                 $exception->objectType,
