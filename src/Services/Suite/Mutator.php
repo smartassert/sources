@@ -23,7 +23,7 @@ class Mutator
     {
         $foundSuite = $this->repository->findOneBySourceOwnerAndLabel($request->source, $request->label);
         if ($foundSuite instanceof Suite && $foundSuite->id !== $suite->id) {
-            throw new NonUniqueEntityLabelException('suite');
+            throw new NonUniqueEntityLabelException();
         }
 
         $suite->setSource($request->source);

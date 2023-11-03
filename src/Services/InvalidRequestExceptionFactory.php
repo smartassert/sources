@@ -5,22 +5,19 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Exception\InvalidRequestException;
+use App\Request\LabelledObjectRequestInterface;
+use App\Request\ObjectRequestInterface;
 use App\ResponseBody\InvalidField;
 
 class InvalidRequestExceptionFactory
 {
-    public function createInvalidRequestExceptionForNonUniqueEntityLabel(
-        object $request,
-        string $labelValue,
-        string $objectType
+    public function createFromLabelledObjectRequest(
+        LabelledObjectRequestInterface&ObjectRequestInterface $request
     ): InvalidRequestException {
         return new InvalidRequestException($request, new InvalidField(
             'label',
-            $labelValue,
-            sprintf(
-                'This label is being used by another %s belonging to this user',
-                $objectType
-            )
+            $request->getLabel(),
+            sprintf('This label is being used by another %s belonging to this user', $request->getObjectType())
         ));
     }
 }

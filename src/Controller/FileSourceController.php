@@ -37,12 +37,8 @@ readonly class FileSourceController
     {
         try {
             return new JsonResponse($this->sourceFactory->create($user, $request));
-        } catch (NonUniqueEntityLabelException $exception) {
-            throw $this->invalidRequestExceptionFactory->createInvalidRequestExceptionForNonUniqueEntityLabel(
-                $request,
-                $request->label,
-                $exception->objectType
-            );
+        } catch (NonUniqueEntityLabelException) {
+            throw $this->invalidRequestExceptionFactory->createFromLabelledObjectRequest($request);
         }
     }
 
@@ -59,12 +55,8 @@ readonly class FileSourceController
 
         try {
             $source = $this->sourceMutator->updateFile($source, $request);
-        } catch (NonUniqueEntityLabelException $exception) {
-            throw $this->invalidRequestExceptionFactory->createInvalidRequestExceptionForNonUniqueEntityLabel(
-                $request,
-                $request->label,
-                $exception->objectType
-            );
+        } catch (NonUniqueEntityLabelException) {
+            throw $this->invalidRequestExceptionFactory->createFromLabelledObjectRequest($request);
         }
 
         return new JsonResponse($source);
