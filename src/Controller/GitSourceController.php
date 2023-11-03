@@ -37,11 +37,11 @@ readonly class GitSourceController
     {
         try {
             return new JsonResponse($this->gitSourceFactory->create($user, $request));
-        } catch (NonUniqueEntityLabelException) {
+        } catch (NonUniqueEntityLabelException $exception) {
             throw $this->exceptionFactory->createInvalidRequestExceptionForNonUniqueEntityLabel(
                 $request,
                 $request->label,
-                'source'
+                $exception->objectType,
             );
         }
     }
@@ -59,11 +59,11 @@ readonly class GitSourceController
 
         try {
             $source = $this->mutator->updateGit($source, $request);
-        } catch (NonUniqueEntityLabelException) {
+        } catch (NonUniqueEntityLabelException $exception) {
             throw $this->exceptionFactory->createInvalidRequestExceptionForNonUniqueEntityLabel(
                 $request,
                 $request->label,
-                'source'
+                $exception->objectType,
             );
         }
 

@@ -38,11 +38,11 @@ class SuiteController
     {
         try {
             return new JsonResponse($this->factory->create($request));
-        } catch (NonUniqueEntityLabelException) {
+        } catch (NonUniqueEntityLabelException $exception) {
             throw $this->exceptionFactory->createInvalidRequestExceptionForNonUniqueEntityLabel(
                 $request,
                 $request->label,
-                'suite'
+                $exception->objectType,
             );
         }
     }
@@ -74,11 +74,11 @@ class SuiteController
 
         try {
             return new JsonResponse($this->mutator->update($suite, $request));
-        } catch (NonUniqueEntityLabelException) {
+        } catch (NonUniqueEntityLabelException $exception) {
             throw $this->exceptionFactory->createInvalidRequestExceptionForNonUniqueEntityLabel(
                 $request,
                 $request->label,
-                'suite'
+                $exception->objectType,
             );
         }
     }

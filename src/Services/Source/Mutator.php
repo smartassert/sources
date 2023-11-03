@@ -28,7 +28,7 @@ class Mutator
         );
 
         if ($existingSource instanceof GitSource) {
-            throw new NonUniqueEntityLabelException();
+            throw new NonUniqueEntityLabelException('source');
         }
 
         if ($existingSource instanceof FileSource) {
@@ -39,7 +39,7 @@ class Mutator
                 return $existingSource;
             }
 
-            throw new NonUniqueEntityLabelException();
+            throw new NonUniqueEntityLabelException('source');
         }
 
         $source->setLabel($request->label);
@@ -61,7 +61,7 @@ class Mutator
             $existingSource instanceof FileSource
             || ($existingSource instanceof GitSource && $existingSource->getId() !== $source->getId())
         ) {
-            throw new NonUniqueEntityLabelException();
+            throw new NonUniqueEntityLabelException('source');
         }
 
         $source->setLabel($request->label);
