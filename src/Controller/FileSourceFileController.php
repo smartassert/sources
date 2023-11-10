@@ -14,10 +14,13 @@ use League\Flysystem\FilesystemWriter;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
+#[Route(
+    path: '/file-source/' . SourceRoutes::ROUTE_SOURCE_ID_PATTERN . '/' . self::ROUTE_FILENAME_PATTERN,
+    name: 'file_source_file_'
+)]
 class FileSourceFileController
 {
     private const ROUTE_FILENAME_PATTERN = '{filename<.*\.yaml>}';
-    private const ROUTE_SOURCE_FILE = SourceRoutes::ROUTE_SOURCE . '/' . self::ROUTE_FILENAME_PATTERN;
 
     public function __construct(
         private readonly FilesystemWriter $fileSourceWriter,
@@ -28,7 +31,7 @@ class FileSourceFileController
     /**
      * @throws FilesystemException
      */
-    #[Route(self::ROUTE_SOURCE_FILE, name: 'file_source_file_add', methods: ['POST'])]
+    #[Route(name: 'add', methods: ['POST'])]
     public function add(FileSource $source, AddYamlFileRequest $request): Response
     {
         $yamlFile = $request->file;
@@ -41,7 +44,7 @@ class FileSourceFileController
     /**
      * @throws FilesystemException
      */
-    #[Route(self::ROUTE_SOURCE_FILE, name: 'file_source_file_read', methods: ['GET'])]
+    #[Route(name: 'read', methods: ['GET'])]
     public function read(FileSource $source, YamlFileRequest $request): Response
     {
         $location = $source->getDirectoryPath() . '/' . $request->filename;
@@ -56,7 +59,7 @@ class FileSourceFileController
     /**
      * @throws FilesystemException
      */
-    #[Route(self::ROUTE_SOURCE_FILE, name: 'file_source_file_remove', methods: ['DELETE'])]
+    #[Route(name: 'remove', methods: ['DELETE'])]
     public function remove(FileSource $source, YamlFileRequest $request): Response
     {
         $this->fileSourceWriter->delete($source->getDirectoryPath() . '/' . $request->filename);
