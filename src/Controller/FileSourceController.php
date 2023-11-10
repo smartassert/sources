@@ -54,7 +54,7 @@ readonly class FileSourceController
     /**
      * @throws FilesystemException
      */
-    #[Route(path: '/list/' . SourceRoutes::ROUTE_SOURCE_ID_PATTERN, name: 'list_filenames', methods: ['GET'])]
+    #[Route(path: SourceRoutes::ROUTE_SOURCE_ID_PATTERN . '/list/', name: 'list_filenames', methods: ['GET'])]
     public function listFilenames(FileSource $source, FileSourceDirectoryLister $lister): Response
     {
         return new JsonResponse($lister->list($source));
