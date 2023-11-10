@@ -8,11 +8,9 @@ use App\Entity\FileSource;
 use App\Request\AddYamlFileRequest;
 use App\Request\YamlFileRequest;
 use App\Response\YamlResponse;
-use App\Services\SourceRepository\Reader\FileSourceDirectoryLister;
 use League\Flysystem\FilesystemException;
 use League\Flysystem\FilesystemReader;
 use League\Flysystem\FilesystemWriter;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -64,14 +62,5 @@ class FileSourceFileController
         $this->fileSourceWriter->delete($source->getDirectoryPath() . '/' . $request->filename);
 
         return new Response();
-    }
-
-    /**
-     * @throws FilesystemException
-     */
-    #[Route(SourceRoutes::ROUTE_SOURCE . '/list', name: 'file_source_list_filenames', methods: ['GET'])]
-    public function listFilenames(FileSource $source, FileSourceDirectoryLister $lister): Response
-    {
-        return new JsonResponse($lister->list($source));
     }
 }

@@ -11,6 +11,8 @@ use App\Exception\NonUniqueEntityLabelException;
 use App\Request\FileSourceRequest;
 use App\Services\Source\FileSourceFactory;
 use App\Services\Source\Mutator;
+use App\Services\SourceRepository\Reader\FileSourceDirectoryLister;
+use League\Flysystem\FilesystemException;
 use SmartAssert\UsersSecurityBundle\Security\User;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -47,5 +49,14 @@ readonly class FileSourceController
         }
 
         return new JsonResponse($this->sourceMutator->updateFile($source, $request));
+    }
+
+    /**
+     * @throws FilesystemException
+     */
+    #[Route(path: '/list/' . SourceRoutes::ROUTE_SOURCE_ID_PATTERN, name: 'list_filenames', methods: ['GET'])]
+    public function listFilenames(FileSource $source, FileSourceDirectoryLister $lister): Response
+    {
+        return new JsonResponse($lister->list($source));
     }
 }
