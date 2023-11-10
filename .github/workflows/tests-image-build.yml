@@ -16,7 +16,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Set env.image_tag
         run: echo "image_tag=smartassert/sources:$(date +%s)" >> "$GITHUB_ENV"
