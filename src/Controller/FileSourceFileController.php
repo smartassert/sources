@@ -44,6 +44,19 @@ class FileSourceFileController
     /**
      * @throws FilesystemException
      */
+    #[Route(name: 'update', methods: ['PUT'])]
+    public function update(FileSource $source, AddYamlFileRequest $request): Response
+    {
+        $yamlFile = $request->file;
+
+        $this->fileSourceWriter->write($source->getDirectoryPath() . '/' . $yamlFile->name, $yamlFile->content);
+
+        return new Response();
+    }
+
+    /**
+     * @throws FilesystemException
+     */
     #[Route(name: 'read', methods: ['GET'])]
     public function read(FileSource $source, YamlFileRequest $request): Response
     {

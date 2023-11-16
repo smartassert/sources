@@ -53,6 +53,26 @@ abstract class AbstractFileSourceFileTest extends AbstractApplicationTest
     }
 
     /**
+     * @dataProvider addFileInvalidRequestDataProvider
+     *
+     * @param array<mixed> $expectedResponseData
+     */
+    public function testUpdateFileInvalidRequest(
+        string $filename,
+        string $content,
+        array $expectedResponseData
+    ): void {
+        $response = $this->applicationClient->makeUpdateFileRequest(
+            self::$apiTokens->get(self::USER_1_EMAIL),
+            $this->fileSource->getId(),
+            $filename,
+            $content
+        );
+
+        $this->responseAsserter->assertInvalidRequestJsonResponse($response, $expectedResponseData);
+    }
+
+    /**
      * @return array<mixed>
      */
     public static function addFileInvalidRequestDataProvider(): array
