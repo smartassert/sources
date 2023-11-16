@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use App\Entity\FileSource;
+use App\Exception\DuplicateFilePathException;
 use App\Request\AddYamlFileRequest;
 use App\Request\YamlFileRequest;
 use App\Response\YamlResponse;
@@ -30,13 +31,19 @@ class FileSourceFileController
 
     /**
      * @throws FilesystemException
+     * @throws DuplicateFilePathException
      */
     #[Route(name: 'add', methods: ['POST'])]
     public function add(FileSource $source, AddYamlFileRequest $request): Response
     {
         $yamlFile = $request->file;
+        $path = $source->getDirectoryPath() . '/' . $yamlFile->name;
 
-        $this->fileSourceWriter->write($source->getDirectoryPath() . '/' . $yamlFile->name, $yamlFile->content);
+        if ($this->fileSourceReader->fileExists($path)) {
+            throw new DuplicateFilePathException((string) $yamlFile->name);
+        }
+
+        $this->fileSourceWriter->write($path, $yamlFile->content);
 
         return new Response();
     }

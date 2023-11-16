@@ -130,6 +130,37 @@ abstract class AbstractFileSourceFileTest extends AbstractApplicationTest
         ];
     }
 
+    public function testAddFileDuplicateFilename(): void
+    {
+        $initialContent = md5((string) rand());
+
+        $this->applicationClient->makeAddFileRequest(
+            self::$apiTokens->get(self::USER_1_EMAIL),
+            $this->fileSource->getId(),
+            self::FILENAME,
+            $initialContent
+        );
+
+        $failedAddResponse = $this->applicationClient->makeAddFileRequest(
+            self::$apiTokens->get(self::USER_1_EMAIL),
+            $this->fileSource->getId(),
+            self::FILENAME,
+            $initialContent
+        );
+
+        $this->responseAsserter->assertInvalidRequestJsonResponse(
+            $failedAddResponse,
+            [
+                'error' => [
+                    'type' => 'duplicate_file_path',
+                    'payload' => [
+                        'path' => self::FILENAME,
+                    ],
+                ]
+            ]
+        );
+    }
+
     /**
      * @dataProvider yamlFileInvalidRequestDataProvider
      *
@@ -237,7 +268,7 @@ abstract class AbstractFileSourceFileTest extends AbstractApplicationTest
 
         $this->responseAsserter->assertReadSourceSuccessResponse($initialReadResponse, $initialContent);
 
-        $updateResponse = $this->applicationClient->makeAddFileRequest(
+        $updateResponse = $this->applicationClient->makeUpdateFileRequest(
             self::$apiTokens->get(self::USER_1_EMAIL),
             $this->fileSource->getId(),
             self::FILENAME,
