@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\EventListener;
 
+use App\Exception\DuplicateFilePathException;
 use App\Exception\HasHttpErrorCodeInterface;
 use App\Exception\InvalidRequestException;
 use App\Exception\ModifyReadOnlyEntityException;
@@ -62,6 +63,10 @@ readonly class KernelExceptionEventSubscriber implements EventSubscriberInterfac
             $response = $this->handleNonUniqueEntityLabelException($throwable);
         }
 
+        if ($throwable instanceof DuplicateFilePathException) {
+            $response = $this->handleDuplicateFilePathException($throwable);
+        }
+
         if ($response instanceof Response) {
             $event->setResponse($response);
             $event->stopPropagation();
@@ -112,6 +117,19 @@ readonly class KernelExceptionEventSubscriber implements EventSubscriberInterfac
 
         return $this->responseFactory->createErrorResponse(
             new InvalidRequestResponse($invalidField),
+            400
+        );
+    }
+
+    private function handleDuplicateFilePathException(DuplicateFilePathException $throwable): Response
+    {
+        return $this->responseFactory->createErrorResponse(
+            new ErrorResponse(
+                'duplicate_file_path',
+                [
+                    'path' => $throwable->path,
+                ]
+            ),
             400
         );
     }

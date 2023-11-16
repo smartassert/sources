@@ -42,6 +42,20 @@ class Client
         );
     }
 
+    public function makeUpdateFileRequest(
+        ?string $authenticationToken,
+        string $sourceId,
+        string $filename,
+        string $content
+    ): ResponseInterface {
+        return $this->client->makeRequest(
+            'PUT',
+            $this->router->generate('file_source_file_add', ['sourceId' => $sourceId, 'filename' => $filename]),
+            $this->createAuthorizationHeader($authenticationToken),
+            $content
+        );
+    }
+
     public function makeRemoveFileRequest(
         ?string $authenticationToken,
         string $sourceId,
