@@ -201,7 +201,8 @@ abstract class AbstractCreateSuiteTest extends AbstractSuiteTest
                         'message' => 'This label is being used by another suite belonging to this user',
                     ],
                 ],
-            ]
+            ],
+            409
         );
     }
 
@@ -244,7 +245,8 @@ abstract class AbstractCreateSuiteTest extends AbstractSuiteTest
                         'message' => 'This label is being used by another suite belonging to this user',
                     ],
                 ],
-            ]
+            ],
+            409
         );
     }
 

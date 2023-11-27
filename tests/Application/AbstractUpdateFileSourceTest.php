@@ -117,7 +117,8 @@ abstract class AbstractUpdateFileSourceTest extends AbstractApplicationTest
                         'message' => 'This label is being used by another source belonging to this user',
                     ],
                 ],
-            ]
+            ],
+            409
         );
     }
 
