@@ -117,7 +117,7 @@ readonly class KernelExceptionEventSubscriber implements EventSubscriberInterfac
 
         return $this->responseFactory->createErrorResponse(
             new InvalidRequestResponse($invalidField),
-            400
+            409
         );
     }
 

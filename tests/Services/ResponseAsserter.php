@@ -33,9 +33,12 @@ class ResponseAsserter
     /**
      * @param array<mixed> $expectedData
      */
-    public function assertInvalidRequestJsonResponse(ResponseInterface $response, array $expectedData): void
-    {
-        (new JsonResponseAsserter(Response::HTTP_BAD_REQUEST, $expectedData))
+    public function assertInvalidRequestJsonResponse(
+        ResponseInterface $response,
+        array $expectedData,
+        int $expectedStatusCode = Response::HTTP_BAD_REQUEST
+    ): void {
+        (new JsonResponseAsserter($expectedStatusCode, $expectedData))
             ->assert($response)
         ;
     }

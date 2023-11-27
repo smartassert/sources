@@ -53,7 +53,8 @@ abstract class AbstractUpdateSuiteTest extends AbstractSuiteTest
                         'message' => 'This label is being used by another suite belonging to this user',
                     ],
                 ],
-            ]
+            ],
+            409
         );
     }
 
