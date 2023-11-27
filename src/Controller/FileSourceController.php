@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use App\Entity\FileSource;
+use App\Exception\DuplicateEntityLabelException;
 use App\Exception\EmptyEntityIdException;
 use App\Exception\ModifyReadOnlyEntityException;
-use App\Exception\NonUniqueEntityLabelException;
 use App\Request\FileSourceRequest;
 use App\Services\Source\FileSourceFactory;
 use App\Services\Source\Mutator;
@@ -29,7 +29,7 @@ readonly class FileSourceController
 
     /**
      * @throws EmptyEntityIdException
-     * @throws NonUniqueEntityLabelException
+     * @throws DuplicateEntityLabelException
      */
     #[Route(name: 'create', methods: ['POST'])]
     public function create(User $user, FileSourceRequest $request): JsonResponse
@@ -39,7 +39,7 @@ readonly class FileSourceController
 
     /**
      * @throws ModifyReadOnlyEntityException
-     * @throws NonUniqueEntityLabelException
+     * @throws DuplicateEntityLabelException
      */
     #[Route(path: '/' . SourceRoutes::ROUTE_SOURCE_ID_PATTERN, name: 'update', methods: ['PUT'])]
     public function update(FileSource $source, FileSourceRequest $request): Response

@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Services\Suite;
 
 use App\Entity\Suite;
+use App\Exception\DuplicateEntityLabelException;
 use App\Exception\EmptyEntityIdException;
-use App\Exception\NonUniqueEntityLabelException;
 use App\Repository\SuiteRepository;
 use App\Request\SuiteRequest;
 use App\Services\EntityIdFactory;
@@ -22,7 +22,7 @@ class Factory
 
     /**
      * @throws EmptyEntityIdException
-     * @throws NonUniqueEntityLabelException
+     * @throws DuplicateEntityLabelException
      */
     public function create(SuiteRequest $request): Suite
     {

@@ -6,7 +6,7 @@ namespace App\Services\Source;
 
 use App\Entity\FileSource;
 use App\Entity\GitSource;
-use App\Exception\NonUniqueEntityLabelException;
+use App\Exception\DuplicateEntityLabelException;
 use App\Repository\SourceRepository;
 use App\Request\FileSourceRequest;
 use App\Request\GitSourceRequest;
@@ -19,7 +19,7 @@ class Mutator
     }
 
     /**
-     * @throws NonUniqueEntityLabelException
+     * @throws DuplicateEntityLabelException
      */
     public function updateFile(FileSource $source, FileSourceRequest $request): FileSource
     {
@@ -28,7 +28,7 @@ class Mutator
         );
 
         if ($existingSource instanceof GitSource) {
-            throw new NonUniqueEntityLabelException($request);
+            throw new DuplicateEntityLabelException($request);
         }
 
         if ($existingSource instanceof FileSource) {
@@ -39,7 +39,7 @@ class Mutator
                 return $existingSource;
             }
 
-            throw new NonUniqueEntityLabelException($request);
+            throw new DuplicateEntityLabelException($request);
         }
 
         $source->setLabel($request->label);
@@ -49,7 +49,7 @@ class Mutator
     }
 
     /**
-     * @throws NonUniqueEntityLabelException
+     * @throws DuplicateEntityLabelException
      */
     public function updateGit(GitSource $source, GitSourceRequest $request): GitSource
     {
@@ -61,7 +61,7 @@ class Mutator
             $existingSource instanceof FileSource
             || ($existingSource instanceof GitSource && $existingSource->getId() !== $source->getId())
         ) {
-            throw new NonUniqueEntityLabelException($request);
+            throw new DuplicateEntityLabelException($request);
         }
 
         $source->setLabel($request->label);

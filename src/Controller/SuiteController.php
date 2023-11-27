@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use App\Entity\Suite;
+use App\Exception\DuplicateEntityLabelException;
 use App\Exception\EmptyEntityIdException;
 use App\Exception\ModifyReadOnlyEntityException;
-use App\Exception\NonUniqueEntityLabelException;
 use App\Repository\SuiteRepository;
 use App\Request\SuiteRequest;
 use App\Services\Suite\Factory;
@@ -28,7 +28,7 @@ readonly class SuiteController
 
     /**
      * @throws EmptyEntityIdException
-     * @throws NonUniqueEntityLabelException
+     * @throws DuplicateEntityLabelException
      */
     #[Route(SuiteRoutes::ROUTE_SUITE_BASE, name: 'suite_create', methods: ['POST'])]
     public function create(SuiteRequest $request): Response
@@ -52,7 +52,7 @@ readonly class SuiteController
 
     /**
      * @throws ModifyReadOnlyEntityException
-     * @throws NonUniqueEntityLabelException
+     * @throws DuplicateEntityLabelException
      */
     #[Route(SuiteRoutes::ROUTE_SUITE, name: 'suite_update', methods: ['PUT'])]
     public function update(Suite $suite, SuiteRequest $request): Response

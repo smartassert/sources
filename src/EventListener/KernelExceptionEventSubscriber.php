@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace App\EventListener;
 
+use App\Exception\DuplicateEntityLabelException;
 use App\Exception\DuplicateFilePathException;
 use App\Exception\HasHttpErrorCodeInterface;
 use App\Exception\InvalidRequestException;
 use App\Exception\ModifyReadOnlyEntityException;
-use App\Exception\NonUniqueEntityLabelException;
 use App\ResponseBody\ErrorResponse;
 use App\ResponseBody\FilesystemExceptionResponse;
 use App\ResponseBody\InvalidField;
@@ -59,7 +59,7 @@ readonly class KernelExceptionEventSubscriber implements EventSubscriberInterfac
             $response = $this->handleModifyReadOnlyEntityException($throwable);
         }
 
-        if ($throwable instanceof NonUniqueEntityLabelException) {
+        if ($throwable instanceof DuplicateEntityLabelException) {
             $response = $this->handleNonUniqueEntityLabelException($throwable);
         }
 
@@ -105,7 +105,7 @@ readonly class KernelExceptionEventSubscriber implements EventSubscriberInterfac
         );
     }
 
-    private function handleNonUniqueEntityLabelException(NonUniqueEntityLabelException $throwable): Response
+    private function handleNonUniqueEntityLabelException(DuplicateEntityLabelException $throwable): Response
     {
         $request = $throwable->request;
 
