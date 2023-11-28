@@ -60,7 +60,6 @@ readonly class GitSourceRequestFactory
         \assert('' !== (string) $label);
         \assert('' !== (string) $hostUrl);
         \assert('' !== (string) $path);
-        \assert('' !== (string) $credentials);
 
         return new GitSourceRequest((string) $label, (string) $hostUrl, (string) $path, (string) $credentials);
     }
