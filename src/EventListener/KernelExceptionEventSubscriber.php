@@ -9,6 +9,9 @@ use App\Exception\DuplicateFilePathException;
 use App\Exception\HasHttpErrorCodeInterface;
 use App\Exception\InvalidRequestException;
 use App\Exception\ModifyReadOnlyEntityException;
+use App\FooResponse\ErrorInterface;
+use App\FooResponse\RenderableErrorInterface;
+use App\FooResponse\SizeInterface;
 use App\ResponseBody\ErrorResponse;
 use App\ResponseBody\FilesystemExceptionResponse;
 use App\ResponseBody\InvalidField;
@@ -16,6 +19,7 @@ use App\ResponseBody\InvalidRequestResponse;
 use App\Services\ResponseFactory;
 use League\Flysystem\FilesystemException;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 
@@ -45,6 +49,10 @@ readonly class KernelExceptionEventSubscriber implements EventSubscriberInterfac
 
         if ($throwable instanceof HasHttpErrorCodeInterface) {
             $response = $this->handleHttpErrorException($throwable);
+        }
+
+        if ($throwable instanceof ErrorInterface) {
+            $response = $this->handleFooHttpError($throwable);
         }
 
         if ($throwable instanceof InvalidRequestException) {
@@ -131,6 +139,53 @@ readonly class KernelExceptionEventSubscriber implements EventSubscriberInterfac
                 ]
             ),
             400
+        );
+    }
+
+    private function handleFooHttpError(ErrorInterface $error): Response
+    {
+        $field = $error->getField();
+
+        $data = [
+            'class' => $error->getClass(),
+            'field' => [
+                'name' => $field->getName(),
+                'value' => $field->getValue(),
+            ],
+        ];
+
+        $type = $error->getType();
+        if (is_string($type)) {
+            $data['type'] = $type;
+        }
+
+        $renderRequirements =
+            ($error instanceof RenderableErrorInterface && $error->renderRequirements())
+            || !$error instanceof RenderableErrorInterface;
+
+        if ($renderRequirements) {
+            $fieldRequirements = $field->getRequirements();
+
+            $requirementsData = [
+                'data_type' => $fieldRequirements->getDataType(),
+            ];
+
+            $fieldRequirementsSize = $fieldRequirements->getSize();
+            if ($fieldRequirementsSize instanceof SizeInterface) {
+                $requirementsData['size'] = [
+                    'minimum' => $fieldRequirementsSize->getMinimum(),
+                    'maximum' => $fieldRequirementsSize->getMaximum(),
+                ];
+            }
+
+            $data['requirements'] = $requirementsData;
+        }
+
+        $statusCode = $error instanceof HasHttpErrorCodeInterface ? $error->getErrorCode() : 400;
+
+        return new JsonResponse(
+            $data,
+            $statusCode
         );
     }
 }

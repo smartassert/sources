@@ -20,13 +20,18 @@ trait CreateUpdateFileSourceDataProviderTrait
             'missing label' => [
                 'requestParameters' => [],
                 'expectedResponseData' => [
-                    'error' => [
-                        'type' => 'invalid_request',
-                        'payload' => [
-                            'name' => 'label',
-                            'value' => '',
-                            'message' => 'This value should be between 1 and 255 characters long.',
-                        ],
+                    'class' => 'invalid_request_field',
+                    'field' => [
+                        'name' => 'label',
+                        'value' => '',
+                    ],
+                    'type' => 'empty',
+                    'requirements' => [
+                        'data_type' => 'string',
+                        'size' => [
+                            'minimum' => 1,
+                            'maximum' => 255,
+                        ]
                     ],
                 ],
             ],
@@ -35,13 +40,18 @@ trait CreateUpdateFileSourceDataProviderTrait
                     FileSourceRequest::PARAMETER_LABEL => $labelTooLong,
                 ],
                 'expectedResponseData' => [
-                    'error' => [
-                        'type' => 'invalid_request',
-                        'payload' => [
-                            'name' => 'label',
-                            'value' => $labelTooLong,
-                            'message' => 'This value should be between 1 and 255 characters long.',
-                        ],
+                    'class' => 'invalid_request_field',
+                    'field' => [
+                        'name' => 'label',
+                        'value' => $labelTooLong,
+                    ],
+                    'type' => 'too_large',
+                    'requirements' => [
+                        'data_type' => 'string',
+                        'size' => [
+                            'minimum' => 1,
+                            'maximum' => 255,
+                        ]
                     ],
                 ],
             ],
