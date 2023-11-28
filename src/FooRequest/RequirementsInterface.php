@@ -8,6 +8,9 @@ use App\FooResponse\SizeInterface;
 
 interface RequirementsInterface
 {
+    public const CAN_BE_EMPTY = true;
+    public const CANNOT_BE_EMPTY = false;
+
     /**
      * @return 'bool'|'float'|'int'|'string'
      */
