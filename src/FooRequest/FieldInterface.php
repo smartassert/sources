@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\FooResponse;
+namespace App\FooRequest;
 
 interface FieldInterface
 {
@@ -16,8 +16,5 @@ interface FieldInterface
      */
     public function getValue(): bool|float|int|string;
 
-    /**
-     * @return 'bool'|'float'|'int'|'string'
-     */
-    public function getDataType(): ?string;
+    public function getRequirements(): RequirementsInterface;
 }
