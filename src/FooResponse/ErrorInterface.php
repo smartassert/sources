@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\FooResponse;
 
+use App\FooRequest\FieldInterface;
+
 interface ErrorInterface
 {
     /**
@@ -17,6 +19,4 @@ interface ErrorInterface
      * @return ?non-empty-string
      */
     public function getType(): ?string;
-
-    public function getRequirements(): ?RequirementsInterface;
 }

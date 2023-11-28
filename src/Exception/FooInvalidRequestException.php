@@ -4,9 +4,8 @@ declare(strict_types=1);
 
 namespace App\Exception;
 
+use App\FooRequest\FieldInterface;
 use App\FooResponse\ErrorInterface;
-use App\FooResponse\FieldInterface;
-use App\FooResponse\RequirementsInterface;
 
 class FooInvalidRequestException extends \Exception implements ErrorInterface, HasHttpErrorCodeInterface
 {
@@ -18,7 +17,6 @@ class FooInvalidRequestException extends \Exception implements ErrorInterface, H
         private readonly string $class,
         private readonly FieldInterface $field,
         private readonly ?string $type,
-        private readonly ?RequirementsInterface $requirements,
     ) {
         $message = $class . ': ' . $class;
         if (is_string($type)) {
@@ -41,11 +39,6 @@ class FooInvalidRequestException extends \Exception implements ErrorInterface, H
     public function getType(): ?string
     {
         return $this->type;
-    }
-
-    public function getRequirements(): ?RequirementsInterface
-    {
-        return $this->requirements;
     }
 
     public function getErrorCode(): int
