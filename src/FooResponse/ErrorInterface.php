@@ -18,5 +18,5 @@ interface ErrorInterface
      */
     public function getType(): ?string;
 
-    public function getRequirements(): RequirementsInterface;
+    public function getRequirements(): ?RequirementsInterface;
 }
