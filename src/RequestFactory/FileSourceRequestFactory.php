@@ -4,27 +4,39 @@ declare(strict_types=1);
 
 namespace App\RequestFactory;
 
-use App\Entity\AbstractSource;
-use App\Exception\InvalidRequestException;
+use App\Exception\FooInvalidRequestException;
+use App\FooRequest\Field\LabelField;
+use App\FooResponse\SizeInterface;
 use App\Request\FileSourceRequest;
-use App\ResponseBody\InvalidField;
 use Symfony\Component\HttpFoundation\Request;
 
 class FileSourceRequestFactory
 {
     /**
-     * @throws InvalidRequestException
+     * @throws FooInvalidRequestException
      */
     public function create(Request $request): FileSourceRequest
     {
         $label = trim((string) $request->request->get(FileSourceRequest::PARAMETER_LABEL));
-        if ('' === $label || mb_strlen($label) > AbstractSource::LABEL_MAX_LENGTH) {
-            $message = sprintf(
-                'This value should be between 1 and %d characters long.',
-                AbstractSource::LABEL_MAX_LENGTH
-            );
+        $labelField = new LabelField($label);
 
-            throw new InvalidRequestException($request, new InvalidField('label', $label, $message));
+        if ('' === $label) {
+            throw new FooInvalidRequestException(
+                'invalid_request_field',
+                new LabelField($label),
+                'empty'
+            );
+        }
+
+        $sizeRequirements = $labelField->getRequirements()->getSize();
+        if ($sizeRequirements instanceof SizeInterface) {
+            if (mb_strlen($label) > $sizeRequirements->getMaximum()) {
+                throw new FooInvalidRequestException(
+                    'invalid_request_field',
+                    new LabelField($label),
+                    'too_large'
+                );
+            }
         }
 
         return new FileSourceRequest($label);
