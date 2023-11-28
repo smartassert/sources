@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace App\FooRequest\Field;
 
-use App\FooRequest\FieldInterface;
 use App\FooRequest\RequirementsInterface;
+use App\FooRequest\StringFieldInterface;
 
-readonly class LabelField implements FieldInterface
+readonly class LabelField implements StringFieldInterface
 {
     private Requirements $requirements;
 
@@ -16,7 +16,7 @@ readonly class LabelField implements FieldInterface
     ) {
         $this->requirements = new StringRequirements(
             new Size(1, 255),
-            Requirements::CANNOT_BE_EMPTY
+            RequirementsInterface::CANNOT_BE_EMPTY
         );
     }
 
