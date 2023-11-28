@@ -8,8 +8,8 @@ use App\FooResponse\SizeInterface;
 
 readonly class StringRequirements extends Requirements
 {
-    public function __construct(SizeInterface $size, bool $canBeEmpty)
+    public function __construct(SizeInterface $size)
     {
-        parent::__construct('string', $size, $canBeEmpty);
+        parent::__construct('string', $size, 0 === $size->getMinimum());
     }
 }
