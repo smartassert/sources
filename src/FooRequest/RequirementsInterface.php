@@ -14,4 +14,6 @@ interface RequirementsInterface
     public function getDataType(): string;
 
     public function getSize(): ?SizeInterface;
+
+    public function canBeEmpty(): bool;
 }
