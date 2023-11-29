@@ -6,7 +6,7 @@ namespace App\FooRequest\Field;
 
 use App\FooRequest\StringFieldInterface;
 
-readonly class StringField implements StringFieldInterface
+readonly class StringField extends Field implements StringFieldInterface
 {
     private StringRequirements $requirements;
 
@@ -14,22 +14,14 @@ readonly class StringField implements StringFieldInterface
      * @param non-empty-string $name
      */
     public function __construct(
-        private string $name,
-        private string $value,
+        string $name,
+        string $value,
         int $minimumLength,
         int $maximumLength,
     ) {
         $this->requirements = new StringRequirements(new Size($minimumLength, $maximumLength));
-    }
 
-    public function getName(): string
-    {
-        return $this->name;
-    }
-
-    public function getValue(): string
-    {
-        return $this->value;
+        parent::__construct($name, $value, $this->requirements);
     }
 
     public function getRequirements(): StringRequirements
