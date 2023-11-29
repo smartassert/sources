@@ -6,58 +6,61 @@ namespace App\RequestFactory;
 
 use App\Entity\AbstractSource;
 use App\Entity\GitSource;
-use App\Exception\InvalidRequestException;
+use App\Exception\FooInvalidRequestException;
+use App\FooRequest\Field\StringField;
+use App\FooRequest\FieldValidator;
 use App\Request\GitSourceRequest;
-use App\ResponseBody\InvalidField;
 use Symfony\Component\HttpFoundation\Request;
 
-class GitSourceRequestFactory
+readonly class GitSourceRequestFactory
 {
+    public function __construct(
+        private FieldValidator $fieldValidator,
+    ) {
+    }
+
     /**
-     * @throws InvalidRequestException
+     * @throws FooInvalidRequestException
      */
     public function create(Request $request): GitSourceRequest
     {
-        $label = trim((string) $request->request->get(GitSourceRequest::PARAMETER_LABEL));
-        if ('' === $label || mb_strlen($label) > AbstractSource::LABEL_MAX_LENGTH) {
-            $message = sprintf(
-                'This value should be between 1 and %d characters long.',
-                AbstractSource::LABEL_MAX_LENGTH
-            );
+        $label = new StringField(
+            GitSourceRequest::PARAMETER_LABEL,
+            trim($request->request->getString(GitSourceRequest::PARAMETER_LABEL)),
+            1,
+            AbstractSource::LABEL_MAX_LENGTH,
+        );
+        $this->fieldValidator->validate($label);
 
-            throw new InvalidRequestException($request, new InvalidField('label', $label, $message));
-        }
+        $hostUrl = new StringField(
+            GitSourceRequest::PARAMETER_HOST_URL,
+            trim($request->request->getString(GitSourceRequest::PARAMETER_HOST_URL)),
+            1,
+            GitSource::HOST_URL_MAX_LENGTH,
+        );
+        $this->fieldValidator->validate($hostUrl);
 
-        $hostUrl = trim((string) $request->request->get(GitSourceRequest::PARAMETER_HOST_URL));
-        if ('' === $hostUrl || strlen($hostUrl) > GitSource::HOST_URL_MAX_LENGTH) {
-            $message = sprintf(
-                'This value should be between 1 and %d characters long.',
-                GitSource::HOST_URL_MAX_LENGTH
-            );
+        $path = new StringField(
+            GitSourceRequest::PARAMETER_PATH,
+            trim($request->request->getString(GitSourceRequest::PARAMETER_PATH)),
+            1,
+            GitSource::PATH_MAX_LENGTH,
+        );
+        $this->fieldValidator->validate($path);
 
-            throw new InvalidRequestException($request, new InvalidField('host-url', $hostUrl, $message));
-        }
+        $credentials = new StringField(
+            GitSourceRequest::PARAMETER_CREDENTIALS,
+            trim($request->request->getString(GitSourceRequest::PARAMETER_CREDENTIALS)),
+            0,
+            GitSource::CREDENTIALS_MAX_LENGTH,
+        );
 
-        $path = trim((string) $request->request->get(GitSourceRequest::PARAMETER_PATH));
-        if ('' === $path || strlen($path) > GitSource::PATH_MAX_LENGTH) {
-            $message = sprintf(
-                'This value should be between 1 and %d characters long.',
-                GitSource::PATH_MAX_LENGTH
-            );
+        $this->fieldValidator->validate($credentials);
 
-            throw new InvalidRequestException($request, new InvalidField('path', $path, $message));
-        }
+        \assert('' !== (string) $label);
+        \assert('' !== (string) $hostUrl);
+        \assert('' !== (string) $path);
 
-        $credentials = trim((string) $request->request->get(GitSourceRequest::PARAMETER_CREDENTIALS));
-        if (strlen($credentials) > GitSource::CREDENTIALS_MAX_LENGTH) {
-            $message = sprintf(
-                'This value should be between 0 and %d characters long.',
-                GitSource::CREDENTIALS_MAX_LENGTH
-            );
-
-            throw new InvalidRequestException($request, new InvalidField('credentials', $credentials, $message));
-        }
-
-        return new GitSourceRequest($label, $hostUrl, $path, $credentials);
+        return new GitSourceRequest((string) $label, (string) $hostUrl, (string) $path, (string) $credentials);
     }
 }

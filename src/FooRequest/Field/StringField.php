@@ -7,22 +7,30 @@ namespace App\FooRequest\Field;
 use App\FooRequest\RequirementsInterface;
 use App\FooRequest\StringFieldInterface;
 
-readonly class LabelField implements StringFieldInterface
+readonly class StringField implements StringFieldInterface
 {
     private Requirements $requirements;
 
+    /**
+     * @param non-empty-string $name
+     */
     public function __construct(
+        private string $name,
         private string $value,
+        int $minimumLength,
+        int $maximumLength,
     ) {
-        $this->requirements = new StringRequirements(
-            new Size(1, 255),
-            RequirementsInterface::CANNOT_BE_EMPTY
-        );
+        $this->requirements = new StringRequirements(new Size($minimumLength, $maximumLength));
+    }
+
+    public function __toString(): string
+    {
+        return $this->getValue();
     }
 
     public function getName(): string
     {
-        return 'label';
+        return $this->name;
     }
 
     public function getValue(): string

@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 namespace App\RequestFactory;
 
+use App\Entity\AbstractSource;
 use App\Exception\FooInvalidRequestException;
-use App\FooRequest\Field\LabelField;
+use App\FooRequest\Field\StringField;
 use App\FooRequest\FieldValidator;
 use App\Request\FileSourceRequest;
 use Symfony\Component\HttpFoundation\Request;
@@ -22,13 +23,16 @@ readonly class FileSourceRequestFactory
      */
     public function create(Request $request): FileSourceRequest
     {
-        $labelField = new LabelField(
-            trim($request->request->getString(FileSourceRequest::PARAMETER_LABEL))
+        $label = new StringField(
+            FileSourceRequest::PARAMETER_LABEL,
+            trim($request->request->getString(FileSourceRequest::PARAMETER_LABEL)),
+            1,
+            AbstractSource::LABEL_MAX_LENGTH,
         );
 
-        $this->fieldValidator->validate($labelField);
-        \assert('' !== $labelField->getValue());
+        $this->fieldValidator->validate($label);
+        \assert('' !== (string) $label);
 
-        return new FileSourceRequest($labelField->getValue());
+        return new FileSourceRequest((string) $label);
     }
 }

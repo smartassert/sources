@@ -25,35 +25,40 @@ trait CreateUpdateGitSourceDataProviderTrait
 
         return [
             'missing label' => [
-                'requestParameters' => [
-                    GitSourceRequest::PARAMETER_HOST_URL => $hostUrl,
-                    GitSourceRequest::PARAMETER_PATH => $path,
-                ],
+                'requestParameters' => [],
                 'expectedResponseData' => [
-                    'error' => [
-                        'type' => 'invalid_request',
-                        'payload' => [
-                            'name' => 'label',
-                            'value' => '',
-                            'message' => 'This value should be between 1 and 255 characters long.',
-                        ],
+                    'class' => 'invalid_request_field',
+                    'field' => [
+                        'name' => 'label',
+                        'value' => '',
+                    ],
+                    'type' => 'empty',
+                    'requirements' => [
+                        'data_type' => 'string',
+                        'size' => [
+                            'minimum' => 1,
+                            'maximum' => 255,
+                        ]
                     ],
                 ],
             ],
-            'label too long' => [
+            'label length exceeds length limit' => [
                 'requestParameters' => [
                     GitSourceRequest::PARAMETER_LABEL => $labelTooLong,
-                    GitSourceRequest::PARAMETER_HOST_URL => $hostUrl,
-                    GitSourceRequest::PARAMETER_PATH => $path,
                 ],
                 'expectedResponseData' => [
-                    'error' => [
-                        'type' => 'invalid_request',
-                        'payload' => [
-                            'name' => 'label',
-                            'value' => $labelTooLong,
-                            'message' => 'This value should be between 1 and 255 characters long.',
-                        ],
+                    'class' => 'invalid_request_field',
+                    'field' => [
+                        'name' => 'label',
+                        'value' => $labelTooLong,
+                    ],
+                    'type' => 'too_large',
+                    'requirements' => [
+                        'data_type' => 'string',
+                        'size' => [
+                            'minimum' => 1,
+                            'maximum' => 255,
+                        ]
                     ],
                 ],
             ],
@@ -63,13 +68,18 @@ trait CreateUpdateGitSourceDataProviderTrait
                     GitSourceRequest::PARAMETER_PATH => $path,
                 ],
                 'expectedResponseData' => [
-                    'error' => [
-                        'type' => 'invalid_request',
-                        'payload' => [
-                            'name' => 'host-url',
-                            'value' => '',
-                            'message' => 'This value should be between 1 and 255 characters long.',
-                        ],
+                    'class' => 'invalid_request_field',
+                    'field' => [
+                        'name' => 'host-url',
+                        'value' => '',
+                    ],
+                    'type' => 'empty',
+                    'requirements' => [
+                        'data_type' => 'string',
+                        'size' => [
+                            'minimum' => 1,
+                            'maximum' => 255,
+                        ]
                     ],
                 ],
             ],
@@ -80,13 +90,18 @@ trait CreateUpdateGitSourceDataProviderTrait
                     GitSourceRequest::PARAMETER_PATH => $path,
                 ],
                 'expectedResponseData' => [
-                    'error' => [
-                        'type' => 'invalid_request',
-                        'payload' => [
-                            'name' => 'host-url',
-                            'value' => $hostUrlTooLong,
-                            'message' => 'This value should be between 1 and 255 characters long.',
-                        ],
+                    'class' => 'invalid_request_field',
+                    'field' => [
+                        'name' => 'host-url',
+                        'value' => $hostUrlTooLong,
+                    ],
+                    'type' => 'too_large',
+                    'requirements' => [
+                        'data_type' => 'string',
+                        'size' => [
+                            'minimum' => 1,
+                            'maximum' => 255,
+                        ]
                     ],
                 ],
             ],
@@ -96,13 +111,18 @@ trait CreateUpdateGitSourceDataProviderTrait
                     GitSourceRequest::PARAMETER_HOST_URL => $hostUrl,
                 ],
                 'expectedResponseData' => [
-                    'error' => [
-                        'type' => 'invalid_request',
-                        'payload' => [
-                            'name' => 'path',
-                            'value' => '',
-                            'message' => 'This value should be between 1 and 255 characters long.',
-                        ],
+                    'class' => 'invalid_request_field',
+                    'field' => [
+                        'name' => 'path',
+                        'value' => '',
+                    ],
+                    'type' => 'empty',
+                    'requirements' => [
+                        'data_type' => 'string',
+                        'size' => [
+                            'minimum' => 1,
+                            'maximum' => 255,
+                        ]
                     ],
                 ],
             ],
@@ -113,13 +133,18 @@ trait CreateUpdateGitSourceDataProviderTrait
                     GitSourceRequest::PARAMETER_PATH => $pathTooLong,
                 ],
                 'expectedResponseData' => [
-                    'error' => [
-                        'type' => 'invalid_request',
-                        'payload' => [
-                            'name' => 'path',
-                            'value' => $pathTooLong,
-                            'message' => 'This value should be between 1 and 255 characters long.',
-                        ],
+                    'class' => 'invalid_request_field',
+                    'field' => [
+                        'name' => 'path',
+                        'value' => $pathTooLong,
+                    ],
+                    'type' => 'too_large',
+                    'requirements' => [
+                        'data_type' => 'string',
+                        'size' => [
+                            'minimum' => 1,
+                            'maximum' => 255,
+                        ]
                     ],
                 ],
             ],
@@ -131,13 +156,18 @@ trait CreateUpdateGitSourceDataProviderTrait
                     GitSourceRequest::PARAMETER_CREDENTIALS => $credentialsTooLong,
                 ],
                 'expectedResponseData' => [
-                    'error' => [
-                        'type' => 'invalid_request',
-                        'payload' => [
-                            'name' => 'credentials',
-                            'value' => $credentialsTooLong,
-                            'message' => 'This value should be between 0 and 255 characters long.',
-                        ],
+                    'class' => 'invalid_request_field',
+                    'field' => [
+                        'name' => 'credentials',
+                        'value' => $credentialsTooLong,
+                    ],
+                    'type' => 'too_large',
+                    'requirements' => [
+                        'data_type' => 'string',
+                        'size' => [
+                            'minimum' => 0,
+                            'maximum' => 255,
+                        ]
                     ],
                 ],
             ],
