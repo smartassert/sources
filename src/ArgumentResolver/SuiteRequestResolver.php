@@ -7,24 +7,26 @@ namespace App\ArgumentResolver;
 use App\Entity\SourceInterface;
 use App\Entity\Suite;
 use App\Exception\EntityNotFoundException;
-use App\Exception\InvalidRequestException;
+use App\Exception\FooInvalidRequestException;
+use App\FooRequest\Field\StringField;
+use App\FooRequest\Field\YamlFilenameCollectionField;
+use App\FooRequest\StringFieldValidator;
+use App\FooRequest\YamlFilenameCollectionFieldValidator;
 use App\Repository\SourceRepository;
 use App\Request\SuiteRequest;
-use App\ResponseBody\InvalidField;
 use App\Security\EntityAccessChecker;
-use SmartAssert\YamlFile\Filename;
-use SmartAssert\YamlFile\Validator\YamlFilenameValidator;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Controller\ValueResolverInterface;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
-class SuiteRequestResolver implements ValueResolverInterface
+readonly class SuiteRequestResolver implements ValueResolverInterface
 {
     public function __construct(
-        private readonly SourceRepository $sourceRepository,
-        private readonly YamlFilenameValidator $yamlFilenameValidator,
-        private readonly EntityAccessChecker $entityAccessChecker,
+        private SourceRepository $sourceRepository,
+        private EntityAccessChecker $entityAccessChecker,
+        private StringFieldValidator $fieldValidator,
+        private YamlFilenameCollectionFieldValidator $yamlFilenameCollectionFieldValidator,
     ) {
     }
 
@@ -32,8 +34,8 @@ class SuiteRequestResolver implements ValueResolverInterface
      * @return SuiteRequest[]
      *
      * @throws AccessDeniedException
-     * @throws InvalidRequestException
      * @throws EntityNotFoundException
+     * @throws FooInvalidRequestException
      */
     public function resolve(Request $request, ArgumentMetadata $argument): iterable
     {
@@ -67,53 +69,36 @@ class SuiteRequestResolver implements ValueResolverInterface
     /**
      * @return non-empty-string
      *
-     * @throws InvalidRequestException
+     * @throws FooInvalidRequestException
      */
     private function getLabel(Request $request): string
     {
-        $label = trim((string) $request->request->get(SuiteRequest::PARAMETER_LABEL));
-        if ('' === $label || mb_strlen($label) > Suite::LABEL_MAX_LENGTH) {
-            $message = sprintf(
-                'This value should be between 1 and %d characters long.',
-                Suite::LABEL_MAX_LENGTH
-            );
-
-            throw new InvalidRequestException($request, new InvalidField('label', $label, $message));
-        }
-
-        return $label;
+        return $this->fieldValidator->validateNonEmptyString(new StringField(
+            SuiteRequest::PARAMETER_LABEL,
+            trim($request->request->getString(SuiteRequest::PARAMETER_LABEL)),
+            1,
+            Suite::LABEL_MAX_LENGTH,
+        ));
     }
 
     /**
      * @return non-empty-string[]
      *
-     * @throws InvalidRequestException
+     * @throws FooInvalidRequestException
      */
     private function getTests(Request $request): array
     {
         $requestTests = $request->request->all(SuiteRequest::PARAMETER_TESTS);
-        $tests = [];
+        $stringRequestTests = [];
 
         foreach ($requestTests as $requestTest) {
-            if (is_string($requestTest)) {
-                $requestTest = trim($requestTest);
-
-                $validation = $this->yamlFilenameValidator->validate(Filename::parse($requestTest));
-                if ($validation->isValid() && '' !== $requestTest) {
-                    $tests[] = $requestTest;
-                } else {
-                    throw new InvalidRequestException(
-                        $request,
-                        new InvalidField(
-                            'tests',
-                            implode(', ', $requestTests),
-                            'Tests must be valid yaml file paths.'
-                        )
-                    );
-                }
+            if (is_string($requestTest) && '' !== $requestTest) {
+                $stringRequestTests[] = $requestTest;
             }
         }
 
-        return $tests;
+        $testsField = new YamlFilenameCollectionField(SuiteRequest::PARAMETER_TESTS, $stringRequestTests);
+
+        return $this->yamlFilenameCollectionFieldValidator->validate($testsField);
     }
 }

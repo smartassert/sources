@@ -4,12 +4,131 @@ declare(strict_types=1);
 
 namespace App\Tests\Application;
 
+use App\Entity\AbstractSource;
 use App\Entity\Suite;
 use App\Repository\SuiteRepository;
 use App\Request\SuiteRequest;
 
 abstract class AbstractCreateSuiteTest extends AbstractSuiteTest
 {
+    /**
+     * @dataProvider createSuiteInvalidRequestDataProvider
+     *
+     * @param array<mixed> $requestParameters
+     * @param array<mixed> $expectedResponseData
+     */
+    public function testCreateInvalidSuiteRequest(array $requestParameters, array $expectedResponseData): void
+    {
+        $response = $this->applicationClient->makeCreateSuiteRequest(
+            self::$apiTokens->get(self::USER_1_EMAIL),
+            array_merge(
+                [
+                    SuiteRequest::PARAMETER_SOURCE_ID => $this->sourceId,
+                ],
+                $requestParameters
+            )
+        );
+
+        self::assertSame(400, $response->getStatusCode());
+        self::assertSame('application/json', $response->getHeaderLine('content-type'));
+
+        self::assertJsonStringEqualsJsonString(
+            (string) json_encode($expectedResponseData),
+            $response->getBody()->getContents(),
+        );
+    }
+
+    /**
+     * @return array<mixed>
+     */
+    public static function createSuiteInvalidRequestDataProvider(): array
+    {
+        $labelTooLong = str_repeat('.', AbstractSource::LABEL_MAX_LENGTH + 1);
+
+        return [
+            'missing label' => [
+                'requestParameters' => [],
+                'expectedResponseData' => [
+                    'class' => 'invalid_request_field',
+                    'field' => [
+                        'name' => 'label',
+                        'value' => '',
+                    ],
+                    'type' => 'empty',
+                    'requirements' => [
+                        'data_type' => 'string',
+                        'size' => [
+                            'minimum' => 1,
+                            'maximum' => 255,
+                        ]
+                    ],
+                ],
+            ],
+            'label length exceeds length limit' => [
+                'requestParameters' => [
+                    SuiteRequest::PARAMETER_LABEL => $labelTooLong,
+                ],
+                'expectedResponseData' => [
+                    'class' => 'invalid_request_field',
+                    'field' => [
+                        'name' => 'label',
+                        'value' => $labelTooLong,
+                    ],
+                    'type' => 'too_large',
+                    'requirements' => [
+                        'data_type' => 'string',
+                        'size' => [
+                            'minimum' => 1,
+                            'maximum' => 255,
+                        ]
+                    ],
+                ],
+            ],
+            'invalid yaml filename within singular tests collection' => [
+                'requestParameters' => [
+                    SuiteRequest::PARAMETER_LABEL => md5((string) rand()),
+                    SuiteRequest::PARAMETER_TESTS => ['test.txt'],
+                ],
+                'expectedResponseData' => [
+                    'class' => 'invalid_request_field',
+                    'field' => [
+                        'name' => 'tests',
+                        'position' => 1,
+                        'value' => [
+                            'test.txt',
+                        ],
+                    ],
+                    'type' => 'invalid',
+                    'requirements' => [
+                        'data_type' => 'yaml_filename_collection'
+                    ],
+                ],
+            ],
+            'invalid yaml filename within tests collection' => [
+                'requestParameters' => [
+                    SuiteRequest::PARAMETER_LABEL => md5((string) rand()),
+                    SuiteRequest::PARAMETER_TESTS => ['test.yaml', 'test.txt', 'test.yml'],
+                ],
+                'expectedResponseData' => [
+                    'class' => 'invalid_request_field',
+                    'field' => [
+                        'name' => 'tests',
+                        'position' => 2,
+                        'value' => [
+                            'test.yaml',
+                            'test.txt',
+                            'test.yml',
+                        ],
+                    ],
+                    'type' => 'invalid',
+                    'requirements' => [
+                        'data_type' => 'yaml_filename_collection'
+                    ],
+                ],
+            ],
+        ];
+    }
+
     /**
      * @dataProvider createSuccessDataProvider
      *

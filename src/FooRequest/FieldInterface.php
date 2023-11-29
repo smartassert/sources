@@ -11,10 +11,7 @@ interface FieldInterface
      */
     public function getName(): string;
 
-    /**
-     * @return scalar
-     */
-    public function getValue(): bool|float|int|string;
+    public function getValue(): mixed;
 
     public function getRequirements(): RequirementsInterface;
 }
