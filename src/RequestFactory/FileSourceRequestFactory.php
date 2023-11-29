@@ -23,16 +23,13 @@ readonly class FileSourceRequestFactory
      */
     public function create(Request $request): FileSourceRequest
     {
-        $label = new StringField(
+        $label = $this->fieldValidator->validateNonEmptyString(new StringField(
             FileSourceRequest::PARAMETER_LABEL,
             trim($request->request->getString(FileSourceRequest::PARAMETER_LABEL)),
             1,
             AbstractSource::LABEL_MAX_LENGTH,
-        );
+        ));
 
-        $this->fieldValidator->validate($label);
-        \assert('' !== (string) $label);
-
-        return new FileSourceRequest((string) $label);
+        return new FileSourceRequest($label);
     }
 }

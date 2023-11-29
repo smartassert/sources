@@ -24,43 +24,34 @@ readonly class GitSourceRequestFactory
      */
     public function create(Request $request): GitSourceRequest
     {
-        $label = new StringField(
+        $label = $this->fieldValidator->validateNonEmptyString(new StringField(
             GitSourceRequest::PARAMETER_LABEL,
             trim($request->request->getString(GitSourceRequest::PARAMETER_LABEL)),
             1,
             AbstractSource::LABEL_MAX_LENGTH,
-        );
-        $this->fieldValidator->validate($label);
+        ));
 
-        $hostUrl = new StringField(
+        $hostUrl = $this->fieldValidator->validateNonEmptyString(new StringField(
             GitSourceRequest::PARAMETER_HOST_URL,
             trim($request->request->getString(GitSourceRequest::PARAMETER_HOST_URL)),
             1,
             GitSource::HOST_URL_MAX_LENGTH,
-        );
-        $this->fieldValidator->validate($hostUrl);
+        ));
 
-        $path = new StringField(
+        $path = $this->fieldValidator->validateNonEmptyString(new StringField(
             GitSourceRequest::PARAMETER_PATH,
             trim($request->request->getString(GitSourceRequest::PARAMETER_PATH)),
             1,
             GitSource::PATH_MAX_LENGTH,
-        );
-        $this->fieldValidator->validate($path);
+        ));
 
-        $credentials = new StringField(
+        $credentials = $this->fieldValidator->validateString(new StringField(
             GitSourceRequest::PARAMETER_CREDENTIALS,
             trim($request->request->getString(GitSourceRequest::PARAMETER_CREDENTIALS)),
             0,
             GitSource::CREDENTIALS_MAX_LENGTH,
-        );
+        ));
 
-        $this->fieldValidator->validate($credentials);
-
-        \assert('' !== (string) $label);
-        \assert('' !== (string) $hostUrl);
-        \assert('' !== (string) $path);
-
-        return new GitSourceRequest((string) $label, (string) $hostUrl, (string) $path, (string) $credentials);
+        return new GitSourceRequest($label, $hostUrl, $path, $credentials);
     }
 }
