@@ -75,18 +75,17 @@ abstract class AbstractUpdateSuiteTest extends AbstractSuiteTest
             ]
         );
 
-        $this->responseAsserter->assertInvalidRequestJsonResponse(
-            $updateResponse,
-            [
-                'error' => [
-                    'type' => 'invalid_request',
-                    'payload' => [
-                        'name' => 'label',
-                        'value' => $suiteLabel2,
-                        'message' => 'This label is being used by another suite belonging to this user',
-                    ],
-                ],
-            ]
+        $expectedResponseData = [
+            'class' => 'duplicate',
+            'field' => [
+                'name' => 'label',
+                'value' => $suiteLabel2,
+            ],
+        ];
+
+        self::assertJsonStringEqualsJsonString(
+            (string) json_encode($expectedResponseData),
+            $updateResponse->getBody()->getContents(),
         );
     }
 

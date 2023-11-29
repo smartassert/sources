@@ -105,18 +105,17 @@ abstract class AbstractUpdateGitSourceTest extends AbstractApplicationTest
             $updateParameters
         );
 
-        $this->responseAsserter->assertInvalidRequestJsonResponse(
-            $updateResponse,
-            [
-                'error' => [
-                    'type' => 'invalid_request',
-                    'payload' => [
-                        'name' => 'label',
-                        'value' => $conflictSourceLabel,
-                        'message' => 'This label is being used by another source belonging to this user',
-                    ],
-                ],
-            ]
+        $expectedResponseData = [
+            'class' => 'duplicate',
+            'field' => [
+                'name' => 'label',
+                'value' => $conflictCreateParameters['label'],
+            ],
+        ];
+
+        self::assertJsonStringEqualsJsonString(
+            (string) json_encode($expectedResponseData),
+            $updateResponse->getBody()->getContents(),
         );
     }
 
