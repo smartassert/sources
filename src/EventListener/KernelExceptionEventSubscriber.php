@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace App\EventListener;
 
 use App\Exception\DuplicateEntityLabelException;
-use App\Exception\DuplicateFilePathException;
 use App\Exception\EntityStorageException;
 use App\Exception\HasHttpErrorCodeInterface;
 use App\Exception\ModifyReadOnlyEntityException;
 use App\FooRequest\CollectionFieldInterface;
+use App\FooRequest\RequirementsInterface;
 use App\FooRequest\ScalarRequirementsInterface;
 use App\FooResponse\ErrorInterface;
 use App\FooResponse\RenderableErrorInterface;
@@ -72,10 +72,6 @@ readonly class KernelExceptionEventSubscriber implements EventSubscriberInterfac
 
         if ($throwable instanceof DuplicateEntityLabelException) {
             $response = $this->handleNonUniqueEntityLabelException($throwable);
-        }
-
-        if ($throwable instanceof DuplicateFilePathException) {
-            $response = $this->handleDuplicateFilePathException($throwable);
         }
 
         if ($response instanceof Response) {
@@ -151,19 +147,6 @@ readonly class KernelExceptionEventSubscriber implements EventSubscriberInterfac
         );
     }
 
-    private function handleDuplicateFilePathException(DuplicateFilePathException $throwable): Response
-    {
-        return $this->responseFactory->createErrorResponse(
-            new ErrorResponse(
-                'duplicate_file_path',
-                [
-                    'path' => $throwable->path,
-                ]
-            ),
-            400
-        );
-    }
-
     private function handleFooHttpError(ErrorInterface $error): Response
     {
         $field = $error->getField();
@@ -188,13 +171,13 @@ readonly class KernelExceptionEventSubscriber implements EventSubscriberInterfac
             $data['type'] = $type;
         }
 
+        $fieldRequirements = $field->getRequirements();
+
         $renderRequirements =
             ($error instanceof RenderableErrorInterface && $error->renderRequirements())
             || !$error instanceof RenderableErrorInterface;
 
-        if ($renderRequirements) {
-            $fieldRequirements = $field->getRequirements();
-
+        if ($renderRequirements && $fieldRequirements instanceof RequirementsInterface) {
             $requirementsData = [
                 'data_type' => $fieldRequirements->getDataType(),
             ];

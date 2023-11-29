@@ -15,7 +15,7 @@ readonly class Field implements FieldInterface
     public function __construct(
         private string $name,
         private string $value,
-        private RequirementsInterface $requirements
+        private ?RequirementsInterface $requirements = null
     ) {
     }
 
@@ -29,7 +29,7 @@ readonly class Field implements FieldInterface
         return $this->value;
     }
 
-    public function getRequirements(): RequirementsInterface
+    public function getRequirements(): ?RequirementsInterface
     {
         return $this->requirements;
     }
