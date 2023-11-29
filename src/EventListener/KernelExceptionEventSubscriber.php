@@ -6,14 +6,12 @@ namespace App\EventListener;
 
 use App\Exception\EntityStorageException;
 use App\Exception\HasHttpErrorCodeInterface;
-use App\Exception\ModifyReadOnlyEntityException;
 use App\FooRequest\CollectionFieldInterface;
 use App\FooRequest\RequirementsInterface;
 use App\FooRequest\ScalarRequirementsInterface;
 use App\FooResponse\ErrorInterface;
 use App\FooResponse\RenderableErrorInterface;
 use App\FooResponse\SizeInterface;
-use App\ResponseBody\ErrorResponse;
 use App\ResponseBody\FilesystemExceptionResponse;
 use App\Services\ResponseFactory;
 use League\Flysystem\FilesystemException;
@@ -63,10 +61,6 @@ readonly class KernelExceptionEventSubscriber implements EventSubscriberInterfac
             $response = $this->handleFilesystemException($throwable);
         }
 
-        if ($throwable instanceof ModifyReadOnlyEntityException) {
-            $response = $this->handleModifyReadOnlyEntityException($throwable);
-        }
-
         if ($response instanceof Response) {
             $event->setResponse($response);
             $event->stopPropagation();
@@ -107,20 +101,6 @@ readonly class KernelExceptionEventSubscriber implements EventSubscriberInterfac
                 'location' => $location,
             ],
             500
-        );
-    }
-
-    private function handleModifyReadOnlyEntityException(ModifyReadOnlyEntityException $throwable): Response
-    {
-        return $this->responseFactory->createErrorResponse(
-            new ErrorResponse(
-                'modify-read-only-entity',
-                [
-                    'type' => $throwable->type,
-                    'id' => $throwable->id,
-                ]
-            ),
-            $throwable->getErrorCode()
         );
     }
 

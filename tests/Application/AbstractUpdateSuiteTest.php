@@ -267,17 +267,18 @@ abstract class AbstractUpdateSuiteTest extends AbstractSuiteTest
             ]
         );
 
-        $this->responseAsserter->assertMethodNotAllowedResponse(
-            $response,
-            [
-                'error' => [
-                    'type' => 'modify-read-only-entity',
-                    'payload' => [
-                        'type' => 'suite',
-                        'id' => $suiteId,
-                    ],
-                ],
-            ]
+        $expectedResponseData = [
+            'class' => 'modify_read_only',
+            'field' => [
+                'name' => 'id',
+                'value' => $suiteId,
+            ],
+            'type' => 'suite',
+        ];
+
+        self::assertJsonStringEqualsJsonString(
+            (string) json_encode($expectedResponseData),
+            $response->getBody()->getContents(),
         );
     }
 

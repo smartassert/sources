@@ -392,17 +392,18 @@ abstract class AbstractUpdateGitSourceTest extends AbstractApplicationTest
             ]
         );
 
-        $this->responseAsserter->assertMethodNotAllowedResponse(
-            $response,
-            [
-                'error' => [
-                    'type' => 'modify-read-only-entity',
-                    'payload' => [
-                        'type' => 'source',
-                        'id' => $source->getId(),
-                    ],
-                ],
-            ]
+        $expectedResponseData = [
+            'class' => 'modify_read_only',
+            'field' => [
+                'name' => 'id',
+                'value' => $source->getId(),
+            ],
+            'type' => 'source',
+        ];
+
+        self::assertJsonStringEqualsJsonString(
+            (string) json_encode($expectedResponseData),
+            $response->getBody()->getContents(),
         );
     }
 }
