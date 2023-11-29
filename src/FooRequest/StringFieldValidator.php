@@ -15,11 +15,14 @@ class StringFieldValidator
     public function validateString(StringFieldInterface $field): string
     {
         $value = $field->getValue();
+        $requirements = $field->getRequirements();
+        if ($requirements instanceof ScalarRequirementsInterface) {
+            $sizeRequirements = $requirements->getSize();
 
-        $sizeRequirements = $field->getRequirements()->getSize();
-        if ($sizeRequirements instanceof SizeInterface) {
-            if (mb_strlen($value) > $sizeRequirements->getMaximum()) {
-                throw new FooInvalidRequestException('invalid_request_field', $field, 'too_large');
+            if ($sizeRequirements instanceof SizeInterface) {
+                if (mb_strlen($value) > $sizeRequirements->getMaximum()) {
+                    throw new FooInvalidRequestException('invalid_request_field', $field, 'too_large');
+                }
             }
         }
 

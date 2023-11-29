@@ -27,6 +27,7 @@ class YamlFileRequestValidator
     public function validate(YamlFileRequest $request): void
     {
         $validation = $this->yamlFilenameValidator->validate($request->filename);
+        var_dump($validation);
 
         if (!$validation->isValid()) {
             throw new InvalidRequestException(

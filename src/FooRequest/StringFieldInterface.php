@@ -8,5 +8,5 @@ interface StringFieldInterface extends FieldInterface
 {
     public function getValue(): string;
 
-    public function getRequirements(): ScalarRequirementsInterface;
+    public function getRequirements(): RequirementsInterface;
 }
