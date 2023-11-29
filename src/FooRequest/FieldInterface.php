@@ -13,5 +13,5 @@ interface FieldInterface
 
     public function getValue(): mixed;
 
-    public function getRequirements(): RequirementsInterface;
+    public function getRequirements(): ?RequirementsInterface;
 }
