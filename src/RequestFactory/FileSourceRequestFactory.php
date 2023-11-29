@@ -7,14 +7,14 @@ namespace App\RequestFactory;
 use App\Entity\AbstractSource;
 use App\Exception\FooInvalidRequestException;
 use App\FooRequest\Field\StringField;
-use App\FooRequest\FieldValidator;
+use App\FooRequest\StringFieldValidator;
 use App\Request\FileSourceRequest;
 use Symfony\Component\HttpFoundation\Request;
 
 readonly class FileSourceRequestFactory
 {
     public function __construct(
-        private FieldValidator $fieldValidator,
+        private StringFieldValidator $fieldValidator,
     ) {
     }
 
