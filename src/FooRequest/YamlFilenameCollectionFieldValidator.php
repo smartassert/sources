@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\FooRequest;
 
-use App\Exception\FooInvalidRequestException;
+use App\Exception\InvalidRequestException;
 use App\FooRequest\Field\YamlFilenameCollectionField;
 use SmartAssert\YamlFile\Filename;
 use SmartAssert\YamlFile\Validator\YamlFilenameValidator;
@@ -19,7 +19,7 @@ readonly class YamlFilenameCollectionFieldValidator
     /**
      * @return non-empty-string[]
      *
-     * @throws FooInvalidRequestException
+     * @throws InvalidRequestException
      */
     public function validate(YamlFilenameCollectionField $field): array
     {
@@ -34,7 +34,7 @@ readonly class YamlFilenameCollectionFieldValidator
             } else {
                 $field->setErrorPosition($nameIndex + 1);
 
-                throw new FooInvalidRequestException('invalid_request_field', $field, 'invalid');
+                throw new InvalidRequestException('invalid_request_field', $field, 'invalid');
             }
         }
 

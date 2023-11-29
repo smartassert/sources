@@ -7,7 +7,7 @@ namespace App\ArgumentResolver;
 use App\Entity\SourceInterface;
 use App\Entity\Suite;
 use App\Exception\EntityNotFoundException;
-use App\Exception\FooInvalidRequestException;
+use App\Exception\InvalidRequestException;
 use App\FooRequest\Field\StringField;
 use App\FooRequest\Field\YamlFilenameCollectionField;
 use App\FooRequest\StringFieldValidator;
@@ -35,7 +35,7 @@ readonly class SuiteRequestResolver implements ValueResolverInterface
      *
      * @throws AccessDeniedException
      * @throws EntityNotFoundException
-     * @throws FooInvalidRequestException
+     * @throws InvalidRequestException
      */
     public function resolve(Request $request, ArgumentMetadata $argument): iterable
     {
@@ -69,7 +69,7 @@ readonly class SuiteRequestResolver implements ValueResolverInterface
     /**
      * @return non-empty-string
      *
-     * @throws FooInvalidRequestException
+     * @throws InvalidRequestException
      */
     private function getLabel(Request $request): string
     {
@@ -84,7 +84,7 @@ readonly class SuiteRequestResolver implements ValueResolverInterface
     /**
      * @return non-empty-string[]
      *
-     * @throws FooInvalidRequestException
+     * @throws InvalidRequestException
      */
     private function getTests(Request $request): array
     {
