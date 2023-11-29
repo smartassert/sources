@@ -4,12 +4,11 @@ declare(strict_types=1);
 
 namespace App\FooRequest\Field;
 
-use App\FooRequest\FieldInterface;
-use App\FooRequest\RequirementsInterface;
+use App\FooRequest\StringFieldInterface;
 
-readonly class StringField implements FieldInterface
+readonly class StringField implements StringFieldInterface
 {
-    private Requirements $requirements;
+    private StringRequirements $requirements;
 
     /**
      * @param non-empty-string $name
@@ -33,7 +32,7 @@ readonly class StringField implements FieldInterface
         return $this->value;
     }
 
-    public function getRequirements(): RequirementsInterface
+    public function getRequirements(): StringRequirements
     {
         return $this->requirements;
     }

@@ -9,6 +9,8 @@ use App\Exception\DuplicateFilePathException;
 use App\Exception\HasHttpErrorCodeInterface;
 use App\Exception\InvalidRequestException;
 use App\Exception\ModifyReadOnlyEntityException;
+use App\FooRequest\CollectionFieldInterface;
+use App\FooRequest\ScalarRequirementsInterface;
 use App\FooResponse\ErrorInterface;
 use App\FooResponse\RenderableErrorInterface;
 use App\FooResponse\SizeInterface;
@@ -148,11 +150,18 @@ readonly class KernelExceptionEventSubscriber implements EventSubscriberInterfac
 
         $data = [
             'class' => $error->getClass(),
-            'field' => [
-                'name' => $field->getName(),
-                'value' => $field->getValue(),
-            ],
         ];
+
+        $fieldData = [
+            'name' => $field->getName(),
+            'value' => $field->getValue(),
+        ];
+
+        if ($field instanceof CollectionFieldInterface) {
+            $fieldData['position'] = $field->getErrorPosition();
+        }
+
+        $data['field'] = $fieldData;
 
         $type = $error->getType();
         if (is_string($type)) {
@@ -170,12 +179,14 @@ readonly class KernelExceptionEventSubscriber implements EventSubscriberInterfac
                 'data_type' => $fieldRequirements->getDataType(),
             ];
 
-            $fieldRequirementsSize = $fieldRequirements->getSize();
-            if ($fieldRequirementsSize instanceof SizeInterface) {
-                $requirementsData['size'] = [
-                    'minimum' => $fieldRequirementsSize->getMinimum(),
-                    'maximum' => $fieldRequirementsSize->getMaximum(),
-                ];
+            if ($fieldRequirements instanceof ScalarRequirementsInterface) {
+                $fieldRequirementsSize = $fieldRequirements->getSize();
+                if ($fieldRequirementsSize instanceof SizeInterface) {
+                    $requirementsData['size'] = [
+                        'minimum' => $fieldRequirementsSize->getMinimum(),
+                        'maximum' => $fieldRequirementsSize->getMaximum(),
+                    ];
+                }
             }
 
             $data['requirements'] = $requirementsData;

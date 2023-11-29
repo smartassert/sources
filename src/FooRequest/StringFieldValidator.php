@@ -7,14 +7,14 @@ namespace App\FooRequest;
 use App\Exception\FooInvalidRequestException;
 use App\FooResponse\SizeInterface;
 
-class FieldValidator
+class StringFieldValidator
 {
     /**
      * @throws FooInvalidRequestException
      */
-    public function validateString(FieldInterface $field): string
+    public function validateString(StringFieldInterface $field): string
     {
-        $value = (string) $field->getValue();
+        $value = $field->getValue();
 
         $sizeRequirements = $field->getRequirements()->getSize();
         if ($sizeRequirements instanceof SizeInterface) {
@@ -31,7 +31,7 @@ class FieldValidator
      *
      * @throws FooInvalidRequestException
      */
-    public function validateNonEmptyString(FieldInterface $field): string
+    public function validateNonEmptyString(StringFieldInterface $field): string
     {
         $value = $this->validateString($field);
 

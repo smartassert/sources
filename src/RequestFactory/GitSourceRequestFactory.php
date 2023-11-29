@@ -8,14 +8,14 @@ use App\Entity\AbstractSource;
 use App\Entity\GitSource;
 use App\Exception\FooInvalidRequestException;
 use App\FooRequest\Field\StringField;
-use App\FooRequest\FieldValidator;
+use App\FooRequest\StringFieldValidator;
 use App\Request\GitSourceRequest;
 use Symfony\Component\HttpFoundation\Request;
 
 readonly class GitSourceRequestFactory
 {
     public function __construct(
-        private FieldValidator $fieldValidator,
+        private StringFieldValidator $fieldValidator,
     ) {
     }
 

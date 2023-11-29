@@ -7,9 +7,12 @@ namespace App\Tests\Application;
 use App\Entity\Suite;
 use App\Repository\SuiteRepository;
 use App\Request\SuiteRequest;
+use App\Tests\DataProvider\CreateUpdateSuiteDataProviderTrait;
 
 abstract class AbstractUpdateSuiteTest extends AbstractSuiteTest
 {
+    use CreateUpdateSuiteDataProviderTrait;
+
     private string $secondarySourceId;
 
     protected function setUp(): void
@@ -17,6 +20,36 @@ abstract class AbstractUpdateSuiteTest extends AbstractSuiteTest
         parent::setUp();
 
         $this->secondarySourceId = $this->createSource(self::USER_1_EMAIL);
+    }
+
+    /**
+     * @dataProvider createUpdateSuiteInvalidRequestDataProvider
+     *
+     * @param array<mixed> $requestParameters
+     * @param array<mixed> $expectedResponseData
+     */
+    public function testUpdateInvalidSuiteRequest(array $requestParameters, array $expectedResponseData): void
+    {
+        $suiteId = $this->createSuite($this->sourceId, md5((string) rand()), []);
+
+        $response = $this->applicationClient->makeUpdateSuiteRequest(
+            self::$apiTokens->get(self::USER_1_EMAIL),
+            $suiteId,
+            array_merge(
+                [
+                    SuiteRequest::PARAMETER_SOURCE_ID => $this->sourceId,
+                ],
+                $requestParameters
+            )
+        );
+
+        self::assertSame(400, $response->getStatusCode());
+        self::assertSame('application/json', $response->getHeaderLine('content-type'));
+
+        self::assertJsonStringEqualsJsonString(
+            (string) json_encode($expectedResponseData),
+            $response->getBody()->getContents(),
+        );
     }
 
     public function testUpdateNewLabelNotUnique(): void
