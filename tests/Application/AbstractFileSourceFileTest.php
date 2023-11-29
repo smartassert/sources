@@ -184,16 +184,17 @@ abstract class AbstractFileSourceFileTest extends AbstractApplicationTest
             $initialContent
         );
 
-        $this->responseAsserter->assertInvalidRequestJsonResponse(
-            $failedAddResponse,
-            [
-                'error' => [
-                    'type' => 'duplicate_file_path',
-                    'payload' => [
-                        'path' => self::FILENAME,
-                    ],
-                ]
-            ]
+        $expectedResponseData = [
+            'class' => 'duplicate',
+            'field' => [
+                'name' => 'filename',
+                'value' => self::FILENAME,
+            ],
+        ];
+
+        self::assertJsonStringEqualsJsonString(
+            (string) json_encode($expectedResponseData),
+            $failedAddResponse->getBody()->getContents(),
         );
     }
 
