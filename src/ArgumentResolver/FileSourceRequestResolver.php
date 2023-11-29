@@ -4,24 +4,26 @@ declare(strict_types=1);
 
 namespace App\ArgumentResolver;
 
-use App\Exception\InvalidRequestException;
+use App\Entity\AbstractSource;
+use App\Exception\FooInvalidRequestException;
+use App\FooRequest\Field\StringField;
+use App\FooRequest\StringFieldValidator;
 use App\Request\FileSourceRequest;
-use App\RequestFactory\FileSourceRequestFactory;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Controller\ValueResolverInterface;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 
-class FileSourceRequestResolver implements ValueResolverInterface
+readonly class FileSourceRequestResolver implements ValueResolverInterface
 {
     public function __construct(
-        private readonly FileSourceRequestFactory $fileSourceRequestFactory,
+        private StringFieldValidator $fieldValidator,
     ) {
     }
 
     /**
      * @return FileSourceRequest[]
      *
-     * @throws InvalidRequestException
+     * @throws FooInvalidRequestException
      */
     public function resolve(Request $request, ArgumentMetadata $argument): iterable
     {
@@ -29,6 +31,13 @@ class FileSourceRequestResolver implements ValueResolverInterface
             return [];
         }
 
-        return [$this->fileSourceRequestFactory->create($request)];
+        $label = $this->fieldValidator->validateNonEmptyString(new StringField(
+            FileSourceRequest::PARAMETER_LABEL,
+            trim($request->request->getString(FileSourceRequest::PARAMETER_LABEL)),
+            1,
+            AbstractSource::LABEL_MAX_LENGTH,
+        ));
+
+        return [new FileSourceRequest($label)];
     }
 }
