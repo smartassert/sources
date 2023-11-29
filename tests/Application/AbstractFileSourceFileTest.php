@@ -176,7 +176,13 @@ abstract class AbstractFileSourceFileTest extends AbstractApplicationTest
             $filename
         );
 
-        $this->responseAsserter->assertInvalidRequestJsonResponse($response, $expectedResponseData);
+        self::assertSame(400, $response->getStatusCode());
+        self::assertSame('application/json', $response->getHeaderLine('content-type'));
+
+        self::assertJsonStringEqualsJsonString(
+            (string) json_encode($expectedResponseData),
+            $response->getBody()->getContents(),
+        );
     }
 
     /**
@@ -194,7 +200,13 @@ abstract class AbstractFileSourceFileTest extends AbstractApplicationTest
             $filename
         );
 
-        $this->responseAsserter->assertInvalidRequestJsonResponse($response, $expectedResponseData);
+        self::assertSame(400, $response->getStatusCode());
+        self::assertSame('application/json', $response->getHeaderLine('content-type'));
+
+        self::assertJsonStringEqualsJsonString(
+            (string) json_encode($expectedResponseData),
+            $response->getBody()->getContents(),
+        );
     }
 
     /**
@@ -205,21 +217,45 @@ abstract class AbstractFileSourceFileTest extends AbstractApplicationTest
         return [
             'name empty with .yaml extension' => [
                 'filename' => '.yaml',
-                'expectedResponseData' => InvalidFilenameResponseDataFactory::createForMessage(
-                    YamlFileRequestValidator::MESSAGE_NAME_INVALID,
-                ),
+                'expectedResponseData' => [
+                    'class' => 'invalid_request_field',
+                    'field' => [
+                        'name' => 'filename',
+                        'value' => '.yaml',
+                    ],
+                    'type' => 'invalid',
+                    'requirements' => [
+                        'data_type' => 'yaml_filename',
+                    ],
+                ],
             ],
             'name contains backslash characters' => [
                 'filename' => 'one-two-\\-three.yaml',
-                'expectedResponseData' => InvalidFilenameResponseDataFactory::createForMessage(
-                    YamlFileRequestValidator::MESSAGE_NAME_INVALID,
-                ),
+                'expectedResponseData' => [
+                    'class' => 'invalid_request_field',
+                    'field' => [
+                        'name' => 'filename',
+                        'value' => 'one-two-\\-three.yaml',
+                    ],
+                    'type' => 'invalid',
+                    'requirements' => [
+                        'data_type' => 'yaml_filename',
+                    ],
+                ],
             ],
             'name contains space characters' => [
                 'filename' => 'one two three.yaml',
-                'expectedResponseData' => InvalidFilenameResponseDataFactory::createForMessage(
-                    YamlFileRequestValidator::MESSAGE_NAME_INVALID,
-                ),
+                'expectedResponseData' => [
+                    'class' => 'invalid_request_field',
+                    'field' => [
+                        'name' => 'filename',
+                        'value' => 'one two three.yaml',
+                    ],
+                    'type' => 'invalid',
+                    'requirements' => [
+                        'data_type' => 'yaml_filename',
+                    ],
+                ],
             ],
         ];
     }
