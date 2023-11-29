@@ -4,29 +4,53 @@ declare(strict_types=1);
 
 namespace App\Exception;
 
-use App\ResponseBody\InvalidField;
+use App\FooRequest\FieldInterface;
+use App\FooResponse\RenderableErrorInterface;
+use App\FooResponse\RenderableErrorInterface as Renderable;
 
-class InvalidRequestException extends \Exception implements HasHttpErrorCodeInterface
+class InvalidRequestException extends \Exception implements HasHttpErrorCodeInterface, Renderable
 {
+    /**
+     * @param non-empty-string                                                   $class
+     * @param ?non-empty-string                                                  $type
+     * @param Renderable::DO_NOT_SHOW_REQUIREMENTS|Renderable::SHOW_REQUIREMENTS $renderRequirements
+     */
     public function __construct(
-        private readonly object $request,
-        private readonly InvalidField $invalidField,
+        private readonly string $class,
+        private readonly FieldInterface $field,
+        private readonly ?string $type,
+        private readonly bool $renderRequirements = RenderableErrorInterface::SHOW_REQUIREMENTS,
     ) {
-        parent::__construct();
+        $message = $class . ': ' . $class;
+        if (is_string($type)) {
+            $message .= ' ' . $type;
+        }
+
+        parent::__construct($message, 400);
     }
 
-    public function getRequest(): object
+    public function getClass(): string
     {
-        return $this->request;
+        return $this->class;
     }
 
-    public function getInvalidField(): InvalidField
+    public function getField(): FieldInterface
     {
-        return $this->invalidField;
+        return $this->field;
+    }
+
+    public function getType(): ?string
+    {
+        return $this->type;
     }
 
     public function getErrorCode(): int
     {
-        return 400;
+        return $this->getCode();
+    }
+
+    public function renderRequirements(): bool
+    {
+        return $this->renderRequirements;
     }
 }
