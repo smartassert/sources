@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\EventListener;
 
-use App\Exception\DuplicateEntityLabelException;
 use App\Exception\EntityStorageException;
 use App\Exception\HasHttpErrorCodeInterface;
 use App\Exception\ModifyReadOnlyEntityException;
@@ -16,8 +15,6 @@ use App\FooResponse\RenderableErrorInterface;
 use App\FooResponse\SizeInterface;
 use App\ResponseBody\ErrorResponse;
 use App\ResponseBody\FilesystemExceptionResponse;
-use App\ResponseBody\InvalidField;
-use App\ResponseBody\InvalidRequestResponse;
 use App\Services\ResponseFactory;
 use League\Flysystem\FilesystemException;
 use League\Flysystem\FilesystemOperationFailed;
@@ -68,10 +65,6 @@ readonly class KernelExceptionEventSubscriber implements EventSubscriberInterfac
 
         if ($throwable instanceof ModifyReadOnlyEntityException) {
             $response = $this->handleModifyReadOnlyEntityException($throwable);
-        }
-
-        if ($throwable instanceof DuplicateEntityLabelException) {
-            $response = $this->handleNonUniqueEntityLabelException($throwable);
         }
 
         if ($response instanceof Response) {
@@ -128,22 +121,6 @@ readonly class KernelExceptionEventSubscriber implements EventSubscriberInterfac
                 ]
             ),
             $throwable->getErrorCode()
-        );
-    }
-
-    private function handleNonUniqueEntityLabelException(DuplicateEntityLabelException $throwable): Response
-    {
-        $request = $throwable->request;
-
-        $invalidField = new InvalidField(
-            'label',
-            $request->getLabel(),
-            sprintf('This label is being used by another %s belonging to this user', $request->getObjectType())
-        );
-
-        return $this->responseFactory->createErrorResponse(
-            new InvalidRequestResponse($invalidField),
-            400
         );
     }
 
