@@ -16,6 +16,9 @@ readonly class YamlFilenameFieldValidator
     ) {
     }
 
+    /**
+     * @throws FooInvalidRequestException
+     */
     public function validate(YamlFilenameField $field): YamlFilename
     {
         $filename = $field->getFilename();

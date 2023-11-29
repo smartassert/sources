@@ -8,5 +8,5 @@ interface SizeInterface
 {
     public function getMinimum(): int;
 
-    public function getMaximum(): int;
+    public function getMaximum(): ?int;
 }
