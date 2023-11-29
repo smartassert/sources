@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace App\FooRequest\Field;
 
+use App\FooRequest\FieldInterface;
 use App\FooRequest\RequirementsInterface;
-use App\FooRequest\StringFieldInterface;
 
-readonly class StringField implements StringFieldInterface
+readonly class StringField implements FieldInterface
 {
     private Requirements $requirements;
 
@@ -21,11 +21,6 @@ readonly class StringField implements StringFieldInterface
         int $maximumLength,
     ) {
         $this->requirements = new StringRequirements(new Size($minimumLength, $maximumLength));
-    }
-
-    public function __toString(): string
-    {
-        return $this->getValue();
     }
 
     public function getName(): string
