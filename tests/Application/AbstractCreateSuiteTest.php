@@ -220,18 +220,17 @@ abstract class AbstractCreateSuiteTest extends AbstractSuiteTest
             ]
         );
 
-        $this->responseAsserter->assertInvalidRequestJsonResponse(
-            $secondResponse,
-            [
-                'error' => [
-                    'type' => 'invalid_request',
-                    'payload' => [
-                        'name' => 'label',
-                        'value' => $label,
-                        'message' => 'This label is being used by another suite belonging to this user',
-                    ],
-                ],
-            ]
+        $expectedResponseData = [
+            'class' => 'duplicate',
+            'field' => [
+                'name' => 'label',
+                'value' => $label,
+            ],
+        ];
+
+        self::assertJsonStringEqualsJsonString(
+            (string) json_encode($expectedResponseData),
+            $secondResponse->getBody()->getContents(),
         );
     }
 
@@ -263,18 +262,17 @@ abstract class AbstractCreateSuiteTest extends AbstractSuiteTest
             ]
         );
 
-        $this->responseAsserter->assertInvalidRequestJsonResponse(
-            $secondResponse,
-            [
-                'error' => [
-                    'type' => 'invalid_request',
-                    'payload' => [
-                        'name' => 'label',
-                        'value' => $label,
-                        'message' => 'This label is being used by another suite belonging to this user',
-                    ],
-                ],
-            ]
+        $expectedResponseData = [
+            'class' => 'duplicate',
+            'field' => [
+                'name' => 'label',
+                'value' => $label,
+            ],
+        ];
+
+        self::assertJsonStringEqualsJsonString(
+            (string) json_encode($expectedResponseData),
+            $secondResponse->getBody()->getContents(),
         );
     }
 
