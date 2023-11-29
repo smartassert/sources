@@ -9,13 +9,19 @@ use App\Request\AddYamlFileRequest;
 use App\ResponseBody\InvalidField;
 use SmartAssert\YamlFile\Validation\ContentContext;
 use SmartAssert\YamlFile\Validation\YamlFileContext;
+use SmartAssert\YamlFile\Validator\YamlFilenameValidator;
 use SmartAssert\YamlFile\Validator\YamlFileValidator;
 
-class AddYamlFileRequestValidator
+readonly class AddYamlFileRequestValidator
 {
+    public const MESSAGE_NAME_INVALID =
+        'File name must be non-empty, '
+        . 'have a .yml or .yaml extension, '
+        . 'and contain no backslash or null byte characters.';
+
     public function __construct(
-        private readonly YamlFileRequestValidator $yamlFileRequestValidator,
-        private readonly YamlFileValidator $yamlFileValidator,
+        private YamlFileValidator $yamlFileValidator,
+        private YamlFilenameValidator $yamlFilenameValidator,
     ) {
     }
 
@@ -24,7 +30,17 @@ class AddYamlFileRequestValidator
      */
     public function validate(AddYamlFileRequest $request): void
     {
-        $this->yamlFileRequestValidator->validate($request);
+        $validation = $this->yamlFilenameValidator->validate($request->filename);
+        if (!$validation->isValid()) {
+            throw new InvalidRequestException(
+                $request,
+                new InvalidField(
+                    'name',
+                    '',
+                    self::MESSAGE_NAME_INVALID
+                ),
+            );
+        }
 
         $validation = $this->yamlFileValidator->validate($request->file);
 
