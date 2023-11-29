@@ -8,7 +8,6 @@ use App\Exception\DuplicateEntityLabelException;
 use App\Exception\DuplicateFilePathException;
 use App\Exception\EntityStorageException;
 use App\Exception\HasHttpErrorCodeInterface;
-use App\Exception\InvalidRequestException;
 use App\Exception\ModifyReadOnlyEntityException;
 use App\FooRequest\CollectionFieldInterface;
 use App\FooRequest\ScalarRequirementsInterface;
@@ -59,10 +58,6 @@ readonly class KernelExceptionEventSubscriber implements EventSubscriberInterfac
             $response = $this->handleFooHttpError($throwable);
         }
 
-        if ($throwable instanceof InvalidRequestException) {
-            $response = $this->handleInvalidRequest($throwable);
-        }
-
         if ($throwable instanceof EntityStorageException) {
             $response = $this->handleEntityStorageException($throwable);
         }
@@ -92,14 +87,6 @@ readonly class KernelExceptionEventSubscriber implements EventSubscriberInterfac
     private function handleHttpErrorException(HasHttpErrorCodeInterface $throwable): Response
     {
         return new Response(null, $throwable->getErrorCode());
-    }
-
-    private function handleInvalidRequest(InvalidRequestException $throwable): Response
-    {
-        return $this->responseFactory->createErrorResponse(
-            new InvalidRequestResponse($throwable->getInvalidField()),
-            $throwable->getErrorCode()
-        );
     }
 
     private function handleFilesystemException(FilesystemException $throwable): Response
