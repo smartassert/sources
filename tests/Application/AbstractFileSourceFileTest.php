@@ -6,8 +6,6 @@ namespace App\Tests\Application;
 
 use App\Entity\FileSource;
 use App\Repository\SourceRepository;
-use App\RequestValidator\YamlFileRequestValidator;
-use App\Tests\Services\InvalidFilenameResponseDataFactory;
 use App\Tests\Services\SourceOriginFactory;
 
 abstract class AbstractFileSourceFileTest extends AbstractApplicationTest
@@ -49,7 +47,13 @@ abstract class AbstractFileSourceFileTest extends AbstractApplicationTest
             $content
         );
 
-        $this->responseAsserter->assertInvalidRequestJsonResponse($response, $expectedResponseData);
+        self::assertSame(400, $response->getStatusCode());
+        self::assertSame('application/json', $response->getHeaderLine('content-type'));
+
+        self::assertJsonStringEqualsJsonString(
+            (string) json_encode($expectedResponseData),
+            $response->getBody()->getContents(),
+        );
     }
 
     /**
@@ -69,7 +73,13 @@ abstract class AbstractFileSourceFileTest extends AbstractApplicationTest
             $content
         );
 
-        $this->responseAsserter->assertInvalidRequestJsonResponse($response, $expectedResponseData);
+        self::assertSame(400, $response->getStatusCode());
+        self::assertSame('application/json', $response->getHeaderLine('content-type'));
+
+        self::assertJsonStringEqualsJsonString(
+            (string) json_encode($expectedResponseData),
+            $response->getBody()->getContents(),
+        );
     }
 
     /**
@@ -81,35 +91,60 @@ abstract class AbstractFileSourceFileTest extends AbstractApplicationTest
             'name empty with .yaml extension, content non-empty' => [
                 'filename' => '.yaml',
                 'content' => 'non-empty value',
-                'expectedResponseData' => InvalidFilenameResponseDataFactory::createForMessage(
-                    YamlFileRequestValidator::MESSAGE_NAME_INVALID,
-                ),
+                'expectedResponseData' => [
+                    'class' => 'invalid_request_field',
+                    'field' => [
+                        'name' => 'filename',
+                        'value' => '.yaml',
+                    ],
+                    'type' => 'invalid',
+                    'requirements' => [
+                        'data_type' => 'yaml_filename',
+                    ],
+                ],
             ],
             'name contains backslash characters, content non-empty' => [
                 'filename' => 'one-two-\\-three.yaml',
                 'content' => 'non-empty value',
-                'expectedResponseData' => InvalidFilenameResponseDataFactory::createForMessage(
-                    YamlFileRequestValidator::MESSAGE_NAME_INVALID,
-                ),
+                'expectedResponseData' => [
+                    'class' => 'invalid_request_field',
+                    'field' => [
+                        'name' => 'filename',
+                        'value' => 'one-two-\\-three.yaml',
+                    ],
+                    'type' => 'invalid',
+                    'requirements' => [
+                        'data_type' => 'yaml_filename',
+                    ],
+                ],
             ],
             'name contains space characters, content non-empty' => [
                 'filename' => 'one two three.yaml',
                 'content' => 'non-empty value',
-                'expectedResponseData' => InvalidFilenameResponseDataFactory::createForMessage(
-                    YamlFileRequestValidator::MESSAGE_NAME_INVALID,
-                ),
+                'expectedResponseData' => [
+                    'class' => 'invalid_request_field',
+                    'field' => [
+                        'name' => 'filename',
+                        'value' => 'one two three.yaml',
+                    ],
+                    'type' => 'invalid',
+                    'requirements' => [
+                        'data_type' => 'yaml_filename',
+                    ],
+                ],
             ],
             'name valid, content empty' => [
                 'filename' => self::FILENAME,
                 'content' => '',
                 'expectedResponseData' => [
-                    'error' => [
-                        'type' => 'invalid_request',
-                        'payload' => [
-                            'name' => 'content',
-                            'value' => '',
-                            'message' => 'File content must not be empty.',
-                        ],
+                    'class' => 'invalid_request_field',
+                    'field' => [
+                        'name' => 'content',
+                        'value' => '',
+                    ],
+                    'type' => 'empty',
+                    'requirements' => [
+                        'data_type' => 'yaml',
                     ],
                 ],
             ],
@@ -117,13 +152,14 @@ abstract class AbstractFileSourceFileTest extends AbstractApplicationTest
                 'filename' => self::FILENAME,
                 'content' => "- item\ncontent",
                 'expectedResponseData' => [
-                    'error' => [
-                        'type' => 'invalid_request',
-                        'payload' => [
-                            'name' => 'content',
-                            'value' => '',
-                            'message' => 'Content must be valid YAML: Unable to parse at line 2 (near "content").',
-                        ],
+                    'class' => 'invalid_request_field',
+                    'field' => [
+                        'name' => 'content',
+                        'value' => "- item\ncontent",
+                    ],
+                    'type' => 'invalid',
+                    'requirements' => [
+                        'data_type' => 'yaml',
                     ],
                 ],
             ],
