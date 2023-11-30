@@ -39,8 +39,15 @@ class FilesystemExceptionHandlingTest extends WebTestCase
         $this->applicationClient = $factory->create($client);
     }
 
-    public function testListFileSourceFilenamesHandlesThrownFilesystemException(): void
-    {
+    /**
+     * @dataProvider exceptionHandlerDataProvider
+     *
+     * @param array<mixed> $expectedResponseData
+     */
+    public function testListFileSourceFilenamesHandlesThrownFilesystemException(
+        \Exception&FilesystemException $exception,
+        array $expectedResponseData,
+    ): void {
         $userId = md5((string) rand());
 
         $this->mockAuthenticator($userId);
@@ -60,14 +67,6 @@ class FilesystemExceptionHandlingTest extends WebTestCase
         self::getContainer()->set(SourceRepository::class, $sourceRepository);
 
         $fileSourceDirectoryLister = \Mockery::mock(FileSourceDirectoryLister::class);
-
-        $exception = (new class () extends \Exception implements FilesystemException {
-            public function __construct()
-            {
-                parent::__construct('message', 123);
-            }
-        });
-
         $fileSourceDirectoryLister
             ->shouldReceive('list')
             ->andThrow($exception)
@@ -85,20 +84,39 @@ class FilesystemExceptionHandlingTest extends WebTestCase
         self::assertSame(500, $response->getStatusCode());
         self::assertSame('application/json', $response->getHeaderLine('content-type'));
 
-        $expectedData = [
-            'error' => [
-                'payload' => [
-                    'file' => '',
-                    'message' => 'message',
-                ],
-                'type' => 'source_unknown_exception',
-            ],
-        ];
-
         self::assertJsonStringEqualsJsonString(
-            (string) json_encode($expectedData),
+            (string) json_encode($expectedResponseData),
             $response->getBody()->getContents()
         );
+    }
+
+    /**
+     * @return array<mixed>
+     */
+    public static function exceptionHandlerDataProvider(): array
+    {
+        $message = md5((string) rand());
+        $code = rand();
+
+        return [
+            'generic filesystem error' => [
+                'exception' => new class ($message, $code) extends \Exception implements FilesystemException {
+                    public function __construct(string $message, int $code)
+                    {
+                        parent::__construct($message, $code);
+                    }
+                },
+                'expectedResponseData' => [
+                    'error' => [
+                        'payload' => [
+                            'file' => '',
+                            'message' => $message,
+                        ],
+                        'type' => 'source_unknown_exception',
+                    ],
+                ],
+            ],
+        ];
     }
 
     private function mockAuthenticator(string $userId): void
