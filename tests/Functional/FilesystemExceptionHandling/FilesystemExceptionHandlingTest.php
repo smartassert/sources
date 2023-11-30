@@ -6,6 +6,7 @@ namespace App\Tests\Functional\FilesystemExceptionHandling;
 
 use App\Entity\FileSource;
 use App\Entity\SerializedSuite;
+use App\Entity\SourceInterface;
 use App\Repository\SerializedSuiteRepository;
 use App\Repository\SourceRepository;
 use App\Services\SourceRepository\Reader\FileSourceDirectoryLister;
@@ -14,6 +15,7 @@ use App\Tests\Services\ApplicationClient\ClientFactory;
 use League\Flysystem\FilesystemException as FsException;
 use League\Flysystem\FilesystemOperationFailed as FsOpFailed;
 use League\Flysystem\FilesystemOperator;
+use Mockery\MockInterface;
 use Psr\Http\Message\ResponseInterface;
 use SmartAssert\SymfonyTestClient\SymfonyClient;
 use SmartAssert\UsersSecurityBundle\Security\Authenticator;
@@ -57,11 +59,7 @@ class FilesystemExceptionHandlingTest extends WebTestCase
 
         $this->mockAuthenticator($userId);
 
-        $source = \Mockery::mock(FileSource::class);
-        $source
-            ->shouldReceive('getUserId')
-            ->andReturn($userId)
-        ;
+        $source = $this->createSource($userId);
 
         $sourceRepository = \Mockery::mock(SourceRepository::class);
         $sourceRepository
@@ -103,15 +101,7 @@ class FilesystemExceptionHandlingTest extends WebTestCase
 
         $this->mockAuthenticator($userId);
 
-        $source = \Mockery::mock(FileSource::class);
-        $source
-            ->shouldReceive('getUserId')
-            ->andReturn($userId)
-        ;
-        $source
-            ->shouldReceive('getDirectoryPath')
-            ->andReturn($userId . '/' . $sourceId)
-        ;
+        $source = $this->createSource($userId, $sourceId);
 
         $sourceRepository = \Mockery::mock(SourceRepository::class);
         $sourceRepository
@@ -147,15 +137,7 @@ class FilesystemExceptionHandlingTest extends WebTestCase
 
         $this->mockAuthenticator($userId);
 
-        $source = \Mockery::mock(FileSource::class);
-        $source
-            ->shouldReceive('getUserId')
-            ->andReturn($userId)
-        ;
-        $source
-            ->shouldReceive('getDirectoryPath')
-            ->andReturn($userId . '/' . $sourceId)
-        ;
+        $source = $this->createSource($userId, $sourceId);
 
         $sourceRepository = \Mockery::mock(SourceRepository::class);
         $sourceRepository
@@ -191,15 +173,7 @@ class FilesystemExceptionHandlingTest extends WebTestCase
 
         $this->mockAuthenticator($userId);
 
-        $source = \Mockery::mock(FileSource::class);
-        $source
-            ->shouldReceive('getUserId')
-            ->andReturn($userId)
-        ;
-        $source
-            ->shouldReceive('getDirectoryPath')
-            ->andReturn($userId . '/' . $sourceId)
-        ;
+        $source = $this->createSource($userId, $sourceId);
 
         $sourceRepository = \Mockery::mock(SourceRepository::class);
         $sourceRepository
@@ -234,15 +208,7 @@ class FilesystemExceptionHandlingTest extends WebTestCase
 
         $this->mockAuthenticator($userId);
 
-        $source = \Mockery::mock(FileSource::class);
-        $source
-            ->shouldReceive('getUserId')
-            ->andReturn($userId)
-        ;
-        $source
-            ->shouldReceive('getDirectoryPath')
-            ->andReturn($userId . '/' . $sourceId)
-        ;
+        $source = $this->createSource($userId, $sourceId);
 
         $sourceRepository = \Mockery::mock(SourceRepository::class);
         $sourceRepository
@@ -327,18 +293,10 @@ class FilesystemExceptionHandlingTest extends WebTestCase
 
         $this->mockAuthenticator($userId);
 
-        $source = \Mockery::mock(FileSource::class);
-        $source
-            ->shouldReceive('getUserId')
-            ->andReturn($userId)
-        ;
+        $source = $this->createSource($userId, $sourceId);
         $source
             ->shouldReceive('getDeletedAt')
             ->andReturn(null)
-        ;
-        $source
-            ->shouldReceive('getDirectoryPath')
-            ->andReturn($userId . '/' . $sourceId)
         ;
 
         $sourceRepository = \Mockery::mock(SourceRepository::class);
@@ -546,5 +504,23 @@ class FilesystemExceptionHandlingTest extends WebTestCase
             (string) json_encode($expectedResponseData),
             $response->getBody()->getContents()
         );
+    }
+
+    private function createSource(string $userId, ?string $sourceId = null): SourceInterface&MockInterface
+    {
+        $source = \Mockery::mock(FileSource::class);
+        $source
+            ->shouldReceive('getUserId')
+            ->andReturn($userId)
+        ;
+
+        if (is_string($sourceId)) {
+            $source
+                ->shouldReceive('getDirectoryPath')
+                ->andReturn($userId . '/' . $sourceId)
+            ;
+        }
+
+        return $source;
     }
 }
