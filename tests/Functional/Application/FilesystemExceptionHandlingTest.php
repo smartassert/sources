@@ -9,7 +9,8 @@ use App\Repository\SourceRepository;
 use App\Services\SourceRepository\Reader\FileSourceDirectoryLister;
 use App\Tests\Services\ApplicationClient\Client;
 use App\Tests\Services\ApplicationClient\ClientFactory;
-use League\Flysystem\FilesystemException;
+use League\Flysystem\FilesystemException as FsException;
+use League\Flysystem\FilesystemOperationFailed as FsOpFailed;
 use SmartAssert\SymfonyTestClient\SymfonyClient;
 use SmartAssert\UsersSecurityBundle\Security\Authenticator;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -45,7 +46,7 @@ class FilesystemExceptionHandlingTest extends WebTestCase
      * @param array<mixed> $expectedResponseData
      */
     public function testListFileSourceFilenamesHandlesThrownFilesystemException(
-        \Exception&FilesystemException $exception,
+        \Exception&FsException $exception,
         array $expectedResponseData,
     ): void {
         $userId = md5((string) rand());
@@ -97,10 +98,11 @@ class FilesystemExceptionHandlingTest extends WebTestCase
     {
         $message = md5((string) rand());
         $code = rand();
+        $location = md5((string) rand());
 
         return [
             'generic filesystem error' => [
-                'exception' => new class ($message, $code) extends \Exception implements FilesystemException {
+                'exception' => new class ($message, $code) extends \Exception implements FsException {
                     public function __construct(string $message, int $code)
                     {
                         parent::__construct($message, $code);
@@ -113,6 +115,77 @@ class FilesystemExceptionHandlingTest extends WebTestCase
                             'message' => $message,
                         ],
                         'type' => 'source_unknown_exception',
+                    ],
+                ],
+            ],
+            'read failed, no known location' => [
+                'exception' => new class ($message, $code) extends \Exception implements FsOpFailed {
+                    public function __construct(string $message, int $code)
+                    {
+                        parent::__construct($message, $code);
+                    }
+
+                    public function operation(): string
+                    {
+                        return 'read';
+                    }
+                },
+                'expectedResponseData' => [
+                    'error' => [
+                        'payload' => [
+                            'file' => '',
+                            'message' => $message,
+                        ],
+                        'type' => 'source_read_exception',
+                    ],
+                ],
+            ],
+            'write failed, no known location' => [
+                'exception' => new class ($message, $code) extends \Exception implements FsOpFailed {
+                    public function __construct(string $message, int $code)
+                    {
+                        parent::__construct($message, $code);
+                    }
+
+                    public function operation(): string
+                    {
+                        return 'write';
+                    }
+                },
+                'expectedResponseData' => [
+                    'error' => [
+                        'payload' => [
+                            'file' => '',
+                            'message' => $message,
+                        ],
+                        'type' => 'source_write_exception',
+                    ],
+                ],
+            ],
+            'write failed, known location' => [
+                'exception' => new class ($location, $message, $code) extends \Exception implements FsOpFailed {
+                    public function __construct(private readonly string $location, string $message, int $code)
+                    {
+                        parent::__construct($message, $code);
+                    }
+
+                    public function operation(): string
+                    {
+                        return 'write';
+                    }
+
+                    public function location(): string
+                    {
+                        return $this->location;
+                    }
+                },
+                'expectedResponseData' => [
+                    'error' => [
+                        'payload' => [
+                            'file' => $location,
+                            'message' => $message,
+                        ],
+                        'type' => 'source_write_exception',
                     ],
                 ],
             ],
