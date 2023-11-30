@@ -126,13 +126,7 @@ class FilesystemExceptionHandlingTest extends WebTestCase
 
         self::getContainer()->set(SourceRepository::class, $sourceRepository);
 
-        $filesystemOperator = \Mockery::mock(FilesystemOperator::class);
-        $filesystemOperator
-            ->shouldReceive('fileExists')
-            ->andThrow($exception)
-        ;
-
-        self::getContainer()->set('file_source.storage', $filesystemOperator);
+        $this->mockFileSourceStorageCall('fileExists', $exception);
 
         $response = $this->applicationClient->makeAddFileRequest(
             'api token',
@@ -182,13 +176,7 @@ class FilesystemExceptionHandlingTest extends WebTestCase
 
         self::getContainer()->set(SourceRepository::class, $sourceRepository);
 
-        $filesystemOperator = \Mockery::mock(FilesystemOperator::class);
-        $filesystemOperator
-            ->shouldReceive('write')
-            ->andThrow($exception)
-        ;
-
-        self::getContainer()->set('file_source.storage', $filesystemOperator);
+        $this->mockFileSourceStorageCall('write', $exception);
 
         $response = $this->applicationClient->makeUpdateFileRequest(
             'api token',
@@ -238,13 +226,7 @@ class FilesystemExceptionHandlingTest extends WebTestCase
 
         self::getContainer()->set(SourceRepository::class, $sourceRepository);
 
-        $filesystemOperator = \Mockery::mock(FilesystemOperator::class);
-        $filesystemOperator
-            ->shouldReceive('fileExists')
-            ->andThrow($exception)
-        ;
-
-        self::getContainer()->set('file_source.storage', $filesystemOperator);
+        $this->mockFileSourceStorageCall('fileExists', $exception);
 
         $response = $this->applicationClient->makeReadFileRequest(
             'api token',
@@ -293,13 +275,7 @@ class FilesystemExceptionHandlingTest extends WebTestCase
 
         self::getContainer()->set(SourceRepository::class, $sourceRepository);
 
-        $filesystemOperator = \Mockery::mock(FilesystemOperator::class);
-        $filesystemOperator
-            ->shouldReceive('delete')
-            ->andThrow($exception)
-        ;
-
-        self::getContainer()->set('file_source.storage', $filesystemOperator);
+        $this->mockFileSourceStorageCall('delete', $exception);
 
         $response = $this->applicationClient->makeRemoveFileRequest(
             'api token',
@@ -411,13 +387,7 @@ class FilesystemExceptionHandlingTest extends WebTestCase
 
         self::getContainer()->set(SourceRepository::class, $sourceRepository);
 
-        $filesystemOperator = \Mockery::mock(FilesystemOperator::class);
-        $filesystemOperator
-            ->shouldReceive('deleteDirectory')
-            ->andThrow($exception)
-        ;
-
-        self::getContainer()->set('file_source.storage', $filesystemOperator);
+        $this->mockFileSourceStorageCall('deleteDirectory', $exception);
 
         $response = $this->applicationClient->makeDeleteSourceRequest('api token', $sourceId);
 
@@ -592,5 +562,16 @@ class FilesystemExceptionHandlingTest extends WebTestCase
         ;
 
         return $authenticator;
+    }
+
+    private function mockFileSourceStorageCall(string $method, \Exception $exception): void
+    {
+        $filesystemOperator = \Mockery::mock(FilesystemOperator::class);
+        $filesystemOperator
+            ->shouldReceive($method)
+            ->andThrow($exception)
+        ;
+
+        self::getContainer()->set('file_source.storage', $filesystemOperator);
     }
 }
