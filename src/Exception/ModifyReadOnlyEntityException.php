@@ -6,9 +6,9 @@ namespace App\Exception;
 
 use App\FooRequest\Field\Field;
 use App\FooRequest\FieldInterface;
-use App\FooResponse\ErrorInterface;
+use App\FooResponse\BadRequestErrorInterface;
 
-class ModifyReadOnlyEntityException extends \Exception implements HasHttpErrorCodeInterface, ErrorInterface
+class ModifyReadOnlyEntityException extends \Exception implements HasHttpErrorCodeInterface, BadRequestErrorInterface
 {
     /**
      * @param non-empty-string $type
