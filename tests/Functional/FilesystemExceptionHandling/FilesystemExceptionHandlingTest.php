@@ -373,6 +373,64 @@ class FilesystemExceptionHandlingTest extends WebTestCase
     }
 
     /**
+     * @dataProvider exceptionHandlerDataProvider
+     *
+     * @param array<mixed> $expectedResponseData
+     */
+    public function testDeleteSourceHandlesThrownFilesystemException(
+        \Exception&FsException $exception,
+        array $expectedResponseData,
+    ): void {
+        $userId = md5((string) rand());
+        $sourceId = (string) new Ulid();
+
+        $this->mockAuthenticator($userId);
+
+        $source = \Mockery::mock(FileSource::class);
+        $source
+            ->shouldReceive('getUserId')
+            ->andReturn($userId)
+        ;
+        $source
+            ->shouldReceive('getDeletedAt')
+            ->andReturn(null)
+        ;
+        $source
+            ->shouldReceive('getDirectoryPath')
+            ->andReturn($userId . '/' . $sourceId)
+        ;
+
+        $sourceRepository = \Mockery::mock(SourceRepository::class);
+        $sourceRepository
+            ->shouldReceive('find')
+            ->andReturn($source)
+        ;
+        $sourceRepository
+            ->shouldReceive('delete')
+        ;
+
+        self::getContainer()->set(SourceRepository::class, $sourceRepository);
+
+        $filesystemOperator = \Mockery::mock(FilesystemOperator::class);
+        $filesystemOperator
+            ->shouldReceive('deleteDirectory')
+            ->andThrow($exception)
+        ;
+
+        self::getContainer()->set('file_source.storage', $filesystemOperator);
+
+        $response = $this->applicationClient->makeDeleteSourceRequest('api token', $sourceId);
+
+        self::assertSame(500, $response->getStatusCode());
+        self::assertSame('application/json', $response->getHeaderLine('content-type'));
+
+        self::assertJsonStringEqualsJsonString(
+            (string) json_encode($expectedResponseData),
+            $response->getBody()->getContents()
+        );
+    }
+
+    /**
      * @return array<mixed>
      */
     public static function exceptionHandlerDataProvider(): array
