@@ -6,9 +6,9 @@ namespace App\Exception;
 
 use App\FooRequest\Field\Field;
 use App\FooRequest\FieldInterface;
-use App\FooResponse\ErrorInterface;
+use App\FooResponse\BadRequestErrorInterface;
 
-class DuplicateFilePathException extends \Exception implements ErrorInterface
+class DuplicateFilePathException extends \Exception implements BadRequestErrorInterface
 {
     public function __construct(
         public readonly string $path,

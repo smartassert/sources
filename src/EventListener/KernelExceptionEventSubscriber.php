@@ -9,6 +9,7 @@ use App\Exception\HasHttpErrorCodeInterface;
 use App\FooRequest\CollectionFieldInterface;
 use App\FooRequest\RequirementsInterface;
 use App\FooRequest\ScalarRequirementsInterface;
+use App\FooResponse\BadRequestErrorInterface;
 use App\FooResponse\ErrorInterface;
 use App\FooResponse\RenderableErrorInterface;
 use App\FooResponse\SizeInterface;
@@ -110,50 +111,52 @@ readonly class KernelExceptionEventSubscriber implements EventSubscriberInterfac
 
     private function handleFooHttpError(ErrorInterface $error): Response
     {
-        $field = $error->getField();
-
         $data = [
             'class' => $error->getClass(),
         ];
 
-        $fieldData = [
-            'name' => $field->getName(),
-            'value' => $field->getValue(),
-        ];
+        if ($error instanceof BadRequestErrorInterface) {
+            $field = $error->getField();
 
-        if ($field instanceof CollectionFieldInterface) {
-            $fieldData['position'] = $field->getErrorPosition();
+            $fieldData = [
+                'name' => $field->getName(),
+                'value' => $field->getValue(),
+            ];
+
+            if ($field instanceof CollectionFieldInterface) {
+                $fieldData['position'] = $field->getErrorPosition();
+            }
+
+            $data['field'] = $fieldData;
+
+            $fieldRequirements = $field->getRequirements();
+
+            $renderRequirements =
+                ($error instanceof RenderableErrorInterface && $error->renderRequirements())
+                || !$error instanceof RenderableErrorInterface;
+
+            if ($renderRequirements && $fieldRequirements instanceof RequirementsInterface) {
+                $requirementsData = [
+                    'data_type' => $fieldRequirements->getDataType(),
+                ];
+
+                if ($fieldRequirements instanceof ScalarRequirementsInterface) {
+                    $fieldRequirementsSize = $fieldRequirements->getSize();
+                    if ($fieldRequirementsSize instanceof SizeInterface) {
+                        $requirementsData['size'] = [
+                            'minimum' => $fieldRequirementsSize->getMinimum(),
+                            'maximum' => $fieldRequirementsSize->getMaximum(),
+                        ];
+                    }
+                }
+
+                $data['requirements'] = $requirementsData;
+            }
         }
-
-        $data['field'] = $fieldData;
 
         $type = $error->getType();
         if (is_string($type)) {
             $data['type'] = $type;
-        }
-
-        $fieldRequirements = $field->getRequirements();
-
-        $renderRequirements =
-            ($error instanceof RenderableErrorInterface && $error->renderRequirements())
-            || !$error instanceof RenderableErrorInterface;
-
-        if ($renderRequirements && $fieldRequirements instanceof RequirementsInterface) {
-            $requirementsData = [
-                'data_type' => $fieldRequirements->getDataType(),
-            ];
-
-            if ($fieldRequirements instanceof ScalarRequirementsInterface) {
-                $fieldRequirementsSize = $fieldRequirements->getSize();
-                if ($fieldRequirementsSize instanceof SizeInterface) {
-                    $requirementsData['size'] = [
-                        'minimum' => $fieldRequirementsSize->getMinimum(),
-                        'maximum' => $fieldRequirementsSize->getMaximum(),
-                    ];
-                }
-            }
-
-            $data['requirements'] = $requirementsData;
         }
 
         $statusCode = $error instanceof HasHttpErrorCodeInterface ? $error->getErrorCode() : 400;
