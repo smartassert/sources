@@ -6,6 +6,7 @@ namespace App\Controller;
 
 use App\Entity\FileSource;
 use App\Exception\DuplicateFilePathException;
+use App\Exception\EntityStorageException;
 use App\Request\AddYamlFileRequest;
 use App\Request\YamlFileRequest;
 use App\Response\YamlResponse;
@@ -30,8 +31,8 @@ class FileSourceFileController
     }
 
     /**
-     * @throws FilesystemException
      * @throws DuplicateFilePathException
+     * @throws EntityStorageException
      */
     #[Route(name: 'add', methods: ['POST'])]
     public function add(FileSource $source, AddYamlFileRequest $request): Response
@@ -39,50 +40,66 @@ class FileSourceFileController
         $yamlFile = $request->file;
         $path = $source->getDirectoryPath() . '/' . $yamlFile->name;
 
-        if ($this->fileSourceReader->fileExists($path)) {
-            throw new DuplicateFilePathException((string) $yamlFile->name);
-        }
+        try {
+            if ($this->fileSourceReader->fileExists($path)) {
+                throw new DuplicateFilePathException((string) $yamlFile->name);
+            }
 
-        $this->fileSourceWriter->write($path, $yamlFile->content);
+            $this->fileSourceWriter->write($path, $yamlFile->content);
+        } catch (FilesystemException $e) {
+            throw new EntityStorageException($source, $e);
+        }
 
         return new Response();
     }
 
     /**
-     * @throws FilesystemException
+     * @throws EntityStorageException
      */
     #[Route(name: 'update', methods: ['PUT'])]
     public function update(FileSource $source, AddYamlFileRequest $request): Response
     {
         $yamlFile = $request->file;
 
-        $this->fileSourceWriter->write($source->getDirectoryPath() . '/' . $yamlFile->name, $yamlFile->content);
+        try {
+            $this->fileSourceWriter->write($source->getDirectoryPath() . '/' . $yamlFile->name, $yamlFile->content);
+        } catch (FilesystemException $e) {
+            throw new EntityStorageException($source, $e);
+        }
 
         return new Response();
     }
 
     /**
-     * @throws FilesystemException
+     * @throws EntityStorageException
      */
     #[Route(name: 'read', methods: ['GET'])]
     public function read(FileSource $source, YamlFileRequest $request): Response
     {
         $location = $source->getDirectoryPath() . '/' . $request->filename;
 
-        if (false === $this->fileSourceReader->fileExists($location)) {
-            return new Response('', 404);
-        }
+        try {
+            if (false === $this->fileSourceReader->fileExists($location)) {
+                return new Response('', 404);
+            }
 
-        return new YamlResponse($this->fileSourceReader->read($location));
+            return new YamlResponse($this->fileSourceReader->read($location));
+        } catch (FilesystemException $e) {
+            throw new EntityStorageException($source, $e);
+        }
     }
 
     /**
-     * @throws FilesystemException
+     * @throws EntityStorageException
      */
     #[Route(name: 'remove', methods: ['DELETE'])]
     public function remove(FileSource $source, YamlFileRequest $request): Response
     {
-        $this->fileSourceWriter->delete($source->getDirectoryPath() . '/' . $request->filename);
+        try {
+            $this->fileSourceWriter->delete($source->getDirectoryPath() . '/' . $request->filename);
+        } catch (FilesystemException $e) {
+            throw new EntityStorageException($source, $e);
+        }
 
         return new Response();
     }

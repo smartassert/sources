@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use App\Entity\SerializedSuite;
+use App\Exception\EntityStorageException;
 use App\Exception\SerializedSuiteSourceDoesNotExistException;
 use App\Message\SerializeSuite;
 use App\Repository\SerializedSuiteRepository;
@@ -40,7 +41,7 @@ class SerializedSuiteController
     }
 
     /**
-     * @throws FilesystemException
+     * @throws EntityStorageException
      */
     #[Route(SerializedSuiteRoutes::ROUTE_SERIALIZED_SUITE . '/read', name: 'serialized_suite_read', methods: ['GET'])]
     public function read(
@@ -51,6 +52,8 @@ class SerializedSuiteController
             return new YamlResponse($suiteSerializer->read($serializedSuite));
         } catch (SerializedSuiteSourceDoesNotExistException) {
             return new Response(null, 404);
+        } catch (FilesystemException $e) {
+            throw new EntityStorageException($serializedSuite, $e);
         }
     }
 

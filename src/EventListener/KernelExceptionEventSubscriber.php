@@ -6,6 +6,7 @@ namespace App\EventListener;
 
 use App\Exception\DuplicateEntityLabelException;
 use App\Exception\DuplicateFilePathException;
+use App\Exception\EntityStorageException;
 use App\Exception\HasHttpErrorCodeInterface;
 use App\Exception\InvalidRequestException;
 use App\Exception\ModifyReadOnlyEntityException;
@@ -15,7 +16,9 @@ use App\ResponseBody\InvalidField;
 use App\ResponseBody\InvalidRequestResponse;
 use App\Services\ResponseFactory;
 use League\Flysystem\FilesystemException;
+use League\Flysystem\FilesystemOperationFailed;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 
@@ -49,6 +52,10 @@ readonly class KernelExceptionEventSubscriber implements EventSubscriberInterfac
 
         if ($throwable instanceof InvalidRequestException) {
             $response = $this->handleInvalidRequest($throwable);
+        }
+
+        if ($throwable instanceof EntityStorageException) {
+            $response = $this->handleEntityStorageException($throwable);
         }
 
         if ($throwable instanceof FilesystemException) {
@@ -89,6 +96,33 @@ readonly class KernelExceptionEventSubscriber implements EventSubscriberInterfac
     private function handleFilesystemException(FilesystemException $throwable): Response
     {
         return $this->responseFactory->createErrorResponse(new FilesystemExceptionResponse($throwable), 500);
+    }
+
+    private function handleEntityStorageException(EntityStorageException $throwable): Response
+    {
+        $filesystemException = $throwable->filesystemException;
+        $operationType = 'unknown';
+        if ($filesystemException instanceof FilesystemOperationFailed) {
+            $operationType = strtolower($filesystemException->operation());
+        }
+
+        $location = null;
+        if (method_exists($filesystemException, 'location')) {
+            $location = $filesystemException->location();
+        }
+
+        return new JsonResponse(
+            [
+                'class' => 'entity_storage',
+                'entity' => [
+                    'type' => $throwable->entity->getEntityType()->value,
+                    'id' => $throwable->entity->getId(),
+                ],
+                'type' => $operationType,
+                'location' => $location,
+            ],
+            500
+        );
     }
 
     private function handleModifyReadOnlyEntityException(ModifyReadOnlyEntityException $throwable): Response

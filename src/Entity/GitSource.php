@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
+use App\Enum\EntityType;
 use App\Enum\Source\Type;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -101,5 +102,10 @@ class GitSource extends AbstractSource
     public function getType(): Type
     {
         return Type::GIT;
+    }
+
+    public function getEntityType(): EntityType
+    {
+        return EntityType::GIT_SOURCE;
     }
 }
