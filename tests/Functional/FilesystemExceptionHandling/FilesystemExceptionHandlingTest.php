@@ -60,14 +60,7 @@ class FilesystemExceptionHandlingTest extends WebTestCase
         $this->mockAuthenticator($userId);
 
         $source = $this->createSource($userId);
-
-        $sourceRepository = \Mockery::mock(SourceRepository::class);
-        $sourceRepository
-            ->shouldReceive('find')
-            ->andReturn($source)
-        ;
-
-        self::getContainer()->set(SourceRepository::class, $sourceRepository);
+        $this->createSourceRepository($source);
 
         $fileSourceDirectoryLister = \Mockery::mock(FileSourceDirectoryLister::class);
         $fileSourceDirectoryLister
@@ -103,13 +96,7 @@ class FilesystemExceptionHandlingTest extends WebTestCase
 
         $source = $this->createSource($userId, $sourceId);
 
-        $sourceRepository = \Mockery::mock(SourceRepository::class);
-        $sourceRepository
-            ->shouldReceive('find')
-            ->andReturn($source)
-        ;
-
-        self::getContainer()->set(SourceRepository::class, $sourceRepository);
+        $this->createSourceRepository($source);
 
         $this->mockFileSourceStorageCall('fileExists', $exception);
 
@@ -139,13 +126,7 @@ class FilesystemExceptionHandlingTest extends WebTestCase
 
         $source = $this->createSource($userId, $sourceId);
 
-        $sourceRepository = \Mockery::mock(SourceRepository::class);
-        $sourceRepository
-            ->shouldReceive('find')
-            ->andReturn($source)
-        ;
-
-        self::getContainer()->set(SourceRepository::class, $sourceRepository);
+        $this->createSourceRepository($source);
 
         $this->mockFileSourceStorageCall('write', $exception);
 
@@ -175,14 +156,7 @@ class FilesystemExceptionHandlingTest extends WebTestCase
 
         $source = $this->createSource($userId, $sourceId);
 
-        $sourceRepository = \Mockery::mock(SourceRepository::class);
-        $sourceRepository
-            ->shouldReceive('find')
-            ->andReturn($source)
-        ;
-
-        self::getContainer()->set(SourceRepository::class, $sourceRepository);
-
+        $this->createSourceRepository($source);
         $this->mockFileSourceStorageCall('fileExists', $exception);
 
         $response = $this->applicationClient->makeReadFileRequest(
@@ -210,13 +184,7 @@ class FilesystemExceptionHandlingTest extends WebTestCase
 
         $source = $this->createSource($userId, $sourceId);
 
-        $sourceRepository = \Mockery::mock(SourceRepository::class);
-        $sourceRepository
-            ->shouldReceive('find')
-            ->andReturn($source)
-        ;
-
-        self::getContainer()->set(SourceRepository::class, $sourceRepository);
+        $this->createSourceRepository($source);
 
         $this->mockFileSourceStorageCall('delete', $exception);
 
@@ -299,16 +267,8 @@ class FilesystemExceptionHandlingTest extends WebTestCase
             ->andReturn(null)
         ;
 
-        $sourceRepository = \Mockery::mock(SourceRepository::class);
-        $sourceRepository
-            ->shouldReceive('find')
-            ->andReturn($source)
-        ;
-        $sourceRepository
-            ->shouldReceive('delete')
-        ;
-
-        self::getContainer()->set(SourceRepository::class, $sourceRepository);
+        $sourceRepository = $this->createSourceRepository($source);
+        $sourceRepository->shouldReceive('delete');
 
         $this->mockFileSourceStorageCall('deleteDirectory', $exception);
 
@@ -506,7 +466,7 @@ class FilesystemExceptionHandlingTest extends WebTestCase
         );
     }
 
-    private function createSource(string $userId, ?string $sourceId = null): SourceInterface&MockInterface
+    private function createSource(string $userId, ?string $sourceId = null): MockInterface&SourceInterface
     {
         $source = \Mockery::mock(FileSource::class);
         $source
@@ -522,5 +482,18 @@ class FilesystemExceptionHandlingTest extends WebTestCase
         }
 
         return $source;
+    }
+
+    private function createSourceRepository(SourceInterface $source): MockInterface&SourceRepository
+    {
+        $sourceRepository = \Mockery::mock(SourceRepository::class);
+        $sourceRepository
+            ->shouldReceive('find')
+            ->andReturn($source)
+        ;
+
+        self::getContainer()->set(SourceRepository::class, $sourceRepository);
+
+        return $sourceRepository;
     }
 }
