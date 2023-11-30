@@ -14,6 +14,7 @@ use App\Tests\Services\ApplicationClient\ClientFactory;
 use League\Flysystem\FilesystemException as FsException;
 use League\Flysystem\FilesystemOperationFailed as FsOpFailed;
 use League\Flysystem\FilesystemOperator;
+use Psr\Http\Message\ResponseInterface;
 use SmartAssert\SymfonyTestClient\SymfonyClient;
 use SmartAssert\UsersSecurityBundle\Security\Authenticator;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -85,13 +86,7 @@ class FilesystemExceptionHandlingTest extends WebTestCase
             $sourceId
         );
 
-        self::assertSame(500, $response->getStatusCode());
-        self::assertSame('application/json', $response->getHeaderLine('content-type'));
-
-        self::assertJsonStringEqualsJsonString(
-            (string) json_encode($expectedResponseData),
-            $response->getBody()->getContents()
-        );
+        $this->assertResponse($response, $expectedResponseData);
     }
 
     /**
@@ -135,13 +130,7 @@ class FilesystemExceptionHandlingTest extends WebTestCase
             md5((string) rand())
         );
 
-        self::assertSame(500, $response->getStatusCode());
-        self::assertSame('application/json', $response->getHeaderLine('content-type'));
-
-        self::assertJsonStringEqualsJsonString(
-            (string) json_encode($expectedResponseData),
-            $response->getBody()->getContents()
-        );
+        $this->assertResponse($response, $expectedResponseData);
     }
 
     /**
@@ -185,13 +174,7 @@ class FilesystemExceptionHandlingTest extends WebTestCase
             md5((string) rand())
         );
 
-        self::assertSame(500, $response->getStatusCode());
-        self::assertSame('application/json', $response->getHeaderLine('content-type'));
-
-        self::assertJsonStringEqualsJsonString(
-            (string) json_encode($expectedResponseData),
-            $response->getBody()->getContents()
-        );
+        $this->assertResponse($response, $expectedResponseData);
     }
 
     /**
@@ -234,13 +217,7 @@ class FilesystemExceptionHandlingTest extends WebTestCase
             md5((string) rand()) . '.yaml'
         );
 
-        self::assertSame(500, $response->getStatusCode());
-        self::assertSame('application/json', $response->getHeaderLine('content-type'));
-
-        self::assertJsonStringEqualsJsonString(
-            (string) json_encode($expectedResponseData),
-            $response->getBody()->getContents()
-        );
+        $this->assertResponse($response, $expectedResponseData);
     }
 
     /**
@@ -283,13 +260,7 @@ class FilesystemExceptionHandlingTest extends WebTestCase
             md5((string) rand()) . '.yaml'
         );
 
-        self::assertSame(500, $response->getStatusCode());
-        self::assertSame('application/json', $response->getHeaderLine('content-type'));
-
-        self::assertJsonStringEqualsJsonString(
-            (string) json_encode($expectedResponseData),
-            $response->getBody()->getContents()
-        );
+        $this->assertResponse($response, $expectedResponseData);
     }
 
     /**
@@ -339,13 +310,7 @@ class FilesystemExceptionHandlingTest extends WebTestCase
             $serializedSuiteId,
         );
 
-        self::assertSame(500, $response->getStatusCode());
-        self::assertSame('application/json', $response->getHeaderLine('content-type'));
-
-        self::assertJsonStringEqualsJsonString(
-            (string) json_encode($expectedResponseData),
-            $response->getBody()->getContents()
-        );
+        $this->assertResponse($response, $expectedResponseData);
     }
 
     /**
@@ -391,13 +356,7 @@ class FilesystemExceptionHandlingTest extends WebTestCase
 
         $response = $this->applicationClient->makeDeleteSourceRequest('api token', $sourceId);
 
-        self::assertSame(500, $response->getStatusCode());
-        self::assertSame('application/json', $response->getHeaderLine('content-type'));
-
-        self::assertJsonStringEqualsJsonString(
-            (string) json_encode($expectedResponseData),
-            $response->getBody()->getContents()
-        );
+        $this->assertResponse($response, $expectedResponseData);
     }
 
     /**
@@ -573,5 +532,19 @@ class FilesystemExceptionHandlingTest extends WebTestCase
         ;
 
         self::getContainer()->set('file_source.storage', $filesystemOperator);
+    }
+
+    /**
+     * @param array<mixed> $expectedResponseData
+     */
+    private function assertResponse(ResponseInterface $response, array $expectedResponseData): void
+    {
+        self::assertSame(500, $response->getStatusCode());
+        self::assertSame('application/json', $response->getHeaderLine('content-type'));
+
+        self::assertJsonStringEqualsJsonString(
+            (string) json_encode($expectedResponseData),
+            $response->getBody()->getContents()
+        );
     }
 }
