@@ -18,7 +18,7 @@ use Doctrine\ORM\Mapping as ORM;
     'git' => GitSource::class,
     'file' => FileSource::class,
 ])]
-abstract class AbstractSource implements SourceInterface, \JsonSerializable
+abstract class AbstractSource implements SourceInterface, \JsonSerializable, IdentifyingEntityInterface
 {
     public const ID_LENGTH = 32;
     public const TYPE_DISCRIMINATOR_LENGTH = 32;

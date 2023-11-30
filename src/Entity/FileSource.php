@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
+use App\Enum\EntityType;
 use App\Enum\Source\Type;
 use App\Model\DirectoryLocatorInterface;
 use App\Model\SourceRepositoryInterface;
@@ -34,5 +35,10 @@ class FileSource extends AbstractSource implements DirectoryLocatorInterface, So
     public function getType(): Type
     {
         return Type::FILE;
+    }
+
+    public function getEntityType(): EntityType
+    {
+        return EntityType::FILE_SOURCE;
     }
 }
