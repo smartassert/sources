@@ -23,6 +23,7 @@ return (new PhpCsFixer\Config())
         'declare_strict_types' => true,
         'class_definition' => [
             'multi_line_extends_each_single_line' => true,
+            'space_before_parenthesis' => true,
         ],
         'blank_line_before_statement' => [
             'statements' => [
