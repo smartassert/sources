@@ -149,6 +149,62 @@ class FilesystemExceptionHandlingTest extends WebTestCase
     }
 
     /**
+     * @dataProvider exceptionHandlerDataProvider
+     *
+     * @param array<mixed> $expectedResponseData
+     */
+    public function testUpdateFileSourceFileHandlesThrownFilesystemException(
+        \Exception&FsException $exception,
+        array $expectedResponseData,
+    ): void {
+        $userId = md5((string) rand());
+        $sourceId = (string) new Ulid();
+
+        $this->mockAuthenticator($userId);
+
+        $source = \Mockery::mock(FileSource::class);
+        $source
+            ->shouldReceive('getUserId')
+            ->andReturn($userId)
+        ;
+        $source
+            ->shouldReceive('getDirectoryPath')
+            ->andReturn($userId . '/' . $sourceId)
+        ;
+
+        $sourceRepository = \Mockery::mock(SourceRepository::class);
+        $sourceRepository
+            ->shouldReceive('find')
+            ->andReturn($source)
+        ;
+
+        self::getContainer()->set(SourceRepository::class, $sourceRepository);
+
+        $fileSourceReader = \Mockery::mock(FilesystemOperator::class);
+        $fileSourceReader
+            ->shouldReceive('write')
+            ->andThrow($exception)
+        ;
+
+        self::getContainer()->set('file_source.storage', $fileSourceReader);
+
+        $response = $this->applicationClient->makeUpdateFileRequest(
+            'api token',
+            $sourceId,
+            md5((string) rand()) . '.yaml',
+            md5((string) rand())
+        );
+
+        self::assertSame(500, $response->getStatusCode());
+        self::assertSame('application/json', $response->getHeaderLine('content-type'));
+
+        self::assertJsonStringEqualsJsonString(
+            (string) json_encode($expectedResponseData),
+            $response->getBody()->getContents()
+        );
+    }
+
+    /**
      * @return array<mixed>
      */
     public static function exceptionHandlerDataProvider(): array
