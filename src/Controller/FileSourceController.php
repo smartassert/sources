@@ -7,6 +7,7 @@ namespace App\Controller;
 use App\Entity\FileSource;
 use App\Exception\DuplicateEntityLabelException;
 use App\Exception\EmptyEntityIdException;
+use App\Exception\EntityStorageException;
 use App\Exception\ModifyReadOnlyEntityException;
 use App\Request\FileSourceRequest;
 use App\Services\Source\FileSourceFactory;
@@ -52,11 +53,15 @@ readonly class FileSourceController
     }
 
     /**
-     * @throws FilesystemException
+     * @throws EntityStorageException
      */
     #[Route(path: '/' . SourceRoutes::ROUTE_SOURCE_ID_PATTERN . '/list/', name: 'list_filenames', methods: ['GET'])]
     public function listFilenames(FileSource $source, FileSourceDirectoryLister $lister): Response
     {
-        return new JsonResponse($lister->list($source));
+        try {
+            return new JsonResponse($lister->list($source));
+        } catch (FilesystemException $e) {
+            throw new EntityStorageException($source, $e);
+        }
     }
 }

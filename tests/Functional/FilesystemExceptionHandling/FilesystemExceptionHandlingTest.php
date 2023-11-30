@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace App\Tests\Functional\FilesystemExceptionHandling;
 
 use App\Entity\FileSource;
+use App\Entity\IdentifyingEntityInterface as IdentifyingEntity;
 use App\Entity\SerializedSuite;
 use App\Entity\SourceInterface;
+use App\Enum\EntityType;
 use App\Repository\SerializedSuiteRepository;
 use App\Repository\SourceRepository;
 use App\Services\SourceRepository\Reader\FileSourceDirectoryLister;
@@ -15,7 +17,7 @@ use App\Tests\Services\ApplicationClient\ClientFactory;
 use League\Flysystem\FilesystemException as FsException;
 use League\Flysystem\FilesystemOperationFailed as FsOpFailed;
 use League\Flysystem\FilesystemOperator;
-use Mockery\MockInterface;
+use Mockery\MockInterface as MockI;
 use Psr\Http\Message\ResponseInterface;
 use SmartAssert\SymfonyTestClient\SymfonyClient;
 use SmartAssert\UsersSecurityBundle\Security\Authenticator;
@@ -49,17 +51,18 @@ class FilesystemExceptionHandlingTest extends WebTestCase
     /**
      * @dataProvider exceptionHandlerDataProvider
      *
-     * @param array<mixed> $expectedResponseData
+     * @param callable(IdentifyingEntity): array<mixed> $expectedResponseDataCreator
      */
     public function testListFileSourceFilenamesHandlesThrownFilesystemException(
         \Exception&FsException $exception,
-        array $expectedResponseData,
+        callable $expectedResponseDataCreator,
     ): void {
         $userId = md5((string) rand());
+        $sourceId = (string) new Ulid();
 
         $this->mockAuthenticator($userId);
 
-        $source = $this->createSource($userId);
+        $source = $this->createSource($userId, $sourceId);
         $this->createSourceRepository($source);
 
         $fileSourceDirectoryLister = \Mockery::mock(FileSourceDirectoryLister::class);
@@ -72,17 +75,19 @@ class FilesystemExceptionHandlingTest extends WebTestCase
 
         $response = $this->applicationClient->makeGetFileSourceFilenamesRequest('api token', (string) new Ulid());
 
+        $expectedResponseData = $expectedResponseDataCreator($source);
+
         $this->assertResponse($response, $expectedResponseData);
     }
 
     /**
      * @dataProvider exceptionHandlerDataProvider
      *
-     * @param array<mixed> $expectedResponseData
+     * @param callable(IdentifyingEntity): array<mixed> $expectedResponseDataCreator
      */
     public function testAddFileSourceFileHandlesThrownFilesystemException(
         \Exception&FsException $exception,
-        array $expectedResponseData,
+        callable $expectedResponseDataCreator,
     ): void {
         $userId = md5((string) rand());
         $sourceId = (string) new Ulid();
@@ -101,17 +106,19 @@ class FilesystemExceptionHandlingTest extends WebTestCase
             md5((string) rand())
         );
 
+        $expectedResponseData = $expectedResponseDataCreator($source);
+
         $this->assertResponse($response, $expectedResponseData);
     }
 
     /**
      * @dataProvider exceptionHandlerDataProvider
      *
-     * @param array<mixed> $expectedResponseData
+     * @param callable(IdentifyingEntity): array<mixed> $expectedResponseDataCreator
      */
     public function testUpdateFileSourceFileHandlesThrownFilesystemException(
         \Exception&FsException $exception,
-        array $expectedResponseData,
+        callable $expectedResponseDataCreator,
     ): void {
         $userId = md5((string) rand());
         $sourceId = (string) new Ulid();
@@ -130,17 +137,19 @@ class FilesystemExceptionHandlingTest extends WebTestCase
             md5((string) rand())
         );
 
+        $expectedResponseData = $expectedResponseDataCreator($source);
+
         $this->assertResponse($response, $expectedResponseData);
     }
 
     /**
      * @dataProvider exceptionHandlerDataProvider
      *
-     * @param array<mixed> $expectedResponseData
+     * @param callable(IdentifyingEntity): array<mixed> $expectedResponseDataCreator
      */
     public function testReadFileSourceFileHandlesThrownFilesystemException(
         \Exception&FsException $exception,
-        array $expectedResponseData,
+        callable $expectedResponseDataCreator,
     ): void {
         $userId = md5((string) rand());
         $sourceId = (string) new Ulid();
@@ -158,17 +167,19 @@ class FilesystemExceptionHandlingTest extends WebTestCase
             md5((string) rand()) . '.yaml'
         );
 
+        $expectedResponseData = $expectedResponseDataCreator($source);
+
         $this->assertResponse($response, $expectedResponseData);
     }
 
     /**
      * @dataProvider exceptionHandlerDataProvider
      *
-     * @param array<mixed> $expectedResponseData
+     * @param callable(IdentifyingEntity): array<mixed> $expectedResponseDataCreator
      */
     public function testDeleteFileSourceFileHandlesThrownFilesystemException(
         \Exception&FsException $exception,
-        array $expectedResponseData,
+        callable $expectedResponseDataCreator,
     ): void {
         $userId = md5((string) rand());
         $sourceId = (string) new Ulid();
@@ -186,17 +197,19 @@ class FilesystemExceptionHandlingTest extends WebTestCase
             md5((string) rand()) . '.yaml'
         );
 
+        $expectedResponseData = $expectedResponseDataCreator($source);
+
         $this->assertResponse($response, $expectedResponseData);
     }
 
     /**
      * @dataProvider exceptionHandlerDataProvider
      *
-     * @param array<mixed> $expectedResponseData
+     * @param callable(IdentifyingEntity): array<mixed> $expectedResponseDataCreator
      */
     public function testReadSerializedSuiteHandlesThrownFilesystemException(
         \Exception&FsException $exception,
-        array $expectedResponseData,
+        callable $expectedResponseDataCreator,
     ): void {
         $userId = md5((string) rand());
         $serializedSuiteId = (string) new Ulid();
@@ -208,6 +221,16 @@ class FilesystemExceptionHandlingTest extends WebTestCase
         $serializedSuite
             ->shouldReceive('getUserId')
             ->andReturn($userId)
+        ;
+
+        $serializedSuite
+            ->shouldReceive('getId')
+            ->andReturn($serializedSuiteId)
+        ;
+
+        $serializedSuite
+            ->shouldReceive('getEntityType')
+            ->andReturn(EntityType::SERIALIZED_SUITE)
         ;
 
         $serializedSuite
@@ -236,17 +259,19 @@ class FilesystemExceptionHandlingTest extends WebTestCase
             $serializedSuiteId,
         );
 
+        $expectedResponseData = $expectedResponseDataCreator($serializedSuite);
+
         $this->assertResponse($response, $expectedResponseData);
     }
 
     /**
      * @dataProvider exceptionHandlerDataProvider
      *
-     * @param array<mixed> $expectedResponseData
+     * @param callable(IdentifyingEntity): array<mixed> $expectedResponseDataCreator
      */
     public function testDeleteSourceHandlesThrownFilesystemException(
         \Exception&FsException $exception,
-        array $expectedResponseData,
+        callable $expectedResponseDataCreator,
     ): void {
         $userId = md5((string) rand());
         $sourceId = (string) new Ulid();
@@ -265,6 +290,8 @@ class FilesystemExceptionHandlingTest extends WebTestCase
         $this->mockFileSourceStorageCall('deleteDirectory', $exception);
 
         $response = $this->applicationClient->makeDeleteSourceRequest('api token', $sourceId);
+
+        $expectedResponseData = $expectedResponseDataCreator($source);
 
         $this->assertResponse($response, $expectedResponseData);
     }
@@ -286,15 +313,17 @@ class FilesystemExceptionHandlingTest extends WebTestCase
                         parent::__construct($message, $code);
                     }
                 },
-                'expectedResponseData' => [
-                    'error' => [
-                        'payload' => [
-                            'file' => '',
-                            'message' => $message,
+                'expectedResponseDataCreator' => function (IdentifyingEntity $entity) {
+                    return [
+                        'class' => 'entity_storage',
+                        'entity' => [
+                            'id' => $entity->getId(),
+                            'type' => $entity->getEntityType()->value,
                         ],
-                        'type' => 'source_unknown_exception',
-                    ],
-                ],
+                        'type' => 'unknown',
+                        'location' => null,
+                    ];
+                },
             ],
             'read failed, no known location' => [
                 'exception' => new class ($message, $code) extends \Exception implements FsOpFailed {
@@ -308,15 +337,17 @@ class FilesystemExceptionHandlingTest extends WebTestCase
                         return 'read';
                     }
                 },
-                'expectedResponseData' => [
-                    'error' => [
-                        'payload' => [
-                            'file' => '',
-                            'message' => $message,
+                'expectedResponseDataCreator' => function (IdentifyingEntity $entity) {
+                    return [
+                        'class' => 'entity_storage',
+                        'entity' => [
+                            'id' => $entity->getId(),
+                            'type' => $entity->getEntityType()->value,
                         ],
-                        'type' => 'source_read_exception',
-                    ],
-                ],
+                        'type' => 'read',
+                        'location' => null,
+                    ];
+                },
             ],
             'write failed, no known location' => [
                 'exception' => new class ($message, $code) extends \Exception implements FsOpFailed {
@@ -330,15 +361,17 @@ class FilesystemExceptionHandlingTest extends WebTestCase
                         return 'write';
                     }
                 },
-                'expectedResponseData' => [
-                    'error' => [
-                        'payload' => [
-                            'file' => '',
-                            'message' => $message,
+                'expectedResponseDataCreator' => function (IdentifyingEntity $entity) {
+                    return [
+                        'class' => 'entity_storage',
+                        'entity' => [
+                            'id' => $entity->getId(),
+                            'type' => $entity->getEntityType()->value,
                         ],
-                        'type' => 'source_write_exception',
-                    ],
-                ],
+                        'type' => 'write',
+                        'location' => null,
+                    ];
+                },
             ],
             'write failed, known location' => [
                 'exception' => new class ($location, $message, $code) extends \Exception implements FsOpFailed {
@@ -357,15 +390,17 @@ class FilesystemExceptionHandlingTest extends WebTestCase
                         return $this->location;
                     }
                 },
-                'expectedResponseData' => [
-                    'error' => [
-                        'payload' => [
-                            'file' => $location,
-                            'message' => $message,
+                'expectedResponseDataCreator' => function (IdentifyingEntity $entity) use ($location) {
+                    return [
+                        'class' => 'entity_storage',
+                        'entity' => [
+                            'id' => $entity->getId(),
+                            'type' => $entity->getEntityType()->value,
                         ],
-                        'type' => 'source_write_exception',
-                    ],
-                ],
+                        'type' => 'write',
+                        'location' => $location,
+                    ];
+                },
             ],
         ];
     }
@@ -458,7 +493,7 @@ class FilesystemExceptionHandlingTest extends WebTestCase
         );
     }
 
-    private function createSource(string $userId, ?string $sourceId = null): MockInterface&SourceInterface
+    private function createSource(string $userId, string $sourceId = null): IdentifyingEntity&MockI&SourceInterface
     {
         $source = \Mockery::mock(FileSource::class);
         $source
@@ -466,17 +501,25 @@ class FilesystemExceptionHandlingTest extends WebTestCase
             ->andReturn($userId)
         ;
 
-        if (is_string($sourceId)) {
-            $source
-                ->shouldReceive('getDirectoryPath')
-                ->andReturn($userId . '/' . $sourceId)
-            ;
-        }
+        $source
+            ->shouldReceive('getEntityType')
+            ->andReturn(EntityType::FILE_SOURCE)
+        ;
+
+        $source
+            ->shouldReceive('getDirectoryPath')
+            ->andReturn($userId . '/' . $sourceId)
+        ;
+
+        $source
+            ->shouldReceive('getId')
+            ->andReturn($sourceId)
+        ;
 
         return $source;
     }
 
-    private function createSourceRepository(SourceInterface $source): MockInterface&SourceRepository
+    private function createSourceRepository(SourceInterface $source): MockI&SourceRepository
     {
         $sourceRepository = \Mockery::mock(SourceRepository::class);
         $sourceRepository
