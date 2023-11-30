@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Functional\Application;
+namespace App\Tests\Functional\FilesystemExceptionHandling;
 
 use App\Entity\FileSource;
 use App\Repository\SourceRepository;
