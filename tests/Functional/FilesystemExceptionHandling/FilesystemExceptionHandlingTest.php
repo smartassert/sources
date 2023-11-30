@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Tests\Functional\FilesystemExceptionHandling;
 
 use App\Entity\FileSource;
+use App\Entity\SerializedSuite;
+use App\Repository\SerializedSuiteRepository;
 use App\Repository\SourceRepository;
 use App\Services\SourceRepository\Reader\FileSourceDirectoryLister;
 use App\Tests\Services\ApplicationClient\Client;
@@ -303,6 +305,62 @@ class FilesystemExceptionHandlingTest extends WebTestCase
             'api token',
             $sourceId,
             md5((string) rand()) . '.yaml'
+        );
+
+        self::assertSame(500, $response->getStatusCode());
+        self::assertSame('application/json', $response->getHeaderLine('content-type'));
+
+        self::assertJsonStringEqualsJsonString(
+            (string) json_encode($expectedResponseData),
+            $response->getBody()->getContents()
+        );
+    }
+
+    /**
+     * @dataProvider exceptionHandlerDataProvider
+     *
+     * @param array<mixed> $expectedResponseData
+     */
+    public function testReadSerializedSuiteHandlesThrownFilesystemException(
+        \Exception&FsException $exception,
+        array $expectedResponseData,
+    ): void {
+        $userId = md5((string) rand());
+        $serializedSuiteId = (string) new Ulid();
+
+        $this->mockAuthenticator($userId);
+
+        $serializedSuite = \Mockery::mock(SerializedSuite::class);
+
+        $serializedSuite
+            ->shouldReceive('getUserId')
+            ->andReturn($userId)
+        ;
+
+        $serializedSuite
+            ->shouldReceive('getDirectoryPath')
+            ->andReturn($userId . '/' . $serializedSuiteId)
+        ;
+
+        $serializedSuiteRepository = \Mockery::mock(SerializedSuiteRepository::class);
+        $serializedSuiteRepository
+            ->shouldReceive('find')
+            ->andReturn($serializedSuite)
+        ;
+
+        self::getContainer()->set(SerializedSuiteRepository::class, $serializedSuiteRepository);
+
+        $filesystemOperator = \Mockery::mock(FilesystemOperator::class);
+        $filesystemOperator
+            ->shouldReceive('fileExists')
+            ->andThrow($exception)
+        ;
+
+        self::getContainer()->set('serialized_suite.storage', $filesystemOperator);
+
+        $response = $this->applicationClient->makeReadSerializedSuiteRequest(
+            'api token',
+            $serializedSuiteId,
         );
 
         self::assertSame(500, $response->getStatusCode());
