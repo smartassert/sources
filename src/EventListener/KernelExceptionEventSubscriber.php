@@ -13,7 +13,6 @@ use App\FooResponse\ErrorInterface;
 use App\FooResponse\RenderableErrorInterface;
 use App\FooResponse\SizeInterface;
 use App\ResponseBody\FilesystemExceptionResponse;
-use App\Services\ResponseFactory;
 use League\Flysystem\FilesystemException;
 use League\Flysystem\FilesystemOperationFailed;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -23,11 +22,6 @@ use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 
 readonly class KernelExceptionEventSubscriber implements EventSubscriberInterface
 {
-    public function __construct(
-        private ResponseFactory $responseFactory,
-    ) {
-    }
-
     /**
      * @return array<class-string, array<mixed>>
      */
@@ -74,7 +68,17 @@ readonly class KernelExceptionEventSubscriber implements EventSubscriberInterfac
 
     private function handleFilesystemException(FilesystemException $throwable): Response
     {
-        return $this->responseFactory->createErrorResponse(new FilesystemExceptionResponse($throwable), 500);
+        $error = new FilesystemExceptionResponse($throwable);
+
+        return new JsonResponse(
+            [
+                'error' => [
+                    'type' => $error->getType(),
+                    'payload' => $error->getPayload(),
+                ],
+            ],
+            500
+        );
     }
 
     private function handleEntityStorageException(EntityStorageException $throwable): Response
