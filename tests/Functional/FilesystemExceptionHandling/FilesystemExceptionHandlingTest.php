@@ -70,12 +70,7 @@ class FilesystemExceptionHandlingTest extends WebTestCase
 
         self::getContainer()->set(FileSourceDirectoryLister::class, $fileSourceDirectoryLister);
 
-        $sourceId = (string) new Ulid();
-
-        $response = $this->applicationClient->makeGetFileSourceFilenamesRequest(
-            'api token',
-            $sourceId
-        );
+        $response = $this->applicationClient->makeGetFileSourceFilenamesRequest('api token', (string) new Ulid());
 
         $this->assertResponse($response, $expectedResponseData);
     }
@@ -95,7 +90,6 @@ class FilesystemExceptionHandlingTest extends WebTestCase
         $this->mockAuthenticator($userId);
 
         $source = $this->createSource($userId, $sourceId);
-
         $this->createSourceRepository($source);
 
         $this->mockFileSourceStorageCall('fileExists', $exception);
@@ -125,7 +119,6 @@ class FilesystemExceptionHandlingTest extends WebTestCase
         $this->mockAuthenticator($userId);
 
         $source = $this->createSource($userId, $sourceId);
-
         $this->createSourceRepository($source);
 
         $this->mockFileSourceStorageCall('write', $exception);
@@ -183,7 +176,6 @@ class FilesystemExceptionHandlingTest extends WebTestCase
         $this->mockAuthenticator($userId);
 
         $source = $this->createSource($userId, $sourceId);
-
         $this->createSourceRepository($source);
 
         $this->mockFileSourceStorageCall('delete', $exception);
