@@ -20,28 +20,39 @@ class Factory
 {
     public function create(ErrorInterface $error): JsonResponse
     {
-        $data = [
-            'class' => $error->getClass(),
+        $components = [
+            new Component('class', $error->getClass()),
         ];
 
         $type = $error->getType();
         if (is_string($type)) {
-            $data['type'] = $type;
+            $components[] = new Component('type', $error->getType());
+        }
+
+        if ($error instanceof StorageLocationErrorInterface) {
+            $components[] = new Component('location', $error->getLocation());
+        }
+
+        if ($error instanceof EntityErrorInterface) {
+            $components[] = new Component('entity', [
+                'type' => $error->getEntity()->getEntityType()->value,
+                'id' => $error->getEntity()->getId(),
+            ]);
         }
 
         if ($error instanceof BadRequestErrorInterface) {
             $field = $error->getField();
 
-            $fieldData = [
-                'name' => $field->getName(),
-                'value' => $field->getValue(),
+            $fieldComponents = [
+                new Component('name', $field->getName()),
+                new Component('value', $field->getValue()),
             ];
 
             if ($field instanceof CollectionFieldInterface) {
-                $fieldData['position'] = $field->getErrorPosition();
+                $fieldComponents[] = new Component('position', $field->getErrorPosition());
             }
 
-            $data['field'] = $fieldData;
+            $components[] = new Component('field', $fieldComponents);
 
             $fieldRequirements = $field->getRequirements();
 
@@ -50,35 +61,27 @@ class Factory
                 || !$error instanceof RenderableErrorInterface;
 
             if ($renderRequirements && $fieldRequirements instanceof RequirementsInterface) {
-                $requirementsData = [
-                    'data_type' => $fieldRequirements->getDataType(),
+                $requirementsComponents = [
+                    new Component('data_type', $fieldRequirements->getDataType()),
                 ];
 
                 if ($fieldRequirements instanceof ScalarRequirementsInterface) {
                     $fieldRequirementsSize = $fieldRequirements->getSize();
                     if ($fieldRequirementsSize instanceof SizeInterface) {
-                        $requirementsData['size'] = [
-                            'minimum' => $fieldRequirementsSize->getMinimum(),
-                            'maximum' => $fieldRequirementsSize->getMaximum(),
-                        ];
+                        $requirementsComponents[] = new Component('size', [
+                            new Component('minimum', $fieldRequirementsSize->getMinimum()),
+                            new Component('maximum', $fieldRequirementsSize->getMaximum()),
+                        ]);
                     }
                 }
 
-                $data['requirements'] = $requirementsData;
+                $components[] = new Component('requirements', $requirementsComponents);
             }
         }
 
-        if ($error instanceof EntityErrorInterface) {
-            $entity = $error->getEntity();
-
-            $data['entity'] = [
-                'type' => $entity->getEntityType()->value,
-                'id' => $entity->getId(),
-            ];
-        }
-
-        if ($error instanceof StorageLocationErrorInterface) {
-            $data['location'] = $error->getLocation();
+        $data = [];
+        foreach ($components as $component) {
+            $data = array_merge($data, $component->toArray());
         }
 
         $statusCode = $error instanceof HasHttpErrorCodeInterface ? $error->getErrorCode() : 400;
