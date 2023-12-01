@@ -2,16 +2,16 @@
 
 declare(strict_types=1);
 
-namespace App\Services\ErrorResponse\ComponentFactory;
+namespace App\FooResponse\ErrorSerializer\ComponentFactory;
 
 use App\FooRequest\RequirementsInterface;
 use App\FooRequest\ScalarRequirementsInterface;
 use App\FooResponse\BadRequestErrorInterface;
 use App\FooResponse\ErrorInterface;
+use App\FooResponse\ErrorSerializer\Component;
+use App\FooResponse\ErrorSerializer\ComponentFactoryInterface;
 use App\FooResponse\RenderableErrorInterface;
 use App\FooResponse\SizeInterface;
-use App\Services\ErrorResponse\Component;
-use App\Services\ErrorResponse\ComponentFactoryInterface;
 
 class RequirementsFactory implements ComponentFactoryInterface
 {

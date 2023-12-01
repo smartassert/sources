@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Services\ErrorResponse;
+namespace App\FooResponse\ErrorSerializer;
 
 use App\FooResponse\ErrorInterface;
 

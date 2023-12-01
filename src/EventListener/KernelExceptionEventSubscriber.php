@@ -6,7 +6,7 @@ namespace App\EventListener;
 
 use App\Exception\HasHttpErrorCodeInterface;
 use App\FooResponse\ErrorInterface;
-use App\Services\ErrorResponse\Factory;
+use App\FooResponse\Factory;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;

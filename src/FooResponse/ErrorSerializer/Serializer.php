@@ -2,13 +2,11 @@
 
 declare(strict_types=1);
 
-namespace App\Services\ErrorResponse;
+namespace App\FooResponse\ErrorSerializer;
 
-use App\Exception\HasHttpErrorCodeInterface;
 use App\FooResponse\ErrorInterface;
-use Symfony\Component\HttpFoundation\JsonResponse;
 
-readonly class Factory
+readonly class Serializer
 {
     /**
      * @param iterable<ComponentFactoryInterface> $componentFactories
@@ -18,7 +16,10 @@ readonly class Factory
     ) {
     }
 
-    public function create(ErrorInterface $error): JsonResponse
+    /**
+     * @return array<mixed>
+     */
+    public function create(ErrorInterface $error): array
     {
         $components = [];
         foreach ($this->componentFactories as $componentFactory) {
@@ -35,8 +36,6 @@ readonly class Factory
             $data = array_merge($data, $component->toArray());
         }
 
-        $statusCode = $error instanceof HasHttpErrorCodeInterface ? $error->getErrorCode() : 400;
-
-        return new JsonResponse($data, $statusCode);
+        return $data;
     }
 }
