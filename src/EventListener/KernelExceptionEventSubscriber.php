@@ -39,7 +39,7 @@ readonly class KernelExceptionEventSubscriber implements EventSubscriberInterfac
         $response = null;
 
         if ($throwable instanceof HasHttpErrorCodeInterface) {
-            $response = $this->handleHttpErrorException($throwable);
+            $response = new Response(null, $throwable->getErrorCode());
         }
 
         if ($throwable instanceof ErrorInterface) {
@@ -50,11 +50,6 @@ readonly class KernelExceptionEventSubscriber implements EventSubscriberInterfac
             $event->setResponse($response);
             $event->stopPropagation();
         }
-    }
-
-    private function handleHttpErrorException(HasHttpErrorCodeInterface $throwable): Response
-    {
-        return new Response(null, $throwable->getErrorCode());
     }
 
     private function handleFooHttpError(ErrorInterface $error): Response
