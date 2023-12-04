@@ -33,7 +33,7 @@ readonly class Serializer
 
         $data = [];
         foreach ($components as $component) {
-            $data = array_merge($data, $component->toArray());
+            $data[$component->key] = $component->data;
         }
 
         return $data;
