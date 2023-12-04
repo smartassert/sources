@@ -5,13 +5,12 @@ declare(strict_types=1);
 namespace App\Exception;
 
 use App\ErrorResponse\BadRequestErrorInterface;
-use App\RequestField\Field\Field;
 use App\RequestField\FieldInterface;
 
-class DuplicateFilePathException extends \Exception implements BadRequestErrorInterface
+class DuplicateObjectException extends \Exception implements BadRequestErrorInterface
 {
     public function __construct(
-        public readonly string $path,
+        private readonly FieldInterface $field,
     ) {
         parent::__construct();
     }
@@ -23,7 +22,7 @@ class DuplicateFilePathException extends \Exception implements BadRequestErrorIn
 
     public function getField(): FieldInterface
     {
-        return new Field('filename', $this->path);
+        return $this->field;
     }
 
     public function getType(): ?string

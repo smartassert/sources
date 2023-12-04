@@ -5,10 +5,11 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use App\Entity\FileSource;
-use App\Exception\DuplicateFilePathException;
+use App\Exception\DuplicateObjectException;
 use App\Exception\EntityStorageException;
 use App\Request\AddYamlFileRequest;
 use App\Request\YamlFileRequest;
+use App\RequestField\Field\Field;
 use App\Response\YamlResponse;
 use League\Flysystem\FilesystemException;
 use League\Flysystem\FilesystemReader;
@@ -31,7 +32,7 @@ class FileSourceFileController
     }
 
     /**
-     * @throws DuplicateFilePathException
+     * @throws DuplicateObjectException
      * @throws EntityStorageException
      */
     #[Route(name: 'add', methods: ['POST'])]
@@ -42,7 +43,7 @@ class FileSourceFileController
 
         try {
             if ($this->fileSourceReader->fileExists($path)) {
-                throw new DuplicateFilePathException((string) $yamlFile->name);
+                throw new DuplicateObjectException(new Field('filename', (string) $yamlFile->name));
             }
 
             $this->fileSourceWriter->write($path, $yamlFile->content);
