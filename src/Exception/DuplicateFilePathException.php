@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Exception;
 
-use App\FooResponse\BadRequestErrorInterface;
+use App\ErrorResponse\BadRequestErrorInterface;
 use App\RequestField\Field\Field;
 use App\RequestField\FieldInterface;
 

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Exception;
 
-use App\FooResponse\HasHttpStatusCodeInterface;
+use App\ErrorResponse\HasHttpStatusCodeInterface;
 
 class EntityNotFoundException extends \Exception implements HasHttpStatusCodeInterface
 {

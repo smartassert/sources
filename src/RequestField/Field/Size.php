@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\RequestField\Field;
 
-use App\FooResponse\SizeInterface;
+use App\ErrorResponse\SizeInterface;
 
 readonly class Size implements SizeInterface
 {

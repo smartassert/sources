@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace App\FooResponse\ErrorSerializer\ComponentFactory;
+namespace App\ErrorResponse\ErrorSerializer\ComponentFactory;
 
-use App\FooResponse\BadRequestErrorInterface;
-use App\FooResponse\ErrorInterface;
-use App\FooResponse\ErrorSerializer\Component;
-use App\FooResponse\ErrorSerializer\ComponentFactoryInterface;
-use App\FooResponse\SizeInterface;
+use App\ErrorResponse\BadRequestErrorInterface;
+use App\ErrorResponse\ErrorInterface;
+use App\ErrorResponse\ErrorSerializer\Component;
+use App\ErrorResponse\ErrorSerializer\ComponentFactoryInterface;
+use App\ErrorResponse\SizeInterface;
 use App\RequestField\RequirementsInterface;
 use App\RequestField\ScalarRequirementsInterface;
 

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\FooResponse\ErrorSerializer;
+namespace App\ErrorResponse\ErrorSerializer;
 
 readonly class Component
 {

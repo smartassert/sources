@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace App\Exception;
 
 use App\Entity\IdentifyingEntityInterface;
-use App\FooResponse\EntityErrorInterface as EntityError;
-use App\FooResponse\ErrorInterface as Error;
-use App\FooResponse\HasHttpStatusCodeInterface as HasHttpCode;
-use App\FooResponse\StorageLocationErrorInterface as StorageLocationError;
+use App\ErrorResponse\EntityErrorInterface as EntityError;
+use App\ErrorResponse\ErrorInterface as Error;
+use App\ErrorResponse\HasHttpStatusCodeInterface as HasHttpCode;
+use App\ErrorResponse\StorageLocationErrorInterface as StorageLocationError;
 use League\Flysystem\FilesystemException;
 use League\Flysystem\FilesystemOperationFailed;
 
