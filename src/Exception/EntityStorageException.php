@@ -5,18 +5,17 @@ declare(strict_types=1);
 namespace App\Exception;
 
 use App\Entity\IdentifyingEntityInterface;
-use App\ErrorResponse\EntityErrorInterface as EntityError;
 use App\ErrorResponse\ErrorInterface as Error;
 use App\ErrorResponse\HasHttpStatusCodeInterface as HasHttpCode;
-use App\ErrorResponse\StorageLocationErrorInterface as StorageLocationError;
+use App\ErrorResponse\StorageErrorInterface;
 use League\Flysystem\FilesystemException;
 use League\Flysystem\FilesystemOperationFailed;
 
-class EntityStorageException extends \Exception implements Error, HasHttpCode, EntityError, StorageLocationError
+class EntityStorageException extends \Exception implements Error, HasHttpCode, StorageErrorInterface
 {
     public function __construct(
-        public readonly IdentifyingEntityInterface $entity,
-        public readonly FilesystemException $filesystemException
+        private readonly IdentifyingEntityInterface $entity,
+        private readonly FilesystemException $filesystemException
     ) {
         $message = sprintf(
             'Filesystem %s error for %s %s',
@@ -30,7 +29,7 @@ class EntityStorageException extends \Exception implements Error, HasHttpCode, E
 
     public function getClass(): string
     {
-        return 'entity_storage';
+        return 'storage';
     }
 
     public function getType(): string
@@ -48,11 +47,6 @@ class EntityStorageException extends \Exception implements Error, HasHttpCode, E
         return 500;
     }
 
-    public function getEntity(): IdentifyingEntityInterface
-    {
-        return $this->entity;
-    }
-
     public function getLocation(): ?string
     {
         $location = null;
@@ -61,5 +55,18 @@ class EntityStorageException extends \Exception implements Error, HasHttpCode, E
         }
 
         return $location;
+    }
+
+    public function getObjectType(): string
+    {
+        return 'entity';
+    }
+
+    public function getContext(): array
+    {
+        return [
+            'id' => $this->entity->getId(),
+            'type' => $this->entity->getEntityType()->value,
+        ];
     }
 }
