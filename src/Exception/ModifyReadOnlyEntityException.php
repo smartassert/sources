@@ -7,8 +7,9 @@ namespace App\Exception;
 use App\FooRequest\Field\Field;
 use App\FooRequest\FieldInterface;
 use App\FooResponse\BadRequestErrorInterface;
+use App\FooResponse\HasHttpStatusCodeInterface;
 
-class ModifyReadOnlyEntityException extends \Exception implements HasHttpErrorCodeInterface, BadRequestErrorInterface
+class ModifyReadOnlyEntityException extends \Exception implements HasHttpStatusCodeInterface, BadRequestErrorInterface
 {
     /**
      * @param non-empty-string $type
@@ -24,7 +25,7 @@ class ModifyReadOnlyEntityException extends \Exception implements HasHttpErrorCo
         ));
     }
 
-    public function getErrorCode(): int
+    public function getStatusCode(): int
     {
         return 405;
     }

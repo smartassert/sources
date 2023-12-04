@@ -6,8 +6,9 @@ namespace App\Exception;
 
 use App\FooRequest\FieldInterface;
 use App\FooResponse\BadRequestErrorInterface;
+use App\FooResponse\HasHttpStatusCodeInterface;
 
-class InvalidRequestException extends \Exception implements HasHttpErrorCodeInterface, BadRequestErrorInterface
+class InvalidRequestException extends \Exception implements HasHttpStatusCodeInterface, BadRequestErrorInterface
 {
     /**
      * @param non-empty-string  $class
@@ -41,7 +42,7 @@ class InvalidRequestException extends \Exception implements HasHttpErrorCodeInte
         return $this->type;
     }
 
-    public function getErrorCode(): int
+    public function getStatusCode(): int
     {
         return $this->getCode();
     }
