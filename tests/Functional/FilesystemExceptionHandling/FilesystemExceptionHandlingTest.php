@@ -316,12 +316,13 @@ class FilesystemExceptionHandlingTest extends WebTestCase
                 'expectedResponseDataCreator' => function (IdentifyingEntity $entity) {
                     return [
                         'class' => 'storage',
-                        'entity' => [
+                        'location' => null,
+                        'object_type' => 'entity',
+                        'context' => [
                             'id' => $entity->getId(),
                             'type' => $entity->getEntityType()->value,
                         ],
                         'type' => 'unknown',
-                        'location' => null,
                     ];
                 },
             ],
@@ -340,12 +341,13 @@ class FilesystemExceptionHandlingTest extends WebTestCase
                 'expectedResponseDataCreator' => function (IdentifyingEntity $entity) {
                     return [
                         'class' => 'storage',
-                        'entity' => [
+                        'location' => null,
+                        'object_type' => 'entity',
+                        'context' => [
                             'id' => $entity->getId(),
                             'type' => $entity->getEntityType()->value,
                         ],
                         'type' => 'read',
-                        'location' => null,
                     ];
                 },
             ],
@@ -364,12 +366,13 @@ class FilesystemExceptionHandlingTest extends WebTestCase
                 'expectedResponseDataCreator' => function (IdentifyingEntity $entity) {
                     return [
                         'class' => 'storage',
-                        'entity' => [
+                        'location' => null,
+                        'object_type' => 'entity',
+                        'context' => [
                             'id' => $entity->getId(),
                             'type' => $entity->getEntityType()->value,
                         ],
                         'type' => 'write',
-                        'location' => null,
                     ];
                 },
             ],
@@ -393,12 +396,13 @@ class FilesystemExceptionHandlingTest extends WebTestCase
                 'expectedResponseDataCreator' => function (IdentifyingEntity $entity) use ($location) {
                     return [
                         'class' => 'storage',
-                        'entity' => [
+                        'location' => $location,
+                        'object_type' => 'entity',
+                        'context' => [
                             'id' => $entity->getId(),
                             'type' => $entity->getEntityType()->value,
                         ],
                         'type' => 'write',
-                        'location' => $location,
                     ];
                 },
             ],
