@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\RequestField\Field;
 
-use App\ErrorResponse\SizeInterface;
 use App\RequestField\ScalarRequirementsInterface;
+use App\RequestField\SizeInterface;
 
 readonly class ScalarRequirements extends Requirements implements ScalarRequirementsInterface
 {
