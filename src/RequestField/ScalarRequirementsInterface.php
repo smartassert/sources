@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\RequestField;
 
-use App\FooResponse\SizeInterface;
+use App\ErrorResponse\SizeInterface;
 
 interface ScalarRequirementsInterface extends RequirementsInterface
 {

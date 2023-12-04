@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\EventListener;
 
-use App\FooResponse\ErrorInterface;
-use App\FooResponse\Factory;
-use App\FooResponse\HasHttpStatusCodeInterface;
+use App\ErrorResponse\ErrorInterface;
+use App\ErrorResponse\Factory;
+use App\ErrorResponse\HasHttpStatusCodeInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;

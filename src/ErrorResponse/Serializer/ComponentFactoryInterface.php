@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\FooResponse\ErrorSerializer;
+namespace App\ErrorResponse\Serializer;
 
-use App\FooResponse\ErrorInterface;
+use App\ErrorResponse\ErrorInterface;
 
 interface ComponentFactoryInterface
 {
