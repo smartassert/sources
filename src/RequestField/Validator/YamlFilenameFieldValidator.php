@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\RequestField\Validator;
 
-use App\Exception\InvalidRequestException;
+use App\Exception\BadRequestException;
 use App\RequestField\Field\YamlFilenameField;
 use SmartAssert\YamlFile\Filename as YamlFilename;
 use SmartAssert\YamlFile\Validator\YamlFilenameValidator;
@@ -17,7 +17,7 @@ readonly class YamlFilenameFieldValidator
     }
 
     /**
-     * @throws InvalidRequestException
+     * @throws BadRequestException
      */
     public function validate(YamlFilenameField $field): YamlFilename
     {
@@ -25,7 +25,7 @@ readonly class YamlFilenameFieldValidator
         $validation = $this->yamlFilenameValidator->validate($filename);
 
         if (false === $validation->isValid()) {
-            throw new InvalidRequestException($field, 'invalid');
+            throw new BadRequestException($field, 'invalid');
         }
 
         return $filename;

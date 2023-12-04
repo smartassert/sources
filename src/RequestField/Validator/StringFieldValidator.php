@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\RequestField\Validator;
 
-use App\Exception\InvalidRequestException;
+use App\Exception\BadRequestException;
 use App\RequestField\ScalarRequirementsInterface;
 use App\RequestField\SizeInterface;
 use App\RequestField\StringFieldInterface;
@@ -12,7 +12,7 @@ use App\RequestField\StringFieldInterface;
 class StringFieldValidator
 {
     /**
-     * @throws InvalidRequestException
+     * @throws BadRequestException
      */
     public function validateString(StringFieldInterface $field): string
     {
@@ -23,7 +23,7 @@ class StringFieldValidator
 
             if ($sizeRequirements instanceof SizeInterface) {
                 if (mb_strlen($value) > $sizeRequirements->getMaximum()) {
-                    throw new InvalidRequestException($field, 'too_large');
+                    throw new BadRequestException($field, 'too_large');
                 }
             }
         }
@@ -34,14 +34,14 @@ class StringFieldValidator
     /**
      * @return non-empty-string
      *
-     * @throws InvalidRequestException
+     * @throws BadRequestException
      */
     public function validateNonEmptyString(StringFieldInterface $field): string
     {
         $value = $this->validateString($field);
 
         if ('' === $value) {
-            throw new InvalidRequestException($field, 'empty');
+            throw new BadRequestException($field, 'empty');
         }
 
         return $value;

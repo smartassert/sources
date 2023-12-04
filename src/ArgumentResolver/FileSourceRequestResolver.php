@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\ArgumentResolver;
 
 use App\Entity\AbstractSource;
-use App\Exception\InvalidRequestException;
+use App\Exception\BadRequestException;
 use App\Request\FileSourceRequest;
 use App\RequestField\Field\StringField;
 use App\RequestField\Validator\StringFieldValidator;
@@ -23,7 +23,7 @@ readonly class FileSourceRequestResolver implements ValueResolverInterface
     /**
      * @return FileSourceRequest[]
      *
-     * @throws InvalidRequestException
+     * @throws BadRequestException
      */
     public function resolve(Request $request, ArgumentMetadata $argument): iterable
     {
