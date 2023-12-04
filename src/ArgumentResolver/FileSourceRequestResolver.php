@@ -6,9 +6,9 @@ namespace App\ArgumentResolver;
 
 use App\Entity\AbstractSource;
 use App\Exception\InvalidRequestException;
-use App\FooRequest\Field\StringField;
-use App\FooRequest\StringFieldValidator;
 use App\Request\FileSourceRequest;
+use App\RequestField\Field\StringField;
+use App\RequestField\Validator\StringFieldValidator;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Controller\ValueResolverInterface;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;

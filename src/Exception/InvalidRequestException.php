@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Exception;
 
-use App\FooRequest\FieldInterface;
 use App\FooResponse\BadRequestErrorInterface;
 use App\FooResponse\HasHttpStatusCodeInterface;
+use App\RequestField\FieldInterface;
 
 class InvalidRequestException extends \Exception implements HasHttpStatusCodeInterface, BadRequestErrorInterface
 {

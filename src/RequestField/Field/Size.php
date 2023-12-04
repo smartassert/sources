@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\FooRequest\Field;
+namespace App\RequestField\Field;
 
 use App\FooResponse\SizeInterface;
 

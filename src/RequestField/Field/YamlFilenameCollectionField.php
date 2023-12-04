@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace App\FooRequest\Field;
+namespace App\RequestField\Field;
 
-use App\FooRequest\CollectionFieldInterface;
-use App\FooRequest\RequirementsInterface;
+use App\RequestField\CollectionFieldInterface;
+use App\RequestField\RequirementsInterface;
 
 class YamlFilenameCollectionField implements CollectionFieldInterface
 {

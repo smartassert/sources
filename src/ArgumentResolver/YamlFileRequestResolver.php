@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace App\ArgumentResolver;
 
 use App\Exception\InvalidRequestException;
-use App\FooRequest\Field\YamlFilenameField;
-use App\FooRequest\YamlFilenameFieldValidator;
 use App\Request\YamlFileRequest;
+use App\RequestField\Field\YamlFilenameField;
+use App\RequestField\Validator\YamlFilenameFieldValidator;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Controller\ValueResolverInterface;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
