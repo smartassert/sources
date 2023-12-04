@@ -34,7 +34,7 @@ readonly class YamlFilenameCollectionFieldValidator
             } else {
                 $field->setErrorPosition($nameIndex + 1);
 
-                throw new InvalidRequestException('invalid_request_field', $field, 'invalid');
+                throw new InvalidRequestException($field, 'invalid');
             }
         }
 

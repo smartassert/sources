@@ -11,15 +11,13 @@ use App\RequestField\FieldInterface;
 class InvalidRequestException extends \Exception implements HasHttpStatusCodeInterface, BadRequestErrorInterface
 {
     /**
-     * @param non-empty-string  $class
      * @param ?non-empty-string $type
      */
     public function __construct(
-        private readonly string $class,
         private readonly FieldInterface $field,
         private readonly ?string $type,
     ) {
-        $message = $class . ': ' . $class;
+        $message = 'bad_request: ' . $field->getName();
         if (is_string($type)) {
             $message .= ' ' . $type;
         }
@@ -29,7 +27,7 @@ class InvalidRequestException extends \Exception implements HasHttpStatusCodeInt
 
     public function getClass(): string
     {
-        return $this->class;
+        return 'bad_request';
     }
 
     public function getField(): FieldInterface

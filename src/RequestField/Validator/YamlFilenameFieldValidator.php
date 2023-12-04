@@ -25,7 +25,7 @@ readonly class YamlFilenameFieldValidator
         $validation = $this->yamlFilenameValidator->validate($filename);
 
         if (false === $validation->isValid()) {
-            throw new InvalidRequestException('invalid_request_field', $field, 'invalid');
+            throw new InvalidRequestException($field, 'invalid');
         }
 
         return $filename;

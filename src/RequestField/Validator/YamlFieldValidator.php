@@ -24,12 +24,12 @@ readonly class YamlFieldValidator
     {
         $content = $field->getValue();
         if ('' === $content) {
-            throw new InvalidRequestException('invalid_request_field', $field, 'empty');
+            throw new InvalidRequestException($field, 'empty');
         }
 
         $validation = $this->yamlContentValidator->validate($content);
         if (false === $validation->isValid()) {
-            throw new InvalidRequestException('invalid_request_field', $field, 'invalid');
+            throw new InvalidRequestException($field, 'invalid');
         }
 
         return $content;

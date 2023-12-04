@@ -27,7 +27,7 @@ trait CreateUpdateGitSourceDataProviderTrait
             'missing label' => [
                 'requestParameters' => [],
                 'expectedResponseData' => [
-                    'class' => 'invalid_request_field',
+                    'class' => 'bad_request',
                     'field' => [
                         'name' => 'label',
                         'value' => '',
@@ -47,7 +47,7 @@ trait CreateUpdateGitSourceDataProviderTrait
                     GitSourceRequest::PARAMETER_LABEL => $labelTooLong,
                 ],
                 'expectedResponseData' => [
-                    'class' => 'invalid_request_field',
+                    'class' => 'bad_request',
                     'field' => [
                         'name' => 'label',
                         'value' => $labelTooLong,
@@ -68,7 +68,7 @@ trait CreateUpdateGitSourceDataProviderTrait
                     GitSourceRequest::PARAMETER_PATH => $path,
                 ],
                 'expectedResponseData' => [
-                    'class' => 'invalid_request_field',
+                    'class' => 'bad_request',
                     'field' => [
                         'name' => 'host-url',
                         'value' => '',
@@ -90,7 +90,7 @@ trait CreateUpdateGitSourceDataProviderTrait
                     GitSourceRequest::PARAMETER_PATH => $path,
                 ],
                 'expectedResponseData' => [
-                    'class' => 'invalid_request_field',
+                    'class' => 'bad_request',
                     'field' => [
                         'name' => 'host-url',
                         'value' => $hostUrlTooLong,
@@ -111,7 +111,7 @@ trait CreateUpdateGitSourceDataProviderTrait
                     GitSourceRequest::PARAMETER_HOST_URL => $hostUrl,
                 ],
                 'expectedResponseData' => [
-                    'class' => 'invalid_request_field',
+                    'class' => 'bad_request',
                     'field' => [
                         'name' => 'path',
                         'value' => '',
@@ -133,7 +133,7 @@ trait CreateUpdateGitSourceDataProviderTrait
                     GitSourceRequest::PARAMETER_PATH => $pathTooLong,
                 ],
                 'expectedResponseData' => [
-                    'class' => 'invalid_request_field',
+                    'class' => 'bad_request',
                     'field' => [
                         'name' => 'path',
                         'value' => $pathTooLong,
@@ -156,7 +156,7 @@ trait CreateUpdateGitSourceDataProviderTrait
                     GitSourceRequest::PARAMETER_CREDENTIALS => $credentialsTooLong,
                 ],
                 'expectedResponseData' => [
-                    'class' => 'invalid_request_field',
+                    'class' => 'bad_request',
                     'field' => [
                         'name' => 'credentials',
                         'value' => $credentialsTooLong,

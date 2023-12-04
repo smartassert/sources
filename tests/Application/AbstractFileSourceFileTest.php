@@ -92,7 +92,7 @@ abstract class AbstractFileSourceFileTest extends AbstractApplicationTest
                 'filename' => '.yaml',
                 'content' => 'non-empty value',
                 'expectedResponseData' => [
-                    'class' => 'invalid_request_field',
+                    'class' => 'bad_request',
                     'field' => [
                         'name' => 'filename',
                         'value' => '.yaml',
@@ -107,7 +107,7 @@ abstract class AbstractFileSourceFileTest extends AbstractApplicationTest
                 'filename' => 'one-two-\\-three.yaml',
                 'content' => 'non-empty value',
                 'expectedResponseData' => [
-                    'class' => 'invalid_request_field',
+                    'class' => 'bad_request',
                     'field' => [
                         'name' => 'filename',
                         'value' => 'one-two-\\-three.yaml',
@@ -122,7 +122,7 @@ abstract class AbstractFileSourceFileTest extends AbstractApplicationTest
                 'filename' => 'one two three.yaml',
                 'content' => 'non-empty value',
                 'expectedResponseData' => [
-                    'class' => 'invalid_request_field',
+                    'class' => 'bad_request',
                     'field' => [
                         'name' => 'filename',
                         'value' => 'one two three.yaml',
@@ -137,7 +137,7 @@ abstract class AbstractFileSourceFileTest extends AbstractApplicationTest
                 'filename' => self::FILENAME,
                 'content' => '',
                 'expectedResponseData' => [
-                    'class' => 'invalid_request_field',
+                    'class' => 'bad_request',
                     'field' => [
                         'name' => 'content',
                         'value' => '',
@@ -152,7 +152,7 @@ abstract class AbstractFileSourceFileTest extends AbstractApplicationTest
                 'filename' => self::FILENAME,
                 'content' => "- item\ncontent",
                 'expectedResponseData' => [
-                    'class' => 'invalid_request_field',
+                    'class' => 'bad_request',
                     'field' => [
                         'name' => 'content',
                         'value' => "- item\ncontent",
@@ -256,7 +256,7 @@ abstract class AbstractFileSourceFileTest extends AbstractApplicationTest
             'name empty with .yaml extension' => [
                 'filename' => '.yaml',
                 'expectedResponseData' => [
-                    'class' => 'invalid_request_field',
+                    'class' => 'bad_request',
                     'field' => [
                         'name' => 'filename',
                         'value' => '.yaml',
@@ -270,7 +270,7 @@ abstract class AbstractFileSourceFileTest extends AbstractApplicationTest
             'name contains backslash characters' => [
                 'filename' => 'one-two-\\-three.yaml',
                 'expectedResponseData' => [
-                    'class' => 'invalid_request_field',
+                    'class' => 'bad_request',
                     'field' => [
                         'name' => 'filename',
                         'value' => 'one-two-\\-three.yaml',
@@ -284,7 +284,7 @@ abstract class AbstractFileSourceFileTest extends AbstractApplicationTest
             'name contains space characters' => [
                 'filename' => 'one two three.yaml',
                 'expectedResponseData' => [
-                    'class' => 'invalid_request_field',
+                    'class' => 'bad_request',
                     'field' => [
                         'name' => 'filename',
                         'value' => 'one two three.yaml',

@@ -23,7 +23,7 @@ class StringFieldValidator
 
             if ($sizeRequirements instanceof SizeInterface) {
                 if (mb_strlen($value) > $sizeRequirements->getMaximum()) {
-                    throw new InvalidRequestException('invalid_request_field', $field, 'too_large');
+                    throw new InvalidRequestException($field, 'too_large');
                 }
             }
         }
@@ -41,7 +41,7 @@ class StringFieldValidator
         $value = $this->validateString($field);
 
         if ('' === $value) {
-            throw new InvalidRequestException('invalid_request_field', $field, 'empty');
+            throw new InvalidRequestException($field, 'empty');
         }
 
         return $value;

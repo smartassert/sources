@@ -20,7 +20,7 @@ trait CreateUpdateFileSourceDataProviderTrait
             'missing label' => [
                 'requestParameters' => [],
                 'expectedResponseData' => [
-                    'class' => 'invalid_request_field',
+                    'class' => 'bad_request',
                     'field' => [
                         'name' => 'label',
                         'value' => '',
@@ -40,7 +40,7 @@ trait CreateUpdateFileSourceDataProviderTrait
                     FileSourceRequest::PARAMETER_LABEL => $labelTooLong,
                 ],
                 'expectedResponseData' => [
-                    'class' => 'invalid_request_field',
+                    'class' => 'bad_request',
                     'field' => [
                         'name' => 'label',
                         'value' => $labelTooLong,
