@@ -315,7 +315,7 @@ class FilesystemExceptionHandlingTest extends WebTestCase
                 },
                 'expectedResponseDataCreator' => function (IdentifyingEntity $entity) {
                     return [
-                        'class' => 'entity_storage',
+                        'class' => 'storage',
                         'entity' => [
                             'id' => $entity->getId(),
                             'type' => $entity->getEntityType()->value,
@@ -339,7 +339,7 @@ class FilesystemExceptionHandlingTest extends WebTestCase
                 },
                 'expectedResponseDataCreator' => function (IdentifyingEntity $entity) {
                     return [
-                        'class' => 'entity_storage',
+                        'class' => 'storage',
                         'entity' => [
                             'id' => $entity->getId(),
                             'type' => $entity->getEntityType()->value,
@@ -363,7 +363,7 @@ class FilesystemExceptionHandlingTest extends WebTestCase
                 },
                 'expectedResponseDataCreator' => function (IdentifyingEntity $entity) {
                     return [
-                        'class' => 'entity_storage',
+                        'class' => 'storage',
                         'entity' => [
                             'id' => $entity->getId(),
                             'type' => $entity->getEntityType()->value,
@@ -392,7 +392,7 @@ class FilesystemExceptionHandlingTest extends WebTestCase
                 },
                 'expectedResponseDataCreator' => function (IdentifyingEntity $entity) use ($location) {
                     return [
-                        'class' => 'entity_storage',
+                        'class' => 'storage',
                         'entity' => [
                             'id' => $entity->getId(),
                             'type' => $entity->getEntityType()->value,

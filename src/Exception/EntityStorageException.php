@@ -30,7 +30,7 @@ class EntityStorageException extends \Exception implements Error, HasHttpCode, E
 
     public function getClass(): string
     {
-        return 'entity_storage';
+        return 'storage';
     }
 
     public function getType(): string
