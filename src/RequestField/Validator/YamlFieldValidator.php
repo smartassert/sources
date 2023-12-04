@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace App\FooRequest;
+namespace App\RequestField\Validator;
 
 use App\Exception\InvalidRequestException;
-use App\FooRequest\Field\Field;
+use App\RequestField\Field\Field;
 use SmartAssert\YamlFile\Validator\ContentValidator;
 
 readonly class YamlFieldValidator

@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace App\FooRequest\Field;
+namespace App\RequestField\Field;
 
-use App\FooRequest\ScalarRequirementsInterface;
 use App\FooResponse\SizeInterface;
+use App\RequestField\ScalarRequirementsInterface;
 
 readonly class ScalarRequirements extends Requirements implements ScalarRequirementsInterface
 {

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\FooResponse;
 
-use App\FooRequest\FieldInterface;
+use App\RequestField\FieldInterface;
 
 interface BadRequestErrorInterface extends ErrorInterface
 {

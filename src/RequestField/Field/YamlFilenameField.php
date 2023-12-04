@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace App\FooRequest\Field;
+namespace App\RequestField\Field;
 
-use App\FooRequest\RequirementsInterface;
-use App\FooRequest\StringFieldInterface;
+use App\RequestField\RequirementsInterface;
+use App\RequestField\StringFieldInterface;
 use SmartAssert\YamlFile\Filename as YamlFilename;
 
 readonly class YamlFilenameField implements StringFieldInterface

@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace App\FooRequest\Field;
+namespace App\RequestField\Field;
 
-use App\FooRequest\FieldInterface;
-use App\FooRequest\RequirementsInterface;
+use App\RequestField\FieldInterface;
+use App\RequestField\RequirementsInterface;
 
 readonly class Field implements FieldInterface
 {

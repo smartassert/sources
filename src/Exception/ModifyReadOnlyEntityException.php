@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace App\Exception;
 
-use App\FooRequest\Field\Field;
-use App\FooRequest\FieldInterface;
 use App\FooResponse\BadRequestErrorInterface;
 use App\FooResponse\HasHttpStatusCodeInterface;
+use App\RequestField\Field\Field;
+use App\RequestField\FieldInterface;
 
 class ModifyReadOnlyEntityException extends \Exception implements HasHttpStatusCodeInterface, BadRequestErrorInterface
 {

@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\FooRequest\Field;
+namespace App\RequestField\Field;
 
-use App\FooRequest\StringFieldInterface;
+use App\RequestField\StringFieldInterface;
 
 readonly class StringField extends Field implements StringFieldInterface
 {

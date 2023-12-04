@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace App\FooRequest;
+namespace App\RequestField\Validator;
 
 use App\Exception\InvalidRequestException;
-use App\FooRequest\Field\YamlFilenameField;
+use App\RequestField\Field\YamlFilenameField;
 use SmartAssert\YamlFile\Filename as YamlFilename;
 use SmartAssert\YamlFile\Validator\YamlFilenameValidator;
 

@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\FooRequest\Field;
+namespace App\RequestField\Field;
 
-use App\FooRequest\RequirementsInterface;
+use App\RequestField\RequirementsInterface;
 
 readonly class Requirements implements RequirementsInterface
 {

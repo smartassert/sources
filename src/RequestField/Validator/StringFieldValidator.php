@@ -2,10 +2,12 @@
 
 declare(strict_types=1);
 
-namespace App\FooRequest;
+namespace App\RequestField\Validator;
 
 use App\Exception\InvalidRequestException;
 use App\FooResponse\SizeInterface;
+use App\RequestField\ScalarRequirementsInterface;
+use App\RequestField\StringFieldInterface;
 
 class StringFieldValidator
 {

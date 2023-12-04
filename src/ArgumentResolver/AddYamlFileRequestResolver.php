@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace App\ArgumentResolver;
 
 use App\Exception\InvalidRequestException;
-use App\FooRequest\Field\Field;
-use App\FooRequest\Field\Requirements;
-use App\FooRequest\Field\YamlFilenameField;
-use App\FooRequest\YamlFieldValidator;
-use App\FooRequest\YamlFilenameFieldValidator;
 use App\Request\AddYamlFileRequest;
+use App\RequestField\Field\Field;
+use App\RequestField\Field\Requirements;
+use App\RequestField\Field\YamlFilenameField;
+use App\RequestField\Validator\YamlFieldValidator;
+use App\RequestField\Validator\YamlFilenameFieldValidator;
 use SmartAssert\YamlFile\YamlFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Controller\ValueResolverInterface;

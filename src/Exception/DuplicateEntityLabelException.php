@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace App\Exception;
 
-use App\FooRequest\Field\Field;
-use App\FooRequest\FieldInterface;
 use App\FooResponse\BadRequestErrorInterface;
 use App\Request\LabelledObjectRequestInterface;
 use App\Request\ObjectRequestInterface;
+use App\RequestField\Field\Field;
+use App\RequestField\FieldInterface;
 
 class DuplicateEntityLabelException extends \Exception implements BadRequestErrorInterface
 {
