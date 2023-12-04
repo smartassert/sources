@@ -8,9 +8,9 @@ use App\ErrorResponse\BadRequestErrorInterface;
 use App\ErrorResponse\ErrorInterface;
 use App\ErrorResponse\Serializer\Component;
 use App\ErrorResponse\Serializer\ComponentFactoryInterface;
-use App\ErrorResponse\SizeInterface;
 use App\RequestField\RequirementsInterface;
 use App\RequestField\ScalarRequirementsInterface;
+use App\RequestField\SizeInterface;
 
 class RequirementsFactory implements ComponentFactoryInterface
 {

@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\RequestField\Validator;
 
-use App\ErrorResponse\SizeInterface;
 use App\Exception\InvalidRequestException;
 use App\RequestField\ScalarRequirementsInterface;
+use App\RequestField\SizeInterface;
 use App\RequestField\StringFieldInterface;
 
 class StringFieldValidator

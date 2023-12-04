@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\ErrorResponse;
+namespace App\RequestField;
 
 interface SizeInterface
 {
