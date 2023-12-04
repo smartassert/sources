@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Request;
 
-class FileSourceRequest implements LabelledObjectRequestInterface, ObjectRequestInterface
+class FileSourceRequest implements LabelledObjectRequestInterface
 {
     public const PARAMETER_LABEL = 'label';
 
@@ -19,10 +19,5 @@ class FileSourceRequest implements LabelledObjectRequestInterface, ObjectRequest
     public function getLabel(): string
     {
         return $this->label;
-    }
-
-    public function getObjectType(): string
-    {
-        return 'source';
     }
 }

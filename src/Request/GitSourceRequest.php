@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Request;
 
-class GitSourceRequest implements LabelledObjectRequestInterface, ObjectRequestInterface
+class GitSourceRequest implements LabelledObjectRequestInterface
 {
     public const PARAMETER_LABEL = 'label';
     public const PARAMETER_HOST_URL = 'host-url';
@@ -27,10 +27,5 @@ class GitSourceRequest implements LabelledObjectRequestInterface, ObjectRequestI
     public function getLabel(): string
     {
         return $this->label;
-    }
-
-    public function getObjectType(): string
-    {
-        return 'source';
     }
 }
