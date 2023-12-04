@@ -10,6 +10,6 @@ readonly class StringRequirements extends ScalarRequirements
 {
     public function __construct(SizeInterface $size)
     {
-        parent::__construct('string', $size, 0 === $size->getMinimum());
+        parent::__construct('string', $size);
     }
 }

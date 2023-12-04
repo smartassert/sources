@@ -8,7 +8,6 @@ use App\Exception\InvalidRequestException;
 use App\FooRequest\Field\Field;
 use App\FooRequest\Field\Requirements;
 use App\FooRequest\Field\YamlFilenameField;
-use App\FooRequest\RequirementsInterface;
 use App\FooRequest\YamlFieldValidator;
 use App\FooRequest\YamlFilenameFieldValidator;
 use App\Request\AddYamlFileRequest;
@@ -44,7 +43,7 @@ class AddYamlFileRequestResolver extends AbstractYamlFileRequestResolver impleme
         $contentField = new Field(
             'content',
             trim($request->getContent()),
-            new Requirements('yaml', RequirementsInterface::CANNOT_BE_EMPTY)
+            new Requirements('yaml')
         );
 
         $content = $this->yamlFieldValidator->validate($contentField);

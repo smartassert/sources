@@ -19,7 +19,7 @@ readonly class YamlFilenameField implements StringFieldInterface
         private string $name,
         private YamlFilename $value,
     ) {
-        $this->requirements = new Requirements('yaml_filename', RequirementsInterface::CANNOT_BE_EMPTY);
+        $this->requirements = new Requirements('yaml_filename');
     }
 
     public function getName(): string
