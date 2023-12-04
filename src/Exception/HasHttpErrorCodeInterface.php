@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Exception;
 
-interface HasHttpErrorCodeInterface extends \Throwable
+interface HasHttpErrorCodeInterface
 {
     public function getErrorCode(): int;
 }
