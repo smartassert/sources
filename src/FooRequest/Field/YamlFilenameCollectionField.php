@@ -24,7 +24,7 @@ class YamlFilenameCollectionField implements CollectionFieldInterface
         private readonly string $name,
         private readonly array $value,
     ) {
-        $this->requirements = new Requirements('yaml_filename_collection', RequirementsInterface::CAN_BE_EMPTY);
+        $this->requirements = new Requirements('yaml_filename_collection');
     }
 
     public function getName(): string
