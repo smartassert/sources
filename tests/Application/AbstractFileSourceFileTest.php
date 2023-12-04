@@ -96,11 +96,11 @@ abstract class AbstractFileSourceFileTest extends AbstractApplicationTest
                     'field' => [
                         'name' => 'filename',
                         'value' => '.yaml',
+                        'requirements' => [
+                            'data_type' => 'yaml_filename',
+                        ],
                     ],
                     'type' => 'invalid',
-                    'requirements' => [
-                        'data_type' => 'yaml_filename',
-                    ],
                 ],
             ],
             'name contains backslash characters, content non-empty' => [
@@ -111,11 +111,11 @@ abstract class AbstractFileSourceFileTest extends AbstractApplicationTest
                     'field' => [
                         'name' => 'filename',
                         'value' => 'one-two-\\-three.yaml',
+                        'requirements' => [
+                            'data_type' => 'yaml_filename',
+                        ],
                     ],
                     'type' => 'invalid',
-                    'requirements' => [
-                        'data_type' => 'yaml_filename',
-                    ],
                 ],
             ],
             'name contains space characters, content non-empty' => [
@@ -126,11 +126,11 @@ abstract class AbstractFileSourceFileTest extends AbstractApplicationTest
                     'field' => [
                         'name' => 'filename',
                         'value' => 'one two three.yaml',
+                        'requirements' => [
+                            'data_type' => 'yaml_filename',
+                        ],
                     ],
                     'type' => 'invalid',
-                    'requirements' => [
-                        'data_type' => 'yaml_filename',
-                    ],
                 ],
             ],
             'name valid, content empty' => [
@@ -141,11 +141,11 @@ abstract class AbstractFileSourceFileTest extends AbstractApplicationTest
                     'field' => [
                         'name' => 'content',
                         'value' => '',
+                        'requirements' => [
+                            'data_type' => 'yaml',
+                        ],
                     ],
                     'type' => 'empty',
-                    'requirements' => [
-                        'data_type' => 'yaml',
-                    ],
                 ],
             ],
             'name valid, content invalid yaml' => [
@@ -156,11 +156,11 @@ abstract class AbstractFileSourceFileTest extends AbstractApplicationTest
                     'field' => [
                         'name' => 'content',
                         'value' => "- item\ncontent",
+                        'requirements' => [
+                            'data_type' => 'yaml',
+                        ],
                     ],
                     'type' => 'invalid',
-                    'requirements' => [
-                        'data_type' => 'yaml',
-                    ],
                 ],
             ],
         ];
@@ -259,11 +259,11 @@ abstract class AbstractFileSourceFileTest extends AbstractApplicationTest
                     'field' => [
                         'name' => 'filename',
                         'value' => '.yaml',
+                        'requirements' => [
+                            'data_type' => 'yaml_filename',
+                        ],
                     ],
                     'type' => 'invalid',
-                    'requirements' => [
-                        'data_type' => 'yaml_filename',
-                    ],
                 ],
             ],
             'name contains backslash characters' => [
@@ -273,11 +273,11 @@ abstract class AbstractFileSourceFileTest extends AbstractApplicationTest
                     'field' => [
                         'name' => 'filename',
                         'value' => 'one-two-\\-three.yaml',
+                        'requirements' => [
+                            'data_type' => 'yaml_filename',
+                        ],
                     ],
                     'type' => 'invalid',
-                    'requirements' => [
-                        'data_type' => 'yaml_filename',
-                    ],
                 ],
             ],
             'name contains space characters' => [
@@ -287,11 +287,11 @@ abstract class AbstractFileSourceFileTest extends AbstractApplicationTest
                     'field' => [
                         'name' => 'filename',
                         'value' => 'one two three.yaml',
+                        'requirements' => [
+                            'data_type' => 'yaml_filename',
+                        ],
                     ],
                     'type' => 'invalid',
-                    'requirements' => [
-                        'data_type' => 'yaml_filename',
-                    ],
                 ],
             ],
         ];

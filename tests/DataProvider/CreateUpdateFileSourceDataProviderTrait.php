@@ -24,15 +24,15 @@ trait CreateUpdateFileSourceDataProviderTrait
                     'field' => [
                         'name' => 'label',
                         'value' => '',
+                        'requirements' => [
+                            'data_type' => 'string',
+                            'size' => [
+                                'minimum' => 1,
+                                'maximum' => 255,
+                            ]
+                        ],
                     ],
                     'type' => 'empty',
-                    'requirements' => [
-                        'data_type' => 'string',
-                        'size' => [
-                            'minimum' => 1,
-                            'maximum' => 255,
-                        ]
-                    ],
                 ],
             ],
             'label length exceeds length limit' => [
@@ -44,15 +44,15 @@ trait CreateUpdateFileSourceDataProviderTrait
                     'field' => [
                         'name' => 'label',
                         'value' => $labelTooLong,
+                        'requirements' => [
+                            'data_type' => 'string',
+                            'size' => [
+                                'minimum' => 1,
+                                'maximum' => 255,
+                            ]
+                        ],
                     ],
                     'type' => 'too_large',
-                    'requirements' => [
-                        'data_type' => 'string',
-                        'size' => [
-                            'minimum' => 1,
-                            'maximum' => 255,
-                        ]
-                    ],
                 ],
             ],
         ];

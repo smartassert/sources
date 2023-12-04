@@ -31,15 +31,15 @@ trait CreateUpdateGitSourceDataProviderTrait
                     'field' => [
                         'name' => 'label',
                         'value' => '',
+                        'requirements' => [
+                            'data_type' => 'string',
+                            'size' => [
+                                'minimum' => 1,
+                                'maximum' => 255,
+                            ]
+                        ],
                     ],
                     'type' => 'empty',
-                    'requirements' => [
-                        'data_type' => 'string',
-                        'size' => [
-                            'minimum' => 1,
-                            'maximum' => 255,
-                        ]
-                    ],
                 ],
             ],
             'label length exceeds length limit' => [
@@ -51,15 +51,15 @@ trait CreateUpdateGitSourceDataProviderTrait
                     'field' => [
                         'name' => 'label',
                         'value' => $labelTooLong,
+                        'requirements' => [
+                            'data_type' => 'string',
+                            'size' => [
+                                'minimum' => 1,
+                                'maximum' => 255,
+                            ]
+                        ],
                     ],
                     'type' => 'too_large',
-                    'requirements' => [
-                        'data_type' => 'string',
-                        'size' => [
-                            'minimum' => 1,
-                            'maximum' => 255,
-                        ]
-                    ],
                 ],
             ],
             'missing host url' => [
@@ -72,15 +72,15 @@ trait CreateUpdateGitSourceDataProviderTrait
                     'field' => [
                         'name' => 'host-url',
                         'value' => '',
+                        'requirements' => [
+                            'data_type' => 'string',
+                            'size' => [
+                                'minimum' => 1,
+                                'maximum' => 255,
+                            ]
+                        ],
                     ],
                     'type' => 'empty',
-                    'requirements' => [
-                        'data_type' => 'string',
-                        'size' => [
-                            'minimum' => 1,
-                            'maximum' => 255,
-                        ]
-                    ],
                 ],
             ],
             'host url too long' => [
@@ -94,15 +94,15 @@ trait CreateUpdateGitSourceDataProviderTrait
                     'field' => [
                         'name' => 'host-url',
                         'value' => $hostUrlTooLong,
+                        'requirements' => [
+                            'data_type' => 'string',
+                            'size' => [
+                                'minimum' => 1,
+                                'maximum' => 255,
+                            ]
+                        ],
                     ],
                     'type' => 'too_large',
-                    'requirements' => [
-                        'data_type' => 'string',
-                        'size' => [
-                            'minimum' => 1,
-                            'maximum' => 255,
-                        ]
-                    ],
                 ],
             ],
             'missing path' => [
@@ -115,15 +115,15 @@ trait CreateUpdateGitSourceDataProviderTrait
                     'field' => [
                         'name' => 'path',
                         'value' => '',
+                        'requirements' => [
+                            'data_type' => 'string',
+                            'size' => [
+                                'minimum' => 1,
+                                'maximum' => 255,
+                            ]
+                        ],
                     ],
                     'type' => 'empty',
-                    'requirements' => [
-                        'data_type' => 'string',
-                        'size' => [
-                            'minimum' => 1,
-                            'maximum' => 255,
-                        ]
-                    ],
                 ],
             ],
             'path too long' => [
@@ -137,15 +137,15 @@ trait CreateUpdateGitSourceDataProviderTrait
                     'field' => [
                         'name' => 'path',
                         'value' => $pathTooLong,
+                        'requirements' => [
+                            'data_type' => 'string',
+                            'size' => [
+                                'minimum' => 1,
+                                'maximum' => 255,
+                            ]
+                        ],
                     ],
                     'type' => 'too_large',
-                    'requirements' => [
-                        'data_type' => 'string',
-                        'size' => [
-                            'minimum' => 1,
-                            'maximum' => 255,
-                        ]
-                    ],
                 ],
             ],
             'credentials too long' => [
@@ -160,15 +160,15 @@ trait CreateUpdateGitSourceDataProviderTrait
                     'field' => [
                         'name' => 'credentials',
                         'value' => $credentialsTooLong,
+                        'requirements' => [
+                            'data_type' => 'string',
+                            'size' => [
+                                'minimum' => 0,
+                                'maximum' => 255,
+                            ]
+                        ],
                     ],
                     'type' => 'too_large',
-                    'requirements' => [
-                        'data_type' => 'string',
-                        'size' => [
-                            'minimum' => 0,
-                            'maximum' => 255,
-                        ]
-                    ],
                 ],
             ],
         ];
