@@ -395,11 +395,10 @@ abstract class AbstractUpdateGitSourceTest extends AbstractApplicationTest
 
         $expectedResponseData = [
             'class' => 'modify_read_only',
-            'field' => [
-                'name' => 'id',
-                'value' => $source->getId(),
+            'entity' => [
+                'id' => $source->getId(),
+                'type' => 'git-source',
             ],
-            'type' => 'source',
         ];
 
         self::assertJsonStringEqualsJsonString(

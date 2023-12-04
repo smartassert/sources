@@ -4,12 +4,13 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
+use App\Enum\EntityType;
 use App\Repository\SuiteRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: SuiteRepository::class)]
-class Suite implements \JsonSerializable, UserHeldEntityInterface
+class Suite implements \JsonSerializable, UserHeldEntityInterface, IdentifyingEntityInterface
 {
     public const ID_LENGTH = 32;
     public const LABEL_MAX_LENGTH = 255;
@@ -130,5 +131,15 @@ class Suite implements \JsonSerializable, UserHeldEntityInterface
         }
 
         return $data;
+    }
+
+    public function getId(): string
+    {
+        return $this->id;
+    }
+
+    public function getEntityType(): EntityType
+    {
+        return EntityType::SUITE;
     }
 }

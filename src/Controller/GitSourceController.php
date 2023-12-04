@@ -43,7 +43,7 @@ readonly class GitSourceController
     public function update(GitSource $source, GitSourceRequest $request): Response
     {
         if (null !== $source->getDeletedAt()) {
-            throw new ModifyReadOnlyEntityException($source->getId(), 'source');
+            throw new ModifyReadOnlyEntityException($source);
         }
 
         return new JsonResponse($this->mutator->updateGit($source, $request));

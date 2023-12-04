@@ -58,7 +58,7 @@ readonly class SuiteController
     public function update(Suite $suite, SuiteRequest $request): Response
     {
         if (null !== $suite->getDeletedAt()) {
-            throw new ModifyReadOnlyEntityException($suite->id, 'suite');
+            throw new ModifyReadOnlyEntityException($suite);
         }
 
         return new JsonResponse($this->mutator->update($suite, $request));

@@ -4,24 +4,20 @@ declare(strict_types=1);
 
 namespace App\Exception;
 
-use App\ErrorResponse\BadRequestErrorInterface;
-use App\ErrorResponse\HasHttpStatusCodeInterface;
-use App\RequestField\Field\Field;
-use App\RequestField\FieldInterface;
+use App\Entity\IdentifyingEntityInterface;
+use App\ErrorResponse\EntityErrorInterface as EntityError;
+use App\ErrorResponse\ErrorInterface;
+use App\ErrorResponse\HasHttpStatusCodeInterface as HasHttpStatusCode;
 
-class ModifyReadOnlyEntityException extends \Exception implements HasHttpStatusCodeInterface, BadRequestErrorInterface
+class ModifyReadOnlyEntityException extends \Exception implements HasHttpStatusCode, ErrorInterface, EntityError
 {
-    /**
-     * @param non-empty-string $type
-     */
     public function __construct(
-        public readonly string $id,
-        public readonly string $type,
+        public readonly IdentifyingEntityInterface $entity,
     ) {
         parent::__construct(sprintf(
             'Cannot modify %s %s, entity is read-only',
-            $this->type,
-            $this->id
+            $entity->getEntityType()->value,
+            $entity->getId(),
         ));
     }
 
@@ -35,13 +31,13 @@ class ModifyReadOnlyEntityException extends \Exception implements HasHttpStatusC
         return 'modify_read_only';
     }
 
-    public function getField(): FieldInterface
+    public function getType(): null
     {
-        return new Field('id', $this->id);
+        return null;
     }
 
-    public function getType(): string
+    public function getEntity(): IdentifyingEntityInterface
     {
-        return $this->type;
+        return $this->entity;
     }
 }
