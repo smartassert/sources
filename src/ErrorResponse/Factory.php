@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\ErrorResponse;
 
-use App\ErrorResponse\ErrorSerializer\Serializer;
+use App\ErrorResponse\Serializer\Serializer;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
 readonly class Factory

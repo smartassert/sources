@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace App\ErrorResponse\ErrorSerializer\ComponentFactory;
+namespace App\ErrorResponse\Serializer\ComponentFactory;
 
 use App\ErrorResponse\EntityErrorInterface;
 use App\ErrorResponse\ErrorInterface;
-use App\ErrorResponse\ErrorSerializer\Component;
-use App\ErrorResponse\ErrorSerializer\ComponentFactoryInterface;
+use App\ErrorResponse\Serializer\Component;
+use App\ErrorResponse\Serializer\ComponentFactoryInterface;
 
 class EntityFactory implements ComponentFactoryInterface
 {
