@@ -190,6 +190,7 @@ abstract class AbstractFileSourceFileTest extends AbstractApplicationTest
                 'name' => 'filename',
                 'value' => self::FILENAME,
             ],
+            'duplication_of' => 'file path',
         ];
 
         self::assertJsonStringEqualsJsonString(

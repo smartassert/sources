@@ -81,6 +81,7 @@ abstract class AbstractUpdateSuiteTest extends AbstractSuiteTest
                 'name' => 'label',
                 'value' => $suiteLabel2,
             ],
+            'duplication_of' => 'entity label',
         ];
 
         self::assertJsonStringEqualsJsonString(
