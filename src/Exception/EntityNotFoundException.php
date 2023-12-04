@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Exception;
 
-class EntityNotFoundException extends \Exception implements HasHttpErrorCodeInterface
+use App\FooResponse\HasHttpStatusCodeInterface;
+
+class EntityNotFoundException extends \Exception implements HasHttpStatusCodeInterface
 {
     public function __construct(
         public readonly string $entityId,
@@ -13,7 +15,7 @@ class EntityNotFoundException extends \Exception implements HasHttpErrorCodeInte
         parent::__construct(sprintf('%s "%s" not found', $this->entityName, $entityId));
     }
 
-    public function getErrorCode(): int
+    public function getStatusCode(): int
     {
         return 404;
     }

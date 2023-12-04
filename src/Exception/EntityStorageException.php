@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace App\Exception;
 
 use App\Entity\IdentifyingEntityInterface;
-use App\Exception\HasHttpErrorCodeInterface as HasHttpCode;
 use App\FooResponse\EntityErrorInterface as EntityError;
 use App\FooResponse\ErrorInterface as Error;
+use App\FooResponse\HasHttpStatusCodeInterface as HasHttpCode;
 use App\FooResponse\StorageLocationErrorInterface as StorageLocationError;
 use League\Flysystem\FilesystemException;
 use League\Flysystem\FilesystemOperationFailed;
@@ -43,7 +43,7 @@ class EntityStorageException extends \Exception implements Error, HasHttpCode, E
         return $operationType;
     }
 
-    public function getErrorCode(): int
+    public function getStatusCode(): int
     {
         return 500;
     }
