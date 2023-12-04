@@ -20,7 +20,7 @@ trait CreateUpdateSuiteDataProviderTrait
             'missing label' => [
                 'requestParameters' => [],
                 'expectedResponseData' => [
-                    'class' => 'invalid_request_field',
+                    'class' => 'bad_request',
                     'field' => [
                         'name' => 'label',
                         'value' => '',
@@ -40,7 +40,7 @@ trait CreateUpdateSuiteDataProviderTrait
                     SuiteRequest::PARAMETER_LABEL => $labelTooLong,
                 ],
                 'expectedResponseData' => [
-                    'class' => 'invalid_request_field',
+                    'class' => 'bad_request',
                     'field' => [
                         'name' => 'label',
                         'value' => $labelTooLong,
@@ -61,7 +61,7 @@ trait CreateUpdateSuiteDataProviderTrait
                     SuiteRequest::PARAMETER_TESTS => ['test.txt'],
                 ],
                 'expectedResponseData' => [
-                    'class' => 'invalid_request_field',
+                    'class' => 'bad_request',
                     'field' => [
                         'name' => 'tests',
                         'position' => 1,
@@ -81,7 +81,7 @@ trait CreateUpdateSuiteDataProviderTrait
                     SuiteRequest::PARAMETER_TESTS => ['test.yaml', 'test.txt', 'test.yml'],
                 ],
                 'expectedResponseData' => [
-                    'class' => 'invalid_request_field',
+                    'class' => 'bad_request',
                     'field' => [
                         'name' => 'tests',
                         'position' => 2,

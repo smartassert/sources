@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\ArgumentResolver;
 
-use App\Exception\InvalidRequestException;
+use App\Exception\BadRequestException;
 use App\Request\YamlFileRequest;
 use App\RequestField\Field\YamlFilenameField;
 use App\RequestField\Validator\YamlFilenameFieldValidator;
@@ -22,7 +22,7 @@ class YamlFileRequestResolver extends AbstractYamlFileRequestResolver implements
     /**
      * @return YamlFileRequest[]
      *
-     * @throws InvalidRequestException
+     * @throws BadRequestException
      */
     public function resolve(Request $request, ArgumentMetadata $argument): iterable
     {
