@@ -318,11 +318,10 @@ abstract class AbstractUpdateFileSourceTest extends AbstractApplicationTest
 
         $expectedResponseData = [
             'class' => 'modify_read_only',
-            'field' => [
-                'name' => 'id',
-                'value' => $source->getId(),
+            'entity' => [
+                'id' => $source->getId(),
+                'type' => 'file-source',
             ],
-            'type' => 'source',
         ];
 
         self::assertJsonStringEqualsJsonString(

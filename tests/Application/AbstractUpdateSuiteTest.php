@@ -270,11 +270,10 @@ abstract class AbstractUpdateSuiteTest extends AbstractSuiteTest
 
         $expectedResponseData = [
             'class' => 'modify_read_only',
-            'field' => [
-                'name' => 'id',
-                'value' => $suiteId,
+            'entity' => [
+                'id' => $suiteId,
+                'type' => 'suite',
             ],
-            'type' => 'suite',
         ];
 
         self::assertJsonStringEqualsJsonString(
