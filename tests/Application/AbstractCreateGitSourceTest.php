@@ -208,6 +208,7 @@ abstract class AbstractCreateGitSourceTest extends AbstractApplicationTest
                 'name' => 'label',
                 'value' => $conflictCreateParameters['label'],
             ],
+            'duplication_of' => 'entity label',
         ];
 
         self::assertJsonStringEqualsJsonString(
