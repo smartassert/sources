@@ -17,7 +17,7 @@ readonly class YamlFilenameField implements FieldInterface
      */
     public function __construct(
         private string $name,
-        private YamlFilename $value,
+        private string $value,
     ) {
         $this->requirements = new Requirements('yaml_filename');
     }
@@ -28,11 +28,6 @@ readonly class YamlFilenameField implements FieldInterface
     }
 
     public function getValue(): string
-    {
-        return (string) $this->value;
-    }
-
-    public function getFilename(): YamlFilename
     {
         return $this->value;
     }
