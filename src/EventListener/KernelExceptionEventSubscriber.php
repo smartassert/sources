@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\EventListener;
 
-use App\ErrorResponse\ErrorInterface;
-use App\ErrorResponse\Factory;
 use App\ErrorResponse\HasHttpStatusCodeInterface;
 use App\ErrorResponse\SerializableBadRequestErrorInterface;
 use App\ErrorResponse\SerializableDuplicateObjectErrorInterface;
@@ -18,11 +16,6 @@ use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 
 readonly class KernelExceptionEventSubscriber implements EventSubscriberInterface
 {
-    public function __construct(
-        private Factory $errorResponseFactory,
-    ) {
-    }
-
     /**
      * @return array<class-string, array<mixed>>
      */
@@ -62,13 +55,6 @@ readonly class KernelExceptionEventSubscriber implements EventSubscriberInterfac
 
         if ($throwable instanceof SerializableModifyReadOnlyEntityErrorInterface) {
             $event->setResponse(new JsonResponse($throwable, 405));
-            $event->stopPropagation();
-
-            return;
-        }
-
-        if ($throwable instanceof ErrorInterface) {
-            $event->setResponse($this->errorResponseFactory->create($throwable));
             $event->stopPropagation();
 
             return;
