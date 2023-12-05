@@ -8,8 +8,7 @@ use App\ErrorResponse\BadRequestErrorInterface;
 use App\ErrorResponse\ErrorInterface;
 use App\ErrorResponse\Serializer\Component;
 use App\ErrorResponse\Serializer\ComponentFactoryInterface;
-use App\RequestField\RequirementsInterface;
-use App\RequestField\SizeInterface;
+use App\RequestField\SerializableFieldInterface;
 
 class FieldFactory implements ComponentFactoryInterface
 {
@@ -20,32 +19,7 @@ class FieldFactory implements ComponentFactoryInterface
         }
 
         $field = $error->getField();
-        $data = [
-            'name' => $field->getName(),
-            'value' => $field->getValue(),
-        ];
 
-        $errorPosition = $field->getErrorPosition();
-        if (is_int($errorPosition)) {
-            $data['position'] = $errorPosition;
-        }
-
-        $requirements = $error->getField()->getRequirements();
-        if ($requirements instanceof RequirementsInterface) {
-            $requirementsData = [];
-
-            $requirementsData = [
-                'data_type' => $requirements->getDataType(),
-            ];
-
-            $size = $requirements->getSize();
-            if ($size instanceof SizeInterface) {
-                $requirementsData['size'] = ['minimum' => $size->getMinimum(), 'maximum' => $size->getMaximum()];
-            }
-
-            $data['requirements'] = $requirementsData;
-        }
-
-        return new Component('field', $data);
+        return $field instanceof SerializableFieldInterface ? new Component('field', $field->jsonSerialize()) : null;
     }
 }

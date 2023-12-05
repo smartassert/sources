@@ -6,8 +6,10 @@ namespace App\RequestField\Field;
 
 use App\RequestField\FieldInterface;
 use App\RequestField\RequirementsInterface;
+use App\RequestField\SerializableFieldInterface;
+use App\RequestField\SizeInterface;
 
-readonly class Field implements FieldInterface
+readonly class Field implements FieldInterface, SerializableFieldInterface
 {
     /**
      * @param non-empty-string     $name
@@ -44,5 +46,32 @@ readonly class Field implements FieldInterface
     public function withErrorPosition(int $position): FieldInterface
     {
         return new Field($this->name, $this->value, $this->requirements, $position);
+    }
+
+    public function jsonSerialize(): array
+    {
+        $data = [
+            'name' => $this->getName(),
+            'value' => $this->getValue(),
+        ];
+
+        if (null !== $this->errorPosition) {
+            $data['position'] = $this->errorPosition;
+        }
+
+        if ($this->requirements instanceof RequirementsInterface) {
+            $requirementsData = [
+                'data_type' => $this->requirements->getDataType(),
+            ];
+
+            $size = $this->requirements->getSize();
+            if ($size instanceof SizeInterface) {
+                $requirementsData['size'] = ['minimum' => $size->getMinimum(), 'maximum' => $size->getMaximum()];
+            }
+
+            $data['requirements'] = $requirementsData;
+        }
+
+        return $data;
     }
 }
