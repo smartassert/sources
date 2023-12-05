@@ -5,14 +5,12 @@ declare(strict_types=1);
 namespace App\Exception;
 
 use App\Entity\IdentifyingEntityInterface;
-use App\ErrorResponse\ErrorInterface as Error;
-use App\ErrorResponse\HasHttpStatusCodeInterface as HasHttpCode;
 use App\ErrorResponse\SerializableStorageErrorInterface as SerializableStorageError;
 use App\ErrorResponse\StorageErrorInterface as StorageError;
 use League\Flysystem\FilesystemException;
 use League\Flysystem\FilesystemOperationFailed;
 
-class EntityStorageException extends \Exception implements Error, HasHttpCode, StorageError, SerializableStorageError
+class EntityStorageException extends \Exception implements StorageError, SerializableStorageError
 {
     public function __construct(
         private readonly IdentifyingEntityInterface $entity,
