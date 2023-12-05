@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 namespace App\Exception;
 
-use App\ErrorResponse\BadRequestErrorInterface;
+use App\ErrorResponse\BadRequestErrorInterface as BadRequestError;
+use App\ErrorResponse\SerializableDuplicateObjectErrorInterface as SerializableDuplicateObjectError;
 use App\RequestField\FieldInterface;
 
-class DuplicateObjectException extends \Exception implements BadRequestErrorInterface
+class DuplicateObjectException extends \Exception implements BadRequestError, SerializableDuplicateObjectError
 {
     public function __construct(
         private readonly FieldInterface $field,
@@ -28,5 +29,13 @@ class DuplicateObjectException extends \Exception implements BadRequestErrorInte
     public function getType(): ?string
     {
         return null;
+    }
+
+    public function jsonSerialize(): array
+    {
+        return [
+            'class' => $this->getClass(),
+            'field' => $this->field->jsonSerialize(),
+        ];
     }
 }
