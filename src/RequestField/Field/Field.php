@@ -6,10 +6,9 @@ namespace App\RequestField\Field;
 
 use App\RequestField\FieldInterface;
 use App\RequestField\RequirementsInterface;
-use App\RequestField\SerializableFieldInterface;
 use App\RequestField\SizeInterface;
 
-readonly class Field implements FieldInterface, SerializableFieldInterface
+readonly class Field implements FieldInterface
 {
     /**
      * @param non-empty-string     $name

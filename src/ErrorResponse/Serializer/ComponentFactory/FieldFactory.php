@@ -8,7 +8,6 @@ use App\ErrorResponse\BadRequestErrorInterface;
 use App\ErrorResponse\ErrorInterface;
 use App\ErrorResponse\Serializer\Component;
 use App\ErrorResponse\Serializer\ComponentFactoryInterface;
-use App\RequestField\SerializableFieldInterface;
 
 class FieldFactory implements ComponentFactoryInterface
 {
@@ -18,8 +17,6 @@ class FieldFactory implements ComponentFactoryInterface
             return null;
         }
 
-        $field = $error->getField();
-
-        return $field instanceof SerializableFieldInterface ? new Component('field', $field->jsonSerialize()) : null;
+        return new Component('field', $error->getField()->jsonSerialize());
     }
 }

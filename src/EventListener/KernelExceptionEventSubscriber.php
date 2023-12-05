@@ -7,6 +7,7 @@ namespace App\EventListener;
 use App\ErrorResponse\ErrorInterface;
 use App\ErrorResponse\Factory;
 use App\ErrorResponse\HasHttpStatusCodeInterface;
+use App\ErrorResponse\SerializableBadRequestErrorInterface;
 use App\ErrorResponse\SerializableStorageErrorInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -35,22 +36,30 @@ readonly class KernelExceptionEventSubscriber implements EventSubscriberInterfac
     public function onKernelException(ExceptionEvent $event): void
     {
         $throwable = $event->getThrowable();
-        $response = null;
 
-        if ($throwable instanceof HasHttpStatusCodeInterface) {
-            $response = new Response(null, $throwable->getStatusCode());
+        if ($throwable instanceof SerializableStorageErrorInterface) {
+            $event->setResponse(new JsonResponse($throwable, 500));
+            $event->stopPropagation();
+
+            return;
+        }
+
+        if ($throwable instanceof SerializableBadRequestErrorInterface) {
+            $event->setResponse(new JsonResponse($throwable, 400));
+            $event->stopPropagation();
+
+            return;
         }
 
         if ($throwable instanceof ErrorInterface) {
-            $response = $this->errorResponseFactory->create($throwable);
+            $event->setResponse($this->errorResponseFactory->create($throwable));
+            $event->stopPropagation();
+
+            return;
         }
 
-        if ($throwable instanceof SerializableStorageErrorInterface) {
-            $response = new JsonResponse($throwable, 500);
-        }
-
-        if ($response instanceof Response) {
-            $event->setResponse($response);
+        if ($throwable instanceof HasHttpStatusCodeInterface) {
+            $event->setResponse(new Response(null, $throwable->getStatusCode()));
             $event->stopPropagation();
         }
     }

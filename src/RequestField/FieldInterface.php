@@ -4,6 +4,19 @@ declare(strict_types=1);
 
 namespace App\RequestField;
 
+/**
+ * @phpstan-type SerializedField array{
+ *   name: non-empty-string,
+ *   value: scalar|array<scalar>,
+ *   requirements?: array{
+ *     data_type: string,
+ *     size?: array{
+ *       minimum: int,
+ *       maximum: ?int
+ *     }
+ *   }
+ * }
+ */
 interface FieldInterface
 {
     /**
@@ -21,4 +34,9 @@ interface FieldInterface
     public function getErrorPosition(): ?int;
 
     public function withErrorPosition(int $position): FieldInterface;
+
+    /**
+     * @return SerializedField
+     */
+    public function jsonSerialize(): array;
 }
