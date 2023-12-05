@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace App\RequestField\Field;
 
+use App\RequestField\FieldInterface;
 use App\RequestField\RequirementsInterface;
-use App\RequestField\StringFieldInterface;
 
-readonly class StringField extends Field implements StringFieldInterface
+readonly class StringField extends Field implements FieldInterface
 {
     private RequirementsInterface $requirements;
 

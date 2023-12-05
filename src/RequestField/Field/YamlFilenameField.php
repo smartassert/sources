@@ -6,10 +6,9 @@ namespace App\RequestField\Field;
 
 use App\RequestField\FieldInterface;
 use App\RequestField\RequirementsInterface;
-use App\RequestField\StringFieldInterface;
 use SmartAssert\YamlFile\Filename as YamlFilename;
 
-readonly class YamlFilenameField implements StringFieldInterface
+readonly class YamlFilenameField implements FieldInterface
 {
     private RequirementsInterface $requirements;
 
