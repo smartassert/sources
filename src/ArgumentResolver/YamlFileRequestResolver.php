@@ -6,7 +6,7 @@ namespace App\ArgumentResolver;
 
 use App\Exception\BadRequestException;
 use App\Request\YamlFileRequest;
-use App\RequestField\Field\YamlFilenameField;
+use App\RequestField\Field\Factory;
 use App\RequestField\Validator\YamlFilenameFieldValidator;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Controller\ValueResolverInterface;
@@ -16,6 +16,7 @@ class YamlFileRequestResolver extends AbstractYamlFileRequestResolver implements
 {
     public function __construct(
         private readonly YamlFilenameFieldValidator $yamlFilenameFieldValidator,
+        private readonly Factory $fieldFactory,
     ) {
     }
 
@@ -30,11 +31,10 @@ class YamlFileRequestResolver extends AbstractYamlFileRequestResolver implements
             return [];
         }
 
-        $field = new YamlFilenameField(
+        $filename = $this->yamlFilenameFieldValidator->validate($this->fieldFactory->createYamlFilenameField(
             self::KEY_ATTRIBUTE_FILENAME,
             (string) $this->createFilenameFromRequest($request)
-        );
-        $filename = $this->yamlFilenameFieldValidator->validate($field);
+        ));
 
         return [new YamlFileRequest($filename)];
     }

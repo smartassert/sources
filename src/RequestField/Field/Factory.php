@@ -19,4 +19,12 @@ readonly class Factory
     ): FieldInterface {
         return new Field($name, $value, new Requirements('string', new Size($minimumLength, $maximumLength)));
     }
+
+    /**
+     * @param non-empty-string $name
+     */
+    public function createYamlFilenameField(string $name, string $value): FieldInterface
+    {
+        return new Field($name, $value, new Requirements('yaml_filename'));
+    }
 }

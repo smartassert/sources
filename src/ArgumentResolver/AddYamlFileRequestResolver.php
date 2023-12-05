@@ -6,9 +6,9 @@ namespace App\ArgumentResolver;
 
 use App\Exception\BadRequestException;
 use App\Request\AddYamlFileRequest;
+use App\RequestField\Field\Factory;
 use App\RequestField\Field\Field;
 use App\RequestField\Field\Requirements;
-use App\RequestField\Field\YamlFilenameField;
 use App\RequestField\Validator\YamlFieldValidator;
 use App\RequestField\Validator\YamlFilenameFieldValidator;
 use SmartAssert\YamlFile\YamlFile;
@@ -21,6 +21,7 @@ class AddYamlFileRequestResolver extends AbstractYamlFileRequestResolver impleme
     public function __construct(
         private readonly YamlFilenameFieldValidator $yamlFilenameFieldValidator,
         private readonly YamlFieldValidator $yamlFieldValidator,
+        private readonly Factory $fieldFactory,
     ) {
     }
 
@@ -35,7 +36,7 @@ class AddYamlFileRequestResolver extends AbstractYamlFileRequestResolver impleme
             return [];
         }
 
-        $filename = $this->yamlFilenameFieldValidator->validate(new YamlFilenameField(
+        $filename = $this->yamlFilenameFieldValidator->validate($this->fieldFactory->createYamlFilenameField(
             self::KEY_ATTRIBUTE_FILENAME,
             (string) $this->createFilenameFromRequest($request)
         ));
