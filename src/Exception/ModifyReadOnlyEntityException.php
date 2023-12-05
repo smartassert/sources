@@ -6,11 +6,9 @@ namespace App\Exception;
 
 use App\Entity\IdentifyingEntityInterface;
 use App\ErrorResponse\EntityErrorInterface as EntityError;
-use App\ErrorResponse\ErrorInterface as Error;
-use App\ErrorResponse\HasHttpStatusCodeInterface as HasHttpCode;
-use App\ErrorResponse\SerializableModifyReadOnlyEntityErrorInterface as SerializableError;
+use App\ErrorResponse\SerializableModifyReadOnlyEntityErrorInterface as SerializableModifyReadOnlyEntityError;
 
-class ModifyReadOnlyEntityException extends \Exception implements HasHttpCode, Error, EntityError, SerializableError
+class ModifyReadOnlyEntityException extends \Exception implements EntityError, SerializableModifyReadOnlyEntityError
 {
     public function __construct(
         public readonly IdentifyingEntityInterface $entity,

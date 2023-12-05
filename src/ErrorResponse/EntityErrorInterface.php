@@ -6,7 +6,7 @@ namespace App\ErrorResponse;
 
 use App\Entity\IdentifyingEntityInterface;
 
-interface EntityErrorInterface
+interface EntityErrorInterface extends ErrorInterface
 {
     public function getEntity(): IdentifyingEntityInterface;
 }

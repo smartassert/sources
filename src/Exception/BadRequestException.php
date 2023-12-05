@@ -4,15 +4,14 @@ declare(strict_types=1);
 
 namespace App\Exception;
 
-use App\ErrorResponse\BadRequestErrorInterface as BadRequestError;
-use App\ErrorResponse\HasHttpStatusCodeInterface as HasHttpStatusCode;
-use App\ErrorResponse\SerializableBadRequestErrorInterface as SerializableBadRequestError;
+use App\ErrorResponse\BadRequestErrorInterface;
+use App\ErrorResponse\SerializableBadRequestErrorInterface;
 use App\RequestField\FieldInterface;
 
 /**
- * @phpstan-import-type SerializedBadRequestError from SerializableBadRequestError
+ * @phpstan-import-type SerializedBadRequestError from SerializableBadRequestErrorInterface
  */
-class BadRequestException extends \Exception implements HasHttpStatusCode, BadRequestError, SerializableBadRequestError
+class BadRequestException extends \Exception implements BadRequestErrorInterface, SerializableBadRequestErrorInterface
 {
     /**
      * @param non-empty-string $type

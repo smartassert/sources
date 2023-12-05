@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\ErrorResponse;
 
-interface StorageErrorInterface
+interface StorageErrorInterface extends ErrorInterface
 {
     /**
      * @return ?non-empty-string

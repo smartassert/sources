@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\ErrorResponse;
 
-interface SerializableErrorInterface extends \JsonSerializable
+interface SerializableErrorInterface extends \JsonSerializable, HasHttpStatusCodeInterface
 {
     public function getStatusCode(): int;
 
