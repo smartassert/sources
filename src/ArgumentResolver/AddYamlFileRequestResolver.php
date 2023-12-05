@@ -4,9 +4,13 @@ declare(strict_types=1);
 
 namespace App\ArgumentResolver;
 
-use App\Exception\InvalidRequestException;
+use App\Exception\BadRequestException;
 use App\Request\AddYamlFileRequest;
-use App\RequestValidator\AddYamlFileRequestValidator;
+use App\RequestField\Field\Factory;
+use App\RequestField\Field\Field;
+use App\RequestField\Field\Requirements;
+use App\RequestField\Validator\YamlFieldValidator;
+use App\RequestField\Validator\YamlFilenameFieldValidator;
 use SmartAssert\YamlFile\YamlFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Controller\ValueResolverInterface;
@@ -15,14 +19,16 @@ use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 class AddYamlFileRequestResolver extends AbstractYamlFileRequestResolver implements ValueResolverInterface
 {
     public function __construct(
-        private readonly AddYamlFileRequestValidator $requestValidator,
+        private readonly YamlFilenameFieldValidator $yamlFilenameFieldValidator,
+        private readonly YamlFieldValidator $yamlFieldValidator,
+        private readonly Factory $fieldFactory,
     ) {
     }
 
     /**
      * @return AddYamlFileRequest[]
      *
-     * @throws InvalidRequestException
+     * @throws BadRequestException
      */
     public function resolve(Request $request, ArgumentMetadata $argument): iterable
     {
@@ -30,15 +36,19 @@ class AddYamlFileRequestResolver extends AbstractYamlFileRequestResolver impleme
             return [];
         }
 
-        $addYamlFileRequest = new AddYamlFileRequest(
-            new YamlFile(
-                $this->createFilenameFromRequest($request),
-                trim($request->getContent())
-            )
+        $filename = $this->yamlFilenameFieldValidator->validate($this->fieldFactory->createYamlFilenameField(
+            self::KEY_ATTRIBUTE_FILENAME,
+            (string) $this->createFilenameFromRequest($request)
+        ));
+
+        $contentField = new Field(
+            'content',
+            trim($request->getContent()),
+            new Requirements('yaml')
         );
 
-        $this->requestValidator->validate($addYamlFileRequest);
+        $content = $this->yamlFieldValidator->validate($contentField);
 
-        return [$addYamlFileRequest];
+        return [new AddYamlFileRequest(new YamlFile($filename, $content))];
     }
 }

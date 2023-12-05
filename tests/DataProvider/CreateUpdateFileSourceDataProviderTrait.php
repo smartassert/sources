@@ -20,14 +20,19 @@ trait CreateUpdateFileSourceDataProviderTrait
             'missing label' => [
                 'requestParameters' => [],
                 'expectedResponseData' => [
-                    'error' => [
-                        'type' => 'invalid_request',
-                        'payload' => [
-                            'name' => 'label',
-                            'value' => '',
-                            'message' => 'This value should be between 1 and 255 characters long.',
+                    'class' => 'bad_request',
+                    'field' => [
+                        'name' => 'label',
+                        'value' => '',
+                        'requirements' => [
+                            'data_type' => 'string',
+                            'size' => [
+                                'minimum' => 1,
+                                'maximum' => 255,
+                            ]
                         ],
                     ],
+                    'type' => 'empty',
                 ],
             ],
             'label length exceeds length limit' => [
@@ -35,14 +40,19 @@ trait CreateUpdateFileSourceDataProviderTrait
                     FileSourceRequest::PARAMETER_LABEL => $labelTooLong,
                 ],
                 'expectedResponseData' => [
-                    'error' => [
-                        'type' => 'invalid_request',
-                        'payload' => [
-                            'name' => 'label',
-                            'value' => $labelTooLong,
-                            'message' => 'This value should be between 1 and 255 characters long.',
+                    'class' => 'bad_request',
+                    'field' => [
+                        'name' => 'label',
+                        'value' => $labelTooLong,
+                        'requirements' => [
+                            'data_type' => 'string',
+                            'size' => [
+                                'minimum' => 1,
+                                'maximum' => 255,
+                            ]
                         ],
                     ],
+                    'type' => 'too_large',
                 ],
             ],
         ];

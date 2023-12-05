@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Services\Source;
 
 use App\Entity\FileSource;
-use App\Exception\DuplicateEntityLabelException;
+use App\Exception\DuplicateObjectException;
 use App\Exception\EmptyEntityIdException;
 use App\Request\FileSourceRequest;
 use App\Services\EntityIdFactory;
@@ -21,7 +21,7 @@ class FileSourceFactory
 
     /**
      * @throws EmptyEntityIdException
-     * @throws DuplicateEntityLabelException
+     * @throws DuplicateObjectException
      */
     public function create(User $user, FileSourceRequest $request): FileSource
     {

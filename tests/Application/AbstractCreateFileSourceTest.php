@@ -29,7 +29,13 @@ abstract class AbstractCreateFileSourceTest extends AbstractApplicationTest
             $requestParameters
         );
 
-        $this->responseAsserter->assertInvalidRequestJsonResponse($response, $expectedResponseData);
+        self::assertSame(400, $response->getStatusCode());
+        self::assertSame('application/json', $response->getHeaderLine('content-type'));
+
+        self::assertJsonStringEqualsJsonString(
+            (string) json_encode($expectedResponseData),
+            $response->getBody()->getContents(),
+        );
     }
 
     /**
@@ -174,18 +180,17 @@ abstract class AbstractCreateFileSourceTest extends AbstractApplicationTest
             $conflictCreateParameters
         );
 
-        $this->responseAsserter->assertInvalidRequestJsonResponse(
-            $secondRequestResponse,
-            [
-                'error' => [
-                    'type' => 'invalid_request',
-                    'payload' => [
-                        'name' => 'label',
-                        'value' => $label,
-                        'message' => 'This label is being used by another source belonging to this user',
-                    ],
-                ],
-            ]
+        $expectedResponseData = [
+            'class' => 'duplicate',
+            'field' => [
+                'name' => 'label',
+                'value' => $conflictCreateParameters['label'],
+            ],
+        ];
+
+        self::assertJsonStringEqualsJsonString(
+            (string) json_encode($expectedResponseData),
+            $secondRequestResponse->getBody()->getContents(),
         );
     }
 

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use App\Entity\Suite;
-use App\Exception\DuplicateEntityLabelException;
+use App\Exception\DuplicateObjectException;
 use App\Exception\EmptyEntityIdException;
 use App\Exception\ModifyReadOnlyEntityException;
 use App\Repository\SuiteRepository;
@@ -28,7 +28,7 @@ readonly class SuiteController
 
     /**
      * @throws EmptyEntityIdException
-     * @throws DuplicateEntityLabelException
+     * @throws DuplicateObjectException
      */
     #[Route(SuiteRoutes::ROUTE_SUITE_BASE, name: 'suite_create', methods: ['POST'])]
     public function create(SuiteRequest $request): Response
@@ -52,13 +52,13 @@ readonly class SuiteController
 
     /**
      * @throws ModifyReadOnlyEntityException
-     * @throws DuplicateEntityLabelException
+     * @throws DuplicateObjectException
      */
     #[Route(SuiteRoutes::ROUTE_SUITE, name: 'suite_update', methods: ['PUT'])]
     public function update(Suite $suite, SuiteRequest $request): Response
     {
         if (null !== $suite->getDeletedAt()) {
-            throw new ModifyReadOnlyEntityException($suite->id, 'suite');
+            throw new ModifyReadOnlyEntityException($suite);
         }
 
         return new JsonResponse($this->mutator->update($suite, $request));
