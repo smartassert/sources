@@ -27,7 +27,7 @@ class StringFieldValidator
             $sizeRequirements = $requirements->getSize();
 
             if ($sizeRequirements instanceof SizeInterface) {
-                if (mb_strlen($value) > $sizeRequirements->getMaximum()) {
+                if (is_string($value) && mb_strlen($value) > $sizeRequirements->getMaximum()) {
                     throw new BadRequestException($field, 'too_large');
                 }
             }
