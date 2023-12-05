@@ -33,15 +33,15 @@ class EntityStorageException extends \Exception implements Error, HasHttpCode, S
     }
 
     /**
-     * @return non-empty-string
+     * @return ?non-empty-string
      */
-    public function getType(): string
+    public function getType(): ?string
     {
-        $operationType = 'unknown';
+        $operationType = null;
         if ($this->filesystemException instanceof FilesystemOperationFailed) {
             $operationType = strtolower($this->filesystemException->operation());
             if ('' === $operationType) {
-                $operationType = 'unknown';
+                $operationType = null;
             }
         }
 
