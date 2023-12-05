@@ -6,10 +6,11 @@ namespace App\Exception;
 
 use App\Entity\IdentifyingEntityInterface;
 use App\ErrorResponse\EntityErrorInterface as EntityError;
-use App\ErrorResponse\ErrorInterface;
-use App\ErrorResponse\HasHttpStatusCodeInterface as HasHttpStatusCode;
+use App\ErrorResponse\ErrorInterface as Error;
+use App\ErrorResponse\HasHttpStatusCodeInterface as HasHttpCode;
+use App\ErrorResponse\SerializableModifyReadOnlyEntityErrorInterface as SerializableError;
 
-class ModifyReadOnlyEntityException extends \Exception implements HasHttpStatusCode, ErrorInterface, EntityError
+class ModifyReadOnlyEntityException extends \Exception implements HasHttpCode, Error, EntityError, SerializableError
 {
     public function __construct(
         public readonly IdentifyingEntityInterface $entity,
@@ -39,5 +40,16 @@ class ModifyReadOnlyEntityException extends \Exception implements HasHttpStatusC
     public function getEntity(): IdentifyingEntityInterface
     {
         return $this->entity;
+    }
+
+    public function jsonSerialize(): array
+    {
+        return [
+            'class' => $this->getClass(),
+            'entity' => [
+                'id' => $this->entity->getId(),
+                'type' => $this->entity->getEntityType()->value,
+            ],
+        ];
     }
 }
