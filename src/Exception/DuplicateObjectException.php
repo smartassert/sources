@@ -38,4 +38,9 @@ class DuplicateObjectException extends \Exception implements BadRequestError, Se
             'field' => $this->field->jsonSerialize(),
         ];
     }
+
+    public function getStatusCode(): int
+    {
+        return 400;
+    }
 }

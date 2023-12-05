@@ -15,7 +15,7 @@ use App\RequestField\FieldInterface;
  *   field: SerializedField,
  * }
  */
-interface SerializableBadRequestErrorInterface extends \JsonSerializable
+interface SerializableBadRequestErrorInterface extends SerializableErrorInterface
 {
     /**
      * @return SerializedBadRequestError
