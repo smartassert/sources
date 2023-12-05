@@ -47,11 +47,17 @@ class EntityStorageException extends \Exception implements Error, HasHttpCode, S
         return 500;
     }
 
+    /**
+     * @return ?non-empty-string
+     */
     public function getLocation(): ?string
     {
         $location = null;
         if (method_exists($this->filesystemException, 'location')) {
-            $location = $this->filesystemException->location();
+            $location = trim($this->filesystemException->location());
+            if ('' === $location) {
+                $location = null;
+            }
         }
 
         return $location;
