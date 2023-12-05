@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\RequestField\Validator;
 
 use App\Exception\BadRequestException;
-use App\RequestField\Field\YamlFilenameCollectionField;
+use App\RequestField\FieldInterface;
 use SmartAssert\YamlFile\Filename;
 use SmartAssert\YamlFile\Validator\YamlFilenameValidator;
 
@@ -21,20 +21,26 @@ readonly class YamlFilenameCollectionFieldValidator
      *
      * @throws BadRequestException
      */
-    public function validate(YamlFilenameCollectionField $field): array
+    public function validate(FieldInterface $field): array
     {
         $names = $field->getValue();
+        if (!is_array($names)) {
+            throw new BadRequestException($field, 'wrong_type');
+        }
+
         $validatedNames = [];
 
         foreach ($names as $nameIndex => $name) {
-            $validation = $this->yamlFilenameValidator->validate(Filename::parse($name));
+            if (is_string($name)) {
+                $validation = $this->yamlFilenameValidator->validate(Filename::parse($name));
 
-            if ($validation->isValid() && '' !== $name) {
-                $validatedNames[] = $name;
-            } else {
-                $field = $field->withErrorPosition($nameIndex + 1);
+                if ($validation->isValid() && '' !== $name) {
+                    $validatedNames[] = $name;
+                } else {
+                    $field = $field->withErrorPosition($nameIndex + 1);
 
-                throw new BadRequestException($field, 'invalid');
+                    throw new BadRequestException($field, 'invalid');
+                }
             }
         }
 

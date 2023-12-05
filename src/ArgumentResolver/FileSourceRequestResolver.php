@@ -7,7 +7,7 @@ namespace App\ArgumentResolver;
 use App\Entity\AbstractSource;
 use App\Exception\BadRequestException;
 use App\Request\FileSourceRequest;
-use App\RequestField\Field\StringField;
+use App\RequestField\Field\Factory;
 use App\RequestField\Validator\StringFieldValidator;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Controller\ValueResolverInterface;
@@ -17,6 +17,7 @@ readonly class FileSourceRequestResolver implements ValueResolverInterface
 {
     public function __construct(
         private StringFieldValidator $fieldValidator,
+        private Factory $fieldFactory,
     ) {
     }
 
@@ -31,7 +32,7 @@ readonly class FileSourceRequestResolver implements ValueResolverInterface
             return [];
         }
 
-        $label = $this->fieldValidator->validateNonEmptyString(new StringField(
+        $label = $this->fieldValidator->validateNonEmptyString($this->fieldFactory->createStringField(
             FileSourceRequest::PARAMETER_LABEL,
             trim($request->request->getString(FileSourceRequest::PARAMETER_LABEL)),
             1,

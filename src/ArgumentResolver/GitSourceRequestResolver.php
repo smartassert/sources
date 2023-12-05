@@ -8,7 +8,7 @@ use App\Entity\AbstractSource;
 use App\Entity\GitSource;
 use App\Exception\BadRequestException;
 use App\Request\GitSourceRequest;
-use App\RequestField\Field\StringField;
+use App\RequestField\Field\Factory;
 use App\RequestField\Validator\StringFieldValidator;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Controller\ValueResolverInterface;
@@ -18,6 +18,7 @@ readonly class GitSourceRequestResolver implements ValueResolverInterface
 {
     public function __construct(
         private StringFieldValidator $fieldValidator,
+        private Factory $fieldFactory,
     ) {
     }
 
@@ -32,28 +33,28 @@ readonly class GitSourceRequestResolver implements ValueResolverInterface
             return [];
         }
 
-        $label = $this->fieldValidator->validateNonEmptyString(new StringField(
+        $label = $this->fieldValidator->validateNonEmptyString($this->fieldFactory->createStringField(
             GitSourceRequest::PARAMETER_LABEL,
             trim($request->request->getString(GitSourceRequest::PARAMETER_LABEL)),
             1,
             AbstractSource::LABEL_MAX_LENGTH,
         ));
 
-        $hostUrl = $this->fieldValidator->validateNonEmptyString(new StringField(
+        $hostUrl = $this->fieldValidator->validateNonEmptyString($this->fieldFactory->createStringField(
             GitSourceRequest::PARAMETER_HOST_URL,
             trim($request->request->getString(GitSourceRequest::PARAMETER_HOST_URL)),
             1,
             GitSource::HOST_URL_MAX_LENGTH,
         ));
 
-        $path = $this->fieldValidator->validateNonEmptyString(new StringField(
+        $path = $this->fieldValidator->validateNonEmptyString($this->fieldFactory->createStringField(
             GitSourceRequest::PARAMETER_PATH,
             trim($request->request->getString(GitSourceRequest::PARAMETER_PATH)),
             1,
             GitSource::PATH_MAX_LENGTH,
         ));
 
-        $credentials = $this->fieldValidator->validateString(new StringField(
+        $credentials = $this->fieldValidator->validateString($this->fieldFactory->createStringField(
             GitSourceRequest::PARAMETER_CREDENTIALS,
             trim($request->request->getString(GitSourceRequest::PARAMETER_CREDENTIALS)),
             0,

@@ -10,8 +10,7 @@ use App\Exception\BadRequestException;
 use App\Exception\EntityNotFoundException;
 use App\Repository\SourceRepository;
 use App\Request\SuiteRequest;
-use App\RequestField\Field\StringField;
-use App\RequestField\Field\YamlFilenameCollectionField;
+use App\RequestField\Field\Factory;
 use App\RequestField\Validator\StringFieldValidator;
 use App\RequestField\Validator\YamlFilenameCollectionFieldValidator;
 use App\Security\EntityAccessChecker;
@@ -27,6 +26,7 @@ readonly class SuiteRequestResolver implements ValueResolverInterface
         private EntityAccessChecker $entityAccessChecker,
         private StringFieldValidator $fieldValidator,
         private YamlFilenameCollectionFieldValidator $yamlFilenameCollectionFieldValidator,
+        private Factory $fieldFactory,
     ) {
     }
 
@@ -73,7 +73,7 @@ readonly class SuiteRequestResolver implements ValueResolverInterface
      */
     private function getLabel(Request $request): string
     {
-        return $this->fieldValidator->validateNonEmptyString(new StringField(
+        return $this->fieldValidator->validateNonEmptyString($this->fieldFactory->createStringField(
             SuiteRequest::PARAMETER_LABEL,
             trim($request->request->getString(SuiteRequest::PARAMETER_LABEL)),
             1,
@@ -88,16 +88,19 @@ readonly class SuiteRequestResolver implements ValueResolverInterface
      */
     private function getTests(Request $request): array
     {
-        $requestTests = $request->request->all(SuiteRequest::PARAMETER_TESTS);
-        $stringRequestTests = [];
+        $tests = $request->request->all(SuiteRequest::PARAMETER_TESTS);
+        $filteredTests = [];
 
-        foreach ($requestTests as $requestTest) {
+        foreach ($tests as $requestTest) {
             if (is_string($requestTest) && '' !== $requestTest) {
-                $stringRequestTests[] = $requestTest;
+                $filteredTests[] = $requestTest;
             }
         }
 
-        $testsField = new YamlFilenameCollectionField(SuiteRequest::PARAMETER_TESTS, $stringRequestTests);
+        $testsField = $this->fieldFactory->createYamlFilenameCollectionField(
+            SuiteRequest::PARAMETER_TESTS,
+            $filteredTests
+        );
 
         return $this->yamlFilenameCollectionFieldValidator->validate($testsField);
     }
