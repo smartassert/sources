@@ -5,18 +5,22 @@ declare(strict_types=1);
 namespace App\RequestField\Validator;
 
 use App\Exception\BadRequestException;
+use App\RequestField\FieldInterface;
 use App\RequestField\RequirementsInterface;
 use App\RequestField\SizeInterface;
-use App\RequestField\StringFieldInterface;
 
 class StringFieldValidator
 {
     /**
      * @throws BadRequestException
      */
-    public function validateString(StringFieldInterface $field): string
+    public function validateString(FieldInterface $field): string
     {
         $value = $field->getValue();
+        if (!is_string($value)) {
+            throw new BadRequestException($field, 'wrong_type');
+        }
+
         $requirements = $field->getRequirements();
 
         if ($requirements instanceof RequirementsInterface) {
@@ -37,7 +41,7 @@ class StringFieldValidator
      *
      * @throws BadRequestException
      */
-    public function validateNonEmptyString(StringFieldInterface $field): string
+    public function validateNonEmptyString(FieldInterface $field): string
     {
         $value = $this->validateString($field);
 
