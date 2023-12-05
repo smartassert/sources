@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\RequestField\Validator;
 
 use App\Exception\BadRequestException;
-use App\RequestField\Field\Field;
+use App\RequestField\FieldInterface;
 use SmartAssert\YamlFile\Validator\ContentValidator;
 
 readonly class YamlFieldValidator
@@ -20,9 +20,13 @@ readonly class YamlFieldValidator
      *
      * @throws BadRequestException
      */
-    public function validate(Field $field): string
+    public function validate(FieldInterface $field): string
     {
         $content = $field->getValue();
+        if (!is_string($content)) {
+            throw new BadRequestException($field, 'wrong_type');
+        }
+
         if ('' === $content) {
             throw new BadRequestException($field, 'empty');
         }
