@@ -11,7 +11,6 @@ use App\Exception\EntityNotFoundException;
 use App\Repository\SourceRepository;
 use App\Request\SuiteRequest;
 use App\RequestField\Field\Factory;
-use App\RequestField\Field\YamlFilenameCollectionField;
 use App\RequestField\Validator\StringFieldValidator;
 use App\RequestField\Validator\YamlFilenameCollectionFieldValidator;
 use App\Security\EntityAccessChecker;
@@ -89,16 +88,19 @@ readonly class SuiteRequestResolver implements ValueResolverInterface
      */
     private function getTests(Request $request): array
     {
-        $requestTests = $request->request->all(SuiteRequest::PARAMETER_TESTS);
-        $stringRequestTests = [];
+        $tests = $request->request->all(SuiteRequest::PARAMETER_TESTS);
+        $filteredTests = [];
 
-        foreach ($requestTests as $requestTest) {
+        foreach ($tests as $requestTest) {
             if (is_string($requestTest) && '' !== $requestTest) {
-                $stringRequestTests[] = $requestTest;
+                $filteredTests[] = $requestTest;
             }
         }
 
-        $testsField = new YamlFilenameCollectionField(SuiteRequest::PARAMETER_TESTS, $stringRequestTests);
+        $testsField = $this->fieldFactory->createYamlFilenameCollectionField(
+            SuiteRequest::PARAMETER_TESTS,
+            $filteredTests
+        );
 
         return $this->yamlFilenameCollectionFieldValidator->validate($testsField);
     }

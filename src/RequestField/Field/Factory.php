@@ -27,4 +27,13 @@ readonly class Factory
     {
         return new Field($name, $value, new Requirements('yaml_filename'));
     }
+
+    /**
+     * @param non-empty-string $name
+     * @param string[]         $value
+     */
+    public function createYamlFilenameCollectionField(string $name, array $value): FieldInterface
+    {
+        return new Field($name, $value, new Requirements('yaml_filename_collection'));
+    }
 }
