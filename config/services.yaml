@@ -31,9 +31,6 @@ services:
         App\Services\SerializeSuiteExceptionFactory\ExceptionHandlerInterface:
             tags: ['app.foo']
 
-        App\ErrorResponse\Serializer\ComponentFactoryInterface:
-            tags: ['app.error_response_serializer.component_factory']
-
     # makes classes in src/ available to be used as services
     # this creates a service per class whose id is the fully-qualified class name
     App\:
@@ -129,7 +126,3 @@ services:
     App\Services\SerializeSuiteExceptionFactory\SerializeSuiteExceptionFactory:
         arguments:
             $handlers: !tagged_iterator 'app.foo'
-
-    App\ErrorResponse\Serializer\Serializer:
-        arguments:
-            $componentFactories: !tagged_iterator 'app.error_response_serializer.component_factory'
