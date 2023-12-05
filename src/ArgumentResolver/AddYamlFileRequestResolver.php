@@ -37,7 +37,7 @@ class AddYamlFileRequestResolver extends AbstractYamlFileRequestResolver impleme
 
         $filename = $this->yamlFilenameFieldValidator->validate(new YamlFilenameField(
             self::KEY_ATTRIBUTE_FILENAME,
-            $this->createFilenameFromRequest($request)
+            (string) $this->createFilenameFromRequest($request)
         ));
 
         $contentField = new Field(

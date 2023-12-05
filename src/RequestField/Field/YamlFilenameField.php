@@ -6,7 +6,6 @@ namespace App\RequestField\Field;
 
 use App\RequestField\FieldInterface;
 use App\RequestField\RequirementsInterface;
-use SmartAssert\YamlFile\Filename as YamlFilename;
 
 readonly class YamlFilenameField implements FieldInterface
 {
@@ -17,7 +16,7 @@ readonly class YamlFilenameField implements FieldInterface
      */
     public function __construct(
         private string $name,
-        private YamlFilename $value,
+        private string $value,
     ) {
         $this->requirements = new Requirements('yaml_filename');
     }
@@ -28,11 +27,6 @@ readonly class YamlFilenameField implements FieldInterface
     }
 
     public function getValue(): string
-    {
-        return (string) $this->value;
-    }
-
-    public function getFilename(): YamlFilename
     {
         return $this->value;
     }
