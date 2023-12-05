@@ -7,6 +7,4 @@ namespace App\RequestField;
 interface StringFieldInterface extends FieldInterface
 {
     public function getValue(): string;
-
-    public function getRequirements(): RequirementsInterface;
 }

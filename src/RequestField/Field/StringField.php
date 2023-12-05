@@ -4,11 +4,12 @@ declare(strict_types=1);
 
 namespace App\RequestField\Field;
 
+use App\RequestField\RequirementsInterface;
 use App\RequestField\StringFieldInterface;
 
 readonly class StringField extends Field implements StringFieldInterface
 {
-    private StringRequirements $requirements;
+    private RequirementsInterface $requirements;
 
     /**
      * @param non-empty-string $name
@@ -19,13 +20,8 @@ readonly class StringField extends Field implements StringFieldInterface
         int $minimumLength,
         int $maximumLength,
     ) {
-        $this->requirements = new StringRequirements(new Size($minimumLength, $maximumLength));
+        $this->requirements = new Requirements('string', new Size($minimumLength, $maximumLength));
 
         parent::__construct($name, $value, $this->requirements);
-    }
-
-    public function getRequirements(): StringRequirements
-    {
-        return $this->requirements;
     }
 }

@@ -10,7 +10,6 @@ use App\ErrorResponse\Serializer\Component;
 use App\ErrorResponse\Serializer\ComponentFactoryInterface;
 use App\RequestField\CollectionFieldInterface;
 use App\RequestField\RequirementsInterface;
-use App\RequestField\ScalarRequirementsInterface;
 use App\RequestField\SizeInterface;
 
 class FieldFactory implements ComponentFactoryInterface
@@ -39,11 +38,9 @@ class FieldFactory implements ComponentFactoryInterface
                 'data_type' => $requirements->getDataType(),
             ];
 
-            if ($requirements instanceof ScalarRequirementsInterface) {
-                $size = $requirements->getSize();
-                if ($size instanceof SizeInterface) {
-                    $requirementsData['size'] = ['minimum' => $size->getMinimum(), 'maximum' => $size->getMaximum()];
-                }
+            $size = $requirements->getSize();
+            if ($size instanceof SizeInterface) {
+                $requirementsData['size'] = ['minimum' => $size->getMinimum(), 'maximum' => $size->getMaximum()];
             }
 
             $data['requirements'] = $requirementsData;
