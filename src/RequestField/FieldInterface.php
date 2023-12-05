@@ -11,6 +11,9 @@ interface FieldInterface
      */
     public function getName(): string;
 
+    /**
+     * @return array<scalar>|scalar
+     */
     public function getValue(): mixed;
 
     public function getRequirements(): ?RequirementsInterface;
