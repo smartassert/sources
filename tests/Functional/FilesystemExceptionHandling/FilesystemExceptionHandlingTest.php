@@ -316,6 +316,7 @@ class FilesystemExceptionHandlingTest extends WebTestCase
                 'expectedResponseDataCreator' => function (IdentifyingEntity $entity) {
                     return [
                         'class' => 'storage',
+                        'type' => null,
                         'location' => null,
                         'object_type' => 'entity',
                         'context' => [
