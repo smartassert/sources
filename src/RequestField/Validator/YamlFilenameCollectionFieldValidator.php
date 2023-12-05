@@ -32,7 +32,7 @@ readonly class YamlFilenameCollectionFieldValidator
             if ($validation->isValid() && '' !== $name) {
                 $validatedNames[] = $name;
             } else {
-                $field->setErrorPosition($nameIndex + 1);
+                $field = $field->withErrorPosition($nameIndex + 1);
 
                 throw new BadRequestException($field, 'invalid');
             }

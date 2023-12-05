@@ -8,7 +8,6 @@ use App\ErrorResponse\BadRequestErrorInterface;
 use App\ErrorResponse\ErrorInterface;
 use App\ErrorResponse\Serializer\Component;
 use App\ErrorResponse\Serializer\ComponentFactoryInterface;
-use App\RequestField\CollectionFieldInterface;
 use App\RequestField\RequirementsInterface;
 use App\RequestField\SizeInterface;
 
@@ -26,8 +25,9 @@ class FieldFactory implements ComponentFactoryInterface
             'value' => $field->getValue(),
         ];
 
-        if ($field instanceof CollectionFieldInterface) {
-            $data['position'] = $field->getErrorPosition();
+        $errorPosition = $field->getErrorPosition();
+        if (is_int($errorPosition)) {
+            $data['position'] = $errorPosition;
         }
 
         $requirements = $error->getField()->getRequirements();
