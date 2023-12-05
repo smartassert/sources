@@ -4,11 +4,15 @@ declare(strict_types=1);
 
 namespace App\Exception;
 
-use App\ErrorResponse\BadRequestErrorInterface;
-use App\ErrorResponse\HasHttpStatusCodeInterface;
+use App\ErrorResponse\BadRequestErrorInterface as BadRequestError;
+use App\ErrorResponse\HasHttpStatusCodeInterface as HasHttpStatusCode;
+use App\ErrorResponse\SerializableBadRequestErrorInterface as SerializableBadRequestError;
 use App\RequestField\FieldInterface;
 
-class BadRequestException extends \Exception implements HasHttpStatusCodeInterface, BadRequestErrorInterface
+/**
+ * @phpstan-import-type SerializedBadRequestError from SerializableBadRequestError
+ */
+class BadRequestException extends \Exception implements HasHttpStatusCode, BadRequestError, SerializableBadRequestError
 {
     /**
      * @param non-empty-string $type
@@ -32,6 +36,9 @@ class BadRequestException extends \Exception implements HasHttpStatusCodeInterfa
         return $this->field;
     }
 
+    /**
+     * @return non-empty-string
+     */
     public function getType(): string
     {
         return $this->type;
@@ -40,5 +47,17 @@ class BadRequestException extends \Exception implements HasHttpStatusCodeInterfa
     public function getStatusCode(): int
     {
         return $this->getCode();
+    }
+
+    /**
+     * @return SerializedBadRequestError
+     */
+    public function jsonSerialize(): array
+    {
+        return [
+            'class' => $this->getClass(),
+            'type' => $this->getType(),
+            'field' => $this->field->jsonSerialize(),
+        ];
     }
 }
