@@ -11,16 +11,13 @@ use App\RequestField\FieldInterface;
 class BadRequestException extends \Exception implements HasHttpStatusCodeInterface, BadRequestErrorInterface
 {
     /**
-     * @param ?non-empty-string $type
+     * @param non-empty-string $type
      */
     public function __construct(
         private readonly FieldInterface $field,
-        private readonly ?string $type,
+        private readonly string $type,
     ) {
-        $message = 'bad_request: ' . $field->getName();
-        if (is_string($type)) {
-            $message .= ' ' . $type;
-        }
+        $message = 'bad_request: ' . $field->getName() . ' ' . $this->type;
 
         parent::__construct($message, 400);
     }
@@ -35,7 +32,7 @@ class BadRequestException extends \Exception implements HasHttpStatusCodeInterfa
         return $this->field;
     }
 
-    public function getType(): ?string
+    public function getType(): string
     {
         return $this->type;
     }
