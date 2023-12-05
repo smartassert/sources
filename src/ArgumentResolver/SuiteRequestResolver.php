@@ -10,7 +10,7 @@ use App\Exception\BadRequestException;
 use App\Exception\EntityNotFoundException;
 use App\Repository\SourceRepository;
 use App\Request\SuiteRequest;
-use App\RequestField\Field\StringField;
+use App\RequestField\Field\Factory;
 use App\RequestField\Field\YamlFilenameCollectionField;
 use App\RequestField\Validator\StringFieldValidator;
 use App\RequestField\Validator\YamlFilenameCollectionFieldValidator;
@@ -27,6 +27,7 @@ readonly class SuiteRequestResolver implements ValueResolverInterface
         private EntityAccessChecker $entityAccessChecker,
         private StringFieldValidator $fieldValidator,
         private YamlFilenameCollectionFieldValidator $yamlFilenameCollectionFieldValidator,
+        private Factory $fieldFactory,
     ) {
     }
 
@@ -73,7 +74,7 @@ readonly class SuiteRequestResolver implements ValueResolverInterface
      */
     private function getLabel(Request $request): string
     {
-        return $this->fieldValidator->validateNonEmptyString(new StringField(
+        return $this->fieldValidator->validateNonEmptyString($this->fieldFactory->createStringField(
             SuiteRequest::PARAMETER_LABEL,
             trim($request->request->getString(SuiteRequest::PARAMETER_LABEL)),
             1,
