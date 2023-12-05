@@ -10,4 +10,6 @@ interface RequirementsInterface
      * @return non-empty-string
      */
     public function getDataType(): string;
+
+    public function getSize(): ?SizeInterface;
 }

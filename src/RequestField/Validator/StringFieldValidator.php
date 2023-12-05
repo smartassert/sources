@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\RequestField\Validator;
 
 use App\Exception\BadRequestException;
-use App\RequestField\ScalarRequirementsInterface;
+use App\RequestField\RequirementsInterface;
 use App\RequestField\SizeInterface;
 use App\RequestField\StringFieldInterface;
 
@@ -18,7 +18,8 @@ class StringFieldValidator
     {
         $value = $field->getValue();
         $requirements = $field->getRequirements();
-        if ($requirements instanceof ScalarRequirementsInterface) {
+
+        if ($requirements instanceof RequirementsInterface) {
             $sizeRequirements = $requirements->getSize();
 
             if ($sizeRequirements instanceof SizeInterface) {
