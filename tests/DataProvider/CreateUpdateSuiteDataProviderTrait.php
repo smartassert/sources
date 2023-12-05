@@ -24,15 +24,15 @@ trait CreateUpdateSuiteDataProviderTrait
                     'field' => [
                         'name' => 'label',
                         'value' => '',
+                        'requirements' => [
+                            'data_type' => 'string',
+                            'size' => [
+                                'minimum' => 1,
+                                'maximum' => 255,
+                            ]
+                        ],
                     ],
                     'type' => 'empty',
-                    'requirements' => [
-                        'data_type' => 'string',
-                        'size' => [
-                            'minimum' => 1,
-                            'maximum' => 255,
-                        ]
-                    ],
                 ],
             ],
             'label length exceeds length limit' => [
@@ -44,15 +44,15 @@ trait CreateUpdateSuiteDataProviderTrait
                     'field' => [
                         'name' => 'label',
                         'value' => $labelTooLong,
+                        'requirements' => [
+                            'data_type' => 'string',
+                            'size' => [
+                                'minimum' => 1,
+                                'maximum' => 255,
+                            ]
+                        ],
                     ],
                     'type' => 'too_large',
-                    'requirements' => [
-                        'data_type' => 'string',
-                        'size' => [
-                            'minimum' => 1,
-                            'maximum' => 255,
-                        ]
-                    ],
                 ],
             ],
             'invalid yaml filename within singular tests collection' => [
@@ -68,11 +68,11 @@ trait CreateUpdateSuiteDataProviderTrait
                         'value' => [
                             'test.txt',
                         ],
+                        'requirements' => [
+                            'data_type' => 'yaml_filename_collection'
+                        ],
                     ],
                     'type' => 'invalid',
-                    'requirements' => [
-                        'data_type' => 'yaml_filename_collection'
-                    ],
                 ],
             ],
             'invalid yaml filename within tests collection' => [
@@ -90,11 +90,11 @@ trait CreateUpdateSuiteDataProviderTrait
                             'test.txt',
                             'test.yml',
                         ],
+                        'requirements' => [
+                            'data_type' => 'yaml_filename_collection'
+                        ],
                     ],
                     'type' => 'invalid',
-                    'requirements' => [
-                        'data_type' => 'yaml_filename_collection'
-                    ],
                 ],
             ],
         ];
