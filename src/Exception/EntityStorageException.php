@@ -7,11 +7,12 @@ namespace App\Exception;
 use App\Entity\IdentifyingEntityInterface;
 use App\ErrorResponse\ErrorInterface as Error;
 use App\ErrorResponse\HasHttpStatusCodeInterface as HasHttpCode;
-use App\ErrorResponse\StorageErrorInterface;
+use App\ErrorResponse\SerializableStorageErrorInterface as SerializableStorageError;
+use App\ErrorResponse\StorageErrorInterface as StorageError;
 use League\Flysystem\FilesystemException;
 use League\Flysystem\FilesystemOperationFailed;
 
-class EntityStorageException extends \Exception implements Error, HasHttpCode, StorageErrorInterface
+class EntityStorageException extends \Exception implements Error, HasHttpCode, StorageError, SerializableStorageError
 {
     public function __construct(
         private readonly IdentifyingEntityInterface $entity,
@@ -79,6 +80,17 @@ class EntityStorageException extends \Exception implements Error, HasHttpCode, S
         return [
             'id' => $this->entity->getId(),
             'type' => $this->entity->getEntityType()->value,
+        ];
+    }
+
+    public function jsonSerialize(): array
+    {
+        return [
+            'class' => $this->getClass(),
+            'type' => $this->getType(),
+            'location' => $this->getLocation(),
+            'object_type' => $this->getObjectType(),
+            'context' => $this->getContext(),
         ];
     }
 }
