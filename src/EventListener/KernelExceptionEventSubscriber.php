@@ -9,6 +9,7 @@ use App\ErrorResponse\Factory;
 use App\ErrorResponse\HasHttpStatusCodeInterface;
 use App\ErrorResponse\SerializableBadRequestErrorInterface;
 use App\ErrorResponse\SerializableDuplicateObjectErrorInterface;
+use App\ErrorResponse\SerializableModifyReadOnlyEntityErrorInterface;
 use App\ErrorResponse\SerializableStorageErrorInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -54,6 +55,13 @@ readonly class KernelExceptionEventSubscriber implements EventSubscriberInterfac
 
         if ($throwable instanceof SerializableDuplicateObjectErrorInterface) {
             $event->setResponse(new JsonResponse($throwable, 400));
+            $event->stopPropagation();
+
+            return;
+        }
+
+        if ($throwable instanceof SerializableModifyReadOnlyEntityErrorInterface) {
+            $event->setResponse(new JsonResponse($throwable, 405));
             $event->stopPropagation();
 
             return;
