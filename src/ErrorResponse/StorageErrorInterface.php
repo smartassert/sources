@@ -6,6 +6,9 @@ namespace App\ErrorResponse;
 
 interface StorageErrorInterface
 {
+    /**
+     * @return ?non-empty-string
+     */
     public function getLocation(): ?string;
 
     /**
