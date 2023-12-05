@@ -55,6 +55,10 @@ readonly class Field implements FieldInterface, SerializableFieldInterface
             'value' => $this->getValue(),
         ];
 
+        if (null !== $this->errorPosition) {
+            $data['position'] = $this->errorPosition;
+        }
+
         if ($this->requirements instanceof RequirementsInterface) {
             $requirementsData = [
                 'data_type' => $this->requirements->getDataType(),
