@@ -5,10 +5,7 @@ declare(strict_types=1);
 namespace App\EventListener;
 
 use App\ErrorResponse\HasHttpStatusCodeInterface;
-use App\ErrorResponse\SerializableBadRequestErrorInterface;
-use App\ErrorResponse\SerializableDuplicateObjectErrorInterface;
-use App\ErrorResponse\SerializableModifyReadOnlyEntityErrorInterface;
-use App\ErrorResponse\SerializableStorageErrorInterface;
+use App\ErrorResponse\SerializableErrorInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -32,29 +29,8 @@ readonly class KernelExceptionEventSubscriber implements EventSubscriberInterfac
     {
         $throwable = $event->getThrowable();
 
-        if ($throwable instanceof SerializableStorageErrorInterface) {
-            $event->setResponse(new JsonResponse($throwable, 500));
-            $event->stopPropagation();
-
-            return;
-        }
-
-        if ($throwable instanceof SerializableBadRequestErrorInterface) {
-            $event->setResponse(new JsonResponse($throwable, 400));
-            $event->stopPropagation();
-
-            return;
-        }
-
-        if ($throwable instanceof SerializableDuplicateObjectErrorInterface) {
-            $event->setResponse(new JsonResponse($throwable, 400));
-            $event->stopPropagation();
-
-            return;
-        }
-
-        if ($throwable instanceof SerializableModifyReadOnlyEntityErrorInterface) {
-            $event->setResponse(new JsonResponse($throwable, 405));
+        if ($throwable instanceof SerializableErrorInterface) {
+            $event->setResponse(new JsonResponse($throwable, $throwable->getStatusCode()));
             $event->stopPropagation();
 
             return;
