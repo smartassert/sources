@@ -17,4 +17,8 @@ interface FieldInterface
     public function getValue(): mixed;
 
     public function getRequirements(): ?RequirementsInterface;
+
+    public function getErrorPosition(): ?int;
+
+    public function withErrorPosition(int $position): FieldInterface;
 }

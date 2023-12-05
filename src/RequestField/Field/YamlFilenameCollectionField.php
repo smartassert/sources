@@ -4,25 +4,21 @@ declare(strict_types=1);
 
 namespace App\RequestField\Field;
 
-use App\RequestField\CollectionFieldInterface;
+use App\RequestField\FieldInterface;
 use App\RequestField\RequirementsInterface;
 
-class YamlFilenameCollectionField implements CollectionFieldInterface
+readonly class YamlFilenameCollectionField implements FieldInterface
 {
     private RequirementsInterface $requirements;
-
-    /**
-     * @var ?positive-int
-     */
-    private ?int $errorPosition = null;
 
     /**
      * @param non-empty-string $name
      * @param string[]         $value
      */
     public function __construct(
-        private readonly string $name,
-        private readonly array $value,
+        private string $name,
+        private array $value,
+        private ?int $errorPosition = null,
     ) {
         $this->requirements = new Requirements('yaml_filename_collection');
     }
@@ -32,6 +28,9 @@ class YamlFilenameCollectionField implements CollectionFieldInterface
         return $this->name;
     }
 
+    /**
+     * @return string[]
+     */
     public function getValue(): array
     {
         return $this->value;
@@ -47,11 +46,8 @@ class YamlFilenameCollectionField implements CollectionFieldInterface
         return $this->errorPosition;
     }
 
-    /**
-     * @param positive-int $position
-     */
-    public function setErrorPosition(int $position): void
+    public function withErrorPosition(int $position): FieldInterface
     {
-        $this->errorPosition = $position;
+        return new YamlFilenameCollectionField($this->name, $this->value, $position);
     }
 }
