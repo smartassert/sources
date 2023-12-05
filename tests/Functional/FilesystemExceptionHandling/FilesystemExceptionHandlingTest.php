@@ -322,7 +322,6 @@ class FilesystemExceptionHandlingTest extends WebTestCase
                             'id' => $entity->getId(),
                             'type' => $entity->getEntityType()->value,
                         ],
-                        'type' => 'unknown',
                     ];
                 },
             ],
