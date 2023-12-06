@@ -7,6 +7,7 @@ namespace App\MessageFailureHandler;
 use App\Exception\MessageHandler\SerializeSuiteException;
 use App\Repository\SerializedSuiteRepository;
 use SmartAssert\WorkerMessageFailedEventBundle\ExceptionHandlerInterface;
+use Symfony\Component\Messenger\Envelope;
 
 class SerializeSuiteHandler implements ExceptionHandlerInterface
 {
@@ -15,7 +16,7 @@ class SerializeSuiteHandler implements ExceptionHandlerInterface
     ) {
     }
 
-    public function handle(\Throwable $throwable): void
+    public function handle(Envelope $envelope, \Throwable $throwable): void
     {
         if (!$throwable instanceof SerializeSuiteException) {
             return;
