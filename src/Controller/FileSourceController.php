@@ -17,7 +17,7 @@ use League\Flysystem\FilesystemException;
 use SmartAssert\UsersSecurityBundle\Security\User;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 #[Route('/file-source', name: 'file_source_')]
 readonly class FileSourceController

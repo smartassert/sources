@@ -16,26 +16,26 @@
         "league/flysystem-memory": "^3.0",
         "psr/http-client": "^1.0",
         "psr/http-message": "^1.0",
-        "smartassert/health-check-bundle": "^3.1",
+        "smartassert/health-check-bundle": "^6.0",
         "smartassert/users-security-bundle": "^8.0",
         "smartassert/worker-job-source": "^1.0",
-        "smartassert/worker-message-failed-event-bundle": ">=0.6,<1",
+        "smartassert/worker-message-failed-event-bundle": "^2.0",
         "smartassert/yaml-file": "^6.0",
-        "symfony/console": "6.3.*",
-        "symfony/doctrine-messenger": "6.3.*",
-        "symfony/dotenv": "6.3.*",
-        "symfony/finder": "6.3.*",
+        "symfony/console": "6.4.*",
+        "symfony/doctrine-messenger": "6.4.*",
+        "symfony/dotenv": "6.4.*",
+        "symfony/finder": "6.4.*",
         "symfony/flex": "^2",
-        "symfony/framework-bundle": "6.3.*",
-        "symfony/messenger": "6.3.*",
+        "symfony/framework-bundle": "6.4.*",
+        "symfony/messenger": "6.4.*",
         "symfony/monolog-bundle": "^3.7",
-        "symfony/process": "6.3.*",
-        "symfony/proxy-manager-bridge": "6.3.*",
-        "symfony/runtime": "6.3.*",
-        "symfony/security-bundle": "6.3.*",
-        "symfony/string": "6.3.*",
-        "symfony/uid": "6.3.*",
-        "symfony/yaml": "6.3.*"
+        "symfony/process": "6.4.*",
+        "symfony/proxy-manager-bridge": "6.4.*",
+        "symfony/runtime": "6.4.*",
+        "symfony/security-bundle": "6.4.*",
+        "symfony/string": "6.4.*",
+        "symfony/uid": "6.4.*",
+        "symfony/yaml": "6.4.*"
     },
     "require-dev": {
         "mockery/mockery": "^1.4",
@@ -46,14 +46,14 @@
         "phpstan/phpstan-phpunit": "^1.3",
         "phpstan/phpstan-symfony": "^1.3",
         "phpunit/phpunit": "^10.2",
-        "smartassert/symfony-test-client": "^1.0",
+        "smartassert/symfony-test-client": "^2.0",
         "smartassert/test-authenticaton-provider-bundle": "^3.0",
         "squizlabs/php_codesniffer": "dev-master#7c452b0ff35ab2cf1d0c60965fea3e79f621b2d2",
-        "symfony/browser-kit": "6.3.*",
-        "symfony/expression-language": "6.3.*",
+        "symfony/browser-kit": "6.4.*",
+        "symfony/expression-language": "6.4.*",
         "symfony/maker-bundle": "^1.36",
-        "symfony/phpunit-bridge": "^6.0",
-        "symfony/psr-http-message-bridge": "^2.1",
+        "symfony/phpunit-bridge": "7.0.*",
+        "symfony/psr-http-message-bridge": "6.4.*",
         "webignition/object-reflector": "^1.0"
     },
     "config": {
@@ -162,7 +162,7 @@
     "extra": {
         "symfony": {
             "allow-contrib": false,
-            "require": "6.3.*"
+            "require": "6.4.*"
         }
     }
 }

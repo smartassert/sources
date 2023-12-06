@@ -14,7 +14,7 @@ use App\Services\Source\Mutator;
 use SmartAssert\UsersSecurityBundle\Security\User;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 #[Route('/git-source', name: 'git_source_')]
 readonly class GitSourceController
