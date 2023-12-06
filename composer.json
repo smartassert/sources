@@ -52,7 +52,7 @@
         "symfony/browser-kit": "6.4.*",
         "symfony/expression-language": "6.4.*",
         "symfony/maker-bundle": "^1.36",
-        "symfony/phpunit-bridge": "^6.0",
+        "symfony/phpunit-bridge": "7.0.*",
         "symfony/psr-http-message-bridge": "6.4.*",
         "webignition/object-reflector": "^1.0"
     },
