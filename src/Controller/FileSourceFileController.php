@@ -10,6 +10,7 @@ use App\Exception\EntityStorageException;
 use App\Request\AddYamlFileRequest;
 use App\Request\YamlFileRequest;
 use App\RequestField\Field\Field;
+use App\Response\EmptyResponse;
 use App\Response\YamlResponse;
 use League\Flysystem\FilesystemException;
 use League\Flysystem\FilesystemReader;
@@ -51,7 +52,7 @@ class FileSourceFileController
             throw new EntityStorageException($source, $e);
         }
 
-        return new Response();
+        return new EmptyResponse();
     }
 
     /**
@@ -68,7 +69,7 @@ class FileSourceFileController
             throw new EntityStorageException($source, $e);
         }
 
-        return new Response();
+        return new EmptyResponse();
     }
 
     /**
@@ -102,6 +103,6 @@ class FileSourceFileController
             throw new EntityStorageException($source, $e);
         }
 
-        return new Response();
+        return new EmptyResponse();
     }
 }

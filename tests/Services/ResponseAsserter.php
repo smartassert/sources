@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Services;
 
 use App\Tests\Services\Asserter\Response\BodyContentAsserter;
+use App\Tests\Services\Asserter\Response\HeaderAsserter;
 use App\Tests\Services\Asserter\Response\JsonResponseAsserter;
 use App\Tests\Services\Asserter\Response\YamlResponseAsserter;
 use PHPUnit\Framework\Assert;
@@ -44,10 +45,9 @@ class ResponseAsserter
     {
         (new Asserter\Response\ResponseAsserter(Response::HTTP_OK))
             ->addBodyAsserter(new BodyContentAsserter(''))
+            ->addHeaderAsserter(new HeaderAsserter(['content-type' => '']))
             ->assert($response)
         ;
-
-        Assert::assertSame('', $response->getBody()->getContents());
     }
 
     /**
