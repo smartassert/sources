@@ -9,7 +9,7 @@ use App\ErrorResponse\DuplicateObjectError;
 use App\Exception\DuplicateObjectException;
 use App\Repository\SuiteRepository;
 use App\Request\SuiteRequest;
-use App\RequestField\Field\Field;
+use SmartAssert\ServiceRequest\Field\Field;
 
 class Mutator
 {

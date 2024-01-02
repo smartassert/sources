@@ -6,7 +6,7 @@ namespace App\RequestField\Validator;
 
 use App\ErrorResponse\BadRequestError;
 use App\Exception\BadRequestException;
-use App\RequestField\FieldInterface;
+use SmartAssert\ServiceRequest\Field\FieldInterface;
 use SmartAssert\YamlFile\Validator\ContentValidator;
 
 readonly class YamlFieldValidator

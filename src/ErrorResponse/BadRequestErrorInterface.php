@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\ErrorResponse;
 
-use App\RequestField\FieldInterface;
+use SmartAssert\ServiceRequest\Field\FieldInterface;
 
 /**
  * @phpstan-import-type SerializedField from FieldInterface

@@ -11,7 +11,7 @@ use App\Exception\DuplicateObjectException;
 use App\Repository\SourceRepository;
 use App\Request\FileSourceRequest;
 use App\Request\GitSourceRequest;
-use App\RequestField\Field\Field;
+use SmartAssert\ServiceRequest\Field\Field;
 
 class Mutator
 {

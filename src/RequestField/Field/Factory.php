@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 namespace App\RequestField\Field;
 
-use App\RequestField\FieldInterface;
+use SmartAssert\ServiceRequest\Field\Field;
+use SmartAssert\ServiceRequest\Field\FieldInterface;
+use SmartAssert\ServiceRequest\Field\Requirements;
+use SmartAssert\ServiceRequest\Field\Size;
 
 readonly class Factory
 {
@@ -17,7 +20,9 @@ readonly class Factory
         int $minimumLength,
         int $maximumLength
     ): FieldInterface {
-        return new Field($name, $value, new Requirements('string', new Size($minimumLength, $maximumLength)));
+        return (new Field($name, $value))
+            ->withRequirements(new Requirements('string', new Size($minimumLength, $maximumLength)))
+        ;
     }
 
     /**
@@ -25,7 +30,9 @@ readonly class Factory
      */
     public function createYamlFilenameField(string $name, string $value): FieldInterface
     {
-        return new Field($name, $value, new Requirements('yaml_filename'));
+        return (new Field($name, $value))
+            ->withRequirements(new Requirements('yaml_filename'))
+        ;
     }
 
     /**
@@ -34,6 +41,8 @@ readonly class Factory
      */
     public function createYamlFilenameCollectionField(string $name, array $value): FieldInterface
     {
-        return new Field($name, $value, new Requirements('yaml_filename_collection'));
+        return (new Field($name, $value))
+            ->withRequirements(new Requirements('yaml_filename_collection'))
+        ;
     }
 }

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\ErrorResponse;
 
-use App\RequestField\FieldInterface;
+use SmartAssert\ServiceRequest\Field\FieldInterface;
 
 /**
  * @phpstan-import-type SerializedBadRequest from BadRequestErrorInterface
@@ -34,7 +34,7 @@ class BadRequestError extends ErrorResponse implements BadRequestErrorInterface
         return [
             'class' => BadRequestErrorInterface::ERROR_CLASS,
             'type' => $this->errorType,
-            'field' => $this->field->jsonSerialize(),
+            'field' => $this->field->serialize(),
         ];
     }
 }

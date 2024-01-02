@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\ErrorResponse;
 
-use App\RequestField\FieldInterface;
+use SmartAssert\ServiceRequest\Field\FieldInterface;
 
 /**
  * @phpstan-import-type SerializedDuplicateObjectError from DuplicateObjectErrorInterface
@@ -29,7 +29,7 @@ class DuplicateObjectError extends ErrorResponse implements DuplicateObjectError
     {
         return [
             'class' => DuplicateObjectErrorInterface::ERROR_CLASS,
-            'field' => $this->field->jsonSerialize(),
+            'field' => $this->field->serialize(),
         ];
     }
 }
