@@ -15,4 +15,11 @@ interface ErrorInterface
      * @return ?non-empty-string
      */
     public function getType(): ?string;
+
+    public function getStatusCode(): int;
+
+    /**
+     * @return array{class: non-empty-string, type?: non-empty-string}
+     */
+    public function jsonSerialize(): array;
 }

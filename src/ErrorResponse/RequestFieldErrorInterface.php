@@ -9,15 +9,17 @@ use App\RequestField\FieldInterface;
 /**
  * @phpstan-import-type SerializedField from FieldInterface
  *
- * @phpstan-type SerializedDuplicateObjectError array{
+ * @phpstan-type SerializedRequestFieldError array{
  *   class: non-empty-string,
- *   field: SerializedField
+ *   field: SerializedField,
  * }
  */
-interface SerializableDuplicateObjectErrorInterface extends SerializableErrorInterface
+interface RequestFieldErrorInterface extends ErrorInterface
 {
+    public function getField(): FieldInterface;
+
     /**
-     * @return SerializedDuplicateObjectError
+     * @return SerializedRequestFieldError
      */
     public function jsonSerialize(): array;
 }
