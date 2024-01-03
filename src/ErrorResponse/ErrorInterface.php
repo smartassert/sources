@@ -17,4 +17,9 @@ interface ErrorInterface
     public function getType(): ?string;
 
     public function getStatusCode(): int;
+
+    /**
+     * @return array<mixed>
+     */
+    public function jsonSerialize(): array;
 }
