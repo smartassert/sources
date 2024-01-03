@@ -44,7 +44,7 @@ class BadRequestException extends \Exception implements BadRequestErrorInterface
         return $this->getCode();
     }
 
-    public function jsonSerialize(): array
+    public function serialize(): array
     {
         return [
             'class' => $this->getClass(),

@@ -21,5 +21,5 @@ interface RequestFieldErrorInterface extends ErrorInterface
     /**
      * @return SerializedRequestFieldError
      */
-    public function jsonSerialize(): array;
+    public function serialize(): array;
 }

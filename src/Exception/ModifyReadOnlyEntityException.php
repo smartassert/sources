@@ -39,7 +39,7 @@ class ModifyReadOnlyEntityException extends \Exception implements EntityError
         return $this->entity;
     }
 
-    public function jsonSerialize(): array
+    public function serialize(): array
     {
         return [
             'class' => $this->getClass(),

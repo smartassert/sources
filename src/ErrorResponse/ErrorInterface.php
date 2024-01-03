@@ -21,5 +21,5 @@ interface ErrorInterface
     /**
      * @return array{class: non-empty-string, type?: non-empty-string}
      */
-    public function jsonSerialize(): array;
+    public function serialize(): array;
 }
