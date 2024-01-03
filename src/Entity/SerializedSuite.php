@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
-use App\Entity\IdentifiedEntityInterface as IdentifiedEntity;
-use App\Entity\UserHeldEntityInterface as UserEntity;
 use App\Enum\EntityType;
 use App\Enum\SerializedSuite\FailureReason;
 use App\Enum\SerializedSuite\State;
@@ -15,7 +13,7 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: SerializedSuiteRepository::class)]
-class SerializedSuite implements UserEntity, DirectoryLocator, \JsonSerializable, IdentifiedEntity
+class SerializedSuite implements UserHeldEntityInterface, DirectoryLocator, \JsonSerializable, IdentifiedEntityInterface
 {
     public const ID_LENGTH = 32;
 
