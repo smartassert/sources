@@ -13,7 +13,7 @@ namespace App\ErrorResponse;
  *   }
  * }
  */
-interface SerializableModifyReadOnlyEntityErrorInterface extends SerializableErrorInterface
+interface SerializableModifyReadOnlyEntityErrorInterface extends ErrorInterface
 {
     /**
      * @return SerializedModifyReadOnlyEntityError

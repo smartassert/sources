@@ -14,7 +14,7 @@ use App\RequestField\FieldInterface;
  *   field: SerializedField
  * }
  */
-interface SerializableDuplicateObjectErrorInterface extends SerializableErrorInterface
+interface SerializableDuplicateObjectErrorInterface extends ErrorInterface
 {
     /**
      * @return SerializedDuplicateObjectError
