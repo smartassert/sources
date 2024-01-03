@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
+use App\Entity\EntityIdentifierInterface as EntityIdentifier;
+use App\Entity\IdentifiedEntityInterface as IdentifiedEntity;
 use App\Enum\Source\Type;
 use App\Repository\SourceRepository;
 use Doctrine\DBAL\Types\Types;
@@ -18,7 +20,7 @@ use Doctrine\ORM\Mapping as ORM;
     'git' => GitSource::class,
     'file' => FileSource::class,
 ])]
-abstract class AbstractSource implements SourceInterface, \JsonSerializable, EntityIdentifierInterface
+abstract class AbstractSource implements SourceInterface, \JsonSerializable, EntityIdentifier, IdentifiedEntity
 {
     public const ID_LENGTH = 32;
     public const TYPE_DISCRIMINATOR_LENGTH = 32;
