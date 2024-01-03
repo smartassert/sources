@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\FilesystemExceptionHandling;
 
-use App\Entity\EntityIdentifierInterface as IdentifyingEntity;
+use App\Entity\EntityIdentifier;
 use App\Entity\FileSource;
+use App\Entity\IdentifiedEntityInterface as IdentifiedEntity;
 use App\Entity\SerializedSuite;
 use App\Entity\SourceInterface;
 use App\Enum\EntityType;
@@ -51,7 +52,7 @@ class FilesystemExceptionHandlingTest extends WebTestCase
     /**
      * @dataProvider exceptionHandlerDataProvider
      *
-     * @param callable(IdentifyingEntity): array<mixed> $expectedResponseDataCreator
+     * @param callable(IdentifiedEntity): array<mixed> $expectedResponseDataCreator
      */
     public function testListFileSourceFilenamesHandlesThrownFilesystemException(
         \Exception&FsException $exception,
@@ -59,6 +60,7 @@ class FilesystemExceptionHandlingTest extends WebTestCase
     ): void {
         $userId = md5((string) rand());
         $sourceId = (string) new Ulid();
+        \assert('' !== $sourceId);
 
         $this->mockAuthenticator($userId);
 
@@ -83,7 +85,7 @@ class FilesystemExceptionHandlingTest extends WebTestCase
     /**
      * @dataProvider exceptionHandlerDataProvider
      *
-     * @param callable(IdentifyingEntity): array<mixed> $expectedResponseDataCreator
+     * @param callable(IdentifiedEntity): array<mixed> $expectedResponseDataCreator
      */
     public function testAddFileSourceFileHandlesThrownFilesystemException(
         \Exception&FsException $exception,
@@ -91,6 +93,7 @@ class FilesystemExceptionHandlingTest extends WebTestCase
     ): void {
         $userId = md5((string) rand());
         $sourceId = (string) new Ulid();
+        \assert('' !== $sourceId);
 
         $this->mockAuthenticator($userId);
 
@@ -114,7 +117,7 @@ class FilesystemExceptionHandlingTest extends WebTestCase
     /**
      * @dataProvider exceptionHandlerDataProvider
      *
-     * @param callable(IdentifyingEntity): array<mixed> $expectedResponseDataCreator
+     * @param callable(IdentifiedEntity): array<mixed> $expectedResponseDataCreator
      */
     public function testUpdateFileSourceFileHandlesThrownFilesystemException(
         \Exception&FsException $exception,
@@ -122,6 +125,7 @@ class FilesystemExceptionHandlingTest extends WebTestCase
     ): void {
         $userId = md5((string) rand());
         $sourceId = (string) new Ulid();
+        \assert('' !== $sourceId);
 
         $this->mockAuthenticator($userId);
 
@@ -145,7 +149,7 @@ class FilesystemExceptionHandlingTest extends WebTestCase
     /**
      * @dataProvider exceptionHandlerDataProvider
      *
-     * @param callable(IdentifyingEntity): array<mixed> $expectedResponseDataCreator
+     * @param callable(IdentifiedEntity): array<mixed> $expectedResponseDataCreator
      */
     public function testReadFileSourceFileHandlesThrownFilesystemException(
         \Exception&FsException $exception,
@@ -153,6 +157,7 @@ class FilesystemExceptionHandlingTest extends WebTestCase
     ): void {
         $userId = md5((string) rand());
         $sourceId = (string) new Ulid();
+        \assert('' !== $sourceId);
 
         $this->mockAuthenticator($userId);
 
@@ -175,7 +180,7 @@ class FilesystemExceptionHandlingTest extends WebTestCase
     /**
      * @dataProvider exceptionHandlerDataProvider
      *
-     * @param callable(IdentifyingEntity): array<mixed> $expectedResponseDataCreator
+     * @param callable(IdentifiedEntity): array<mixed> $expectedResponseDataCreator
      */
     public function testDeleteFileSourceFileHandlesThrownFilesystemException(
         \Exception&FsException $exception,
@@ -183,6 +188,7 @@ class FilesystemExceptionHandlingTest extends WebTestCase
     ): void {
         $userId = md5((string) rand());
         $sourceId = (string) new Ulid();
+        \assert('' !== $sourceId);
 
         $this->mockAuthenticator($userId);
 
@@ -205,7 +211,7 @@ class FilesystemExceptionHandlingTest extends WebTestCase
     /**
      * @dataProvider exceptionHandlerDataProvider
      *
-     * @param callable(IdentifyingEntity): array<mixed> $expectedResponseDataCreator
+     * @param callable(IdentifiedEntity): array<mixed> $expectedResponseDataCreator
      */
     public function testReadSerializedSuiteHandlesThrownFilesystemException(
         \Exception&FsException $exception,
@@ -213,6 +219,7 @@ class FilesystemExceptionHandlingTest extends WebTestCase
     ): void {
         $userId = md5((string) rand());
         $serializedSuiteId = (string) new Ulid();
+        \assert('' !== $serializedSuiteId);
 
         $this->mockAuthenticator($userId);
 
@@ -236,6 +243,11 @@ class FilesystemExceptionHandlingTest extends WebTestCase
         $serializedSuite
             ->shouldReceive('getDirectoryPath')
             ->andReturn($userId . '/' . $serializedSuiteId)
+        ;
+
+        $serializedSuite
+            ->shouldReceive('getIdentifier')
+            ->andReturn(new EntityIdentifier($serializedSuiteId, EntityType::SERIALIZED_SUITE->value))
         ;
 
         $serializedSuiteRepository = \Mockery::mock(SerializedSuiteRepository::class);
@@ -267,7 +279,7 @@ class FilesystemExceptionHandlingTest extends WebTestCase
     /**
      * @dataProvider exceptionHandlerDataProvider
      *
-     * @param callable(IdentifyingEntity): array<mixed> $expectedResponseDataCreator
+     * @param callable(IdentifiedEntity): array<mixed> $expectedResponseDataCreator
      */
     public function testDeleteSourceHandlesThrownFilesystemException(
         \Exception&FsException $exception,
@@ -275,6 +287,7 @@ class FilesystemExceptionHandlingTest extends WebTestCase
     ): void {
         $userId = md5((string) rand());
         $sourceId = (string) new Ulid();
+        \assert('' !== $sourceId);
 
         $this->mockAuthenticator($userId);
 
@@ -313,15 +326,15 @@ class FilesystemExceptionHandlingTest extends WebTestCase
                         parent::__construct($message, $code);
                     }
                 },
-                'expectedResponseDataCreator' => function (IdentifyingEntity $entity) {
+                'expectedResponseDataCreator' => function (IdentifiedEntity $entity) {
                     return [
                         'class' => 'storage',
                         'type' => null,
                         'location' => null,
                         'object_type' => 'entity',
                         'context' => [
-                            'id' => $entity->getId(),
-                            'type' => $entity->getEntityType(),
+                            'id' => $entity->getIdentifier()->getId(),
+                            'type' => $entity->getIdentifier()->getEntityType(),
                         ],
                     ];
                 },
@@ -338,14 +351,14 @@ class FilesystemExceptionHandlingTest extends WebTestCase
                         return 'read';
                     }
                 },
-                'expectedResponseDataCreator' => function (IdentifyingEntity $entity) {
+                'expectedResponseDataCreator' => function (IdentifiedEntity $entity) {
                     return [
                         'class' => 'storage',
                         'location' => null,
                         'object_type' => 'entity',
                         'context' => [
-                            'id' => $entity->getId(),
-                            'type' => $entity->getEntityType(),
+                            'id' => $entity->getIdentifier()->getId(),
+                            'type' => $entity->getIdentifier()->getEntityType(),
                         ],
                         'type' => 'read',
                     ];
@@ -363,14 +376,14 @@ class FilesystemExceptionHandlingTest extends WebTestCase
                         return 'write';
                     }
                 },
-                'expectedResponseDataCreator' => function (IdentifyingEntity $entity) {
+                'expectedResponseDataCreator' => function (IdentifiedEntity $entity) {
                     return [
                         'class' => 'storage',
                         'location' => null,
                         'object_type' => 'entity',
                         'context' => [
-                            'id' => $entity->getId(),
-                            'type' => $entity->getEntityType(),
+                            'id' => $entity->getIdentifier()->getId(),
+                            'type' => $entity->getIdentifier()->getEntityType(),
                         ],
                         'type' => 'write',
                     ];
@@ -393,14 +406,14 @@ class FilesystemExceptionHandlingTest extends WebTestCase
                         return $this->location;
                     }
                 },
-                'expectedResponseDataCreator' => function (IdentifyingEntity $entity) use ($location) {
+                'expectedResponseDataCreator' => function (IdentifiedEntity $entity) use ($location) {
                     return [
                         'class' => 'storage',
                         'location' => $location,
                         'object_type' => 'entity',
                         'context' => [
-                            'id' => $entity->getId(),
-                            'type' => $entity->getEntityType(),
+                            'id' => $entity->getIdentifier()->getId(),
+                            'type' => $entity->getIdentifier()->getEntityType(),
                         ],
                         'type' => 'write',
                     ];
@@ -497,7 +510,10 @@ class FilesystemExceptionHandlingTest extends WebTestCase
         );
     }
 
-    private function createSource(string $userId, string $sourceId = null): IdentifyingEntity&MockI&SourceInterface
+    /**
+     * @param non-empty-string $sourceId
+     */
+    private function createSource(string $userId, string $sourceId): IdentifiedEntity&MockI&SourceInterface
     {
         $source = \Mockery::mock(FileSource::class);
         $source
@@ -508,6 +524,11 @@ class FilesystemExceptionHandlingTest extends WebTestCase
         $source
             ->shouldReceive('getEntityType')
             ->andReturn(EntityType::FILE_SOURCE)
+        ;
+
+        $source
+            ->shouldReceive('getIdentifier')
+            ->andReturn(new EntityIdentifier($sourceId, EntityType::FILE_SOURCE->value))
         ;
 
         $source

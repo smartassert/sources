@@ -17,7 +17,7 @@ use App\Entity\EntityIdentifierInterface;
  */
 interface EntityErrorInterface extends ErrorInterface
 {
-    public function getEntity(): EntityIdentifierInterface;
+    public function getIdentifier(): EntityIdentifierInterface;
 
     /**
      * @return SerializedModifyReadOnlyEntityError
