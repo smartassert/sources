@@ -321,7 +321,7 @@ class FilesystemExceptionHandlingTest extends WebTestCase
                         'object_type' => 'entity',
                         'context' => [
                             'id' => $entity->getId(),
-                            'type' => $entity->getEntityType()->value,
+                            'type' => $entity->getEntityType(),
                         ],
                     ];
                 },
@@ -345,7 +345,7 @@ class FilesystemExceptionHandlingTest extends WebTestCase
                         'object_type' => 'entity',
                         'context' => [
                             'id' => $entity->getId(),
-                            'type' => $entity->getEntityType()->value,
+                            'type' => $entity->getEntityType(),
                         ],
                         'type' => 'read',
                     ];
@@ -370,7 +370,7 @@ class FilesystemExceptionHandlingTest extends WebTestCase
                         'object_type' => 'entity',
                         'context' => [
                             'id' => $entity->getId(),
-                            'type' => $entity->getEntityType()->value,
+                            'type' => $entity->getEntityType(),
                         ],
                         'type' => 'write',
                     ];
@@ -400,7 +400,7 @@ class FilesystemExceptionHandlingTest extends WebTestCase
                         'object_type' => 'entity',
                         'context' => [
                             'id' => $entity->getId(),
-                            'type' => $entity->getEntityType()->value,
+                            'type' => $entity->getEntityType(),
                         ],
                         'type' => 'write',
                     ];

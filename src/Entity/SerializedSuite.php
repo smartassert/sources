@@ -138,8 +138,8 @@ class SerializedSuite implements UserHeldEntityInterface, DirectoryLocator, \Jso
         return $this->id;
     }
 
-    public function getEntityType(): EntityType
+    public function getEntityType(): string
     {
-        return EntityType::SERIALIZED_SUITE;
+        return EntityType::SERIALIZED_SUITE->value;
     }
 }

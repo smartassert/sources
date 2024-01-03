@@ -104,8 +104,8 @@ class GitSource extends AbstractSource
         return Type::GIT;
     }
 
-    public function getEntityType(): EntityType
+    public function getEntityType(): string
     {
-        return EntityType::GIT_SOURCE;
+        return EntityType::GIT_SOURCE->value;
     }
 }

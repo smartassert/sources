@@ -14,7 +14,7 @@ class ModifyReadOnlyEntityException extends \Exception implements EntityError
     ) {
         parent::__construct(sprintf(
             'Cannot modify %s %s, entity is read-only',
-            $entity->getEntityType()->value,
+            $entity->getEntityType(),
             $entity->getId(),
         ));
     }
@@ -45,7 +45,7 @@ class ModifyReadOnlyEntityException extends \Exception implements EntityError
             'class' => $this->getClass(),
             'entity' => [
                 'id' => $this->entity->getId(),
-                'type' => $this->entity->getEntityType()->value,
+                'type' => $this->entity->getEntityType(),
             ],
         ];
     }

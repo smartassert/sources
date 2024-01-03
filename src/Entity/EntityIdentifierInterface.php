@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
-use App\Enum\EntityType;
-
 interface EntityIdentifierInterface
 {
     /**
@@ -13,5 +11,8 @@ interface EntityIdentifierInterface
      */
     public function getId(): string;
 
-    public function getEntityType(): EntityType;
+    /**
+     * @return non-empty-string
+     */
+    public function getEntityType(): string;
 }

@@ -138,8 +138,8 @@ class Suite implements \JsonSerializable, UserHeldEntityInterface, EntityIdentif
         return $this->id;
     }
 
-    public function getEntityType(): EntityType
+    public function getEntityType(): string
     {
-        return EntityType::SUITE;
+        return EntityType::SUITE->value;
     }
 }

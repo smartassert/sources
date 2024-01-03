@@ -37,8 +37,8 @@ class FileSource extends AbstractSource implements DirectoryLocatorInterface, So
         return Type::FILE;
     }
 
-    public function getEntityType(): EntityType
+    public function getEntityType(): string
     {
-        return EntityType::FILE_SOURCE;
+        return EntityType::FILE_SOURCE->value;
     }
 }
