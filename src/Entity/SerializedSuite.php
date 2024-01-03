@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
-use App\Entity\IdentifyingEntityInterface as IdentifyingEntity;
+use App\Entity\EntityIdentifierInterface as IdentifyingEntity;
 use App\Enum\EntityType;
 use App\Enum\SerializedSuite\FailureReason;
 use App\Enum\SerializedSuite\State;

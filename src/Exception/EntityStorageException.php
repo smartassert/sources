@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Exception;
 
-use App\Entity\IdentifyingEntityInterface;
+use App\Entity\EntityIdentifierInterface;
 use App\ErrorResponse\StorageErrorInterface as StorageError;
 use League\Flysystem\FilesystemException;
 use League\Flysystem\FilesystemOperationFailed;
@@ -12,7 +12,7 @@ use League\Flysystem\FilesystemOperationFailed;
 class EntityStorageException extends \Exception implements StorageError
 {
     public function __construct(
-        private readonly IdentifyingEntityInterface $entity,
+        private readonly EntityIdentifierInterface $entity,
         private readonly FilesystemException $filesystemException
     ) {
         $message = sprintf(

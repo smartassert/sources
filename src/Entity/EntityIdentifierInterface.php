@@ -6,7 +6,7 @@ namespace App\Entity;
 
 use App\Enum\EntityType;
 
-interface IdentifyingEntityInterface
+interface EntityIdentifierInterface
 {
     /**
      * @return non-empty-string
