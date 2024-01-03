@@ -15,4 +15,9 @@ interface EntityIdentifierInterface
      * @return non-empty-string
      */
     public function getType(): string;
+
+    /**
+     * @return array{id: non-empty-string, type: non-empty-string}
+     */
+    public function serialize(): array;
 }

@@ -44,10 +44,7 @@ class ModifyReadOnlyEntityException extends \Exception implements IdentifiedEnti
     {
         return [
             'class' => $this->getClass(),
-            'entity' => [
-                'id' => $this->entity->getIdentifier()->getId(),
-                'type' => $this->entity->getIdentifier()->getType(),
-            ],
+            'entity' => $this->entity->getIdentifier()->serialize(),
         ];
     }
 }

@@ -74,10 +74,7 @@ class EntityStorageException extends \Exception implements StorageError
 
     public function getContext(): array
     {
-        return [
-            'id' => $this->entity->getIdentifier()->getId(),
-            'type' => $this->entity->getIdentifier()->getType(),
-        ];
+        return $this->entity->getIdentifier()->serialize();
     }
 
     public function serialize(): array

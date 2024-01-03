@@ -322,10 +322,7 @@ class FilesystemExceptionHandlingTest extends WebTestCase
                         'type' => null,
                         'location' => null,
                         'object_type' => 'entity',
-                        'context' => [
-                            'id' => $entity->getIdentifier()->getId(),
-                            'type' => $entity->getIdentifier()->getType(),
-                        ],
+                        'context' => $entity->getIdentifier()->serialize(),
                     ];
                 },
             ],
@@ -346,10 +343,7 @@ class FilesystemExceptionHandlingTest extends WebTestCase
                         'class' => 'storage',
                         'location' => null,
                         'object_type' => 'entity',
-                        'context' => [
-                            'id' => $entity->getIdentifier()->getId(),
-                            'type' => $entity->getIdentifier()->getType(),
-                        ],
+                        'context' => $entity->getIdentifier()->serialize(),
                         'type' => 'read',
                     ];
                 },
@@ -371,10 +365,7 @@ class FilesystemExceptionHandlingTest extends WebTestCase
                         'class' => 'storage',
                         'location' => null,
                         'object_type' => 'entity',
-                        'context' => [
-                            'id' => $entity->getIdentifier()->getId(),
-                            'type' => $entity->getIdentifier()->getType(),
-                        ],
+                        'context' => $entity->getIdentifier()->serialize(),
                         'type' => 'write',
                     ];
                 },
@@ -401,10 +392,7 @@ class FilesystemExceptionHandlingTest extends WebTestCase
                         'class' => 'storage',
                         'location' => $location,
                         'object_type' => 'entity',
-                        'context' => [
-                            'id' => $entity->getIdentifier()->getId(),
-                            'type' => $entity->getIdentifier()->getType(),
-                        ],
+                        'context' => $entity->getIdentifier()->serialize(),
                         'type' => 'write',
                     ];
                 },

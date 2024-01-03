@@ -25,4 +25,9 @@ readonly class EntityIdentifier implements EntityIdentifierInterface
     {
         return $this->type;
     }
+
+    public function serialize(): array
+    {
+        return ['id' => $this->id, 'type' => $this->type];
+    }
 }
