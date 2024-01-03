@@ -30,7 +30,7 @@ class DuplicateObjectException extends \Exception implements RequestFieldError
         return null;
     }
 
-    public function jsonSerialize(): array
+    public function serialize(): array
     {
         return [
             'class' => $this->getClass(),

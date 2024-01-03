@@ -30,5 +30,5 @@ interface StorageErrorInterface extends ErrorInterface
      *   context: array<mixed>
      * }
      */
-    public function jsonSerialize(): array;
+    public function serialize(): array;
 }

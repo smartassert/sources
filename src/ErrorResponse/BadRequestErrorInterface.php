@@ -22,5 +22,5 @@ interface BadRequestErrorInterface extends RequestFieldErrorInterface
     /**
      * @return SerializedBadRequestError
      */
-    public function jsonSerialize(): array;
+    public function serialize(): array;
 }

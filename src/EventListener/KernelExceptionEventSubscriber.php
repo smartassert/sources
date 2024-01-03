@@ -29,7 +29,7 @@ readonly class KernelExceptionEventSubscriber implements EventSubscriberInterfac
     {
         $throwable = $event->getThrowable();
         if ($throwable instanceof ErrorInterface) {
-            $event->setResponse(new JsonResponse($throwable->jsonSerialize(), $throwable->getStatusCode()));
+            $event->setResponse(new JsonResponse($throwable->serialize(), $throwable->getStatusCode()));
             $event->stopPropagation();
 
             return;

@@ -22,5 +22,5 @@ interface EntityErrorInterface extends ErrorInterface
     /**
      * @return SerializedModifyReadOnlyEntityError
      */
-    public function jsonSerialize(): array;
+    public function serialize(): array;
 }

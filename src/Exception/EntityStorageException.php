@@ -80,7 +80,7 @@ class EntityStorageException extends \Exception implements StorageError
         ];
     }
 
-    public function jsonSerialize(): array
+    public function serialize(): array
     {
         return [
             'class' => $this->getClass(),
