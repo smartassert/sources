@@ -7,9 +7,6 @@ namespace App\Exception;
 use App\ErrorResponse\BadRequestErrorInterface;
 use App\RequestField\FieldInterface;
 
-/**
- * @phpstan-import-type SerializedBadRequestError from BadRequestErrorInterface
- */
 class BadRequestException extends \Exception implements BadRequestErrorInterface
 {
     /**
@@ -47,9 +44,6 @@ class BadRequestException extends \Exception implements BadRequestErrorInterface
         return $this->getCode();
     }
 
-    /**
-     * @return SerializedBadRequestError
-     */
     public function jsonSerialize(): array
     {
         return [
