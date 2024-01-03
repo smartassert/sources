@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
-use App\Entity\EntityIdentifierInterface as IdentifyingEntity;
 use App\Entity\IdentifiedEntityInterface as IdentifiedEntity;
 use App\Entity\UserHeldEntityInterface as UserEntity;
 use App\Enum\EntityType;
@@ -16,7 +15,7 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: SerializedSuiteRepository::class)]
-class SerializedSuite implements UserEntity, DirectoryLocator, \JsonSerializable, IdentifyingEntity, IdentifiedEntity
+class SerializedSuite implements UserEntity, DirectoryLocator, \JsonSerializable, IdentifiedEntity
 {
     public const ID_LENGTH = 32;
 
@@ -133,16 +132,6 @@ class SerializedSuite implements UserEntity, DirectoryLocator, \JsonSerializable
         }
 
         return $data;
-    }
-
-    public function getId(): string
-    {
-        return $this->id;
-    }
-
-    public function getEntityType(): string
-    {
-        return EntityType::SERIALIZED_SUITE->value;
     }
 
     public function getIdentifier(): EntityIdentifierInterface

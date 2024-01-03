@@ -231,16 +231,6 @@ class FilesystemExceptionHandlingTest extends WebTestCase
         ;
 
         $serializedSuite
-            ->shouldReceive('getId')
-            ->andReturn($serializedSuiteId)
-        ;
-
-        $serializedSuite
-            ->shouldReceive('getEntityType')
-            ->andReturn(EntityType::SERIALIZED_SUITE)
-        ;
-
-        $serializedSuite
             ->shouldReceive('getDirectoryPath')
             ->andReturn($userId . '/' . $serializedSuiteId)
         ;
