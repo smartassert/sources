@@ -512,11 +512,6 @@ class FilesystemExceptionHandlingTest extends WebTestCase
         ;
 
         $source
-            ->shouldReceive('getEntityType')
-            ->andReturn(EntityType::FILE_SOURCE)
-        ;
-
-        $source
             ->shouldReceive('getIdentifier')
             ->andReturn(new EntityIdentifier($sourceId, EntityType::FILE_SOURCE->value))
         ;
