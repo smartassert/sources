@@ -5,10 +5,9 @@ declare(strict_types=1);
 namespace App\Exception;
 
 use App\ErrorResponse\RequestFieldErrorInterface as RequestFieldError;
-use App\ErrorResponse\SerializableDuplicateObjectErrorInterface as SerializableDuplicateObjectError;
 use App\RequestField\FieldInterface;
 
-class DuplicateObjectException extends \Exception implements RequestFieldError, SerializableDuplicateObjectError
+class DuplicateObjectException extends \Exception implements RequestFieldError
 {
     public function __construct(
         private readonly FieldInterface $field,
