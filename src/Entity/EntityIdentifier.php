@@ -21,7 +21,7 @@ readonly class EntityIdentifier implements EntityIdentifierInterface
         return $this->id;
     }
 
-    public function getEntityType(): string
+    public function getType(): string
     {
         return $this->type;
     }

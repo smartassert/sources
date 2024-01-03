@@ -14,5 +14,5 @@ interface EntityIdentifierInterface
     /**
      * @return non-empty-string
      */
-    public function getEntityType(): string;
+    public function getType(): string;
 }

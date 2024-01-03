@@ -15,7 +15,7 @@ class ModifyReadOnlyEntityException extends \Exception implements IdentifiedEnti
     ) {
         parent::__construct(sprintf(
             'Cannot modify %s %s, entity is read-only',
-            $entity->getIdentifier()->getEntityType(),
+            $entity->getIdentifier()->getType(),
             $entity->getIdentifier()->getId(),
         ));
     }
@@ -46,7 +46,7 @@ class ModifyReadOnlyEntityException extends \Exception implements IdentifiedEnti
             'class' => $this->getClass(),
             'entity' => [
                 'id' => $this->entity->getIdentifier()->getId(),
-                'type' => $this->entity->getIdentifier()->getEntityType(),
+                'type' => $this->entity->getIdentifier()->getType(),
             ],
         ];
     }

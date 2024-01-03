@@ -18,7 +18,7 @@ class EntityStorageException extends \Exception implements StorageError
         $message = sprintf(
             'Filesystem %s error for %s %s',
             'foo',
-            $entity->getIdentifier()->getEntityType(),
+            $entity->getIdentifier()->getType(),
             $entity->getIdentifier()->getId(),
         );
 
@@ -76,7 +76,7 @@ class EntityStorageException extends \Exception implements StorageError
     {
         return [
             'id' => $this->entity->getIdentifier()->getId(),
-            'type' => $this->entity->getIdentifier()->getEntityType(),
+            'type' => $this->entity->getIdentifier()->getType(),
         ];
     }
 
