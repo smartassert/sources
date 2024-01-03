@@ -10,7 +10,7 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: SuiteRepository::class)]
-class Suite implements \JsonSerializable, UserHeldEntityInterface, IdentifyingEntityInterface
+class Suite implements \JsonSerializable, UserHeldEntityInterface, IdentifiedEntityInterface
 {
     public const ID_LENGTH = 32;
     public const LABEL_MAX_LENGTH = 255;
@@ -133,13 +133,8 @@ class Suite implements \JsonSerializable, UserHeldEntityInterface, IdentifyingEn
         return $data;
     }
 
-    public function getId(): string
+    public function getIdentifier(): EntityIdentifierInterface
     {
-        return $this->id;
-    }
-
-    public function getEntityType(): EntityType
-    {
-        return EntityType::SUITE;
+        return new EntityIdentifier($this->id, EntityType::SUITE->value);
     }
 }

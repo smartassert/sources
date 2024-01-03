@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Exception;
 
-use App\Entity\IdentifyingEntityInterface;
+use App\Entity\IdentifiedEntityInterface;
 use App\ErrorResponse\StorageErrorInterface as StorageError;
 use League\Flysystem\FilesystemException;
 use League\Flysystem\FilesystemOperationFailed;
@@ -12,14 +12,14 @@ use League\Flysystem\FilesystemOperationFailed;
 class EntityStorageException extends \Exception implements StorageError
 {
     public function __construct(
-        private readonly IdentifyingEntityInterface $entity,
+        private readonly IdentifiedEntityInterface $entity,
         private readonly FilesystemException $filesystemException
     ) {
         $message = sprintf(
             'Filesystem %s error for %s %s',
             'foo',
-            $entity->getEntityType()->value,
-            $entity->getId(),
+            $entity->getIdentifier()->getType(),
+            $entity->getIdentifier()->getId(),
         );
 
         parent::__construct($message, 0, $filesystemException);
@@ -74,10 +74,7 @@ class EntityStorageException extends \Exception implements StorageError
 
     public function getContext(): array
     {
-        return [
-            'id' => $this->entity->getId(),
-            'type' => $this->entity->getEntityType()->value,
-        ];
+        return $this->entity->getIdentifier()->serialize();
     }
 
     public function serialize(): array

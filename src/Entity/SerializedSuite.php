@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
-use App\Entity\IdentifyingEntityInterface as IdentifyingEntity;
 use App\Enum\EntityType;
 use App\Enum\SerializedSuite\FailureReason;
 use App\Enum\SerializedSuite\State;
@@ -14,7 +13,7 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: SerializedSuiteRepository::class)]
-class SerializedSuite implements UserHeldEntityInterface, DirectoryLocator, \JsonSerializable, IdentifyingEntity
+class SerializedSuite implements UserHeldEntityInterface, DirectoryLocator, \JsonSerializable, IdentifiedEntityInterface
 {
     public const ID_LENGTH = 32;
 
@@ -133,13 +132,8 @@ class SerializedSuite implements UserHeldEntityInterface, DirectoryLocator, \Jso
         return $data;
     }
 
-    public function getId(): string
+    public function getIdentifier(): EntityIdentifierInterface
     {
-        return $this->id;
-    }
-
-    public function getEntityType(): EntityType
-    {
-        return EntityType::SERIALIZED_SUITE;
+        return new EntityIdentifier($this->id, EntityType::SERIALIZED_SUITE->value);
     }
 }
