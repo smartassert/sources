@@ -19,7 +19,7 @@ interface ErrorInterface
     public function getStatusCode(): int;
 
     /**
-     * @return array<mixed>
+     * @return array{class: non-empty-string, type?: non-empty-string}
      */
     public function jsonSerialize(): array;
 }
