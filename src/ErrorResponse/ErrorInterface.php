@@ -15,4 +15,6 @@ interface ErrorInterface
      * @return ?non-empty-string
      */
     public function getType(): ?string;
+
+    public function getStatusCode(): int;
 }
