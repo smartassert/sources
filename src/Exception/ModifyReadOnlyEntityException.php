@@ -6,9 +6,8 @@ namespace App\Exception;
 
 use App\Entity\IdentifyingEntityInterface;
 use App\ErrorResponse\EntityErrorInterface as EntityError;
-use App\ErrorResponse\SerializableModifyReadOnlyEntityErrorInterface as SerializableModifyReadOnlyEntityError;
 
-class ModifyReadOnlyEntityException extends \Exception implements EntityError, SerializableModifyReadOnlyEntityError
+class ModifyReadOnlyEntityException extends \Exception implements EntityError
 {
     public function __construct(
         public readonly IdentifyingEntityInterface $entity,
