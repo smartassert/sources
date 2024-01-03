@@ -5,13 +5,12 @@ declare(strict_types=1);
 namespace App\Exception;
 
 use App\ErrorResponse\BadRequestErrorInterface;
-use App\ErrorResponse\SerializableBadRequestErrorInterface;
 use App\RequestField\FieldInterface;
 
 /**
- * @phpstan-import-type SerializedBadRequestError from SerializableBadRequestErrorInterface
+ * @phpstan-import-type SerializedBadRequestError from BadRequestErrorInterface
  */
-class BadRequestException extends \Exception implements BadRequestErrorInterface, SerializableBadRequestErrorInterface
+class BadRequestException extends \Exception implements BadRequestErrorInterface
 {
     /**
      * @param non-empty-string $type
