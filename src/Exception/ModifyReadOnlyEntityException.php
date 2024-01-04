@@ -17,14 +17,10 @@ class ModifyReadOnlyEntityException extends AbstractErrorException implements Mo
         private readonly string $entityType,
     ) {
         parent::__construct(
+            ModifyReadOnlyEntityErrorInterface::ERROR_CLASS,
             sprintf('Cannot modify %s %s, entity is read-only', $entityType, $entityId),
             405
         );
-    }
-
-    public function getClass(): string
-    {
-        return ModifyReadOnlyEntityErrorInterface::ERROR_CLASS;
     }
 
     public function getType(): null
@@ -35,7 +31,7 @@ class ModifyReadOnlyEntityException extends AbstractErrorException implements Mo
     public function serialize(): array
     {
         return [
-            'class' => $this->getClass(),
+            'class' => ModifyReadOnlyEntityErrorInterface::ERROR_CLASS,
             'entity' => [
                 'id' => $this->entityId,
                 'type' => $this->entityType,

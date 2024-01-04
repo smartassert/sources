@@ -9,11 +9,6 @@ interface ModifyReadOnlyEntityErrorInterface extends ErrorInterface
     public const ERROR_CLASS = 'modify_read_only';
 
     /**
-     * @return self::ERROR_CLASS
-     */
-    public function getClass(): string;
-
-    /**
      * @return array{
      *   class: 'modify_read_only',
      *   entity: array{

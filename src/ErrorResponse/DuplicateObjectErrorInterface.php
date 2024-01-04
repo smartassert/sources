@@ -13,11 +13,6 @@ interface DuplicateObjectErrorInterface extends ErrorInterface
 {
     public const ERROR_CLASS = 'duplicate';
 
-    /**
-     * @return self::ERROR_CLASS
-     */
-    public function getClass(): string;
-
     public function getType(): null;
 
     public function getField(): FieldInterface;

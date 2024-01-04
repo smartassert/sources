@@ -13,11 +13,6 @@ interface BadRequestErrorInterface extends ErrorInterface
 {
     public const ERROR_CLASS = 'bad_request';
 
-    /**
-     * @return self::ERROR_CLASS
-     */
-    public function getClass(): string;
-
     public function getField(): FieldInterface;
 
     /**

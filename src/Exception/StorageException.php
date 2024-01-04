@@ -22,12 +22,7 @@ class StorageException extends AbstractErrorException implements StorageErrorInt
         string $message,
         ?\Throwable $previous,
     ) {
-        parent::__construct($message, 500, $previous);
-    }
-
-    public function getClass(): string
-    {
-        return self::ERROR_CLASS;
+        parent::__construct(StorageErrorInterface::ERROR_CLASS, $message, 500, $previous);
     }
 
     public function getType(): ?string
@@ -53,7 +48,7 @@ class StorageException extends AbstractErrorException implements StorageErrorInt
     public function serialize(): array
     {
         return [
-            'class' => $this->getClass(),
+            'class' => StorageErrorInterface::ERROR_CLASS,
             'type' => $this->getType(),
             'location' => $this->getLocation(),
             'object_type' => $this->getObjectType(),

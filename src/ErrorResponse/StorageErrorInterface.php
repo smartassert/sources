@@ -9,11 +9,6 @@ interface StorageErrorInterface extends ErrorInterface
     public const ERROR_CLASS = 'storage';
 
     /**
-     * @return self::ERROR_CLASS
-     */
-    public function getClass(): string;
-
-    /**
      * @return ?non-empty-string
      */
     public function getLocation(): ?string;

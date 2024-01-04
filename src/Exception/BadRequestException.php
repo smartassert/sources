@@ -18,12 +18,7 @@ class BadRequestException extends AbstractErrorException implements BadRequestEr
     ) {
         $message = 'bad_request: ' . $field->getName() . ' ' . $this->type;
 
-        parent::__construct($message, 400);
-    }
-
-    public function getClass(): string
-    {
-        return 'bad_request';
+        parent::__construct(BadRequestErrorInterface::ERROR_CLASS, $message, 400);
     }
 
     public function getField(): FieldInterface
@@ -42,7 +37,7 @@ class BadRequestException extends AbstractErrorException implements BadRequestEr
     public function serialize(): array
     {
         return [
-            'class' => $this->getClass(),
+            'class' => BadRequestErrorInterface::ERROR_CLASS,
             'type' => $this->getType(),
             'field' => $this->field->jsonSerialize(),
         ];

@@ -12,12 +12,7 @@ class DuplicateObjectException extends AbstractErrorException implements Duplica
     public function __construct(
         private readonly FieldInterface $field,
     ) {
-        parent::__construct('', 400);
-    }
-
-    public function getClass(): string
-    {
-        return 'duplicate';
+        parent::__construct(DuplicateObjectErrorInterface::ERROR_CLASS, '', 400);
     }
 
     public function getField(): FieldInterface
@@ -33,7 +28,7 @@ class DuplicateObjectException extends AbstractErrorException implements Duplica
     public function serialize(): array
     {
         return [
-            'class' => $this->getClass(),
+            'class' => DuplicateObjectErrorInterface::ERROR_CLASS,
             'field' => $this->field->jsonSerialize(),
         ];
     }
