@@ -8,12 +8,14 @@ use App\Entity\IdentifiedEntityInterface;
 use League\Flysystem\FilesystemException;
 use League\Flysystem\FilesystemOperationFailed;
 
-class EntityStorageException extends StorageException
+class StorageExceptionFactory
 {
     private const OBJECT_TYPE = 'entity';
 
-    public function __construct(IdentifiedEntityInterface $entity, FilesystemException $filesystemException)
-    {
+    public function createForEntityStorageFailure(
+        IdentifiedEntityInterface $entity,
+        FilesystemException $filesystemException
+    ): StorageException {
         $message = sprintf(
             'Filesystem %s error for %s %s',
             'foo',
@@ -21,7 +23,7 @@ class EntityStorageException extends StorageException
             $entity->getIdentifier()->getId(),
         );
 
-        parent::__construct(
+        return new StorageException(
             $this->createType($filesystemException),
             self::OBJECT_TYPE,
             $this->createLocation($filesystemException),

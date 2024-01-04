@@ -7,7 +7,8 @@ namespace App\Controller;
 use App\Entity\FileSource;
 use App\Entity\SourceInterface;
 use App\Enum\Source\Type;
-use App\Exception\EntityStorageException;
+use App\Exception\StorageException;
+use App\Exception\StorageExceptionFactory;
 use App\Repository\SourceRepository;
 use League\Flysystem\FilesystemException;
 use League\Flysystem\FilesystemWriter;
@@ -36,11 +37,14 @@ class SourceController
     }
 
     /**
-     * @throws EntityStorageException
+     * @throws StorageException
      */
     #[Route(SourceRoutes::ROUTE_SOURCE, name: 'user_source_delete', methods: ['DELETE'])]
-    public function delete(SourceInterface $source, FilesystemWriter $fileSourceWriter): Response
-    {
+    public function delete(
+        SourceInterface $source,
+        FilesystemWriter $fileSourceWriter,
+        StorageExceptionFactory $exceptionFactory,
+    ): Response {
         if (null === $source->getDeletedAt()) {
             $this->repository->delete($source);
 
@@ -48,7 +52,7 @@ class SourceController
                 try {
                     $fileSourceWriter->deleteDirectory($source->getDirectoryPath());
                 } catch (FilesystemException $e) {
-                    throw new EntityStorageException($source, $e);
+                    throw $exceptionFactory->createForEntityStorageFailure($source, $e);
                 }
             }
         }
