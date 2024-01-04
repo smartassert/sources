@@ -7,12 +7,12 @@ namespace App\Exception;
 use App\ErrorResponse\DuplicateObjectErrorInterface;
 use App\RequestField\FieldInterface;
 
-class DuplicateObjectException extends \Exception implements DuplicateObjectErrorInterface
+class DuplicateObjectException extends AbstractErrorException implements DuplicateObjectErrorInterface
 {
     public function __construct(
         private readonly FieldInterface $field,
     ) {
-        parent::__construct();
+        parent::__construct('', 400);
     }
 
     public function getClass(): string
@@ -36,10 +36,5 @@ class DuplicateObjectException extends \Exception implements DuplicateObjectErro
             'class' => $this->getClass(),
             'field' => $this->field->jsonSerialize(),
         ];
-    }
-
-    public function getStatusCode(): int
-    {
-        return 400;
     }
 }

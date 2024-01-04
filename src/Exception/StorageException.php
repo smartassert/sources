@@ -6,7 +6,7 @@ namespace App\Exception;
 
 use App\ErrorResponse\StorageErrorInterface;
 
-class StorageException extends \Exception implements StorageErrorInterface
+class StorageException extends AbstractErrorException implements StorageErrorInterface
 {
     /**
      * @param ?non-empty-string     $type
@@ -22,7 +22,7 @@ class StorageException extends \Exception implements StorageErrorInterface
         string $message,
         ?\Throwable $previous,
     ) {
-        parent::__construct($message, 0, $previous);
+        parent::__construct($message, 500, $previous);
     }
 
     public function getClass(): string
@@ -33,11 +33,6 @@ class StorageException extends \Exception implements StorageErrorInterface
     public function getType(): ?string
     {
         return $this->type;
-    }
-
-    public function getStatusCode(): int
-    {
-        return 500;
     }
 
     public function getLocation(): ?string

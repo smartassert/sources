@@ -7,7 +7,7 @@ namespace App\Exception;
 use App\ErrorResponse\BadRequestErrorInterface;
 use App\RequestField\FieldInterface;
 
-class BadRequestException extends \Exception implements BadRequestErrorInterface
+class BadRequestException extends AbstractErrorException implements BadRequestErrorInterface
 {
     /**
      * @param non-empty-string $type
@@ -37,11 +37,6 @@ class BadRequestException extends \Exception implements BadRequestErrorInterface
     public function getType(): string
     {
         return $this->type;
-    }
-
-    public function getStatusCode(): int
-    {
-        return $this->getCode();
     }
 
     public function serialize(): array

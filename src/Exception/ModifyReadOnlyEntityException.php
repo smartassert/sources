@@ -6,7 +6,7 @@ namespace App\Exception;
 
 use App\ErrorResponse\ModifyReadOnlyEntityErrorInterface;
 
-class ModifyReadOnlyEntityException extends \Exception implements ModifyReadOnlyEntityErrorInterface
+class ModifyReadOnlyEntityException extends AbstractErrorException implements ModifyReadOnlyEntityErrorInterface
 {
     /**
      * @param non-empty-string $entityId
@@ -16,12 +16,10 @@ class ModifyReadOnlyEntityException extends \Exception implements ModifyReadOnly
         private readonly string $entityId,
         private readonly string $entityType,
     ) {
-        parent::__construct(sprintf('Cannot modify %s %s, entity is read-only', $entityType, $entityId));
-    }
-
-    public function getStatusCode(): int
-    {
-        return 405;
+        parent::__construct(
+            sprintf('Cannot modify %s %s, entity is read-only', $entityType, $entityId),
+            405
+        );
     }
 
     public function getClass(): string
