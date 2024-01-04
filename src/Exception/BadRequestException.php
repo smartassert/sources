@@ -10,15 +10,15 @@ use App\RequestField\FieldInterface;
 class BadRequestException extends AbstractErrorException implements BadRequestErrorInterface
 {
     /**
-     * @param non-empty-string $type
+     * @param non-empty-string $errorType
      */
     public function __construct(
         private readonly FieldInterface $field,
-        private readonly string $type,
+        private readonly string $errorType,
     ) {
-        $message = 'bad_request: ' . $field->getName() . ' ' . $this->type;
+        $message = 'bad_request: ' . $field->getName() . ' ' . $errorType;
 
-        parent::__construct(BadRequestErrorInterface::ERROR_CLASS, $message, 400);
+        parent::__construct(BadRequestErrorInterface::ERROR_CLASS, $errorType, $message, 400);
     }
 
     public function getField(): FieldInterface
@@ -26,19 +26,11 @@ class BadRequestException extends AbstractErrorException implements BadRequestEr
         return $this->field;
     }
 
-    /**
-     * @return non-empty-string
-     */
-    public function getType(): string
-    {
-        return $this->type;
-    }
-
     public function serialize(): array
     {
         return [
             'class' => BadRequestErrorInterface::ERROR_CLASS,
-            'type' => $this->getType(),
+            'type' => $this->errorType,
             'field' => $this->field->jsonSerialize(),
         ];
     }

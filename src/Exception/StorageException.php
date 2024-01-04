@@ -15,19 +15,14 @@ class StorageException extends AbstractErrorException implements StorageErrorInt
      * @param array<string, scalar> $context
      */
     public function __construct(
-        private readonly ?string $type,
+        ?string $type,
         private readonly string $objectType,
         private readonly ?string $location,
         private readonly array $context,
         string $message,
         ?\Throwable $previous,
     ) {
-        parent::__construct(StorageErrorInterface::ERROR_CLASS, $message, 500, $previous);
-    }
-
-    public function getType(): ?string
-    {
-        return $this->type;
+        parent::__construct(StorageErrorInterface::ERROR_CLASS, $type, $message, 500, $previous);
     }
 
     public function getLocation(): ?string
