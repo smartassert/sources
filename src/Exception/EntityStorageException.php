@@ -5,16 +5,15 @@ declare(strict_types=1);
 namespace App\Exception;
 
 use App\Entity\IdentifiedEntityInterface;
-use App\ErrorResponse\StorageErrorInterface as StorageError;
 use League\Flysystem\FilesystemException;
 use League\Flysystem\FilesystemOperationFailed;
 
-class EntityStorageException extends \Exception implements StorageError
+class EntityStorageException extends StorageException
 {
-    public function __construct(
-        private readonly IdentifiedEntityInterface $entity,
-        private readonly FilesystemException $filesystemException
-    ) {
+    private const OBJECT_TYPE = 'entity';
+
+    public function __construct(IdentifiedEntityInterface $entity, FilesystemException $filesystemException)
+    {
         $message = sprintf(
             'Filesystem %s error for %s %s',
             'foo',
@@ -22,22 +21,24 @@ class EntityStorageException extends \Exception implements StorageError
             $entity->getIdentifier()->getId(),
         );
 
-        parent::__construct($message, 0, $filesystemException);
-    }
-
-    public function getClass(): string
-    {
-        return 'storage';
+        parent::__construct(
+            $this->createType($filesystemException),
+            self::OBJECT_TYPE,
+            $this->createLocation($filesystemException),
+            $entity->getIdentifier()->serialize(),
+            $message,
+            $filesystemException
+        );
     }
 
     /**
      * @return ?non-empty-string
      */
-    public function getType(): ?string
+    private function createType(FilesystemException $filesystemException): ?string
     {
         $operationType = null;
-        if ($this->filesystemException instanceof FilesystemOperationFailed) {
-            $operationType = strtolower($this->filesystemException->operation());
+        if ($filesystemException instanceof FilesystemOperationFailed) {
+            $operationType = strtolower($filesystemException->operation());
             if ('' === $operationType) {
                 $operationType = null;
             }
@@ -46,45 +47,19 @@ class EntityStorageException extends \Exception implements StorageError
         return $operationType;
     }
 
-    public function getStatusCode(): int
-    {
-        return 500;
-    }
-
     /**
      * @return ?non-empty-string
      */
-    public function getLocation(): ?string
+    private function createLocation(FilesystemException $filesystemException): ?string
     {
         $location = null;
-        if (method_exists($this->filesystemException, 'location')) {
-            $location = trim($this->filesystemException->location());
+        if (method_exists($filesystemException, 'location')) {
+            $location = trim($filesystemException->location());
             if ('' === $location) {
                 $location = null;
             }
         }
 
         return $location;
-    }
-
-    public function getObjectType(): string
-    {
-        return 'entity';
-    }
-
-    public function getContext(): array
-    {
-        return $this->entity->getIdentifier()->serialize();
-    }
-
-    public function serialize(): array
-    {
-        return [
-            'class' => $this->getClass(),
-            'type' => $this->getType(),
-            'location' => $this->getLocation(),
-            'object_type' => $this->getObjectType(),
-            'context' => $this->getContext(),
-        ];
     }
 }
