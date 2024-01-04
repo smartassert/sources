@@ -5,13 +5,13 @@ declare(strict_types=1);
 namespace App\Exception;
 
 use App\Entity\EntityIdentifierInterface;
-use App\Entity\IdentifiedEntityInterface;
-use App\ErrorResponse\EntityErrorInterface;
+use App\Entity\IdentifiedEntityInterface as IdentifiedEntity;
+use App\ErrorResponse\ModifyReadOnlyEntityErrorInterface;
 
-class ModifyReadOnlyEntityException extends \Exception implements IdentifiedEntityInterface, EntityErrorInterface
+class ModifyReadOnlyEntityException extends \Exception implements IdentifiedEntity, ModifyReadOnlyEntityErrorInterface
 {
     public function __construct(
-        public readonly IdentifiedEntityInterface $entity,
+        public readonly IdentifiedEntity $entity,
     ) {
         parent::__construct(sprintf(
             'Cannot modify %s %s, entity is read-only',
@@ -27,7 +27,7 @@ class ModifyReadOnlyEntityException extends \Exception implements IdentifiedEnti
 
     public function getClass(): string
     {
-        return 'modify_read_only';
+        return ModifyReadOnlyEntityErrorInterface::ERROR_CLASS;
     }
 
     public function getType(): null
