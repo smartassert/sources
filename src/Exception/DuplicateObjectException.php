@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace App\Exception;
 
-use App\ErrorResponse\RequestFieldErrorInterface as RequestFieldError;
+use App\ErrorResponse\DuplicateObjectErrorInterface;
 use App\RequestField\FieldInterface;
 
-class DuplicateObjectException extends \Exception implements RequestFieldError
+class DuplicateObjectException extends \Exception implements DuplicateObjectErrorInterface
 {
     public function __construct(
         private readonly FieldInterface $field,
@@ -25,7 +25,7 @@ class DuplicateObjectException extends \Exception implements RequestFieldError
         return $this->field;
     }
 
-    public function getType(): ?string
+    public function getType(): null
     {
         return null;
     }
