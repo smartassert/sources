@@ -9,12 +9,19 @@ use App\RequestField\FieldInterface;
 /**
  * @phpstan-import-type SerializedField from FieldInterface
  */
-interface BadRequestErrorInterface extends RequestFieldErrorInterface
+interface BadRequestErrorInterface extends ErrorInterface
 {
+    public const ERROR_CLASS = 'bad_request';
+
+    /**
+     * @return self::ERROR_CLASS
+     */
+    public function getClass(): string;
+
     public function getField(): FieldInterface;
 
     /**
-     * @return array{class: non-empty-string, type: non-empty-string, field: SerializedField}
+     * @return array{class: 'bad_request', type: non-empty-string, field: SerializedField}
      */
     public function serialize(): array;
 }
