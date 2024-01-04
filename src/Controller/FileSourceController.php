@@ -47,7 +47,10 @@ readonly class FileSourceController
     public function update(FileSource $source, FileSourceRequest $request): Response
     {
         if (null !== $source->getDeletedAt()) {
-            throw new ModifyReadOnlyEntityException($source);
+            throw new ModifyReadOnlyEntityException(
+                $source->getIdentifier()->getId(),
+                $source->getIdentifier()->getType(),
+            );
         }
 
         return new JsonResponse($this->sourceMutator->updateFile($source, $request));

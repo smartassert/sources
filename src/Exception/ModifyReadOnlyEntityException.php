@@ -4,20 +4,19 @@ declare(strict_types=1);
 
 namespace App\Exception;
 
-use App\Entity\EntityIdentifierInterface;
-use App\Entity\IdentifiedEntityInterface as IdentifiedEntity;
 use App\ErrorResponse\ModifyReadOnlyEntityErrorInterface;
 
-class ModifyReadOnlyEntityException extends \Exception implements IdentifiedEntity, ModifyReadOnlyEntityErrorInterface
+class ModifyReadOnlyEntityException extends \Exception implements ModifyReadOnlyEntityErrorInterface
 {
+    /**
+     * @param non-empty-string $entityId
+     * @param non-empty-string $entityType
+     */
     public function __construct(
-        public readonly IdentifiedEntity $entity,
+        private readonly string $entityId,
+        private readonly string $entityType,
     ) {
-        parent::__construct(sprintf(
-            'Cannot modify %s %s, entity is read-only',
-            $entity->getIdentifier()->getType(),
-            $entity->getIdentifier()->getId(),
-        ));
+        parent::__construct(sprintf('Cannot modify %s %s, entity is read-only', $entityType, $entityId));
     }
 
     public function getStatusCode(): int
@@ -35,16 +34,14 @@ class ModifyReadOnlyEntityException extends \Exception implements IdentifiedEnti
         return null;
     }
 
-    public function getIdentifier(): EntityIdentifierInterface
-    {
-        return $this->entity->getIdentifier();
-    }
-
     public function serialize(): array
     {
         return [
             'class' => $this->getClass(),
-            'entity' => $this->entity->getIdentifier()->serialize(),
+            'entity' => [
+                'id' => $this->entityId,
+                'type' => $this->entityType,
+            ],
         ];
     }
 }

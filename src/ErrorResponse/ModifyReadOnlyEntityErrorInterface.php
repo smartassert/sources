@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\ErrorResponse;
 
-use App\Entity\EntityIdentifierInterface;
-
 /**
  * @phpstan-type SerializedModifyReadOnlyEntityError array{
  *   class: 'modify_read_only',
@@ -23,8 +21,6 @@ interface ModifyReadOnlyEntityErrorInterface extends ErrorInterface
      * @return self::ERROR_CLASS
      */
     public function getClass(): string;
-
-    public function getIdentifier(): EntityIdentifierInterface;
 
     /**
      * @return SerializedModifyReadOnlyEntityError

@@ -8,8 +8,6 @@ use App\ErrorResponse\StorageErrorInterface;
 
 class StorageException extends \Exception implements StorageErrorInterface
 {
-    private const CLASS = 'storage';
-
     /**
      * @param ?non-empty-string     $type
      * @param non-empty-string      $objectType
@@ -29,7 +27,7 @@ class StorageException extends \Exception implements StorageErrorInterface
 
     public function getClass(): string
     {
-        return self::CLASS;
+        return self::ERROR_CLASS;
     }
 
     public function getType(): ?string

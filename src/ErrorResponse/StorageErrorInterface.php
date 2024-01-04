@@ -6,6 +6,13 @@ namespace App\ErrorResponse;
 
 interface StorageErrorInterface extends ErrorInterface
 {
+    public const ERROR_CLASS = 'storage';
+
+    /**
+     * @return self::ERROR_CLASS
+     */
+    public function getClass(): string;
+
     /**
      * @return ?non-empty-string
      */
@@ -23,7 +30,7 @@ interface StorageErrorInterface extends ErrorInterface
 
     /**
      * @return array{
-     *   class: non-empty-string,
+     *   class: 'storage',
      *   type: ?non-empty-string,
      *   location: ?non-empty-string,
      *   object_type: non-empty-string,
