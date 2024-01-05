@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Exception;
 
-use App\ErrorResponse\ModifyReadOnlyEntityErrorInterface;
+use SmartAssert\ServiceRequest\Error\ModifyReadOnlyEntityErrorInterface;
 
 class ModifyReadOnlyEntityException extends ErrorResponseException
 {

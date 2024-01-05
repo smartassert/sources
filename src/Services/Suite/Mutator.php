@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace App\Services\Suite;
 
 use App\Entity\Suite;
-use App\ErrorResponse\DuplicateObjectError;
 use App\Exception\DuplicateObjectException;
 use App\Repository\SuiteRepository;
 use App\Request\SuiteRequest;
+use SmartAssert\ServiceRequest\Error\DuplicateObjectError;
 use SmartAssert\ServiceRequest\Field\Field;
 
 class Mutator

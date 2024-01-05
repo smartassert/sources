@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use App\Entity\Suite;
-use App\ErrorResponse\ModifyReadOnlyEntityError;
 use App\Exception\DuplicateObjectException;
 use App\Exception\EmptyEntityIdException;
 use App\Exception\ModifyReadOnlyEntityException;
@@ -13,6 +12,7 @@ use App\Repository\SuiteRepository;
 use App\Request\SuiteRequest;
 use App\Services\Suite\Factory;
 use App\Services\Suite\Mutator;
+use SmartAssert\ServiceRequest\Error\ModifyReadOnlyEntityError;
 use SmartAssert\UsersSecurityBundle\Security\User;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
