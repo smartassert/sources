@@ -2,11 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\Exception;
+namespace App\ErrorResponse;
 
-use App\ErrorResponse\ErrorInterface;
-
-class ErrorException extends \Exception implements ErrorInterface
+class ErrorResponse implements ErrorInterface
 {
     /**
      * @param non-empty-string  $class
@@ -14,22 +12,13 @@ class ErrorException extends \Exception implements ErrorInterface
      */
     public function __construct(
         private readonly string $class,
-        private readonly ?string $type,
-        string $message,
-        int $code,
-        ?\Throwable $previous = null
+        private readonly ?string $type = null,
     ) {
-        parent::__construct($message, $code, $previous);
     }
 
     public function getClass(): string
     {
         return $this->class;
-    }
-
-    public function getStatusCode(): int
-    {
-        return $this->getCode();
     }
 
     /**

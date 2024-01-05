@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\RequestField\Validator;
 
+use App\ErrorResponse\BadRequestError;
 use App\Exception\BadRequestException;
 use App\RequestField\FieldInterface;
 use SmartAssert\YamlFile\Filename as YamlFilename;
@@ -23,14 +24,14 @@ readonly class YamlFilenameFieldValidator
     {
         $value = $field->getValue();
         if (!is_string($value)) {
-            throw new BadRequestException($field, 'wrong_type');
+            throw new BadRequestException(new BadRequestError($field, 'wrong_type'));
         }
 
         $filename = YamlFilename::parse($value);
         $validation = $this->yamlFilenameValidator->validate($filename);
 
         if (false === $validation->isValid()) {
-            throw new BadRequestException($field, 'invalid');
+            throw new BadRequestException(new BadRequestError($field, 'invalid'));
         }
 
         return $filename;

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\RequestField\Validator;
 
+use App\ErrorResponse\BadRequestError;
 use App\Exception\BadRequestException;
 use App\RequestField\FieldInterface;
 use SmartAssert\YamlFile\Filename;
@@ -25,7 +26,7 @@ readonly class YamlFilenameCollectionFieldValidator
     {
         $names = $field->getValue();
         if (!is_array($names)) {
-            throw new BadRequestException($field, 'wrong_type');
+            throw new BadRequestException(new BadRequestError($field, 'wrong_type'));
         }
 
         $validatedNames = [];
@@ -39,7 +40,7 @@ readonly class YamlFilenameCollectionFieldValidator
                 } else {
                     $field = $field->withErrorPosition($nameIndex + 1);
 
-                    throw new BadRequestException($field, 'invalid');
+                    throw new BadRequestException(new BadRequestError($field, 'invalid'));
                 }
             }
         }

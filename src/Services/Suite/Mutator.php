@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Services\Suite;
 
 use App\Entity\Suite;
+use App\ErrorResponse\DuplicateObjectError;
 use App\Exception\DuplicateObjectException;
 use App\Repository\SuiteRepository;
 use App\Request\SuiteRequest;
@@ -24,7 +25,11 @@ class Mutator
     {
         $foundSuite = $this->repository->findOneBySourceOwnerAndLabel($request->source, $request->label);
         if ($foundSuite instanceof Suite && $foundSuite->id !== $suite->id) {
-            throw new DuplicateObjectException(new Field('label', $request->getLabel()));
+            throw new DuplicateObjectException(
+                new DuplicateObjectError(
+                    new Field('label', $request->getLabel())
+                )
+            );
         }
 
         $suite->setSource($request->source);

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Exception;
 
 use App\Entity\IdentifiedEntityInterface;
+use App\ErrorResponse\StorageError;
 use League\Flysystem\FilesystemException;
 use League\Flysystem\FilesystemOperationFailed;
 
@@ -16,19 +17,13 @@ class StorageExceptionFactory
         IdentifiedEntityInterface $entity,
         FilesystemException $filesystemException
     ): StorageException {
-        $message = sprintf(
-            'Filesystem %s error for %s %s',
-            'foo',
-            $entity->getIdentifier()->getType(),
-            $entity->getIdentifier()->getId(),
-        );
-
         return new StorageException(
-            $this->createType($filesystemException),
-            self::OBJECT_TYPE,
-            $this->createLocation($filesystemException),
-            $entity->getIdentifier()->serialize(),
-            $message,
+            new StorageError(
+                $this->createType($filesystemException),
+                self::OBJECT_TYPE,
+                $this->createLocation($filesystemException),
+                $entity->getIdentifier()->serialize(),
+            ),
             $filesystemException
         );
     }
