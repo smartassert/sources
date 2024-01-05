@@ -12,7 +12,7 @@ class ErrorResponse implements FooErrorInterface
      */
     public function __construct(
         private readonly string $class,
-        private readonly ?string $type,
+        private readonly ?string $type = null,
     ) {
     }
 

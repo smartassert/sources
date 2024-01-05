@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use App\Entity\FileSource;
+use App\ErrorResponse\DuplicateObjectError;
 use App\Exception\DuplicateObjectException;
 use App\Exception\StorageException;
 use App\Exception\StorageExceptionFactory;
@@ -46,7 +47,11 @@ readonly class FileSourceFileController
 
         try {
             if ($this->fileSourceReader->fileExists($path)) {
-                throw new DuplicateObjectException(new Field('filename', (string) $yamlFile->name));
+                throw new DuplicateObjectException(
+                    new DuplicateObjectError(
+                        new Field('filename', (string) $yamlFile->name)
+                    )
+                );
             }
 
             $this->fileSourceWriter->write($path, $yamlFile->content);
