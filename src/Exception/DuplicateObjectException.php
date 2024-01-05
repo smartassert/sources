@@ -7,7 +7,10 @@ namespace App\Exception;
 use App\ErrorResponse\DuplicateObjectErrorInterface;
 use App\RequestField\FieldInterface;
 
-class DuplicateObjectException extends AbstractErrorException implements DuplicateObjectErrorInterface
+/**
+ * @phpstan-import-type SerializedDuplicateObjectError from DuplicateObjectErrorInterface
+ */
+class DuplicateObjectException extends ErrorException implements DuplicateObjectErrorInterface
 {
     public function __construct(
         private readonly FieldInterface $field,
@@ -20,6 +23,9 @@ class DuplicateObjectException extends AbstractErrorException implements Duplica
         return $this->field;
     }
 
+    /**
+     * @return SerializedDuplicateObjectError
+     */
     public function serialize(): array
     {
         return [

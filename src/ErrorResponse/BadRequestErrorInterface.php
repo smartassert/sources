@@ -8,6 +8,8 @@ use App\RequestField\FieldInterface;
 
 /**
  * @phpstan-import-type SerializedField from FieldInterface
+ *
+ * @phpstan-type SerializedBadRequest array{class: 'bad_request', type: non-empty-string, field: SerializedField}
  */
 interface BadRequestErrorInterface extends ErrorInterface
 {
@@ -16,7 +18,7 @@ interface BadRequestErrorInterface extends ErrorInterface
     public function getField(): FieldInterface;
 
     /**
-     * @return array{class: 'bad_request', type: non-empty-string, field: SerializedField}
+     * @return SerializedBadRequest
      */
     public function serialize(): array;
 }

@@ -4,6 +4,15 @@ declare(strict_types=1);
 
 namespace App\ErrorResponse;
 
+/**
+ * @phpstan-type SerializedStorageError array{
+ *    class: 'storage',
+ *    type: ?non-empty-string,
+ *    location: ?non-empty-string,
+ *    object_type: non-empty-string,
+ *    context: array<mixed>
+ *  }
+ */
 interface StorageErrorInterface extends ErrorInterface
 {
     public const ERROR_CLASS = 'storage';
@@ -24,13 +33,7 @@ interface StorageErrorInterface extends ErrorInterface
     public function getObjectType(): string;
 
     /**
-     * @return array{
-     *   class: 'storage',
-     *   type: ?non-empty-string,
-     *   location: ?non-empty-string,
-     *   object_type: non-empty-string,
-     *   context: array<mixed>
-     * }
+     * @return SerializedStorageError
      */
     public function serialize(): array;
 }

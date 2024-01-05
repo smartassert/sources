@@ -6,7 +6,10 @@ namespace App\Exception;
 
 use App\ErrorResponse\StorageErrorInterface;
 
-class StorageException extends AbstractErrorException implements StorageErrorInterface
+/**
+ * @phpstan-import-type SerializedStorageError from StorageErrorInterface
+ */
+class StorageException extends ErrorException implements StorageErrorInterface
 {
     /**
      * @param ?non-empty-string     $type
@@ -40,6 +43,9 @@ class StorageException extends AbstractErrorException implements StorageErrorInt
         return $this->context;
     }
 
+    /**
+     * @return SerializedStorageError
+     */
     public function serialize(): array
     {
         return [
