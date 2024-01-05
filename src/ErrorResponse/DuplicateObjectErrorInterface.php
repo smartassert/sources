@@ -8,18 +8,15 @@ use App\RequestField\FieldInterface;
 
 /**
  * @phpstan-import-type SerializedField from FieldInterface
- *
- * @phpstan-type SerializedRequestFieldError array{
- *   class: non-empty-string,
- *   field: SerializedField,
- * }
  */
-interface RequestFieldErrorInterface extends ErrorInterface
+interface DuplicateObjectErrorInterface extends ErrorInterface
 {
+    public const ERROR_CLASS = 'duplicate';
+
     public function getField(): FieldInterface;
 
     /**
-     * @return SerializedRequestFieldError
+     * @return array{class: 'duplicate', field: SerializedField}
      */
     public function serialize(): array;
 }

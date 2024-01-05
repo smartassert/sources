@@ -7,23 +7,18 @@ namespace App\Exception;
 use App\ErrorResponse\BadRequestErrorInterface;
 use App\RequestField\FieldInterface;
 
-class BadRequestException extends \Exception implements BadRequestErrorInterface
+class BadRequestException extends AbstractErrorException implements BadRequestErrorInterface
 {
     /**
-     * @param non-empty-string $type
+     * @param non-empty-string $errorType
      */
     public function __construct(
         private readonly FieldInterface $field,
-        private readonly string $type,
+        private readonly string $errorType,
     ) {
-        $message = 'bad_request: ' . $field->getName() . ' ' . $this->type;
+        $message = 'bad_request: ' . $field->getName() . ' ' . $errorType;
 
-        parent::__construct($message, 400);
-    }
-
-    public function getClass(): string
-    {
-        return 'bad_request';
+        parent::__construct(BadRequestErrorInterface::ERROR_CLASS, $errorType, $message, 400);
     }
 
     public function getField(): FieldInterface
@@ -31,24 +26,11 @@ class BadRequestException extends \Exception implements BadRequestErrorInterface
         return $this->field;
     }
 
-    /**
-     * @return non-empty-string
-     */
-    public function getType(): string
-    {
-        return $this->type;
-    }
-
-    public function getStatusCode(): int
-    {
-        return $this->getCode();
-    }
-
     public function serialize(): array
     {
         return [
-            'class' => $this->getClass(),
-            'type' => $this->getType(),
+            'class' => BadRequestErrorInterface::ERROR_CLASS,
+            'type' => $this->errorType,
             'field' => $this->field->jsonSerialize(),
         ];
     }
