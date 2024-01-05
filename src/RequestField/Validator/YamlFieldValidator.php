@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\RequestField\Validator;
 
+use App\ErrorResponse\BadRequestError;
 use App\Exception\BadRequestException;
 use App\RequestField\FieldInterface;
 use SmartAssert\YamlFile\Validator\ContentValidator;
@@ -24,16 +25,16 @@ readonly class YamlFieldValidator
     {
         $content = $field->getValue();
         if (!is_string($content)) {
-            throw new BadRequestException($field, 'wrong_type');
+            throw new BadRequestException(new BadRequestError($field, 'wrong_type'));
         }
 
         if ('' === $content) {
-            throw new BadRequestException($field, 'empty');
+            throw new BadRequestException(new BadRequestError($field, 'empty'));
         }
 
         $validation = $this->yamlContentValidator->validate($content);
         if (false === $validation->isValid()) {
-            throw new BadRequestException($field, 'invalid');
+            throw new BadRequestException(new BadRequestError($field, 'invalid'));
         }
 
         return $content;

@@ -6,6 +6,7 @@ namespace App\EventListener;
 
 use App\ErrorResponse\ErrorInterface;
 use App\ErrorResponse\HasHttpStatusCodeInterface;
+use App\Exception\FooException;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -28,6 +29,13 @@ readonly class KernelExceptionEventSubscriber implements EventSubscriberInterfac
     public function onKernelException(ExceptionEvent $event): void
     {
         $throwable = $event->getThrowable();
+        if ($throwable instanceof FooException) {
+            $event->setResponse(new JsonResponse($throwable->error->serialize(), $throwable->getCode()));
+            $event->stopPropagation();
+
+            return;
+        }
+
         if ($throwable instanceof ErrorInterface) {
             $event->setResponse(new JsonResponse($throwable->serialize(), $throwable->getStatusCode()));
             $event->stopPropagation();
