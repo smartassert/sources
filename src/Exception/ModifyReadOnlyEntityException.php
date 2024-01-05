@@ -6,7 +6,7 @@ namespace App\Exception;
 
 use App\ErrorResponse\ModifyReadOnlyEntityErrorInterface;
 
-class ModifyReadOnlyEntityException extends FooException
+class ModifyReadOnlyEntityException extends ErrorResponseException
 {
     public function __construct(ModifyReadOnlyEntityErrorInterface $error)
     {

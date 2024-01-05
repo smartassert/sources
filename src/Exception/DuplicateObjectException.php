@@ -6,7 +6,7 @@ namespace App\Exception;
 
 use App\ErrorResponse\DuplicateObjectErrorInterface;
 
-class DuplicateObjectException extends FooException
+class DuplicateObjectException extends ErrorResponseException
 {
     public function __construct(DuplicateObjectErrorInterface $error)
     {

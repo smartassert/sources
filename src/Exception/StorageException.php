@@ -6,7 +6,7 @@ namespace App\Exception;
 
 use App\ErrorResponse\StorageErrorInterface;
 
-class StorageException extends FooException
+class StorageException extends ErrorResponseException
 {
     public function __construct(StorageErrorInterface $error, \Throwable $previous)
     {

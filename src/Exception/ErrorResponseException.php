@@ -6,7 +6,7 @@ namespace App\Exception;
 
 use App\ErrorResponse\FooErrorInterface;
 
-class FooException extends \Exception
+class ErrorResponseException extends \Exception
 {
     public function __construct(
         public readonly FooErrorInterface $error,

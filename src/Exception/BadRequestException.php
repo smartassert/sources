@@ -6,7 +6,7 @@ namespace App\Exception;
 
 use App\ErrorResponse\BadRequestErrorInterface;
 
-class BadRequestException extends FooException
+class BadRequestException extends ErrorResponseException
 {
     public function __construct(BadRequestErrorInterface $error)
     {
