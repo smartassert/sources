@@ -13,7 +13,7 @@ namespace App\ErrorResponse;
  *    }
  *  }
  */
-interface ModifyReadOnlyEntityErrorInterface extends FooErrorInterface
+interface ModifyReadOnlyEntityErrorInterface extends ErrorInterface
 {
     public const ERROR_CLASS = 'modify_read_only';
 

@@ -11,7 +11,7 @@ use App\RequestField\FieldInterface;
  *
  * @phpstan-type SerializedDuplicateObjectError array{class: 'duplicate', field: SerializedField}
  */
-interface DuplicateObjectErrorInterface extends FooErrorInterface
+interface DuplicateObjectErrorInterface extends ErrorInterface
 {
     public const ERROR_CLASS = 'duplicate';
 

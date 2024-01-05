@@ -11,7 +11,7 @@ use App\RequestField\FieldInterface;
  *
  * @phpstan-type SerializedBadRequest array{class: 'bad_request', type: non-empty-string, field: SerializedField}
  */
-interface BadRequestErrorInterface extends FooErrorInterface
+interface BadRequestErrorInterface extends ErrorInterface
 {
     public const ERROR_CLASS = 'bad_request';
 

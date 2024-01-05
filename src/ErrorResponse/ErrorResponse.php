@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\ErrorResponse;
 
-class ErrorResponse implements FooErrorInterface
+class ErrorResponse implements ErrorInterface
 {
     /**
      * @param non-empty-string  $class

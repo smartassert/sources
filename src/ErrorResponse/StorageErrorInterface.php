@@ -13,7 +13,7 @@ namespace App\ErrorResponse;
  *    context: array<mixed>
  *  }
  */
-interface StorageErrorInterface extends FooErrorInterface
+interface StorageErrorInterface extends ErrorInterface
 {
     public const ERROR_CLASS = 'storage';
 

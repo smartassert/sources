@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace App\Exception;
 
-use App\ErrorResponse\FooErrorInterface;
+use App\ErrorResponse\ErrorInterface;
 
 class ErrorResponseException extends \Exception
 {
     public function __construct(
-        public readonly FooErrorInterface $error,
+        public readonly ErrorInterface $error,
         int $code = 0,
         ?\Throwable $previous = null
     ) {
