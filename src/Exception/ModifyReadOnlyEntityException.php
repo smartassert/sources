@@ -6,7 +6,10 @@ namespace App\Exception;
 
 use App\ErrorResponse\ModifyReadOnlyEntityErrorInterface;
 
-class ModifyReadOnlyEntityException extends AbstractErrorException implements ModifyReadOnlyEntityErrorInterface
+/**
+ * @phpstan-import-type SerializedModifyReadOnlyEntityError from ModifyReadOnlyEntityErrorInterface
+ */
+class ModifyReadOnlyEntityException extends ErrorException implements ModifyReadOnlyEntityErrorInterface
 {
     /**
      * @param non-empty-string $entityId
@@ -24,6 +27,9 @@ class ModifyReadOnlyEntityException extends AbstractErrorException implements Mo
         );
     }
 
+    /**
+     * @return SerializedModifyReadOnlyEntityError
+     */
     public function serialize(): array
     {
         return [

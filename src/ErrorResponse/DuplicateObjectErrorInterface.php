@@ -8,6 +8,8 @@ use App\RequestField\FieldInterface;
 
 /**
  * @phpstan-import-type SerializedField from FieldInterface
+ *
+ * @phpstan-type SerializedDuplicateObjectError array{class: 'duplicate', field: SerializedField}
  */
 interface DuplicateObjectErrorInterface extends ErrorInterface
 {
@@ -16,7 +18,7 @@ interface DuplicateObjectErrorInterface extends ErrorInterface
     public function getField(): FieldInterface;
 
     /**
-     * @return array{class: 'duplicate', field: SerializedField}
+     * @return SerializedDuplicateObjectError
      */
     public function serialize(): array;
 }

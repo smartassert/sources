@@ -7,7 +7,10 @@ namespace App\Exception;
 use App\ErrorResponse\BadRequestErrorInterface;
 use App\RequestField\FieldInterface;
 
-class BadRequestException extends AbstractErrorException implements BadRequestErrorInterface
+/**
+ * @phpstan-import-type SerializedBadRequest from BadRequestErrorInterface
+ */
+class BadRequestException extends ErrorException implements BadRequestErrorInterface
 {
     /**
      * @param non-empty-string $errorType
@@ -26,6 +29,9 @@ class BadRequestException extends AbstractErrorException implements BadRequestEr
         return $this->field;
     }
 
+    /**
+     * @return SerializedBadRequest
+     */
     public function serialize(): array
     {
         return [
