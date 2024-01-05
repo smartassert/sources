@@ -6,54 +6,10 @@ namespace App\Exception;
 
 use App\ErrorResponse\StorageErrorInterface;
 
-/**
- * @phpstan-import-type SerializedStorageError from StorageErrorInterface
- */
-class StorageException extends ErrorException implements StorageErrorInterface
+class StorageException extends FooException
 {
-    /**
-     * @param ?non-empty-string     $type
-     * @param non-empty-string      $objectType
-     * @param ?non-empty-string     $location
-     * @param array<string, scalar> $context
-     */
-    public function __construct(
-        ?string $type,
-        private readonly string $objectType,
-        private readonly ?string $location,
-        private readonly array $context,
-        string $message,
-        ?\Throwable $previous,
-    ) {
-        parent::__construct(StorageErrorInterface::ERROR_CLASS, $type, $message, 500, $previous);
-    }
-
-    public function getLocation(): ?string
+    public function __construct(StorageErrorInterface $error, \Throwable $previous)
     {
-        return $this->location;
-    }
-
-    public function getObjectType(): string
-    {
-        return $this->objectType;
-    }
-
-    public function getContext(): array
-    {
-        return $this->context;
-    }
-
-    /**
-     * @return SerializedStorageError
-     */
-    public function serialize(): array
-    {
-        return [
-            'class' => StorageErrorInterface::ERROR_CLASS,
-            'type' => $this->getType(),
-            'location' => $this->getLocation(),
-            'object_type' => $this->getObjectType(),
-            'context' => $this->getContext(),
-        ];
+        parent::__construct($error, 500, $previous);
     }
 }
