@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use App\Entity\FileSource;
+use App\ErrorResponse\ModifyReadOnlyEntityError;
 use App\Exception\DuplicateObjectException;
 use App\Exception\EmptyEntityIdException;
 use App\Exception\ModifyReadOnlyEntityException;
@@ -48,8 +49,10 @@ readonly class FileSourceController
     {
         if (null !== $source->getDeletedAt()) {
             throw new ModifyReadOnlyEntityException(
-                $source->getIdentifier()->getId(),
-                $source->getIdentifier()->getType(),
+                new ModifyReadOnlyEntityError(
+                    $source->getIdentifier()->getId(),
+                    $source->getIdentifier()->getType(),
+                )
             );
         }
 

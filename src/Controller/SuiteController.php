@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use App\Entity\Suite;
+use App\ErrorResponse\ModifyReadOnlyEntityError;
 use App\Exception\DuplicateObjectException;
 use App\Exception\EmptyEntityIdException;
 use App\Exception\ModifyReadOnlyEntityException;
@@ -59,8 +60,10 @@ readonly class SuiteController
     {
         if (null !== $suite->getDeletedAt()) {
             throw new ModifyReadOnlyEntityException(
-                $suite->getIdentifier()->getId(),
-                $suite->getIdentifier()->getType(),
+                new ModifyReadOnlyEntityError(
+                    $suite->getIdentifier()->getId(),
+                    $suite->getIdentifier()->getType(),
+                )
             );
         }
 
