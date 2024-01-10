@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use App\Entity\FileSource;
-use App\ErrorResponse\ModifyReadOnlyEntityError;
 use App\Exception\DuplicateObjectException;
 use App\Exception\EmptyEntityIdException;
 use App\Exception\ModifyReadOnlyEntityException;
@@ -16,6 +15,7 @@ use App\Services\Source\FileSourceFactory;
 use App\Services\Source\Mutator;
 use App\Services\SourceRepository\Reader\FileSourceDirectoryLister;
 use League\Flysystem\FilesystemException;
+use SmartAssert\ServiceRequest\Error\ModifyReadOnlyEntityError;
 use SmartAssert\UsersSecurityBundle\Security\User;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;

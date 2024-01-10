@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Exception;
 
-use App\ErrorResponse\ErrorInterface;
+use SmartAssert\ServiceRequest\Error\ErrorInterface;
 
 class ErrorResponseException extends \Exception
 {

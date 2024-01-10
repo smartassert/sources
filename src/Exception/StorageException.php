@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Exception;
 
-use App\ErrorResponse\StorageErrorInterface;
+use SmartAssert\ServiceRequest\Error\StorageErrorInterface;
 
 class StorageException extends ErrorResponseException
 {

@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace App\RequestField\Validator;
 
-use App\ErrorResponse\BadRequestError;
 use App\Exception\BadRequestException;
-use App\RequestField\FieldInterface;
-use App\RequestField\RequirementsInterface;
-use App\RequestField\SizeInterface;
+use SmartAssert\ServiceRequest\Error\BadRequestError;
+use SmartAssert\ServiceRequest\Field\FieldInterface;
+use SmartAssert\ServiceRequest\Field\RequirementsInterface;
+use SmartAssert\ServiceRequest\Field\SizeInterface;
 
 class StringFieldValidator
 {

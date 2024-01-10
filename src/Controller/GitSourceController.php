@@ -5,13 +5,13 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use App\Entity\GitSource;
-use App\ErrorResponse\ModifyReadOnlyEntityError;
 use App\Exception\DuplicateObjectException;
 use App\Exception\EmptyEntityIdException;
 use App\Exception\ModifyReadOnlyEntityException;
 use App\Request\GitSourceRequest;
 use App\Services\Source\GitSourceFactory;
 use App\Services\Source\Mutator;
+use SmartAssert\ServiceRequest\Error\ModifyReadOnlyEntityError;
 use SmartAssert\UsersSecurityBundle\Security\User;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;

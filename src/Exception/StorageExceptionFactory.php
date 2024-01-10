@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace App\Exception;
 
 use App\Entity\IdentifiedEntityInterface;
-use App\ErrorResponse\StorageError;
 use League\Flysystem\FilesystemException;
 use League\Flysystem\FilesystemOperationFailed;
+use SmartAssert\ServiceRequest\Error\StorageError;
 
 class StorageExceptionFactory
 {

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Exception;
 
-use App\ErrorResponse\DuplicateObjectErrorInterface;
+use SmartAssert\ServiceRequest\Error\DuplicateObjectErrorInterface;
 
 class DuplicateObjectException extends ErrorResponseException
 {
