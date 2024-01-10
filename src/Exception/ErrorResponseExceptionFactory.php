@@ -57,6 +57,9 @@ readonly class ErrorResponseExceptionFactory
         );
     }
 
+    /**
+     * @return int<400, 599>
+     */
     private function deriveStatusCode(ErrorInterface $error): int
     {
         if ($error instanceof ModifyReadOnlyEntityErrorInterface) {
