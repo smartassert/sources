@@ -4,22 +4,27 @@ declare(strict_types=1);
 
 namespace App\RequestField\Validator;
 
-use App\Exception\BadRequestException;
-use SmartAssert\ServiceRequest\Error\BadRequestError;
+use App\Exception\ErrorResponseException;
+use App\Exception\ErrorResponseExceptionFactory;
 use SmartAssert\ServiceRequest\Field\FieldInterface;
 use SmartAssert\ServiceRequest\Field\RequirementsInterface;
 use SmartAssert\ServiceRequest\Field\SizeInterface;
 
-class StringFieldValidator
+readonly class StringFieldValidator
 {
+    public function __construct(
+        private ErrorResponseExceptionFactory $exceptionFactory,
+    ) {
+    }
+
     /**
-     * @throws BadRequestException
+     * @throws ErrorResponseException
      */
     public function validateString(FieldInterface $field): string
     {
         $value = $field->getValue();
         if (!is_string($value)) {
-            throw new BadRequestException(new BadRequestError($field, 'wrong_type'));
+            throw $this->exceptionFactory->createForBadRequest($field, 'wrong_type');
         }
 
         $requirements = $field->getRequirements();
@@ -29,7 +34,7 @@ class StringFieldValidator
 
             if ($sizeRequirements instanceof SizeInterface) {
                 if (is_string($value) && mb_strlen($value) > $sizeRequirements->getMaximum()) {
-                    throw new BadRequestException(new BadRequestError($field, 'too_large'));
+                    throw $this->exceptionFactory->createForBadRequest($field, 'too_large');
                 }
             }
         }
@@ -40,14 +45,14 @@ class StringFieldValidator
     /**
      * @return non-empty-string
      *
-     * @throws BadRequestException
+     * @throws ErrorResponseException
      */
     public function validateNonEmptyString(FieldInterface $field): string
     {
         $value = $this->validateString($field);
 
         if ('' === $value) {
-            throw new BadRequestException(new BadRequestError($field, 'empty'));
+            throw $this->exceptionFactory->createForBadRequest($field, 'empty');
         }
 
         return $value;

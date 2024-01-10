@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\RequestField\Validator;
 
-use App\Exception\BadRequestException;
-use SmartAssert\ServiceRequest\Error\BadRequestError;
+use App\Exception\ErrorResponseException;
+use App\Exception\ErrorResponseExceptionFactory;
 use SmartAssert\ServiceRequest\Field\FieldInterface;
 use SmartAssert\YamlFile\Filename;
 use SmartAssert\YamlFile\Validator\YamlFilenameValidator;
@@ -14,19 +14,20 @@ readonly class YamlFilenameCollectionFieldValidator
 {
     public function __construct(
         private YamlFilenameValidator $yamlFilenameValidator,
+        private ErrorResponseExceptionFactory $exceptionFactory,
     ) {
     }
 
     /**
      * @return non-empty-string[]
      *
-     * @throws BadRequestException
+     * @throws ErrorResponseException
      */
     public function validate(FieldInterface $field): array
     {
         $names = $field->getValue();
         if (!is_array($names)) {
-            throw new BadRequestException(new BadRequestError($field, 'wrong_type'));
+            throw $this->exceptionFactory->createForBadRequest($field, 'wrong_type');
         }
 
         $validatedNames = [];
@@ -40,7 +41,7 @@ readonly class YamlFilenameCollectionFieldValidator
                 } else {
                     $field = $field->withErrorPosition($nameIndex + 1);
 
-                    throw new BadRequestException(new BadRequestError($field, 'invalid'));
+                    throw $this->exceptionFactory->createForBadRequest($field, 'invalid');
                 }
             }
         }

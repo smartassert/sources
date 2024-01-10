@@ -6,7 +6,7 @@ namespace App\ArgumentResolver;
 
 use App\Entity\AbstractSource;
 use App\Entity\GitSource;
-use App\Exception\BadRequestException;
+use App\Exception\ErrorResponseException;
 use App\Request\GitSourceRequest;
 use App\RequestField\Field\Factory;
 use App\RequestField\Validator\StringFieldValidator;
@@ -25,7 +25,7 @@ readonly class GitSourceRequestResolver implements ValueResolverInterface
     /**
      * @return GitSourceRequest[]
      *
-     * @throws BadRequestException
+     * @throws ErrorResponseException
      */
     public function resolve(Request $request, ArgumentMetadata $argument): iterable
     {
