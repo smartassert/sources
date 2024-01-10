@@ -7,8 +7,6 @@ namespace App\Controller;
 use App\Entity\FileSource;
 use App\Exception\ErrorResponseException;
 use App\Exception\ErrorResponseExceptionFactory;
-use App\Exception\StorageException;
-use App\Exception\StorageExceptionFactory;
 use App\Request\AddYamlFileRequest;
 use App\Request\YamlFileRequest;
 use App\Response\EmptyResponse;
@@ -31,13 +29,11 @@ readonly class FileSourceFileController
     public function __construct(
         private FilesystemWriter $fileSourceWriter,
         private FilesystemReader $fileSourceReader,
-        private StorageExceptionFactory $storageExceptionFactory,
         private ErrorResponseExceptionFactory $errorResponseExceptionFactory,
     ) {
     }
 
     /**
-     * @throws StorageException
      * @throws ErrorResponseException
      */
     #[Route(name: 'add', methods: ['POST'])]
@@ -55,14 +51,14 @@ readonly class FileSourceFileController
 
             $this->fileSourceWriter->write($path, $yamlFile->content);
         } catch (FilesystemException $e) {
-            throw $this->storageExceptionFactory->createForEntityStorageFailure($source, $e);
+            throw $this->errorResponseExceptionFactory->createForStorageFailure($source, $e);
         }
 
         return new EmptyResponse();
     }
 
     /**
-     * @throws StorageException
+     * @throws ErrorResponseException
      */
     #[Route(name: 'update', methods: ['PUT'])]
     public function update(FileSource $source, AddYamlFileRequest $request): Response
@@ -72,14 +68,14 @@ readonly class FileSourceFileController
         try {
             $this->fileSourceWriter->write($source->getDirectoryPath() . '/' . $yamlFile->name, $yamlFile->content);
         } catch (FilesystemException $e) {
-            throw $this->storageExceptionFactory->createForEntityStorageFailure($source, $e);
+            throw $this->errorResponseExceptionFactory->createForStorageFailure($source, $e);
         }
 
         return new EmptyResponse();
     }
 
     /**
-     * @throws StorageException
+     * @throws ErrorResponseException
      */
     #[Route(name: 'read', methods: ['GET'])]
     public function read(FileSource $source, YamlFileRequest $request): Response
@@ -93,12 +89,12 @@ readonly class FileSourceFileController
 
             return new YamlResponse($this->fileSourceReader->read($location));
         } catch (FilesystemException $e) {
-            throw $this->storageExceptionFactory->createForEntityStorageFailure($source, $e);
+            throw $this->errorResponseExceptionFactory->createForStorageFailure($source, $e);
         }
     }
 
     /**
-     * @throws StorageException
+     * @throws ErrorResponseException
      */
     #[Route(name: 'remove', methods: ['DELETE'])]
     public function remove(FileSource $source, YamlFileRequest $request): Response
@@ -106,7 +102,7 @@ readonly class FileSourceFileController
         try {
             $this->fileSourceWriter->delete($source->getDirectoryPath() . '/' . $request->filename);
         } catch (FilesystemException $e) {
-            throw $this->storageExceptionFactory->createForEntityStorageFailure($source, $e);
+            throw $this->errorResponseExceptionFactory->createForStorageFailure($source, $e);
         }
 
         return new EmptyResponse();

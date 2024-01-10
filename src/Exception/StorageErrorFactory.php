@@ -8,23 +8,21 @@ use App\Entity\IdentifiedEntityInterface;
 use League\Flysystem\FilesystemException;
 use League\Flysystem\FilesystemOperationFailed;
 use SmartAssert\ServiceRequest\Error\StorageError;
+use SmartAssert\ServiceRequest\Error\StorageErrorInterface;
 
-class StorageExceptionFactory
+class StorageErrorFactory
 {
     private const OBJECT_TYPE = 'entity';
 
     public function createForEntityStorageFailure(
         IdentifiedEntityInterface $entity,
         FilesystemException $filesystemException
-    ): StorageException {
-        return new StorageException(
-            new StorageError(
-                $this->createType($filesystemException),
-                self::OBJECT_TYPE,
-                $this->createLocation($filesystemException),
-                $entity->getIdentifier()->serialize(),
-            ),
-            $filesystemException
+    ): StorageErrorInterface {
+        return new StorageError(
+            $this->createType($filesystemException),
+            self::OBJECT_TYPE,
+            $this->createLocation($filesystemException),
+            $entity->getIdentifier()->serialize(),
         );
     }
 

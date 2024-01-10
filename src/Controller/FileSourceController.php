@@ -8,8 +8,6 @@ use App\Entity\FileSource;
 use App\Exception\EmptyEntityIdException;
 use App\Exception\ErrorResponseException;
 use App\Exception\ErrorResponseExceptionFactory;
-use App\Exception\StorageException;
-use App\Exception\StorageExceptionFactory;
 use App\Request\FileSourceRequest;
 use App\Services\Source\FileSourceFactory;
 use App\Services\Source\Mutator;
@@ -57,18 +55,15 @@ readonly class FileSourceController
     }
 
     /**
-     * @throws StorageException
+     * @throws ErrorResponseException
      */
     #[Route(path: '/' . SourceRoutes::ROUTE_SOURCE_ID_PATTERN . '/list/', name: 'list_filenames', methods: ['GET'])]
-    public function listFilenames(
-        FileSource $source,
-        FileSourceDirectoryLister $lister,
-        StorageExceptionFactory $exceptionFactory,
-    ): Response {
+    public function listFilenames(FileSource $source, FileSourceDirectoryLister $lister): Response
+    {
         try {
             return new JsonResponse($lister->list($source));
         } catch (FilesystemException $e) {
-            throw $exceptionFactory->createForEntityStorageFailure($source, $e);
+            throw $this->exceptionFactory->createForStorageFailure($source, $e);
         }
     }
 }
