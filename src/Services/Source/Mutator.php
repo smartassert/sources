@@ -6,22 +6,23 @@ namespace App\Services\Source;
 
 use App\Entity\FileSource;
 use App\Entity\GitSource;
-use App\Exception\DuplicateObjectException;
+use App\Exception\ErrorResponseException;
+use App\Exception\ErrorResponseExceptionFactory;
 use App\Repository\SourceRepository;
 use App\Request\FileSourceRequest;
 use App\Request\GitSourceRequest;
-use SmartAssert\ServiceRequest\Error\DuplicateObjectError;
 use SmartAssert\ServiceRequest\Field\Field;
 
 class Mutator
 {
     public function __construct(
         private readonly SourceRepository $sourceRepository,
+        private readonly ErrorResponseExceptionFactory $exceptionFactory,
     ) {
     }
 
     /**
-     * @throws DuplicateObjectException
+     * @throws ErrorResponseException
      */
     public function updateFile(FileSource $source, FileSourceRequest $request): FileSource
     {
@@ -30,11 +31,7 @@ class Mutator
         );
 
         if ($existingSource instanceof GitSource) {
-            throw new DuplicateObjectException(
-                new DuplicateObjectError(
-                    new Field('label', $request->getLabel())
-                )
-            );
+            throw $this->exceptionFactory->createForDuplicateObject(new Field('label', $request->getLabel()));
         }
 
         if ($existingSource instanceof FileSource) {
@@ -45,11 +42,7 @@ class Mutator
                 return $existingSource;
             }
 
-            throw new DuplicateObjectException(
-                new DuplicateObjectError(
-                    new Field('label', $request->getLabel())
-                )
-            );
+            throw $this->exceptionFactory->createForDuplicateObject(new Field('label', $request->getLabel()));
         }
 
         $source->setLabel($request->label);
@@ -59,7 +52,7 @@ class Mutator
     }
 
     /**
-     * @throws DuplicateObjectException
+     * @throws ErrorResponseException
      */
     public function updateGit(GitSource $source, GitSourceRequest $request): GitSource
     {
@@ -71,11 +64,7 @@ class Mutator
             $existingSource instanceof FileSource
             || ($existingSource instanceof GitSource && $existingSource->getId() !== $source->getId())
         ) {
-            throw new DuplicateObjectException(
-                new DuplicateObjectError(
-                    new Field('label', $request->getLabel())
-                )
-            );
+            throw $this->exceptionFactory->createForDuplicateObject(new Field('label', $request->getLabel()));
         }
 
         $source->setLabel($request->label);

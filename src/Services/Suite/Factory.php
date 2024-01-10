@@ -5,24 +5,24 @@ declare(strict_types=1);
 namespace App\Services\Suite;
 
 use App\Entity\Suite;
-use App\Exception\DuplicateObjectException;
 use App\Exception\EmptyEntityIdException;
+use App\Exception\ErrorResponseException;
 use App\Repository\SuiteRepository;
 use App\Request\SuiteRequest;
 use App\Services\EntityIdFactory;
 
-class Factory
+readonly class Factory
 {
     public function __construct(
-        private readonly SuiteRepository $repository,
-        private readonly EntityIdFactory $entityIdFactory,
-        private readonly Mutator $mutator,
+        private SuiteRepository $repository,
+        private EntityIdFactory $entityIdFactory,
+        private Mutator $mutator,
     ) {
     }
 
     /**
      * @throws EmptyEntityIdException
-     * @throws DuplicateObjectException
+     * @throws ErrorResponseException
      */
     public function create(SuiteRequest $request): Suite
     {

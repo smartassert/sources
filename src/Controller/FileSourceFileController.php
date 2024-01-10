@@ -5,9 +5,8 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use App\Entity\FileSource;
-use App\Exception\DuplicateObjectException;
-use App\Exception\StorageException;
-use App\Exception\StorageExceptionFactory;
+use App\Exception\ErrorResponseException;
+use App\Exception\ErrorResponseExceptionFactory;
 use App\Request\AddYamlFileRequest;
 use App\Request\YamlFileRequest;
 use App\Response\EmptyResponse;
@@ -15,7 +14,6 @@ use App\Response\YamlResponse;
 use League\Flysystem\FilesystemException;
 use League\Flysystem\FilesystemReader;
 use League\Flysystem\FilesystemWriter;
-use SmartAssert\ServiceRequest\Error\DuplicateObjectError;
 use SmartAssert\ServiceRequest\Field\Field;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -31,13 +29,12 @@ readonly class FileSourceFileController
     public function __construct(
         private FilesystemWriter $fileSourceWriter,
         private FilesystemReader $fileSourceReader,
-        private StorageExceptionFactory $exceptionFactory,
+        private ErrorResponseExceptionFactory $errorResponseExceptionFactory,
     ) {
     }
 
     /**
-     * @throws DuplicateObjectException
-     * @throws StorageException
+     * @throws ErrorResponseException
      */
     #[Route(name: 'add', methods: ['POST'])]
     public function add(FileSource $source, AddYamlFileRequest $request): Response
@@ -47,23 +44,21 @@ readonly class FileSourceFileController
 
         try {
             if ($this->fileSourceReader->fileExists($path)) {
-                throw new DuplicateObjectException(
-                    new DuplicateObjectError(
-                        new Field('filename', (string) $yamlFile->name)
-                    )
+                throw $this->errorResponseExceptionFactory->createForDuplicateObject(
+                    new Field('filename', (string) $yamlFile->name)
                 );
             }
 
             $this->fileSourceWriter->write($path, $yamlFile->content);
         } catch (FilesystemException $e) {
-            throw $this->exceptionFactory->createForEntityStorageFailure($source, $e);
+            throw $this->errorResponseExceptionFactory->createForStorageFailure($source, $e);
         }
 
         return new EmptyResponse();
     }
 
     /**
-     * @throws StorageException
+     * @throws ErrorResponseException
      */
     #[Route(name: 'update', methods: ['PUT'])]
     public function update(FileSource $source, AddYamlFileRequest $request): Response
@@ -73,14 +68,14 @@ readonly class FileSourceFileController
         try {
             $this->fileSourceWriter->write($source->getDirectoryPath() . '/' . $yamlFile->name, $yamlFile->content);
         } catch (FilesystemException $e) {
-            throw $this->exceptionFactory->createForEntityStorageFailure($source, $e);
+            throw $this->errorResponseExceptionFactory->createForStorageFailure($source, $e);
         }
 
         return new EmptyResponse();
     }
 
     /**
-     * @throws StorageException
+     * @throws ErrorResponseException
      */
     #[Route(name: 'read', methods: ['GET'])]
     public function read(FileSource $source, YamlFileRequest $request): Response
@@ -94,12 +89,12 @@ readonly class FileSourceFileController
 
             return new YamlResponse($this->fileSourceReader->read($location));
         } catch (FilesystemException $e) {
-            throw $this->exceptionFactory->createForEntityStorageFailure($source, $e);
+            throw $this->errorResponseExceptionFactory->createForStorageFailure($source, $e);
         }
     }
 
     /**
-     * @throws StorageException
+     * @throws ErrorResponseException
      */
     #[Route(name: 'remove', methods: ['DELETE'])]
     public function remove(FileSource $source, YamlFileRequest $request): Response
@@ -107,7 +102,7 @@ readonly class FileSourceFileController
         try {
             $this->fileSourceWriter->delete($source->getDirectoryPath() . '/' . $request->filename);
         } catch (FilesystemException $e) {
-            throw $this->exceptionFactory->createForEntityStorageFailure($source, $e);
+            throw $this->errorResponseExceptionFactory->createForStorageFailure($source, $e);
         }
 
         return new EmptyResponse();

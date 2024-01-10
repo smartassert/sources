@@ -6,8 +6,8 @@ namespace App\ArgumentResolver;
 
 use App\Entity\SourceInterface;
 use App\Entity\Suite;
-use App\Exception\BadRequestException;
 use App\Exception\EntityNotFoundException;
+use App\Exception\ErrorResponseException;
 use App\Repository\SourceRepository;
 use App\Request\SuiteRequest;
 use App\RequestField\Field\Factory;
@@ -35,7 +35,7 @@ readonly class SuiteRequestResolver implements ValueResolverInterface
      *
      * @throws AccessDeniedException
      * @throws EntityNotFoundException
-     * @throws BadRequestException
+     * @throws ErrorResponseException
      */
     public function resolve(Request $request, ArgumentMetadata $argument): iterable
     {
@@ -69,7 +69,7 @@ readonly class SuiteRequestResolver implements ValueResolverInterface
     /**
      * @return non-empty-string
      *
-     * @throws BadRequestException
+     * @throws ErrorResponseException
      */
     private function getLabel(Request $request): string
     {
@@ -84,7 +84,7 @@ readonly class SuiteRequestResolver implements ValueResolverInterface
     /**
      * @return non-empty-string[]
      *
-     * @throws BadRequestException
+     * @throws ErrorResponseException
      */
     private function getTests(Request $request): array
     {

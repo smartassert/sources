@@ -7,8 +7,8 @@ namespace App\Controller;
 use App\Entity\FileSource;
 use App\Entity\SourceInterface;
 use App\Enum\Source\Type;
-use App\Exception\StorageException;
-use App\Exception\StorageExceptionFactory;
+use App\Exception\ErrorResponseException;
+use App\Exception\ErrorResponseExceptionFactory;
 use App\Repository\SourceRepository;
 use League\Flysystem\FilesystemException;
 use League\Flysystem\FilesystemWriter;
@@ -17,10 +17,10 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Core\User\UserInterface;
 
-class SourceController
+readonly class SourceController
 {
     public function __construct(
-        private readonly SourceRepository $repository,
+        private SourceRepository $repository,
     ) {
     }
 
@@ -37,13 +37,13 @@ class SourceController
     }
 
     /**
-     * @throws StorageException
+     * @throws ErrorResponseException
      */
     #[Route(SourceRoutes::ROUTE_SOURCE, name: 'user_source_delete', methods: ['DELETE'])]
     public function delete(
         SourceInterface $source,
         FilesystemWriter $fileSourceWriter,
-        StorageExceptionFactory $exceptionFactory,
+        ErrorResponseExceptionFactory $exceptionFactory,
     ): Response {
         if (null === $source->getDeletedAt()) {
             $this->repository->delete($source);
@@ -52,7 +52,7 @@ class SourceController
                 try {
                     $fileSourceWriter->deleteDirectory($source->getDirectoryPath());
                 } catch (FilesystemException $e) {
-                    throw $exceptionFactory->createForEntityStorageFailure($source, $e);
+                    throw $exceptionFactory->createForStorageFailure($source, $e);
                 }
             }
         }
