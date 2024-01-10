@@ -7,12 +7,11 @@ namespace App\Controller;
 use App\Entity\Suite;
 use App\Exception\EmptyEntityIdException;
 use App\Exception\ErrorResponseException;
-use App\Exception\ModifyReadOnlyEntityException;
+use App\Exception\ErrorResponseExceptionFactory;
 use App\Repository\SuiteRepository;
 use App\Request\SuiteRequest;
 use App\Services\Suite\Factory;
 use App\Services\Suite\Mutator;
-use SmartAssert\ServiceRequest\Error\ModifyReadOnlyEntityError;
 use SmartAssert\UsersSecurityBundle\Security\User;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -24,6 +23,7 @@ readonly class SuiteController
         private Factory $factory,
         private SuiteRepository $repository,
         private Mutator $mutator,
+        private ErrorResponseExceptionFactory $exceptionFactory,
     ) {
     }
 
@@ -52,18 +52,15 @@ readonly class SuiteController
     }
 
     /**
-     * @throws ModifyReadOnlyEntityException
      * @throws ErrorResponseException
      */
     #[Route(SuiteRoutes::ROUTE_SUITE, name: 'suite_update', methods: ['PUT'])]
     public function update(Suite $suite, SuiteRequest $request): Response
     {
         if (null !== $suite->getDeletedAt()) {
-            throw new ModifyReadOnlyEntityException(
-                new ModifyReadOnlyEntityError(
-                    $suite->getIdentifier()->getId(),
-                    $suite->getIdentifier()->getType(),
-                )
+            throw $this->exceptionFactory->createForModifyReadOnlyEntity(
+                $suite->getIdentifier()->getId(),
+                $suite->getIdentifier()->getType(),
             );
         }
 

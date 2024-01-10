@@ -7,11 +7,10 @@ namespace App\Controller;
 use App\Entity\GitSource;
 use App\Exception\EmptyEntityIdException;
 use App\Exception\ErrorResponseException;
-use App\Exception\ModifyReadOnlyEntityException;
+use App\Exception\ErrorResponseExceptionFactory;
 use App\Request\GitSourceRequest;
 use App\Services\Source\GitSourceFactory;
 use App\Services\Source\Mutator;
-use SmartAssert\ServiceRequest\Error\ModifyReadOnlyEntityError;
 use SmartAssert\UsersSecurityBundle\Security\User;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -23,6 +22,7 @@ readonly class GitSourceController
     public function __construct(
         private GitSourceFactory $gitSourceFactory,
         private Mutator $mutator,
+        private ErrorResponseExceptionFactory $exceptionFactory,
     ) {
     }
 
@@ -37,18 +37,15 @@ readonly class GitSourceController
     }
 
     /**
-     * @throws ModifyReadOnlyEntityException
      * @throws ErrorResponseException
      */
     #[Route(path: '/' . SourceRoutes::ROUTE_SOURCE_ID_PATTERN, name: 'update', methods: ['PUT'])]
     public function update(GitSource $source, GitSourceRequest $request): Response
     {
         if (null !== $source->getDeletedAt()) {
-            throw new ModifyReadOnlyEntityException(
-                new ModifyReadOnlyEntityError(
-                    $source->getIdentifier()->getId(),
-                    $source->getIdentifier()->getType(),
-                )
+            throw $this->exceptionFactory->createForModifyReadOnlyEntity(
+                $source->getIdentifier()->getId(),
+                $source->getIdentifier()->getType(),
             );
         }
 
