@@ -5,25 +5,25 @@ declare(strict_types=1);
 namespace App\Services\Source;
 
 use App\Entity\GitSource;
-use App\Exception\DuplicateObjectException;
 use App\Exception\EmptyEntityIdException;
+use App\Exception\ErrorResponseException;
 use App\Repository\GitSourceRepository;
 use App\Request\GitSourceRequest;
 use App\Services\EntityIdFactory;
 use SmartAssert\UsersSecurityBundle\Security\User;
 
-class GitSourceFactory
+readonly class GitSourceFactory
 {
     public function __construct(
-        private readonly EntityIdFactory $entityIdFactory,
-        private readonly GitSourceRepository $gitSourceRepository,
-        private readonly Mutator $sourceMutator,
+        private EntityIdFactory $entityIdFactory,
+        private GitSourceRepository $gitSourceRepository,
+        private Mutator $sourceMutator,
     ) {
     }
 
     /**
      * @throws EmptyEntityIdException
-     * @throws DuplicateObjectException
+     * @throws ErrorResponseException
      */
     public function create(User $user, GitSourceRequest $request): GitSource
     {

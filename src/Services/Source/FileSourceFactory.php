@@ -5,23 +5,23 @@ declare(strict_types=1);
 namespace App\Services\Source;
 
 use App\Entity\FileSource;
-use App\Exception\DuplicateObjectException;
 use App\Exception\EmptyEntityIdException;
+use App\Exception\ErrorResponseException;
 use App\Request\FileSourceRequest;
 use App\Services\EntityIdFactory;
 use SmartAssert\UsersSecurityBundle\Security\User;
 
-class FileSourceFactory
+readonly class FileSourceFactory
 {
     public function __construct(
-        private readonly EntityIdFactory $entityIdFactory,
-        private readonly Mutator $sourceMutator,
+        private EntityIdFactory $entityIdFactory,
+        private Mutator $sourceMutator,
     ) {
     }
 
     /**
      * @throws EmptyEntityIdException
-     * @throws DuplicateObjectException
+     * @throws ErrorResponseException
      */
     public function create(User $user, FileSourceRequest $request): FileSource
     {

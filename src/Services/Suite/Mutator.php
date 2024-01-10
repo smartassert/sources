@@ -5,31 +5,28 @@ declare(strict_types=1);
 namespace App\Services\Suite;
 
 use App\Entity\Suite;
-use App\Exception\DuplicateObjectException;
+use App\Exception\ErrorResponseException;
+use App\Exception\ErrorResponseExceptionFactory;
 use App\Repository\SuiteRepository;
 use App\Request\SuiteRequest;
-use SmartAssert\ServiceRequest\Error\DuplicateObjectError;
 use SmartAssert\ServiceRequest\Field\Field;
 
-class Mutator
+readonly class Mutator
 {
     public function __construct(
-        private readonly SuiteRepository $repository,
+        private SuiteRepository $repository,
+        private ErrorResponseExceptionFactory $exceptionFactory,
     ) {
     }
 
     /**
-     * @throws DuplicateObjectException
+     * @throws ErrorResponseException
      */
     public function update(Suite $suite, SuiteRequest $request): Suite
     {
         $foundSuite = $this->repository->findOneBySourceOwnerAndLabel($request->source, $request->label);
         if ($foundSuite instanceof Suite && $foundSuite->id !== $suite->id) {
-            throw new DuplicateObjectException(
-                new DuplicateObjectError(
-                    new Field('label', $request->getLabel())
-                )
-            );
+            throw $this->exceptionFactory->createForDuplicateObject(new Field('label', $request->getLabel()));
         }
 
         $suite->setSource($request->source);

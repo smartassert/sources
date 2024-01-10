@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use App\Entity\GitSource;
-use App\Exception\DuplicateObjectException;
 use App\Exception\EmptyEntityIdException;
+use App\Exception\ErrorResponseException;
 use App\Exception\ModifyReadOnlyEntityException;
 use App\Request\GitSourceRequest;
 use App\Services\Source\GitSourceFactory;
@@ -28,7 +28,7 @@ readonly class GitSourceController
 
     /**
      * @throws EmptyEntityIdException
-     * @throws DuplicateObjectException
+     * @throws ErrorResponseException
      */
     #[Route(name: 'create', methods: ['POST'])]
     public function create(User $user, GitSourceRequest $request): JsonResponse
@@ -38,7 +38,7 @@ readonly class GitSourceController
 
     /**
      * @throws ModifyReadOnlyEntityException
-     * @throws DuplicateObjectException
+     * @throws ErrorResponseException
      */
     #[Route(path: '/' . SourceRoutes::ROUTE_SOURCE_ID_PATTERN, name: 'update', methods: ['PUT'])]
     public function update(GitSource $source, GitSourceRequest $request): Response
