@@ -31,7 +31,7 @@ class YamlFileRequestResolver extends AbstractYamlFileRequestResolver implements
             return [];
         }
 
-        $filename = $this->yamlFilenameFieldValidator->validate($this->fieldFactory->createYamlFilenameField(
+        $filename = $this->yamlFilenameFieldValidator->validate($this->fieldFactory->createYamlFilenameParameter(
             self::KEY_ATTRIBUTE_FILENAME,
             (string) $this->createFilenameFromRequest($request)
         ));

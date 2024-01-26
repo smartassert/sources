@@ -14,7 +14,7 @@ readonly class Factory
     /**
      * @param non-empty-string $name
      */
-    public function createStringField(
+    public function createStringParameter(
         string $name,
         string $value,
         int $minimumLength,
@@ -28,7 +28,7 @@ readonly class Factory
     /**
      * @param non-empty-string $name
      */
-    public function createYamlFilenameField(string $name, string $value): ParameterInterface
+    public function createYamlFilenameParameter(string $name, string $value): ParameterInterface
     {
         return (new Parameter($name, $value))
             ->withRequirements(new Requirements('yaml_filename'))
@@ -39,7 +39,7 @@ readonly class Factory
      * @param non-empty-string $name
      * @param string[]         $value
      */
-    public function createYamlFilenameCollectionField(string $name, array $value): ParameterInterface
+    public function createYamlFilenameCollectionParameter(string $name, array $value): ParameterInterface
     {
         return (new Parameter($name, $value))
             ->withRequirements(new Requirements('yaml_filename_collection'))

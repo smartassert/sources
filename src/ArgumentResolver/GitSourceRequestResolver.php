@@ -33,28 +33,28 @@ readonly class GitSourceRequestResolver implements ValueResolverInterface
             return [];
         }
 
-        $label = $this->fieldValidator->validateNonEmptyString($this->fieldFactory->createStringField(
+        $label = $this->fieldValidator->validateNonEmptyString($this->fieldFactory->createStringParameter(
             GitSourceRequest::PARAMETER_LABEL,
             trim($request->request->getString(GitSourceRequest::PARAMETER_LABEL)),
             1,
             AbstractSource::LABEL_MAX_LENGTH,
         ));
 
-        $hostUrl = $this->fieldValidator->validateNonEmptyString($this->fieldFactory->createStringField(
+        $hostUrl = $this->fieldValidator->validateNonEmptyString($this->fieldFactory->createStringParameter(
             GitSourceRequest::PARAMETER_HOST_URL,
             trim($request->request->getString(GitSourceRequest::PARAMETER_HOST_URL)),
             1,
             GitSource::HOST_URL_MAX_LENGTH,
         ));
 
-        $path = $this->fieldValidator->validateNonEmptyString($this->fieldFactory->createStringField(
+        $path = $this->fieldValidator->validateNonEmptyString($this->fieldFactory->createStringParameter(
             GitSourceRequest::PARAMETER_PATH,
             trim($request->request->getString(GitSourceRequest::PARAMETER_PATH)),
             1,
             GitSource::PATH_MAX_LENGTH,
         ));
 
-        $credentials = $this->fieldValidator->validateString($this->fieldFactory->createStringField(
+        $credentials = $this->fieldValidator->validateString($this->fieldFactory->createStringParameter(
             GitSourceRequest::PARAMETER_CREDENTIALS,
             trim($request->request->getString(GitSourceRequest::PARAMETER_CREDENTIALS)),
             0,

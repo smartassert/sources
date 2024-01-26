@@ -73,7 +73,7 @@ readonly class SuiteRequestResolver implements ValueResolverInterface
      */
     private function getLabel(Request $request): string
     {
-        return $this->fieldValidator->validateNonEmptyString($this->fieldFactory->createStringField(
+        return $this->fieldValidator->validateNonEmptyString($this->fieldFactory->createStringParameter(
             SuiteRequest::PARAMETER_LABEL,
             trim($request->request->getString(SuiteRequest::PARAMETER_LABEL)),
             1,
@@ -97,7 +97,7 @@ readonly class SuiteRequestResolver implements ValueResolverInterface
             }
         }
 
-        $testsField = $this->fieldFactory->createYamlFilenameCollectionField(
+        $testsField = $this->fieldFactory->createYamlFilenameCollectionParameter(
             SuiteRequest::PARAMETER_TESTS,
             $filteredTests
         );

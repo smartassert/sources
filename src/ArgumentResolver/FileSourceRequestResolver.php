@@ -32,7 +32,7 @@ readonly class FileSourceRequestResolver implements ValueResolverInterface
             return [];
         }
 
-        $label = $this->fieldValidator->validateNonEmptyString($this->fieldFactory->createStringField(
+        $label = $this->fieldValidator->validateNonEmptyString($this->fieldFactory->createStringParameter(
             FileSourceRequest::PARAMETER_LABEL,
             trim($request->request->getString(FileSourceRequest::PARAMETER_LABEL)),
             1,
