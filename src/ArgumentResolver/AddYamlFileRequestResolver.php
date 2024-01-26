@@ -21,7 +21,7 @@ class AddYamlFileRequestResolver extends AbstractYamlFileRequestResolver impleme
     public function __construct(
         private readonly YamlFilenameParameterValidator $yamlFilenameFieldValidator,
         private readonly YamlParameterValidator $yamlFieldValidator,
-        private readonly Factory $fieldFactory,
+        private readonly Factory $parameterFactory,
     ) {
     }
 
@@ -36,7 +36,7 @@ class AddYamlFileRequestResolver extends AbstractYamlFileRequestResolver impleme
             return [];
         }
 
-        $filename = $this->yamlFilenameFieldValidator->validate($this->fieldFactory->createYamlFilenameParameter(
+        $filename = $this->yamlFilenameFieldValidator->validate($this->parameterFactory->createYamlFilenameParameter(
             self::KEY_ATTRIBUTE_FILENAME,
             (string) $this->createFilenameFromRequest($request)
         ));

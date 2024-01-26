@@ -17,7 +17,7 @@ readonly class FileSourceRequestResolver implements ValueResolverInterface
 {
     public function __construct(
         private StringParameterValidator $parameterValidator,
-        private Factory $fieldFactory,
+        private Factory $parameterFactory,
     ) {
     }
 
@@ -32,7 +32,7 @@ readonly class FileSourceRequestResolver implements ValueResolverInterface
             return [];
         }
 
-        $label = $this->parameterValidator->validateNonEmptyString($this->fieldFactory->createStringParameter(
+        $label = $this->parameterValidator->validateNonEmptyString($this->parameterFactory->createStringParameter(
             FileSourceRequest::PARAMETER_LABEL,
             trim($request->request->getString(FileSourceRequest::PARAMETER_LABEL)),
             1,
