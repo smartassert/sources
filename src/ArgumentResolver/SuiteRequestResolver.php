@@ -25,7 +25,7 @@ readonly class SuiteRequestResolver implements ValueResolverInterface
         private SourceRepository $sourceRepository,
         private EntityAccessChecker $entityAccessChecker,
         private StringParameterValidator $parameterValidator,
-        private YamlFilenameCollectionParameterValidator $yamlFilenameCollectionFieldValidator,
+        private YamlFilenameCollectionParameterValidator $yamlFilenameCollectionParameterValidator,
         private Factory $parameterFactory,
     ) {
     }
@@ -97,11 +97,11 @@ readonly class SuiteRequestResolver implements ValueResolverInterface
             }
         }
 
-        $testsField = $this->parameterFactory->createYamlFilenameCollectionParameter(
+        $testsParameter = $this->parameterFactory->createYamlFilenameCollectionParameter(
             SuiteRequest::PARAMETER_TESTS,
             $filteredTests
         );
 
-        return $this->yamlFilenameCollectionFieldValidator->validate($testsField);
+        return $this->yamlFilenameCollectionParameterValidator->validate($testsParameter);
     }
 }

@@ -15,7 +15,7 @@ use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 class YamlFileRequestResolver extends AbstractYamlFileRequestResolver implements ValueResolverInterface
 {
     public function __construct(
-        private readonly YamlFilenameParameterValidator $yamlFilenameFieldValidator,
+        private readonly YamlFilenameParameterValidator $yamlFilenameParameterValidator,
         private readonly Factory $parameterFactory,
     ) {
     }
@@ -31,10 +31,12 @@ class YamlFileRequestResolver extends AbstractYamlFileRequestResolver implements
             return [];
         }
 
-        $filename = $this->yamlFilenameFieldValidator->validate($this->parameterFactory->createYamlFilenameParameter(
-            self::KEY_ATTRIBUTE_FILENAME,
-            (string) $this->createFilenameFromRequest($request)
-        ));
+        $filename = $this->yamlFilenameParameterValidator->validate(
+            $this->parameterFactory->createYamlFilenameParameter(
+                self::KEY_ATTRIBUTE_FILENAME,
+                (string) $this->createFilenameFromRequest($request)
+            )
+        );
 
         return [new YamlFileRequest($filename)];
     }
