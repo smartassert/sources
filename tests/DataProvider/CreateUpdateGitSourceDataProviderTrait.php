@@ -28,7 +28,7 @@ trait CreateUpdateGitSourceDataProviderTrait
                 'requestParameters' => [],
                 'expectedResponseData' => [
                     'class' => 'bad_request',
-                    'field' => [
+                    'parameter' => [
                         'name' => 'label',
                         'value' => '',
                         'requirements' => [
@@ -48,7 +48,7 @@ trait CreateUpdateGitSourceDataProviderTrait
                 ],
                 'expectedResponseData' => [
                     'class' => 'bad_request',
-                    'field' => [
+                    'parameter' => [
                         'name' => 'label',
                         'value' => $labelTooLong,
                         'requirements' => [
@@ -69,7 +69,7 @@ trait CreateUpdateGitSourceDataProviderTrait
                 ],
                 'expectedResponseData' => [
                     'class' => 'bad_request',
-                    'field' => [
+                    'parameter' => [
                         'name' => 'host-url',
                         'value' => '',
                         'requirements' => [
@@ -91,7 +91,7 @@ trait CreateUpdateGitSourceDataProviderTrait
                 ],
                 'expectedResponseData' => [
                     'class' => 'bad_request',
-                    'field' => [
+                    'parameter' => [
                         'name' => 'host-url',
                         'value' => $hostUrlTooLong,
                         'requirements' => [
@@ -112,7 +112,7 @@ trait CreateUpdateGitSourceDataProviderTrait
                 ],
                 'expectedResponseData' => [
                     'class' => 'bad_request',
-                    'field' => [
+                    'parameter' => [
                         'name' => 'path',
                         'value' => '',
                         'requirements' => [
@@ -134,7 +134,7 @@ trait CreateUpdateGitSourceDataProviderTrait
                 ],
                 'expectedResponseData' => [
                     'class' => 'bad_request',
-                    'field' => [
+                    'parameter' => [
                         'name' => 'path',
                         'value' => $pathTooLong,
                         'requirements' => [
@@ -157,7 +157,7 @@ trait CreateUpdateGitSourceDataProviderTrait
                 ],
                 'expectedResponseData' => [
                     'class' => 'bad_request',
-                    'field' => [
+                    'parameter' => [
                         'name' => 'credentials',
                         'value' => $credentialsTooLong,
                         'requirements' => [

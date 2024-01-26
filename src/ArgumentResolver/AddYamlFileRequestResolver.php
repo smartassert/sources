@@ -6,11 +6,11 @@ namespace App\ArgumentResolver;
 
 use App\Exception\ErrorResponseException;
 use App\Request\AddYamlFileRequest;
-use App\RequestField\Field\Factory;
-use App\RequestField\Validator\YamlFieldValidator;
-use App\RequestField\Validator\YamlFilenameFieldValidator;
-use SmartAssert\ServiceRequest\Field\Field;
-use SmartAssert\ServiceRequest\Field\Requirements;
+use App\RequestParameter\Factory;
+use App\RequestParameter\Validator\YamlFilenameParameterValidator;
+use App\RequestParameter\Validator\YamlParameterValidator;
+use SmartAssert\ServiceRequest\Parameter\Parameter;
+use SmartAssert\ServiceRequest\Parameter\Requirements;
 use SmartAssert\YamlFile\YamlFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Controller\ValueResolverInterface;
@@ -19,9 +19,9 @@ use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 class AddYamlFileRequestResolver extends AbstractYamlFileRequestResolver implements ValueResolverInterface
 {
     public function __construct(
-        private readonly YamlFilenameFieldValidator $yamlFilenameFieldValidator,
-        private readonly YamlFieldValidator $yamlFieldValidator,
-        private readonly Factory $fieldFactory,
+        private readonly YamlFilenameParameterValidator $yamlFilenameParameterValidator,
+        private readonly YamlParameterValidator $yamlParameterValidator,
+        private readonly Factory $parameterFactory,
     ) {
     }
 
@@ -36,16 +36,17 @@ class AddYamlFileRequestResolver extends AbstractYamlFileRequestResolver impleme
             return [];
         }
 
-        $filename = $this->yamlFilenameFieldValidator->validate($this->fieldFactory->createYamlFilenameField(
-            self::KEY_ATTRIBUTE_FILENAME,
-            (string) $this->createFilenameFromRequest($request)
-        ));
+        $filename = $this->yamlFilenameParameterValidator->validate(
+            $this->parameterFactory->createYamlFilenameParameter(
+                self::KEY_ATTRIBUTE_FILENAME,
+                (string) $this->createFilenameFromRequest($request)
+            )
+        );
 
-        $contentField = (new Field('content', trim($request->getContent())))
-            ->withRequirements(new Requirements('yaml'))
-        ;
-
-        $content = $this->yamlFieldValidator->validate($contentField);
+        $content = $this->yamlParameterValidator->validate(
+            (new Parameter('content', trim($request->getContent())))
+                ->withRequirements(new Requirements('yaml'))
+        );
 
         return [new AddYamlFileRequest(new YamlFile($filename, $content))];
     }

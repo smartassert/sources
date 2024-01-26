@@ -7,8 +7,8 @@ namespace App\ArgumentResolver;
 use App\Entity\AbstractSource;
 use App\Exception\ErrorResponseException;
 use App\Request\FileSourceRequest;
-use App\RequestField\Field\Factory;
-use App\RequestField\Validator\StringFieldValidator;
+use App\RequestParameter\Factory;
+use App\RequestParameter\Validator\StringParameterValidator;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Controller\ValueResolverInterface;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
@@ -16,8 +16,8 @@ use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 readonly class FileSourceRequestResolver implements ValueResolverInterface
 {
     public function __construct(
-        private StringFieldValidator $fieldValidator,
-        private Factory $fieldFactory,
+        private StringParameterValidator $parameterValidator,
+        private Factory $parameterFactory,
     ) {
     }
 
@@ -32,7 +32,7 @@ readonly class FileSourceRequestResolver implements ValueResolverInterface
             return [];
         }
 
-        $label = $this->fieldValidator->validateNonEmptyString($this->fieldFactory->createStringField(
+        $label = $this->parameterValidator->validateNonEmptyString($this->parameterFactory->createStringParameter(
             FileSourceRequest::PARAMETER_LABEL,
             trim($request->request->getString(FileSourceRequest::PARAMETER_LABEL)),
             1,

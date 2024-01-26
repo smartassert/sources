@@ -222,7 +222,7 @@ abstract class AbstractCreateSuiteTest extends AbstractSuiteTest
 
         $expectedResponseData = [
             'class' => 'duplicate',
-            'field' => [
+            'parameter' => [
                 'name' => 'label',
                 'value' => $label,
             ],
@@ -264,7 +264,7 @@ abstract class AbstractCreateSuiteTest extends AbstractSuiteTest
 
         $expectedResponseData = [
             'class' => 'duplicate',
-            'field' => [
+            'parameter' => [
                 'name' => 'label',
                 'value' => $label,
             ],

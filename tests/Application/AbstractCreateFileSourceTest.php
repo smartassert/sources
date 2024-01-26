@@ -182,7 +182,7 @@ abstract class AbstractCreateFileSourceTest extends AbstractApplicationTest
 
         $expectedResponseData = [
             'class' => 'duplicate',
-            'field' => [
+            'parameter' => [
                 'name' => 'label',
                 'value' => $conflictCreateParameters['label'],
             ],

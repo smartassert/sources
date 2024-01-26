@@ -93,7 +93,7 @@ abstract class AbstractFileSourceFileTest extends AbstractApplicationTest
                 'content' => 'non-empty value',
                 'expectedResponseData' => [
                     'class' => 'bad_request',
-                    'field' => [
+                    'parameter' => [
                         'name' => 'filename',
                         'value' => '.yaml',
                         'requirements' => [
@@ -108,7 +108,7 @@ abstract class AbstractFileSourceFileTest extends AbstractApplicationTest
                 'content' => 'non-empty value',
                 'expectedResponseData' => [
                     'class' => 'bad_request',
-                    'field' => [
+                    'parameter' => [
                         'name' => 'filename',
                         'value' => 'one-two-\\-three.yaml',
                         'requirements' => [
@@ -123,7 +123,7 @@ abstract class AbstractFileSourceFileTest extends AbstractApplicationTest
                 'content' => 'non-empty value',
                 'expectedResponseData' => [
                     'class' => 'bad_request',
-                    'field' => [
+                    'parameter' => [
                         'name' => 'filename',
                         'value' => 'one two three.yaml',
                         'requirements' => [
@@ -138,7 +138,7 @@ abstract class AbstractFileSourceFileTest extends AbstractApplicationTest
                 'content' => '',
                 'expectedResponseData' => [
                     'class' => 'bad_request',
-                    'field' => [
+                    'parameter' => [
                         'name' => 'content',
                         'value' => '',
                         'requirements' => [
@@ -153,7 +153,7 @@ abstract class AbstractFileSourceFileTest extends AbstractApplicationTest
                 'content' => "- item\ncontent",
                 'expectedResponseData' => [
                     'class' => 'bad_request',
-                    'field' => [
+                    'parameter' => [
                         'name' => 'content',
                         'value' => "- item\ncontent",
                         'requirements' => [
@@ -186,7 +186,7 @@ abstract class AbstractFileSourceFileTest extends AbstractApplicationTest
 
         $expectedResponseData = [
             'class' => 'duplicate',
-            'field' => [
+            'parameter' => [
                 'name' => 'filename',
                 'value' => self::FILENAME,
             ],
@@ -256,7 +256,7 @@ abstract class AbstractFileSourceFileTest extends AbstractApplicationTest
                 'filename' => '.yaml',
                 'expectedResponseData' => [
                     'class' => 'bad_request',
-                    'field' => [
+                    'parameter' => [
                         'name' => 'filename',
                         'value' => '.yaml',
                         'requirements' => [
@@ -270,7 +270,7 @@ abstract class AbstractFileSourceFileTest extends AbstractApplicationTest
                 'filename' => 'one-two-\\-three.yaml',
                 'expectedResponseData' => [
                     'class' => 'bad_request',
-                    'field' => [
+                    'parameter' => [
                         'name' => 'filename',
                         'value' => 'one-two-\\-three.yaml',
                         'requirements' => [
@@ -284,7 +284,7 @@ abstract class AbstractFileSourceFileTest extends AbstractApplicationTest
                 'filename' => 'one two three.yaml',
                 'expectedResponseData' => [
                     'class' => 'bad_request',
-                    'field' => [
+                    'parameter' => [
                         'name' => 'filename',
                         'value' => 'one two three.yaml',
                         'requirements' => [

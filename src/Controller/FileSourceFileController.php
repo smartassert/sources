@@ -14,7 +14,7 @@ use App\Response\YamlResponse;
 use League\Flysystem\FilesystemException;
 use League\Flysystem\FilesystemReader;
 use League\Flysystem\FilesystemWriter;
-use SmartAssert\ServiceRequest\Field\Field;
+use SmartAssert\ServiceRequest\Parameter\Parameter;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
@@ -45,7 +45,7 @@ readonly class FileSourceFileController
         try {
             if ($this->fileSourceReader->fileExists($path)) {
                 throw $this->errorResponseExceptionFactory->createForDuplicateObject(
-                    new Field('filename', (string) $yamlFile->name)
+                    new Parameter('filename', (string) $yamlFile->name)
                 );
             }
 

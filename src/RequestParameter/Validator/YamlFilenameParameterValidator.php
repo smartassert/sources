@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace App\RequestField\Validator;
+namespace App\RequestParameter\Validator;
 
 use App\Exception\ErrorResponseException;
 use App\Exception\ErrorResponseExceptionFactory;
-use SmartAssert\ServiceRequest\Field\FieldInterface;
+use SmartAssert\ServiceRequest\Parameter\ParameterInterface;
 use SmartAssert\YamlFile\Filename as YamlFilename;
 use SmartAssert\YamlFile\Validator\YamlFilenameValidator;
 
-readonly class YamlFilenameFieldValidator
+readonly class YamlFilenameParameterValidator
 {
     public function __construct(
         private YamlFilenameValidator $yamlFilenameValidator,
@@ -21,18 +21,18 @@ readonly class YamlFilenameFieldValidator
     /**
      * @throws ErrorResponseException
      */
-    public function validate(FieldInterface $field): YamlFilename
+    public function validate(ParameterInterface $parameter): YamlFilename
     {
-        $value = $field->getValue();
+        $value = $parameter->getValue();
         if (!is_string($value)) {
-            throw $this->exceptionFactory->createForBadRequest($field, 'wrong_type');
+            throw $this->exceptionFactory->createForBadRequest($parameter, 'wrong_type');
         }
 
         $filename = YamlFilename::parse($value);
         $validation = $this->yamlFilenameValidator->validate($filename);
 
         if (false === $validation->isValid()) {
-            throw $this->exceptionFactory->createForBadRequest($field, 'invalid');
+            throw $this->exceptionFactory->createForBadRequest($parameter, 'invalid');
         }
 
         return $filename;

@@ -21,7 +21,7 @@ trait CreateUpdateFileSourceDataProviderTrait
                 'requestParameters' => [],
                 'expectedResponseData' => [
                     'class' => 'bad_request',
-                    'field' => [
+                    'parameter' => [
                         'name' => 'label',
                         'value' => '',
                         'requirements' => [
@@ -41,7 +41,7 @@ trait CreateUpdateFileSourceDataProviderTrait
                 ],
                 'expectedResponseData' => [
                     'class' => 'bad_request',
-                    'field' => [
+                    'parameter' => [
                         'name' => 'label',
                         'value' => $labelTooLong,
                         'requirements' => [

@@ -10,9 +10,9 @@ use App\Exception\EntityNotFoundException;
 use App\Exception\ErrorResponseException;
 use App\Repository\SourceRepository;
 use App\Request\SuiteRequest;
-use App\RequestField\Field\Factory;
-use App\RequestField\Validator\StringFieldValidator;
-use App\RequestField\Validator\YamlFilenameCollectionFieldValidator;
+use App\RequestParameter\Factory;
+use App\RequestParameter\Validator\StringParameterValidator;
+use App\RequestParameter\Validator\YamlFilenameCollectionParameterValidator;
 use App\Security\EntityAccessChecker;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Controller\ValueResolverInterface;
@@ -24,9 +24,9 @@ readonly class SuiteRequestResolver implements ValueResolverInterface
     public function __construct(
         private SourceRepository $sourceRepository,
         private EntityAccessChecker $entityAccessChecker,
-        private StringFieldValidator $fieldValidator,
-        private YamlFilenameCollectionFieldValidator $yamlFilenameCollectionFieldValidator,
-        private Factory $fieldFactory,
+        private StringParameterValidator $parameterValidator,
+        private YamlFilenameCollectionParameterValidator $yamlFilenameCollectionParameterValidator,
+        private Factory $parameterFactory,
     ) {
     }
 
@@ -73,7 +73,7 @@ readonly class SuiteRequestResolver implements ValueResolverInterface
      */
     private function getLabel(Request $request): string
     {
-        return $this->fieldValidator->validateNonEmptyString($this->fieldFactory->createStringField(
+        return $this->parameterValidator->validateNonEmptyString($this->parameterFactory->createStringParameter(
             SuiteRequest::PARAMETER_LABEL,
             trim($request->request->getString(SuiteRequest::PARAMETER_LABEL)),
             1,
@@ -97,11 +97,11 @@ readonly class SuiteRequestResolver implements ValueResolverInterface
             }
         }
 
-        $testsField = $this->fieldFactory->createYamlFilenameCollectionField(
+        $testsParameter = $this->parameterFactory->createYamlFilenameCollectionParameter(
             SuiteRequest::PARAMETER_TESTS,
             $filteredTests
         );
 
-        return $this->yamlFilenameCollectionFieldValidator->validate($testsField);
+        return $this->yamlFilenameCollectionParameterValidator->validate($testsParameter);
     }
 }
