@@ -10,7 +10,7 @@ use SmartAssert\ServiceRequest\Parameter\ParameterInterface;
 use SmartAssert\ServiceRequest\Parameter\RequirementsInterface;
 use SmartAssert\ServiceRequest\Parameter\SizeInterface;
 
-readonly class StringFieldValidator
+readonly class StringParameterValidator
 {
     public function __construct(
         private ErrorResponseExceptionFactory $exceptionFactory,

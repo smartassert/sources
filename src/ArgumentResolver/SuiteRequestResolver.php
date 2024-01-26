@@ -11,8 +11,8 @@ use App\Exception\ErrorResponseException;
 use App\Repository\SourceRepository;
 use App\Request\SuiteRequest;
 use App\RequestParameter\Factory;
-use App\RequestParameter\Validator\StringFieldValidator;
-use App\RequestParameter\Validator\YamlFilenameCollectionFieldValidator;
+use App\RequestParameter\Validator\StringParameterValidator;
+use App\RequestParameter\Validator\YamlFilenameCollectionParameterValidator;
 use App\Security\EntityAccessChecker;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Controller\ValueResolverInterface;
@@ -24,8 +24,8 @@ readonly class SuiteRequestResolver implements ValueResolverInterface
     public function __construct(
         private SourceRepository $sourceRepository,
         private EntityAccessChecker $entityAccessChecker,
-        private StringFieldValidator $fieldValidator,
-        private YamlFilenameCollectionFieldValidator $yamlFilenameCollectionFieldValidator,
+        private StringParameterValidator $fieldValidator,
+        private YamlFilenameCollectionParameterValidator $yamlFilenameCollectionFieldValidator,
         private Factory $fieldFactory,
     ) {
     }

@@ -9,7 +9,7 @@ use App\Entity\GitSource;
 use App\Exception\ErrorResponseException;
 use App\Request\GitSourceRequest;
 use App\RequestParameter\Factory;
-use App\RequestParameter\Validator\StringFieldValidator;
+use App\RequestParameter\Validator\StringParameterValidator;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Controller\ValueResolverInterface;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
@@ -17,7 +17,7 @@ use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 readonly class GitSourceRequestResolver implements ValueResolverInterface
 {
     public function __construct(
-        private StringFieldValidator $fieldValidator,
+        private StringParameterValidator $fieldValidator,
         private Factory $fieldFactory,
     ) {
     }

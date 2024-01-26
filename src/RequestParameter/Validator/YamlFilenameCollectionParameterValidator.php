@@ -10,7 +10,7 @@ use SmartAssert\ServiceRequest\Parameter\ParameterInterface;
 use SmartAssert\YamlFile\Filename;
 use SmartAssert\YamlFile\Validator\YamlFilenameValidator;
 
-readonly class YamlFilenameCollectionFieldValidator
+readonly class YamlFilenameCollectionParameterValidator
 {
     public function __construct(
         private YamlFilenameValidator $yamlFilenameValidator,

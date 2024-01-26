@@ -9,7 +9,7 @@ use App\Exception\ErrorResponseExceptionFactory;
 use SmartAssert\ServiceRequest\Parameter\ParameterInterface;
 use SmartAssert\YamlFile\Validator\ContentValidator;
 
-readonly class YamlFieldValidator
+readonly class YamlParameterValidator
 {
     public function __construct(
         private ContentValidator $yamlContentValidator,

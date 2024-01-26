@@ -7,7 +7,7 @@ namespace App\ArgumentResolver;
 use App\Exception\ErrorResponseException;
 use App\Request\YamlFileRequest;
 use App\RequestParameter\Factory;
-use App\RequestParameter\Validator\YamlFilenameFieldValidator;
+use App\RequestParameter\Validator\YamlFilenameParameterValidator;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Controller\ValueResolverInterface;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
@@ -15,7 +15,7 @@ use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 class YamlFileRequestResolver extends AbstractYamlFileRequestResolver implements ValueResolverInterface
 {
     public function __construct(
-        private readonly YamlFilenameFieldValidator $yamlFilenameFieldValidator,
+        private readonly YamlFilenameParameterValidator $yamlFilenameFieldValidator,
         private readonly Factory $fieldFactory,
     ) {
     }
