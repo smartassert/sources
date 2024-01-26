@@ -52,7 +52,7 @@ trait CreateUpdateFileSourceDataProviderTrait
                             ]
                         ],
                     ],
-                    'type' => 'too_large',
+                    'type' => 'wrong_size',
                 ],
             ],
         ];

@@ -34,7 +34,7 @@ readonly class StringParameterValidator
 
             if ($sizeRequirements instanceof SizeInterface) {
                 if (is_string($value) && mb_strlen($value) > $sizeRequirements->getMaximum()) {
-                    throw $this->exceptionFactory->createForBadRequest($parameter, 'too_large');
+                    throw $this->exceptionFactory->createForBadRequest($parameter, 'wrong_size');
                 }
             }
         }
