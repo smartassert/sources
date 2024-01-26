@@ -59,7 +59,7 @@ trait CreateUpdateGitSourceDataProviderTrait
                             ]
                         ],
                     ],
-                    'type' => 'too_large',
+                    'type' => 'wrong_size',
                 ],
             ],
             'missing host url' => [
@@ -102,7 +102,7 @@ trait CreateUpdateGitSourceDataProviderTrait
                             ]
                         ],
                     ],
-                    'type' => 'too_large',
+                    'type' => 'wrong_size',
                 ],
             ],
             'missing path' => [
@@ -145,7 +145,7 @@ trait CreateUpdateGitSourceDataProviderTrait
                             ]
                         ],
                     ],
-                    'type' => 'too_large',
+                    'type' => 'wrong_size',
                 ],
             ],
             'credentials too long' => [
@@ -168,7 +168,7 @@ trait CreateUpdateGitSourceDataProviderTrait
                             ]
                         ],
                     ],
-                    'type' => 'too_large',
+                    'type' => 'wrong_size',
                 ],
             ],
         ];

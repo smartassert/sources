@@ -52,7 +52,7 @@ trait CreateUpdateSuiteDataProviderTrait
                             ]
                         ],
                     ],
-                    'type' => 'too_large',
+                    'type' => 'wrong_size',
                 ],
             ],
             'invalid yaml filename within singular tests collection' => [
