@@ -17,7 +17,7 @@ use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 readonly class GitSourceRequestResolver implements ValueResolverInterface
 {
     public function __construct(
-        private StringParameterValidator $fieldValidator,
+        private StringParameterValidator $parameterValidator,
         private Factory $fieldFactory,
     ) {
     }
@@ -33,28 +33,28 @@ readonly class GitSourceRequestResolver implements ValueResolverInterface
             return [];
         }
 
-        $label = $this->fieldValidator->validateNonEmptyString($this->fieldFactory->createStringParameter(
+        $label = $this->parameterValidator->validateNonEmptyString($this->fieldFactory->createStringParameter(
             GitSourceRequest::PARAMETER_LABEL,
             trim($request->request->getString(GitSourceRequest::PARAMETER_LABEL)),
             1,
             AbstractSource::LABEL_MAX_LENGTH,
         ));
 
-        $hostUrl = $this->fieldValidator->validateNonEmptyString($this->fieldFactory->createStringParameter(
+        $hostUrl = $this->parameterValidator->validateNonEmptyString($this->fieldFactory->createStringParameter(
             GitSourceRequest::PARAMETER_HOST_URL,
             trim($request->request->getString(GitSourceRequest::PARAMETER_HOST_URL)),
             1,
             GitSource::HOST_URL_MAX_LENGTH,
         ));
 
-        $path = $this->fieldValidator->validateNonEmptyString($this->fieldFactory->createStringParameter(
+        $path = $this->parameterValidator->validateNonEmptyString($this->fieldFactory->createStringParameter(
             GitSourceRequest::PARAMETER_PATH,
             trim($request->request->getString(GitSourceRequest::PARAMETER_PATH)),
             1,
             GitSource::PATH_MAX_LENGTH,
         ));
 
-        $credentials = $this->fieldValidator->validateString($this->fieldFactory->createStringParameter(
+        $credentials = $this->parameterValidator->validateString($this->fieldFactory->createStringParameter(
             GitSourceRequest::PARAMETER_CREDENTIALS,
             trim($request->request->getString(GitSourceRequest::PARAMETER_CREDENTIALS)),
             0,

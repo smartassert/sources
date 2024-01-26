@@ -16,7 +16,7 @@ use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 readonly class FileSourceRequestResolver implements ValueResolverInterface
 {
     public function __construct(
-        private StringParameterValidator $fieldValidator,
+        private StringParameterValidator $parameterValidator,
         private Factory $fieldFactory,
     ) {
     }
@@ -32,7 +32,7 @@ readonly class FileSourceRequestResolver implements ValueResolverInterface
             return [];
         }
 
-        $label = $this->fieldValidator->validateNonEmptyString($this->fieldFactory->createStringParameter(
+        $label = $this->parameterValidator->validateNonEmptyString($this->fieldFactory->createStringParameter(
             FileSourceRequest::PARAMETER_LABEL,
             trim($request->request->getString(FileSourceRequest::PARAMETER_LABEL)),
             1,

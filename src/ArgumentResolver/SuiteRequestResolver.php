@@ -24,7 +24,7 @@ readonly class SuiteRequestResolver implements ValueResolverInterface
     public function __construct(
         private SourceRepository $sourceRepository,
         private EntityAccessChecker $entityAccessChecker,
-        private StringParameterValidator $fieldValidator,
+        private StringParameterValidator $parameterValidator,
         private YamlFilenameCollectionParameterValidator $yamlFilenameCollectionFieldValidator,
         private Factory $fieldFactory,
     ) {
@@ -73,7 +73,7 @@ readonly class SuiteRequestResolver implements ValueResolverInterface
      */
     private function getLabel(Request $request): string
     {
-        return $this->fieldValidator->validateNonEmptyString($this->fieldFactory->createStringParameter(
+        return $this->parameterValidator->validateNonEmptyString($this->fieldFactory->createStringParameter(
             SuiteRequest::PARAMETER_LABEL,
             trim($request->request->getString(SuiteRequest::PARAMETER_LABEL)),
             1,
