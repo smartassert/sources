@@ -9,7 +9,7 @@ use App\Exception\ErrorResponseException;
 use App\Exception\ErrorResponseExceptionFactory;
 use App\Repository\SuiteRepository;
 use App\Request\SuiteRequest;
-use SmartAssert\ServiceRequest\Field\Field;
+use SmartAssert\ServiceRequest\Parameter\Parameter;
 
 readonly class Mutator
 {
@@ -26,7 +26,7 @@ readonly class Mutator
     {
         $foundSuite = $this->repository->findOneBySourceOwnerAndLabel($request->source, $request->label);
         if ($foundSuite instanceof Suite && $foundSuite->id !== $suite->id) {
-            throw $this->exceptionFactory->createForDuplicateObject(new Field('label', $request->getLabel()));
+            throw $this->exceptionFactory->createForDuplicateObject(new Parameter('label', $request->getLabel()));
         }
 
         $suite->setSource($request->source);

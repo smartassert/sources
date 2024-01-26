@@ -9,8 +9,8 @@ use App\Request\AddYamlFileRequest;
 use App\RequestField\Field\Factory;
 use App\RequestField\Validator\YamlFieldValidator;
 use App\RequestField\Validator\YamlFilenameFieldValidator;
-use SmartAssert\ServiceRequest\Field\Field;
-use SmartAssert\ServiceRequest\Field\Requirements;
+use SmartAssert\ServiceRequest\Parameter\Parameter;
+use SmartAssert\ServiceRequest\Parameter\Requirements;
 use SmartAssert\YamlFile\YamlFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Controller\ValueResolverInterface;
@@ -41,11 +41,10 @@ class AddYamlFileRequestResolver extends AbstractYamlFileRequestResolver impleme
             (string) $this->createFilenameFromRequest($request)
         ));
 
-        $contentField = (new Field('content', trim($request->getContent())))
-            ->withRequirements(new Requirements('yaml'))
-        ;
-
-        $content = $this->yamlFieldValidator->validate($contentField);
+        $content = $this->yamlFieldValidator->validate(
+            (new Parameter('content', trim($request->getContent())))
+                ->withRequirements(new Requirements('yaml'))
+        );
 
         return [new AddYamlFileRequest(new YamlFile($filename, $content))];
     }

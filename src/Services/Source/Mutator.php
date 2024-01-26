@@ -11,7 +11,7 @@ use App\Exception\ErrorResponseExceptionFactory;
 use App\Repository\SourceRepository;
 use App\Request\FileSourceRequest;
 use App\Request\GitSourceRequest;
-use SmartAssert\ServiceRequest\Field\Field;
+use SmartAssert\ServiceRequest\Parameter\Parameter;
 
 class Mutator
 {
@@ -31,7 +31,7 @@ class Mutator
         );
 
         if ($existingSource instanceof GitSource) {
-            throw $this->exceptionFactory->createForDuplicateObject(new Field('label', $request->getLabel()));
+            throw $this->exceptionFactory->createForDuplicateObject(new Parameter('label', $request->getLabel()));
         }
 
         if ($existingSource instanceof FileSource) {
@@ -42,7 +42,7 @@ class Mutator
                 return $existingSource;
             }
 
-            throw $this->exceptionFactory->createForDuplicateObject(new Field('label', $request->getLabel()));
+            throw $this->exceptionFactory->createForDuplicateObject(new Parameter('label', $request->getLabel()));
         }
 
         $source->setLabel($request->label);
@@ -64,7 +64,7 @@ class Mutator
             $existingSource instanceof FileSource
             || ($existingSource instanceof GitSource && $existingSource->getId() !== $source->getId())
         ) {
-            throw $this->exceptionFactory->createForDuplicateObject(new Field('label', $request->getLabel()));
+            throw $this->exceptionFactory->createForDuplicateObject(new Parameter('label', $request->getLabel()));
         }
 
         $source->setLabel($request->label);

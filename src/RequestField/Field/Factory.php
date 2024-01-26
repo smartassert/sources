@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace App\RequestField\Field;
 
-use SmartAssert\ServiceRequest\Field\Field;
-use SmartAssert\ServiceRequest\Field\FieldInterface;
-use SmartAssert\ServiceRequest\Field\Requirements;
-use SmartAssert\ServiceRequest\Field\Size;
+use SmartAssert\ServiceRequest\Parameter\Parameter;
+use SmartAssert\ServiceRequest\Parameter\ParameterInterface;
+use SmartAssert\ServiceRequest\Parameter\Requirements;
+use SmartAssert\ServiceRequest\Parameter\Size;
 
 readonly class Factory
 {
@@ -19,8 +19,8 @@ readonly class Factory
         string $value,
         int $minimumLength,
         int $maximumLength
-    ): FieldInterface {
-        return (new Field($name, $value))
+    ): ParameterInterface {
+        return (new Parameter($name, $value))
             ->withRequirements(new Requirements('string', new Size($minimumLength, $maximumLength)))
         ;
     }
@@ -28,9 +28,9 @@ readonly class Factory
     /**
      * @param non-empty-string $name
      */
-    public function createYamlFilenameField(string $name, string $value): FieldInterface
+    public function createYamlFilenameField(string $name, string $value): ParameterInterface
     {
-        return (new Field($name, $value))
+        return (new Parameter($name, $value))
             ->withRequirements(new Requirements('yaml_filename'))
         ;
     }
@@ -39,9 +39,9 @@ readonly class Factory
      * @param non-empty-string $name
      * @param string[]         $value
      */
-    public function createYamlFilenameCollectionField(string $name, array $value): FieldInterface
+    public function createYamlFilenameCollectionField(string $name, array $value): ParameterInterface
     {
-        return (new Field($name, $value))
+        return (new Parameter($name, $value))
             ->withRequirements(new Requirements('yaml_filename_collection'))
         ;
     }

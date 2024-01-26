@@ -6,7 +6,7 @@ namespace App\RequestField\Validator;
 
 use App\Exception\ErrorResponseException;
 use App\Exception\ErrorResponseExceptionFactory;
-use SmartAssert\ServiceRequest\Field\FieldInterface;
+use SmartAssert\ServiceRequest\Parameter\ParameterInterface;
 use SmartAssert\YamlFile\Validator\ContentValidator;
 
 readonly class YamlFieldValidator
@@ -22,20 +22,20 @@ readonly class YamlFieldValidator
      *
      * @throws ErrorResponseException
      */
-    public function validate(FieldInterface $field): string
+    public function validate(ParameterInterface $parameter): string
     {
-        $content = $field->getValue();
+        $content = $parameter->getValue();
         if (!is_string($content)) {
-            throw $this->exceptionFactory->createForBadRequest($field, 'wrong_type');
+            throw $this->exceptionFactory->createForBadRequest($parameter, 'wrong_type');
         }
 
         if ('' === $content) {
-            throw $this->exceptionFactory->createForBadRequest($field, 'empty');
+            throw $this->exceptionFactory->createForBadRequest($parameter, 'empty');
         }
 
         $validation = $this->yamlContentValidator->validate($content);
         if (false === $validation->isValid()) {
-            throw $this->exceptionFactory->createForBadRequest($field, 'invalid');
+            throw $this->exceptionFactory->createForBadRequest($parameter, 'invalid');
         }
 
         return $content;

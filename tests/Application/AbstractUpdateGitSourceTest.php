@@ -107,7 +107,7 @@ abstract class AbstractUpdateGitSourceTest extends AbstractApplicationTest
 
         $expectedResponseData = [
             'class' => 'duplicate',
-            'field' => [
+            'parameter' => [
                 'name' => 'label',
                 'value' => $conflictCreateParameters['label'],
             ],

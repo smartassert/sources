@@ -6,9 +6,9 @@ namespace App\RequestField\Validator;
 
 use App\Exception\ErrorResponseException;
 use App\Exception\ErrorResponseExceptionFactory;
-use SmartAssert\ServiceRequest\Field\FieldInterface;
-use SmartAssert\ServiceRequest\Field\RequirementsInterface;
-use SmartAssert\ServiceRequest\Field\SizeInterface;
+use SmartAssert\ServiceRequest\Parameter\ParameterInterface;
+use SmartAssert\ServiceRequest\Parameter\RequirementsInterface;
+use SmartAssert\ServiceRequest\Parameter\SizeInterface;
 
 readonly class StringFieldValidator
 {
@@ -20,21 +20,21 @@ readonly class StringFieldValidator
     /**
      * @throws ErrorResponseException
      */
-    public function validateString(FieldInterface $field): string
+    public function validateString(ParameterInterface $parameter): string
     {
-        $value = $field->getValue();
+        $value = $parameter->getValue();
         if (!is_string($value)) {
-            throw $this->exceptionFactory->createForBadRequest($field, 'wrong_type');
+            throw $this->exceptionFactory->createForBadRequest($parameter, 'wrong_type');
         }
 
-        $requirements = $field->getRequirements();
+        $requirements = $parameter->getRequirements();
 
         if ($requirements instanceof RequirementsInterface) {
             $sizeRequirements = $requirements->getSize();
 
             if ($sizeRequirements instanceof SizeInterface) {
                 if (is_string($value) && mb_strlen($value) > $sizeRequirements->getMaximum()) {
-                    throw $this->exceptionFactory->createForBadRequest($field, 'too_large');
+                    throw $this->exceptionFactory->createForBadRequest($parameter, 'too_large');
                 }
             }
         }
@@ -47,12 +47,12 @@ readonly class StringFieldValidator
      *
      * @throws ErrorResponseException
      */
-    public function validateNonEmptyString(FieldInterface $field): string
+    public function validateNonEmptyString(ParameterInterface $parameter): string
     {
-        $value = $this->validateString($field);
+        $value = $this->validateString($parameter);
 
         if ('' === $value) {
-            throw $this->exceptionFactory->createForBadRequest($field, 'empty');
+            throw $this->exceptionFactory->createForBadRequest($parameter, 'empty');
         }
 
         return $value;

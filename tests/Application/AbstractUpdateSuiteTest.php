@@ -77,7 +77,7 @@ abstract class AbstractUpdateSuiteTest extends AbstractSuiteTest
 
         $expectedResponseData = [
             'class' => 'duplicate',
-            'field' => [
+            'parameter' => [
                 'name' => 'label',
                 'value' => $suiteLabel2,
             ],

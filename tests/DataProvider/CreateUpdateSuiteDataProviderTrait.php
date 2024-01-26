@@ -21,7 +21,7 @@ trait CreateUpdateSuiteDataProviderTrait
                 'requestParameters' => [],
                 'expectedResponseData' => [
                     'class' => 'bad_request',
-                    'field' => [
+                    'parameter' => [
                         'name' => 'label',
                         'value' => '',
                         'requirements' => [
@@ -41,7 +41,7 @@ trait CreateUpdateSuiteDataProviderTrait
                 ],
                 'expectedResponseData' => [
                     'class' => 'bad_request',
-                    'field' => [
+                    'parameter' => [
                         'name' => 'label',
                         'value' => $labelTooLong,
                         'requirements' => [
@@ -62,7 +62,7 @@ trait CreateUpdateSuiteDataProviderTrait
                 ],
                 'expectedResponseData' => [
                     'class' => 'bad_request',
-                    'field' => [
+                    'parameter' => [
                         'name' => 'tests',
                         'position' => 1,
                         'value' => [
@@ -82,7 +82,7 @@ trait CreateUpdateSuiteDataProviderTrait
                 ],
                 'expectedResponseData' => [
                     'class' => 'bad_request',
-                    'field' => [
+                    'parameter' => [
                         'name' => 'tests',
                         'position' => 2,
                         'value' => [

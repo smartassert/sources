@@ -12,7 +12,7 @@ use SmartAssert\ServiceRequest\Error\ErrorInterface;
 use SmartAssert\ServiceRequest\Error\ModifyReadOnlyEntityError;
 use SmartAssert\ServiceRequest\Error\ModifyReadOnlyEntityErrorInterface;
 use SmartAssert\ServiceRequest\Error\StorageErrorInterface;
-use SmartAssert\ServiceRequest\Field\FieldInterface;
+use SmartAssert\ServiceRequest\Parameter\ParameterInterface;
 
 readonly class ErrorResponseExceptionFactory
 {
@@ -29,14 +29,14 @@ readonly class ErrorResponseExceptionFactory
     /**
      * @param non-empty-string $errorType
      */
-    public function createForBadRequest(FieldInterface $field, string $errorType): ErrorResponseException
+    public function createForBadRequest(ParameterInterface $parameter, string $errorType): ErrorResponseException
     {
-        return $this->create(new BadRequestError($field, $errorType));
+        return $this->create(new BadRequestError($parameter, $errorType));
     }
 
-    public function createForDuplicateObject(FieldInterface $field): ErrorResponseException
+    public function createForDuplicateObject(ParameterInterface $parameter): ErrorResponseException
     {
-        return $this->create(new DuplicateObjectError($field));
+        return $this->create(new DuplicateObjectError($parameter));
     }
 
     /**
