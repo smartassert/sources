@@ -6,8 +6,8 @@ namespace App\ArgumentResolver;
 
 use App\Exception\ErrorResponseException;
 use App\Request\YamlFileRequest;
-use App\RequestField\Field\Factory;
-use App\RequestField\Validator\YamlFilenameFieldValidator;
+use App\RequestParameter\Factory;
+use App\RequestParameter\Validator\YamlFilenameFieldValidator;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Controller\ValueResolverInterface;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;

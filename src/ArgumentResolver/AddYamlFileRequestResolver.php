@@ -6,9 +6,9 @@ namespace App\ArgumentResolver;
 
 use App\Exception\ErrorResponseException;
 use App\Request\AddYamlFileRequest;
-use App\RequestField\Field\Factory;
-use App\RequestField\Validator\YamlFieldValidator;
-use App\RequestField\Validator\YamlFilenameFieldValidator;
+use App\RequestParameter\Factory;
+use App\RequestParameter\Validator\YamlFieldValidator;
+use App\RequestParameter\Validator\YamlFilenameFieldValidator;
 use SmartAssert\ServiceRequest\Parameter\Parameter;
 use SmartAssert\ServiceRequest\Parameter\Requirements;
 use SmartAssert\YamlFile\YamlFile;

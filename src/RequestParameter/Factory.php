@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\RequestField\Field;
+namespace App\RequestParameter;
 
 use SmartAssert\ServiceRequest\Parameter\Parameter;
 use SmartAssert\ServiceRequest\Parameter\ParameterInterface;

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\RequestField\Validator;
+namespace App\RequestParameter\Validator;
 
 use App\Exception\ErrorResponseException;
 use App\Exception\ErrorResponseExceptionFactory;
