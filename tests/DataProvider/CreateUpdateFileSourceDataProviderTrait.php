@@ -32,7 +32,7 @@ trait CreateUpdateFileSourceDataProviderTrait
                             ]
                         ],
                     ],
-                    'type' => 'empty',
+                    'type' => 'wrong_size',
                 ],
             ],
             'label length exceeds length limit' => [
