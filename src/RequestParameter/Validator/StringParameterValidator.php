@@ -7,7 +7,6 @@ namespace App\RequestParameter\Validator;
 use App\Exception\ErrorResponseException;
 use App\Exception\ErrorResponseExceptionFactory;
 use SmartAssert\ServiceRequest\Parameter\ParameterInterface;
-use SmartAssert\ServiceRequest\Parameter\RequirementsInterface;
 use SmartAssert\ServiceRequest\Parameter\SizeInterface;
 
 readonly class StringParameterValidator
@@ -27,16 +26,14 @@ readonly class StringParameterValidator
             throw $this->exceptionFactory->createForBadRequest($parameter, 'wrong_type');
         }
 
-        $requirements = $parameter->getRequirements();
+        $sizeRequirements = $parameter->getRequirements()?->getSize();
+        if (!$sizeRequirements instanceof SizeInterface) {
+            return $value;
+        }
 
-        if ($requirements instanceof RequirementsInterface) {
-            $sizeRequirements = $requirements->getSize();
-
-            if ($sizeRequirements instanceof SizeInterface) {
-                if (is_string($value) && mb_strlen($value) > $sizeRequirements->getMaximum()) {
-                    throw $this->exceptionFactory->createForBadRequest($parameter, 'wrong_size');
-                }
-            }
+        $size = mb_strlen($value);
+        if ($size < $sizeRequirements->getMinimum() || $size > $sizeRequirements->getMaximum()) {
+            throw $this->exceptionFactory->createForBadRequest($parameter, 'wrong_size');
         }
 
         return $value;
@@ -52,7 +49,7 @@ readonly class StringParameterValidator
         $value = $this->validateString($parameter);
 
         if ('' === $value) {
-            throw $this->exceptionFactory->createForBadRequest($parameter, 'empty');
+            throw $this->exceptionFactory->createForBadRequest($parameter, 'wrong_size');
         }
 
         return $value;

@@ -39,7 +39,7 @@ trait CreateUpdateGitSourceDataProviderTrait
                             ]
                         ],
                     ],
-                    'type' => 'empty',
+                    'type' => 'wrong_size',
                 ],
             ],
             'label length exceeds length limit' => [
@@ -80,7 +80,7 @@ trait CreateUpdateGitSourceDataProviderTrait
                             ]
                         ],
                     ],
-                    'type' => 'empty',
+                    'type' => 'wrong_size',
                 ],
             ],
             'host url too long' => [
@@ -123,7 +123,7 @@ trait CreateUpdateGitSourceDataProviderTrait
                             ]
                         ],
                     ],
-                    'type' => 'empty',
+                    'type' => 'wrong_size',
                 ],
             ],
             'path too long' => [
