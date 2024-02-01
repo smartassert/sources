@@ -128,3 +128,5 @@ services:
             $handlers: !tagged_iterator 'app.foo'
 
     SmartAssert\ServiceRequest\Exception\ErrorResponseExceptionFactory: ~
+
+    SmartAssert\ServiceRequest\Parameter\Validator\StringParameterValidator: ~
