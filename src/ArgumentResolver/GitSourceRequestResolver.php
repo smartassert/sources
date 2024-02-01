@@ -6,10 +6,10 @@ namespace App\ArgumentResolver;
 
 use App\Entity\AbstractSource;
 use App\Entity\GitSource;
-use App\Exception\ErrorResponseException;
 use App\Request\GitSourceRequest;
 use App\RequestParameter\Factory;
 use App\RequestParameter\Validator\StringParameterValidator;
+use SmartAssert\ServiceRequest\Exception\ErrorResponseException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Controller\ValueResolverInterface;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;

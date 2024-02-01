@@ -6,12 +6,12 @@ namespace App\Controller;
 
 use App\Entity\Suite;
 use App\Exception\EmptyEntityIdException;
-use App\Exception\ErrorResponseException;
-use App\Exception\ErrorResponseExceptionFactory;
 use App\Repository\SuiteRepository;
 use App\Request\SuiteRequest;
 use App\Services\Suite\Factory;
 use App\Services\Suite\Mutator;
+use SmartAssert\ServiceRequest\Exception\ErrorResponseException;
+use SmartAssert\ServiceRequest\Exception\ErrorResponseExceptionFactory;
 use SmartAssert\UsersSecurityBundle\Security\User;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;

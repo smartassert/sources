@@ -6,9 +6,9 @@ namespace App\Services\Source;
 
 use App\Entity\FileSource;
 use App\Exception\EmptyEntityIdException;
-use App\Exception\ErrorResponseException;
 use App\Request\FileSourceRequest;
 use App\Services\EntityIdFactory;
+use SmartAssert\ServiceRequest\Exception\ErrorResponseException;
 use SmartAssert\UsersSecurityBundle\Security\User;
 
 readonly class FileSourceFactory

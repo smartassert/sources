@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use App\Entity\SerializedSuite;
-use App\Exception\ErrorResponseException;
-use App\Exception\ErrorResponseExceptionFactory;
 use App\Exception\SerializedSuiteSourceDoesNotExistException;
 use App\Exception\StorageExceptionFactory;
 use App\Message\SerializeSuite;
@@ -15,6 +13,8 @@ use App\Request\CreateSerializedSuiteRequest;
 use App\Response\YamlResponse;
 use App\Services\SuiteSerializer;
 use League\Flysystem\FilesystemException;
+use SmartAssert\ServiceRequest\Exception\ErrorResponseException;
+use SmartAssert\ServiceRequest\Exception\ErrorResponseExceptionFactory;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Messenger\MessageBusInterface;

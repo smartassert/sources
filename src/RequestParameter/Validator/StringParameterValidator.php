@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\RequestParameter\Validator;
 
-use App\Exception\ErrorResponseException;
-use App\Exception\ErrorResponseExceptionFactory;
+use SmartAssert\ServiceRequest\Exception\ErrorResponseException;
+use SmartAssert\ServiceRequest\Exception\ErrorResponseExceptionFactory;
 use SmartAssert\ServiceRequest\Parameter\ParameterInterface;
 use SmartAssert\ServiceRequest\Parameter\SizeInterface;
 

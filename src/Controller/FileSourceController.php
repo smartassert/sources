@@ -6,14 +6,14 @@ namespace App\Controller;
 
 use App\Entity\FileSource;
 use App\Exception\EmptyEntityIdException;
-use App\Exception\ErrorResponseException;
-use App\Exception\ErrorResponseExceptionFactory;
 use App\Exception\StorageExceptionFactory;
 use App\Request\FileSourceRequest;
 use App\Services\Source\FileSourceFactory;
 use App\Services\Source\Mutator;
 use App\Services\SourceRepository\Reader\FileSourceDirectoryLister;
 use League\Flysystem\FilesystemException;
+use SmartAssert\ServiceRequest\Exception\ErrorResponseException;
+use SmartAssert\ServiceRequest\Exception\ErrorResponseExceptionFactory;
 use SmartAssert\UsersSecurityBundle\Security\User;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;

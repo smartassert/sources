@@ -6,11 +6,11 @@ namespace App\Controller;
 
 use App\Entity\GitSource;
 use App\Exception\EmptyEntityIdException;
-use App\Exception\ErrorResponseException;
-use App\Exception\ErrorResponseExceptionFactory;
 use App\Request\GitSourceRequest;
 use App\Services\Source\GitSourceFactory;
 use App\Services\Source\Mutator;
+use SmartAssert\ServiceRequest\Exception\ErrorResponseException;
+use SmartAssert\ServiceRequest\Exception\ErrorResponseExceptionFactory;
 use SmartAssert\UsersSecurityBundle\Security\User;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;

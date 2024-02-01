@@ -126,3 +126,5 @@ services:
     App\Services\SerializeSuiteExceptionFactory\SerializeSuiteExceptionFactory:
         arguments:
             $handlers: !tagged_iterator 'app.foo'
+
+    SmartAssert\ServiceRequest\Exception\ErrorResponseExceptionFactory: ~

@@ -6,11 +6,11 @@ namespace App\Services\Source;
 
 use App\Entity\FileSource;
 use App\Entity\GitSource;
-use App\Exception\ErrorResponseException;
-use App\Exception\ErrorResponseExceptionFactory;
 use App\Repository\SourceRepository;
 use App\Request\FileSourceRequest;
 use App\Request\GitSourceRequest;
+use SmartAssert\ServiceRequest\Exception\ErrorResponseException;
+use SmartAssert\ServiceRequest\Exception\ErrorResponseExceptionFactory;
 use SmartAssert\ServiceRequest\Parameter\Parameter;
 
 class Mutator
