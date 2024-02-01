@@ -9,6 +9,7 @@ use App\Entity\SourceInterface;
 use App\Enum\Source\Type;
 use App\Exception\ErrorResponseException;
 use App\Exception\ErrorResponseExceptionFactory;
+use App\Exception\StorageExceptionFactory;
 use App\Repository\SourceRepository;
 use League\Flysystem\FilesystemException;
 use League\Flysystem\FilesystemWriter;
@@ -44,6 +45,7 @@ readonly class SourceController
         SourceInterface $source,
         FilesystemWriter $fileSourceWriter,
         ErrorResponseExceptionFactory $exceptionFactory,
+        StorageExceptionFactory $storageExceptionFactory,
     ): Response {
         if (null === $source->getDeletedAt()) {
             $this->repository->delete($source);
@@ -52,7 +54,9 @@ readonly class SourceController
                 try {
                     $fileSourceWriter->deleteDirectory($source->getDirectoryPath());
                 } catch (FilesystemException $e) {
-                    throw $exceptionFactory->createForStorageFailure($source, $e);
+                    throw $exceptionFactory->createForStorageError(
+                        $storageExceptionFactory->createForEntityStorageFailure($source, $e)
+                    );
                 }
             }
         }

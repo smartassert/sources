@@ -7,6 +7,7 @@ namespace App\Controller;
 use App\Entity\FileSource;
 use App\Exception\ErrorResponseException;
 use App\Exception\ErrorResponseExceptionFactory;
+use App\Exception\StorageExceptionFactory;
 use App\Request\AddYamlFileRequest;
 use App\Request\YamlFileRequest;
 use App\Response\EmptyResponse;
@@ -30,6 +31,7 @@ readonly class FileSourceFileController
         private FilesystemWriter $fileSourceWriter,
         private FilesystemReader $fileSourceReader,
         private ErrorResponseExceptionFactory $errorResponseExceptionFactory,
+        private StorageExceptionFactory $storageExceptionFactory,
     ) {
     }
 
@@ -51,7 +53,9 @@ readonly class FileSourceFileController
 
             $this->fileSourceWriter->write($path, $yamlFile->content);
         } catch (FilesystemException $e) {
-            throw $this->errorResponseExceptionFactory->createForStorageFailure($source, $e);
+            throw $this->errorResponseExceptionFactory->createForStorageError(
+                $this->storageExceptionFactory->createForEntityStorageFailure($source, $e)
+            );
         }
 
         return new EmptyResponse();
@@ -68,7 +72,9 @@ readonly class FileSourceFileController
         try {
             $this->fileSourceWriter->write($source->getDirectoryPath() . '/' . $yamlFile->name, $yamlFile->content);
         } catch (FilesystemException $e) {
-            throw $this->errorResponseExceptionFactory->createForStorageFailure($source, $e);
+            throw $this->errorResponseExceptionFactory->createForStorageError(
+                $this->storageExceptionFactory->createForEntityStorageFailure($source, $e)
+            );
         }
 
         return new EmptyResponse();
@@ -89,7 +95,9 @@ readonly class FileSourceFileController
 
             return new YamlResponse($this->fileSourceReader->read($location));
         } catch (FilesystemException $e) {
-            throw $this->errorResponseExceptionFactory->createForStorageFailure($source, $e);
+            throw $this->errorResponseExceptionFactory->createForStorageError(
+                $this->storageExceptionFactory->createForEntityStorageFailure($source, $e)
+            );
         }
     }
 
@@ -102,7 +110,9 @@ readonly class FileSourceFileController
         try {
             $this->fileSourceWriter->delete($source->getDirectoryPath() . '/' . $request->filename);
         } catch (FilesystemException $e) {
-            throw $this->errorResponseExceptionFactory->createForStorageFailure($source, $e);
+            throw $this->errorResponseExceptionFactory->createForStorageError(
+                $this->storageExceptionFactory->createForEntityStorageFailure($source, $e)
+            );
         }
 
         return new EmptyResponse();

@@ -4,23 +4,17 @@ declare(strict_types=1);
 
 namespace App\Exception;
 
-use App\Entity\IdentifiedEntityInterface;
-use League\Flysystem\FilesystemException;
 use SmartAssert\ServiceRequest\Error\BadRequestError;
 use SmartAssert\ServiceRequest\Error\DuplicateObjectError;
 use SmartAssert\ServiceRequest\Error\ErrorInterface;
 use SmartAssert\ServiceRequest\Error\ModifyReadOnlyEntityError;
 use SmartAssert\ServiceRequest\Error\ModifyReadOnlyEntityErrorInterface;
+use SmartAssert\ServiceRequest\Error\StorageError;
 use SmartAssert\ServiceRequest\Error\StorageErrorInterface;
 use SmartAssert\ServiceRequest\Parameter\ParameterInterface;
 
 readonly class ErrorResponseExceptionFactory
 {
-    public function __construct(
-        private StorageErrorFactory $storageErrorFactory,
-    ) {
-    }
-
     public function create(ErrorInterface $error, ?\Throwable $previous = null): ErrorResponseException
     {
         return new ErrorResponseException($error, $this->deriveStatusCode($error), $previous);
@@ -48,13 +42,14 @@ readonly class ErrorResponseExceptionFactory
         return $this->create(new ModifyReadOnlyEntityError($entityId, $entityType));
     }
 
-    public function createForStorageFailure(
-        IdentifiedEntityInterface $entity,
-        FilesystemException $filesystemException
-    ): ErrorResponseException {
-        return $this->create(
-            $this->storageErrorFactory->createForEntityStorageFailure($entity, $filesystemException)
-        );
+    public function createForStorageError(StorageExceptionInterface $storageException): ErrorResponseException
+    {
+        return $this->create(new StorageError(
+            $storageException->getOperation(),
+            $storageException->getObjectType(),
+            $storageException->getLocation(),
+            $storageException->getContext(),
+        ));
     }
 
     /**

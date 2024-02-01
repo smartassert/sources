@@ -8,6 +8,7 @@ use App\Entity\SerializedSuite;
 use App\Exception\ErrorResponseException;
 use App\Exception\ErrorResponseExceptionFactory;
 use App\Exception\SerializedSuiteSourceDoesNotExistException;
+use App\Exception\StorageExceptionFactory;
 use App\Message\SerializeSuite;
 use App\Repository\SerializedSuiteRepository;
 use App\Request\CreateSerializedSuiteRequest;
@@ -49,13 +50,16 @@ class SerializedSuiteController
         SerializedSuite $serializedSuite,
         SuiteSerializer $suiteSerializer,
         ErrorResponseExceptionFactory $exceptionFactory,
+        StorageExceptionFactory $storageExceptionFactory,
     ): Response {
         try {
             return new YamlResponse($suiteSerializer->read($serializedSuite));
         } catch (SerializedSuiteSourceDoesNotExistException) {
             return new Response(null, 404);
         } catch (FilesystemException $e) {
-            throw $exceptionFactory->createForStorageFailure($serializedSuite, $e);
+            throw $exceptionFactory->createForStorageError(
+                $storageExceptionFactory->createForEntityStorageFailure($serializedSuite, $e)
+            );
         }
     }
 
