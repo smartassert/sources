@@ -11,6 +11,7 @@ use SmartAssert\ServiceRequest\Error\ModifyReadOnlyEntityError;
 use SmartAssert\ServiceRequest\Error\ModifyReadOnlyEntityErrorInterface;
 use SmartAssert\ServiceRequest\Error\StorageError;
 use SmartAssert\ServiceRequest\Error\StorageErrorInterface;
+use SmartAssert\ServiceRequest\Exception\StorageExceptionInterface;
 use SmartAssert\ServiceRequest\Parameter\ParameterInterface;
 
 readonly class ErrorResponseExceptionFactory
