@@ -17,7 +17,7 @@
         "psr/http-client": "^1.0",
         "psr/http-message": "^1.0",
         "smartassert/health-check-bundle": "^6.0",
-        "smartassert/service-request": "^1.0",
+        "smartassert/service-request": "^1.3",
         "smartassert/users-security-bundle": "^8.0",
         "smartassert/worker-job-source": "^1.0",
         "smartassert/worker-message-failed-event-bundle": "^2.0",
