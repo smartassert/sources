@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace App\Services\Suite;
 
 use App\Entity\Suite;
-use App\Exception\ErrorResponseException;
-use App\Exception\ErrorResponseExceptionFactory;
 use App\Repository\SuiteRepository;
 use App\Request\SuiteRequest;
+use SmartAssert\ServiceRequest\Exception\ErrorResponseException;
+use SmartAssert\ServiceRequest\Exception\ErrorResponseExceptionFactory;
 use SmartAssert\ServiceRequest\Parameter\Parameter;
 
 readonly class Mutator

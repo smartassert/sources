@@ -7,6 +7,8 @@ namespace App\Exception;
 use App\Entity\IdentifiedEntityInterface;
 use League\Flysystem\FilesystemException;
 use League\Flysystem\FilesystemOperationFailed;
+use SmartAssert\ServiceRequest\Exception\StorageException;
+use SmartAssert\ServiceRequest\Exception\StorageExceptionInterface;
 
 class StorageExceptionFactory
 {

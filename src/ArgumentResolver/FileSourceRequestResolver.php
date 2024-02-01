@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace App\ArgumentResolver;
 
 use App\Entity\AbstractSource;
-use App\Exception\ErrorResponseException;
 use App\Request\FileSourceRequest;
 use App\RequestParameter\Factory;
-use App\RequestParameter\Validator\StringParameterValidator;
+use SmartAssert\ServiceRequest\Exception\ErrorResponseException;
+use SmartAssert\ServiceRequest\Parameter\Validator\StringParameterValidator;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Controller\ValueResolverInterface;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;

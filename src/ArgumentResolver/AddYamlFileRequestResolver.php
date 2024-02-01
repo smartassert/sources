@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace App\ArgumentResolver;
 
-use App\Exception\ErrorResponseException;
 use App\Request\AddYamlFileRequest;
 use App\RequestParameter\Factory;
 use App\RequestParameter\Validator\YamlFilenameParameterValidator;
 use App\RequestParameter\Validator\YamlParameterValidator;
+use SmartAssert\ServiceRequest\Exception\ErrorResponseException;
 use SmartAssert\ServiceRequest\Parameter\Parameter;
 use SmartAssert\ServiceRequest\Parameter\Requirements;
 use SmartAssert\YamlFile\YamlFile;

@@ -6,10 +6,10 @@ namespace App\Services\Source;
 
 use App\Entity\GitSource;
 use App\Exception\EmptyEntityIdException;
-use App\Exception\ErrorResponseException;
 use App\Repository\GitSourceRepository;
 use App\Request\GitSourceRequest;
 use App\Services\EntityIdFactory;
+use SmartAssert\ServiceRequest\Exception\ErrorResponseException;
 use SmartAssert\UsersSecurityBundle\Security\User;
 
 readonly class GitSourceFactory

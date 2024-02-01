@@ -6,10 +6,10 @@ namespace App\Services\Suite;
 
 use App\Entity\Suite;
 use App\Exception\EmptyEntityIdException;
-use App\Exception\ErrorResponseException;
 use App\Repository\SuiteRepository;
 use App\Request\SuiteRequest;
 use App\Services\EntityIdFactory;
+use SmartAssert\ServiceRequest\Exception\ErrorResponseException;
 
 readonly class Factory
 {
