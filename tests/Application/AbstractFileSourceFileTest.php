@@ -20,7 +20,7 @@ abstract class AbstractFileSourceFileTest extends AbstractApplicationTest
 
         $fileSource = SourceOriginFactory::create(
             'file',
-            self::$users->get(self::USER_1_EMAIL)->id
+            self::$users->get(self::USER_1_EMAIL)['id']
         );
         \assert($fileSource instanceof FileSource);
         $this->fileSource = $fileSource;

@@ -63,7 +63,7 @@ abstract class AbstractCreateGitSourceTest extends AbstractApplicationTest
         self::assertInstanceOf(SourceInterface::class, $source);
 
         $expected['id'] = $source->getId();
-        $expected['user_id'] = self::$users->get(self::USER_1_EMAIL)->id;
+        $expected['user_id'] = self::$users->get(self::USER_1_EMAIL)['id'];
 
         $this->responseAsserter->assertSuccessfulJsonResponse($response, $expected);
     }

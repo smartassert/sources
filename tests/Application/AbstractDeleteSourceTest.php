@@ -80,7 +80,7 @@ abstract class AbstractDeleteSourceTest extends AbstractApplicationTest
 
         $fileSource = SourceOriginFactory::create(
             type: 'file',
-            userId: self::$users->get(self::USER_1_EMAIL)->id,
+            userId: self::$users->get(self::USER_1_EMAIL)['id'],
             label: 'file source label',
         );
         \assert($fileSource instanceof FileSource);
@@ -108,7 +108,7 @@ abstract class AbstractDeleteSourceTest extends AbstractApplicationTest
     {
         $source = SourceOriginFactory::create(
             type: 'file',
-            userId: self::$users->get(self::USER_1_EMAIL)->id,
+            userId: self::$users->get(self::USER_1_EMAIL)['id'],
         );
         $this->sourceRepository->save($source);
 

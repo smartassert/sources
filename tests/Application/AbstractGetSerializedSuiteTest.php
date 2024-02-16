@@ -85,7 +85,7 @@ abstract class AbstractGetSerializedSuiteTest extends AbstractApplicationTest
                 'sourceCreator' => function (UserProvider $users) {
                     return SourceOriginFactory::create(
                         type: 'file',
-                        userId: $users->get(self::USER_1_EMAIL)->id,
+                        userId: $users->get(self::USER_1_EMAIL)['id'],
                     );
                 },
                 'suiteCreator' => function (SourceInterface $source) {
@@ -112,7 +112,7 @@ abstract class AbstractGetSerializedSuiteTest extends AbstractApplicationTest
                 'sourceCreator' => function (UserProvider $users) {
                     return SourceOriginFactory::create(
                         type: 'file',
-                        userId: $users->get(self::USER_1_EMAIL)->id,
+                        userId: $users->get(self::USER_1_EMAIL)['id'],
                     );
                 },
                 'suiteCreator' => function (SourceInterface $source) {
@@ -145,7 +145,7 @@ abstract class AbstractGetSerializedSuiteTest extends AbstractApplicationTest
                 'sourceCreator' => function (UserProvider $users) {
                     return SourceOriginFactory::create(
                         type: 'file',
-                        userId: $users->get(self::USER_1_EMAIL)->id,
+                        userId: $users->get(self::USER_1_EMAIL)['id'],
                     );
                 },
                 'suiteCreator' => function (SourceInterface $source) {

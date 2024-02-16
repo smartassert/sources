@@ -80,7 +80,7 @@ abstract class AbstractListSuitesTest extends AbstractApplicationTest
                 ) {
                     $source = SourceOriginFactory::create(
                         type: 'file',
-                        userId: $users->get(self::USER_1_EMAIL)->id,
+                        userId: $users->get(self::USER_1_EMAIL)['id'],
                         label: 'source one',
                     );
 
@@ -111,7 +111,7 @@ abstract class AbstractListSuitesTest extends AbstractApplicationTest
                 ) {
                     $source1 = SourceOriginFactory::create(
                         type: 'file',
-                        userId: $users->get(self::USER_1_EMAIL)->id,
+                        userId: $users->get(self::USER_1_EMAIL)['id'],
                         label: 'source one',
                     );
 
@@ -127,7 +127,7 @@ abstract class AbstractListSuitesTest extends AbstractApplicationTest
 
                     $source2 = SourceOriginFactory::create(
                         type: 'file',
-                        userId: $users->get(self::USER_1_EMAIL)->id,
+                        userId: $users->get(self::USER_1_EMAIL)['id'],
                         label: 'source two',
                     );
 
@@ -176,7 +176,7 @@ abstract class AbstractListSuitesTest extends AbstractApplicationTest
                 ) {
                     $zebraSource = SourceOriginFactory::create(
                         type: 'file',
-                        userId: $users->get(self::USER_1_EMAIL)->id,
+                        userId: $users->get(self::USER_1_EMAIL)['id'],
                         label: 'zebra one',
                     );
 
@@ -192,7 +192,7 @@ abstract class AbstractListSuitesTest extends AbstractApplicationTest
 
                     $appleAndBatSource = SourceOriginFactory::create(
                         type: 'file',
-                        userId: $users->get(self::USER_1_EMAIL)->id,
+                        userId: $users->get(self::USER_1_EMAIL)['id'],
                         label: 'apple and bat source',
                     );
 
