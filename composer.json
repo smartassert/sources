@@ -31,7 +31,7 @@
         "symfony/messenger": "7.0.*",
         "symfony/monolog-bundle": "^3.7",
         "symfony/process": "7.0.*",
-        "symfony/runtime": "6.4.*",
+        "symfony/runtime": "7.0.*",
         "symfony/security-bundle": "6.4.*",
         "symfony/string": "6.4.*",
         "symfony/uid": "6.4.*",
