@@ -76,11 +76,11 @@ abstract class AbstractListSourcesTest extends AbstractApplicationTest
                 'sourcesCreator' => function (UserProvider $users) {
                     $fileSource = SourceOriginFactory::create(
                         type: 'file',
-                        userId: $users->get(self::USER_1_EMAIL)->id,
+                        userId: $users->get(self::USER_1_EMAIL)['id'],
                     );
                     $gitSource = SourceOriginFactory::create(
                         type: 'git',
-                        userId: $users->get(self::USER_1_EMAIL)->id,
+                        userId: $users->get(self::USER_1_EMAIL)['id'],
                     );
 
                     return [
@@ -119,13 +119,13 @@ abstract class AbstractListSourcesTest extends AbstractApplicationTest
                     return [
                         SourceOriginFactory::create(
                             type: 'file',
-                            userId: $users->get(self::USER_1_EMAIL)->id,
+                            userId: $users->get(self::USER_1_EMAIL)['id'],
                         ),
                         SourceOriginFactory::create(type: 'file'),
                         SourceOriginFactory::create(type: 'file'),
                         SourceOriginFactory::create(
                             type: 'git',
-                            userId: $users->get(self::USER_1_EMAIL)->id,
+                            userId: $users->get(self::USER_1_EMAIL)['id'],
                         ),
                         SourceOriginFactory::create(type: 'git'),
                         SourceOriginFactory::create(type: 'git'),
@@ -161,7 +161,7 @@ abstract class AbstractListSourcesTest extends AbstractApplicationTest
                 'sourcesCreator' => function (UserProvider $users) {
                     $fileSource = SourceOriginFactory::create(
                         type: 'file',
-                        userId: $users->get(self::USER_1_EMAIL)->id,
+                        userId: $users->get(self::USER_1_EMAIL)['id'],
                         deletedAt: new \DateTimeImmutable('-1 second'),
                     );
 
@@ -178,30 +178,30 @@ abstract class AbstractListSourcesTest extends AbstractApplicationTest
                     return [
                         SourceOriginFactory::create(
                             type: 'file',
-                            userId: $users->get(self::USER_1_EMAIL)->id,
+                            userId: $users->get(self::USER_1_EMAIL)['id'],
                             deletedAt: new \DateTimeImmutable('-1 second'),
                         ),
                         SourceOriginFactory::create(
                             type: 'file',
-                            userId: $users->get(self::USER_1_EMAIL)->id,
+                            userId: $users->get(self::USER_1_EMAIL)['id'],
                             deletedAt: new \DateTimeImmutable('-10 second'),
                         ),
                         SourceOriginFactory::create(
                             type: 'file',
-                            userId: $users->get(self::USER_1_EMAIL)->id,
+                            userId: $users->get(self::USER_1_EMAIL)['id'],
                         ),
                         SourceOriginFactory::create(
                             type: 'file',
-                            userId: $users->get(self::USER_1_EMAIL)->id,
+                            userId: $users->get(self::USER_1_EMAIL)['id'],
                         ),
                         SourceOriginFactory::create(
                             type: 'file',
-                            userId: $users->get(self::USER_1_EMAIL)->id,
+                            userId: $users->get(self::USER_1_EMAIL)['id'],
                             deletedAt: new \DateTimeImmutable('+1 second'),
                         ),
                         SourceOriginFactory::create(
                             type: 'file',
-                            userId: $users->get(self::USER_1_EMAIL)->id,
+                            userId: $users->get(self::USER_1_EMAIL)['id'],
                             deletedAt: new \DateTimeImmutable('+10 second'),
                         ),
                     ];

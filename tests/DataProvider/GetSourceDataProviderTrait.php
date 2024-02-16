@@ -22,7 +22,7 @@ trait GetSourceDataProviderTrait
                 'sourceCreator' => function (UserProvider $users) {
                     return SourceOriginFactory::create(
                         type: 'git',
-                        userId: $users->get(self::USER_1_EMAIL)->id,
+                        userId: $users->get(self::USER_1_EMAIL)['id'],
                         credentials: md5((string) rand()),
                     );
                 },
@@ -49,7 +49,7 @@ trait GetSourceDataProviderTrait
                 'sourceCreator' => function (UserProvider $users) {
                     return SourceOriginFactory::create(
                         type: 'git',
-                        userId: $users->get(self::USER_1_EMAIL)->id,
+                        userId: $users->get(self::USER_1_EMAIL)['id'],
                     );
                 },
                 'expectedResponseDataCreator' => function (GitSource $source) {
@@ -75,7 +75,7 @@ trait GetSourceDataProviderTrait
                 'sourceCreator' => function (UserProvider $users) {
                     return SourceOriginFactory::create(
                         type: 'file',
-                        userId: $users->get(self::USER_1_EMAIL)->id,
+                        userId: $users->get(self::USER_1_EMAIL)['id'],
                     );
                 },
                 'expectedResponseDataCreator' => function (FileSource $source) {

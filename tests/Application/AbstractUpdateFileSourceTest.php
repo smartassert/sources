@@ -48,7 +48,7 @@ abstract class AbstractUpdateFileSourceTest extends AbstractApplicationTest
     ): void {
         $source = SourceOriginFactory::create(
             type: Type::FILE->value,
-            userId: self::$users->get(self::USER_1_EMAIL)->id
+            userId: self::$users->get(self::USER_1_EMAIL)['id']
         );
 
         $this->sourceRepository->save($source);
@@ -194,7 +194,7 @@ abstract class AbstractUpdateFileSourceTest extends AbstractApplicationTest
                 'sourceCreator' => function (UserProvider $users) {
                     return SourceOriginFactory::create(
                         type: 'file',
-                        userId: $users->get(self::USER_1_EMAIL)->id,
+                        userId: $users->get(self::USER_1_EMAIL)['id'],
                         label: 'original label',
                     );
                 },
@@ -264,14 +264,14 @@ abstract class AbstractUpdateFileSourceTest extends AbstractApplicationTest
                 'targetSourceCreator' => function (UserProvider $users) {
                     return SourceOriginFactory::create(
                         type: 'file',
-                        userId: $users->get(self::USER_1_EMAIL)->id,
+                        userId: $users->get(self::USER_1_EMAIL)['id'],
                         label: 'label1',
                     );
                 },
                 'deletedSourceCreator' => function (UserProvider $users) {
                     return SourceOriginFactory::create(
                         type: 'file',
-                        userId: $users->get(self::USER_1_EMAIL)->id,
+                        userId: $users->get(self::USER_1_EMAIL)['id'],
                         label: 'label2',
                     );
                 },
@@ -281,14 +281,14 @@ abstract class AbstractUpdateFileSourceTest extends AbstractApplicationTest
                 'targetSourceCreator' => function (UserProvider $users) {
                     return SourceOriginFactory::create(
                         type: 'file',
-                        userId: $users->get(self::USER_1_EMAIL)->id,
+                        userId: $users->get(self::USER_1_EMAIL)['id'],
                         label: 'label1',
                     );
                 },
                 'deletedSourceCreator' => function (UserProvider $users) {
                     return SourceOriginFactory::create(
                         type: 'git',
-                        userId: $users->get(self::USER_1_EMAIL)->id,
+                        userId: $users->get(self::USER_1_EMAIL)['id'],
                         label: 'label2',
                     );
                 },
@@ -301,7 +301,7 @@ abstract class AbstractUpdateFileSourceTest extends AbstractApplicationTest
     {
         $source = SourceOriginFactory::create(
             type: 'file',
-            userId: self::$users->get(self::USER_1_EMAIL)->id,
+            userId: self::$users->get(self::USER_1_EMAIL)['id'],
             label: 'original label',
         );
         $this->sourceRepository->save($source);
