@@ -33,6 +33,7 @@ services:
                 verify: false
 
     SmartAssert\SymfonyTestClient\HttpClient:
+        public: true
         arguments:
             $httpClient: '@app.tests.integration.http.client'
 
