@@ -88,6 +88,21 @@ abstract class AbstractFileSourceFileTest extends AbstractApplicationTest
     public static function addFileInvalidRequestDataProvider(): array
     {
         return [
+            'name missing .yaml extension, content non-empty' => [
+                'filename' => 'non-yaml-filename',
+                'content' => 'non-empty value',
+                'expectedResponseData' => [
+                    'class' => 'bad_request',
+                    'parameter' => [
+                        'name' => 'filename',
+                        'value' => 'non-yaml-filename',
+                        'requirements' => [
+                            'data_type' => 'yaml_filename',
+                        ],
+                    ],
+                    'type' => 'invalid',
+                ],
+            ],
             'name empty with .yaml extension, content non-empty' => [
                 'filename' => '.yaml',
                 'content' => 'non-empty value',
@@ -252,6 +267,20 @@ abstract class AbstractFileSourceFileTest extends AbstractApplicationTest
     public static function yamlFileInvalidRequestDataProvider(): array
     {
         return [
+            'name missing .yaml extension' => [
+                'filename' => 'non-yaml-filename',
+                'expectedResponseData' => [
+                    'class' => 'bad_request',
+                    'parameter' => [
+                        'name' => 'filename',
+                        'value' => 'non-yaml-filename',
+                        'requirements' => [
+                            'data_type' => 'yaml_filename',
+                        ],
+                    ],
+                    'type' => 'invalid',
+                ],
+            ],
             'name empty with .yaml extension' => [
                 'filename' => '.yaml',
                 'expectedResponseData' => [
