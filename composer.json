@@ -18,24 +18,24 @@
         "psr/http-message": "^1.0",
         "smartassert/health-check-bundle": "^6.0",
         "smartassert/service-request": "^1.4",
-        "smartassert/users-security-bundle": "^8.0",
-        "smartassert/worker-job-source": "^1.0",
+        "smartassert/users-security-bundle": "^10.0",
+        "smartassert/worker-job-source": "^2.0",
         "smartassert/worker-message-failed-event-bundle": "^3.0",
-        "smartassert/yaml-file": "^6.0",
-        "symfony/console": "6.4.*",
-        "symfony/doctrine-messenger": "6.4.*",
-        "symfony/dotenv": "6.4.*",
-        "symfony/finder": "6.4.*",
+        "smartassert/yaml-file": "^7.1",
+        "symfony/console": "7.0.*",
+        "symfony/doctrine-messenger": "7.0.*",
+        "symfony/dotenv": "7.0.*",
+        "symfony/finder": "7.0.*",
         "symfony/flex": "^2",
-        "symfony/framework-bundle": "6.4.*",
-        "symfony/messenger": "6.4.*",
+        "symfony/framework-bundle": "7.0.*",
+        "symfony/messenger": "7.0.*",
         "symfony/monolog-bundle": "^3.7",
-        "symfony/process": "6.4.*",
-        "symfony/runtime": "6.4.*",
-        "symfony/security-bundle": "6.4.*",
-        "symfony/string": "6.4.*",
-        "symfony/uid": "6.4.*",
-        "symfony/yaml": "6.4.*"
+        "symfony/process": "7.0.*",
+        "symfony/runtime": "7.0.*",
+        "symfony/security-bundle": "7.0.*",
+        "symfony/string": "7.0.*",
+        "symfony/uid": "7.0.*",
+        "symfony/yaml": "7.0.*"
     },
     "require-dev": {
         "mockery/mockery": "^1.4",
@@ -49,11 +49,11 @@
         "smartassert/symfony-test-client": "^2.1",
         "smartassert/test-authenticaton-provider-bundle": "^5.0",
         "squizlabs/php_codesniffer": "^3.8",
-        "symfony/browser-kit": "6.4.*",
-        "symfony/expression-language": "6.4.*",
+        "symfony/browser-kit": "7.0.*",
+        "symfony/expression-language": "7.0.*",
         "symfony/maker-bundle": "^1.36",
         "symfony/phpunit-bridge": "7.0.*",
-        "symfony/psr-http-message-bridge": "6.4.*",
+        "symfony/psr-http-message-bridge": "7.0.*",
         "webignition/object-reflector": "^1.0"
     },
     "config": {
@@ -162,7 +162,7 @@
     "extra": {
         "symfony": {
             "allow-contrib": false,
-            "require": "6.4.*"
+            "require": "7.0.*"
         }
     }
 }
