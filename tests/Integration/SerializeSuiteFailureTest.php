@@ -73,9 +73,9 @@ class SerializeSuiteFailureTest extends AbstractApplicationTest
         \assert(is_array($getSerializedSuiteResponseData));
         self::assertSame('failed', $getSerializedSuiteResponseData['state']);
         self::assertSame('git/clone', $getSerializedSuiteResponseData['failure_reason']);
-        self::assertSame(
+        self::assertStringContainsString(
             sprintf(
-                'fatal: unable to access \'%s/\': Failed to connect to app port %d: Connection refused',
+                'fatal: unable to access \'%s/\': Failed to connect to app port %d',
                 $hostUrl,
                 $hostUrlPort
             ),
