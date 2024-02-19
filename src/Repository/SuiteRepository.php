@@ -7,6 +7,8 @@ namespace App\Repository;
 use App\Entity\SourceInterface;
 use App\Entity\Suite;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\ORM\Query\Parameter;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\Security\Core\User\UserInterface;
 
@@ -73,17 +75,20 @@ class SuiteRepository extends ServiceEntityRepository
     {
         $queryBuilder = $this->createQueryBuilder('Suite');
 
+        $labelParameter = new Parameter('Label', $label);
+        $userIdParameter = new Parameter('UserId', $source->getUserId());
+
         $queryBuilder
             ->join('Suite.source', 'Source')
-            ->where('Suite.label = :Label')
-            ->andWhere('Source.userId = :UserId')
+            ->where('Suite.label = :' . $labelParameter->getName())
+            ->andWhere('Source.userId = :' . $userIdParameter->getName())
             ->andWhere('Suite.deletedAt IS NULL')
             ->orderBy('Suite.label', 'ASC')
             ->setMaxResults(1)
-            ->setParameters([
-                'Label' => $label,
-                'UserId' => $source->getUserId()
-            ])
+            ->setParameters(new ArrayCollection([
+                new Parameter('Label', $label),
+                new Parameter('UserId', $source->getUserId()),
+            ]))
         ;
 
         $query = $queryBuilder->getQuery();
