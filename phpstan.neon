@@ -5,12 +5,3 @@ parameters:
     - src
     - tests
   inferPrivatePropertyTypeFromConstructor: true
-  # @todo: fix in #1388
-  ignoreErrors:
-    -
-      message: '#with type mixed does not narrow down the type#'
-      path: src/Security/EntityAccessVoter.php
-
-    -
-      message: '#with type string does not narrow down the type#'
-      path: src/Security/EntityAccessVoter.php

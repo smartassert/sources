@@ -9,6 +9,9 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 use Symfony\Component\Security\Core\User\UserInterface;
 
+/**
+ * @extends Voter<self::ACCESS, UserHeldEntityInterface>
+ */
 class EntityAccessVoter extends Voter
 {
     public const ACCESS = 'access';
