@@ -9,7 +9,7 @@
         "ext-iconv": "*",
         "doctrine/doctrine-bundle": "^2.8",
         "doctrine/doctrine-migrations-bundle": "^3.2",
-        "doctrine/orm": "^2.14",
+        "doctrine/orm": "^3.0",
         "guzzlehttp/guzzle": "^7.5",
         "league/flysystem-async-aws-s3": "^3.24",
         "league/flysystem-bundle": "^3.3",
