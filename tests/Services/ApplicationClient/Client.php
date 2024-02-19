@@ -6,13 +6,11 @@ namespace App\Tests\Services\ApplicationClient;
 
 use Psr\Http\Message\ResponseInterface;
 use SmartAssert\SymfonyTestClient\ClientInterface;
-use Symfony\Component\Routing\RouterInterface;
 
 class Client
 {
     public function __construct(
         private ClientInterface $client,
-        private RouterInterface $router,
     ) {
     }
 
@@ -24,7 +22,7 @@ class Client
     ): ResponseInterface {
         return $this->client->makeRequest(
             'POST',
-            $this->router->generate('file_source_file_add', ['sourceId' => $sourceId, 'filename' => $filename]),
+            '/file-source/' . $sourceId . '/' . $filename,
             $this->createAuthorizationHeader($authenticationToken),
             $content
         );
@@ -37,7 +35,7 @@ class Client
     ): ResponseInterface {
         return $this->client->makeRequest(
             'GET',
-            $this->router->generate('file_source_file_read', ['sourceId' => $sourceId, 'filename' => $filename]),
+            '/file-source/' . $sourceId . '/' . $filename,
             $this->createAuthorizationHeader($authenticationToken),
         );
     }
@@ -50,7 +48,7 @@ class Client
     ): ResponseInterface {
         return $this->client->makeRequest(
             'PUT',
-            $this->router->generate('file_source_file_add', ['sourceId' => $sourceId, 'filename' => $filename]),
+            '/file-source/' . $sourceId . '/' . $filename,
             $this->createAuthorizationHeader($authenticationToken),
             $content
         );
@@ -63,7 +61,7 @@ class Client
     ): ResponseInterface {
         return $this->client->makeRequest(
             'DELETE',
-            $this->router->generate('file_source_file_remove', ['sourceId' => $sourceId, 'filename' => $filename]),
+            '/file-source/' . $sourceId . '/' . $filename,
             $this->createAuthorizationHeader($authenticationToken),
         );
     }
@@ -82,7 +80,7 @@ class Client
 
         return $this->client->makeRequest(
             'POST',
-            $this->router->generate('file_source_create'),
+            '/file-source',
             $headers,
             http_build_query($payload)
         );
@@ -102,7 +100,7 @@ class Client
 
         return $this->client->makeRequest(
             'POST',
-            $this->router->generate('git_source_create'),
+            '/git-source',
             $headers,
             http_build_query($payload)
         );
@@ -112,7 +110,7 @@ class Client
     {
         return $this->client->makeRequest(
             'GET',
-            $this->router->generate('source_list'),
+            '/sources',
             $this->createAuthorizationHeader($authenticationToken),
         );
     }
@@ -121,7 +119,7 @@ class Client
     {
         return $this->client->makeRequest(
             'GET',
-            $this->router->generate('user_source_get', ['sourceId' => $sourceId]),
+            '/' . $sourceId,
             $this->createAuthorizationHeader($authenticationToken),
         );
     }
@@ -143,7 +141,7 @@ class Client
 
         return $this->client->makeRequest(
             'PUT',
-            $this->router->generate('file_source_update', ['sourceId' => $sourceId]),
+            '/file-source/' . $sourceId,
             $headers,
             http_build_query($payload)
         );
@@ -166,7 +164,7 @@ class Client
 
         return $this->client->makeRequest(
             'PUT',
-            $this->router->generate('git_source_update', ['sourceId' => $sourceId]),
+            '/git-source/' . $sourceId,
             $headers,
             http_build_query($payload)
         );
@@ -176,26 +174,26 @@ class Client
     {
         return $this->client->makeRequest(
             'DELETE',
-            $this->router->generate('user_source_delete', ['sourceId' => $sourceId]),
+            '/' . $sourceId,
             $this->createAuthorizationHeader($authenticationToken),
         );
     }
 
     public function makeGetStatusRequest(): ResponseInterface
     {
-        return $this->client->makeRequest('GET', $this->router->generate('status'));
+        return $this->client->makeRequest('GET', '/status');
     }
 
     public function makeGetHealthCheckRequest(): ResponseInterface
     {
-        return $this->client->makeRequest('GET', $this->router->generate('health-check'));
+        return $this->client->makeRequest('GET', '/health-check');
     }
 
     public function makeGetFileSourceFilenamesRequest(?string $authenticationToken, string $sourceId): ResponseInterface
     {
         return $this->client->makeRequest(
             'GET',
-            $this->router->generate('file_source_list_filenames', ['sourceId' => $sourceId]),
+            '/file-source/' . $sourceId . '/list/',
             $this->createAuthorizationHeader($authenticationToken),
         );
     }
@@ -216,7 +214,7 @@ class Client
 
         return $this->client->makeRequest(
             'POST',
-            $this->router->generate('suite_create'),
+            '/suite',
             $headers,
             http_build_query($payload)
         );
@@ -226,7 +224,7 @@ class Client
     {
         return $this->client->makeRequest(
             'GET',
-            $this->router->generate('suite_get', ['suiteId' => $suiteId]),
+            '/suite/' . $suiteId,
             $this->createAuthorizationHeader($authenticationToken),
         );
     }
@@ -248,7 +246,7 @@ class Client
 
         return $this->client->makeRequest(
             'PUT',
-            $this->router->generate('suite_update', ['suiteId' => $suiteId]),
+            '/suite/' . $suiteId,
             $headers,
             http_build_query($payload)
         );
@@ -258,7 +256,7 @@ class Client
     {
         return $this->client->makeRequest(
             'GET',
-            $this->router->generate('suite_list'),
+            '/suites',
             $this->createAuthorizationHeader($authenticationToken),
         );
     }
@@ -267,7 +265,7 @@ class Client
     {
         return $this->client->makeRequest(
             'DELETE',
-            $this->router->generate('suite_get', ['suiteId' => $suiteId]),
+            '/suite/' . $suiteId,
             $this->createAuthorizationHeader($authenticationToken),
         );
     }
@@ -276,7 +274,7 @@ class Client
     {
         return $this->client->makeRequest(
             'GET',
-            $this->router->generate('serialized_suite_read', ['serializedSuiteId' => $suiteId]),
+            '/serialized_suite/' . $suiteId . '/read',
             $this->createAuthorizationHeader($authenticationToken),
         );
     }
@@ -299,13 +297,7 @@ class Client
 
         return $this->client->makeRequest(
             'POST',
-            $this->router->generate(
-                'serialized_suite_create',
-                [
-                    'suiteId' => $suiteId,
-                    'serializedSuiteId' => $serializedSuiteId,
-                ]
-            ),
+            '/suite/' . $suiteId . '/' . $serializedSuiteId,
             $headers,
             http_build_query($payload)
         );
@@ -317,7 +309,7 @@ class Client
     ): ResponseInterface {
         return $this->client->makeRequest(
             'GET',
-            $this->router->generate('serialized_suite_get', ['serializedSuiteId' => $serializedSuiteId]),
+            '/serialized_suite/' . $serializedSuiteId,
             $this->createAuthorizationHeader($authenticationToken),
         );
     }
