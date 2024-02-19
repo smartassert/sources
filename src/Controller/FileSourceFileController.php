@@ -16,13 +16,14 @@ use League\Flysystem\FilesystemWriter;
 use SmartAssert\ServiceRequest\Exception\ErrorResponseException;
 use SmartAssert\ServiceRequest\Exception\ErrorResponseExceptionFactory;
 use SmartAssert\ServiceRequest\Parameter\Parameter;
+use SmartAssert\ServiceRequest\Parameter\Requirements;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-#[Route(
-    path: '/file-source/' . SourceRoutes::ROUTE_SOURCE_ID_PATTERN . '/' . self::ROUTE_FILENAME_PATTERN,
-    name: 'file_source_file_'
-)]
+// #[Route(
+//    path: '/file-source/' . SourceRoutes::ROUTE_SOURCE_ID_PATTERN . '/' . self::ROUTE_FILENAME_PATTERN,
+//    name: 'file_source_file_'
+// )]
 readonly class FileSourceFileController
 {
     private const ROUTE_FILENAME_PATTERN = '{filename<.*\.yaml>}';
@@ -38,7 +39,11 @@ readonly class FileSourceFileController
     /**
      * @throws ErrorResponseException
      */
-    #[Route(name: 'add', methods: ['POST'])]
+    #[Route(
+        path: '/file-source/' . SourceRoutes::ROUTE_SOURCE_ID_PATTERN . '/' . self::ROUTE_FILENAME_PATTERN,
+        name: 'file_source_file_add',
+        methods: ['POST']
+    )]
     public function add(FileSource $source, AddYamlFileRequest $request): Response
     {
         $yamlFile = $request->file;
@@ -64,7 +69,11 @@ readonly class FileSourceFileController
     /**
      * @throws ErrorResponseException
      */
-    #[Route(name: 'update', methods: ['PUT'])]
+    #[Route(
+        path: '/file-source/' . SourceRoutes::ROUTE_SOURCE_ID_PATTERN . '/' . self::ROUTE_FILENAME_PATTERN,
+        name: 'file_source_file_update',
+        methods: ['PUT']
+    )]
     public function update(FileSource $source, AddYamlFileRequest $request): Response
     {
         $yamlFile = $request->file;
@@ -83,7 +92,11 @@ readonly class FileSourceFileController
     /**
      * @throws ErrorResponseException
      */
-    #[Route(name: 'read', methods: ['GET'])]
+    #[Route(
+        path: '/file-source/' . SourceRoutes::ROUTE_SOURCE_ID_PATTERN . '/' . self::ROUTE_FILENAME_PATTERN,
+        name: 'file_source_file_read',
+        methods: ['GET']
+    )]
     public function read(FileSource $source, YamlFileRequest $request): Response
     {
         $location = $source->getDirectoryPath() . '/' . $request->filename;
@@ -104,7 +117,11 @@ readonly class FileSourceFileController
     /**
      * @throws ErrorResponseException
      */
-    #[Route(name: 'remove', methods: ['DELETE'])]
+    #[Route(
+        path: '/file-source/' . SourceRoutes::ROUTE_SOURCE_ID_PATTERN . '/' . self::ROUTE_FILENAME_PATTERN,
+        name: 'file_source_file_remove',
+        methods: ['DELETE']
+    )]
     public function remove(FileSource $source, YamlFileRequest $request): Response
     {
         try {
@@ -116,5 +133,22 @@ readonly class FileSourceFileController
         }
 
         return new EmptyResponse();
+    }
+
+    /**
+     * @throws ErrorResponseException
+     */
+    #[Route(
+        path: '/file-source/' . SourceRoutes::ROUTE_SOURCE_ID_PATTERN . '/{filename<.*>}',
+        name: 'file_source_file_invalid_filename',
+        methods: ['GET', 'POST', 'PUT', 'DELETE']
+    )]
+    public function handleInvalidFilename(string $filename, ErrorResponseExceptionFactory $exceptionFactory): Response
+    {
+        throw $exceptionFactory->createForBadRequest(
+            (new Parameter('filename', $filename))
+                ->withRequirements(new Requirements('yaml_filename')),
+            'invalid'
+        );
     }
 }
