@@ -14,7 +14,6 @@ use App\Repository\SerializedSuiteRepository;
 use App\Repository\SourceRepository;
 use App\Services\SourceRepository\Reader\FileSourceDirectoryLister;
 use App\Tests\Services\ApplicationClient\Client;
-use App\Tests\Services\ApplicationClient\ClientFactory;
 use League\Flysystem\FilesystemException as FsException;
 use League\Flysystem\FilesystemOperationFailed as FsOpFailed;
 use League\Flysystem\FilesystemOperator;
@@ -43,10 +42,7 @@ class FilesystemExceptionHandlingTest extends WebTestCase
         \assert($client instanceof SymfonyClient);
         $client->setKernelBrowser($kernelBrowser);
 
-        $factory = self::getContainer()->get(ClientFactory::class);
-        \assert($factory instanceof ClientFactory);
-
-        $this->applicationClient = $factory->create($client);
+        $this->applicationClient = new Client($client);
     }
 
     /**

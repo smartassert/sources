@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Tests\Application;
 
 use App\Tests\Services\ApplicationClient\Client;
-use App\Tests\Services\ApplicationClient\ClientFactory;
 use App\Tests\Services\EntityRemover;
 use App\Tests\Services\ResponseAsserter;
 use SmartAssert\SymfonyTestClient\ClientInterface;
@@ -44,10 +43,7 @@ abstract class AbstractApplicationTest extends WebTestCase
     {
         parent::setUp();
 
-        $factory = self::getContainer()->get(ClientFactory::class);
-        \assert($factory instanceof ClientFactory);
-
-        $this->applicationClient = $factory->create($this->getClientAdapter());
+        $this->applicationClient = new Client($this->getClientAdapter());
 
         $responseAsserter = self::getContainer()->get(ResponseAsserter::class);
         \assert($responseAsserter instanceof ResponseAsserter);
