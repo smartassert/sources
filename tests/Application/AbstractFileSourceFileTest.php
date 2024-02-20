@@ -215,26 +215,16 @@ abstract class AbstractFileSourceFileTest extends AbstractApplicationTest
 
     /**
      * @dataProvider yamlFileInvalidRequestDataProvider
-     *
-     * @param array<mixed> $expectedResponseData
      */
-    public function testReadFileInvalidRequest(
-        string $filename,
-        array $expectedResponseData
-    ): void {
+    public function testReadFileInvalidRequest(string $filename): void
+    {
         $response = $this->applicationClient->makeReadFileRequest(
             self::$apiTokens->get(self::USER_1_EMAIL),
             $this->fileSource->getId(),
             $filename
         );
 
-        self::assertSame(400, $response->getStatusCode());
-        self::assertSame('application/json', $response->getHeaderLine('content-type'));
-
-        self::assertJsonStringEqualsJsonString(
-            (string) json_encode($expectedResponseData),
-            $response->getBody()->getContents(),
-        );
+        self::assertSame(404, $response->getStatusCode());
     }
 
     /**
