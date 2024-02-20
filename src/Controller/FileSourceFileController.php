@@ -15,6 +15,7 @@ use League\Flysystem\FilesystemWriter;
 use SmartAssert\ServiceRequest\Exception\ErrorResponseException;
 use SmartAssert\ServiceRequest\Exception\ErrorResponseExceptionFactory;
 use SmartAssert\ServiceRequest\Parameter\Parameter;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
@@ -32,39 +33,20 @@ readonly class FileSourceFileController
     /**
      * @throws ErrorResponseException
      */
-    #[Route(name: 'add', methods: ['POST'])]
-    public function add(FileSource $source, AddYamlFileRequest $request): Response
+    #[Route(name: 'store', methods: ['POST', 'PUT'])]
+    public function store(FileSource $source, AddYamlFileRequest $request, Request $symfonyRequest): Response
     {
         $yamlFile = $request->file;
         $path = $source->getDirectoryPath() . '/' . $yamlFile->name;
 
         try {
-            if ($this->fileSourceReader->fileExists($path)) {
+            if ('POST' === $symfonyRequest->getMethod() && $this->fileSourceReader->fileExists($path)) {
                 throw $this->errorResponseExceptionFactory->createForDuplicateObject(
                     new Parameter('filename', (string) $yamlFile->name)
                 );
             }
 
             $this->fileSourceWriter->write($path, $yamlFile->content);
-        } catch (FilesystemException $e) {
-            throw $this->errorResponseExceptionFactory->createForStorageError(
-                $this->storageExceptionFactory->createForEntityStorageFailure($source, $e)
-            );
-        }
-
-        return new EmptyResponse();
-    }
-
-    /**
-     * @throws ErrorResponseException
-     */
-    #[Route(name: '_update', methods: ['PUT'])]
-    public function update(FileSource $source, AddYamlFileRequest $request): Response
-    {
-        $yamlFile = $request->file;
-
-        try {
-            $this->fileSourceWriter->write($source->getDirectoryPath() . '/' . $yamlFile->name, $yamlFile->content);
         } catch (FilesystemException $e) {
             throw $this->errorResponseExceptionFactory->createForStorageError(
                 $this->storageExceptionFactory->createForEntityStorageFailure($source, $e)
