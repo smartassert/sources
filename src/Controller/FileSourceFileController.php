@@ -7,7 +7,6 @@ namespace App\Controller;
 use App\Entity\FileSource;
 use App\Exception\StorageExceptionFactory;
 use App\Request\AddYamlFileRequest;
-use App\Request\YamlFileRequest;
 use App\Response\EmptyResponse;
 use App\Response\YamlResponse;
 use League\Flysystem\FilesystemException;
@@ -79,9 +78,9 @@ readonly class FileSourceFileController
      * @throws ErrorResponseException
      */
     #[Route(name: 'read', methods: ['GET'])]
-    public function read(FileSource $source, YamlFileRequest $request): Response
+    public function read(FileSource $source, string $filename): Response
     {
-        $location = $source->getDirectoryPath() . '/' . $request->filename;
+        $location = $source->getDirectoryPath() . '/' . $filename;
 
         try {
             if (false === $this->fileSourceReader->fileExists($location)) {
