@@ -238,30 +238,6 @@ abstract class AbstractFileSourceFileTest extends AbstractApplicationTest
     }
 
     /**
-     * @dataProvider yamlFileInvalidRequestDataProvider
-     *
-     * @param array<mixed> $expectedResponseData
-     */
-    public function testRemoveFileInvalidRequest(
-        string $filename,
-        array $expectedResponseData
-    ): void {
-        $response = $this->applicationClient->makeRemoveFileRequest(
-            self::$apiTokens->get(self::USER_1_EMAIL),
-            $this->fileSource->getId(),
-            $filename
-        );
-
-        self::assertSame(400, $response->getStatusCode());
-        self::assertSame('application/json', $response->getHeaderLine('content-type'));
-
-        self::assertJsonStringEqualsJsonString(
-            (string) json_encode($expectedResponseData),
-            $response->getBody()->getContents(),
-        );
-    }
-
-    /**
      * @return array<mixed>
      */
     public static function yamlFileInvalidRequestDataProvider(): array
@@ -332,6 +308,20 @@ abstract class AbstractFileSourceFileTest extends AbstractApplicationTest
             self::$apiTokens->get(self::USER_1_EMAIL),
             $this->fileSource->getId(),
             self::FILENAME
+        );
+
+        $this->responseAsserter->assertSuccessfulResponseWithNoBody($response);
+    }
+
+    /**
+     * @dataProvider yamlFileInvalidRequestDataProvider
+     */
+    public function testRemoveFileInvalidFilename(string $filename): void
+    {
+        $response = $this->applicationClient->makeRemoveFileRequest(
+            self::$apiTokens->get(self::USER_1_EMAIL),
+            $this->fileSource->getId(),
+            $filename
         );
 
         $this->responseAsserter->assertSuccessfulResponseWithNoBody($response);
