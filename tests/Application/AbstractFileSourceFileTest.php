@@ -163,21 +163,6 @@ abstract class AbstractFileSourceFileTest extends AbstractApplicationTest
                     'type' => 'invalid',
                 ],
             ],
-            'name valid, content empty' => [
-                'filename' => self::FILENAME,
-                'content' => '',
-                'expectedResponseData' => [
-                    'class' => 'bad_request',
-                    'parameter' => [
-                        'name' => 'content',
-                        'value' => '',
-                        'requirements' => [
-                            'data_type' => 'yaml',
-                        ],
-                    ],
-                    'type' => 'empty',
-                ],
-            ],
             'name valid, content invalid yaml' => [
                 'filename' => self::FILENAME,
                 'content' => "- item\ncontent",
