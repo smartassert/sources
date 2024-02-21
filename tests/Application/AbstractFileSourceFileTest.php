@@ -31,7 +31,7 @@ abstract class AbstractFileSourceFileTest extends AbstractApplicationTest
     }
 
     /**
-     * @dataProvider addFileInvalidRequestDataProvider
+     * @dataProvider storeFileInvalidRequestDataProvider
      *
      * @param array<mixed> $expectedResponseData
      */
@@ -57,7 +57,7 @@ abstract class AbstractFileSourceFileTest extends AbstractApplicationTest
     }
 
     /**
-     * @dataProvider addFileInvalidRequestDataProvider
+     * @dataProvider storeFileInvalidRequestDataProvider
      *
      * @param array<mixed> $expectedResponseData
      */
@@ -85,9 +85,24 @@ abstract class AbstractFileSourceFileTest extends AbstractApplicationTest
     /**
      * @return array<mixed>
      */
-    public static function addFileInvalidRequestDataProvider(): array
+    public static function storeFileInvalidRequestDataProvider(): array
     {
         return [
+            'name empty, content non-empty' => [
+                'filename' => '',
+                'content' => 'non-empty value',
+                'expectedResponseData' => [
+                    'class' => 'bad_request',
+                    'parameter' => [
+                        'name' => 'filename',
+                        'value' => '',
+                        'requirements' => [
+                            'data_type' => 'yaml_filename',
+                        ],
+                    ],
+                    'type' => 'invalid',
+                ],
+            ],
             'name missing .yaml extension, content non-empty' => [
                 'filename' => 'non-yaml-filename',
                 'content' => 'non-empty value',

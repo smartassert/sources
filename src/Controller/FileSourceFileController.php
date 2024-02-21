@@ -19,7 +19,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-#[Route(path: '/file-source/' . SourceRoutes::ROUTE_SOURCE_ID_PATTERN . '/{filename<.+>}', name: 'file_source_file_')]
+#[Route(path: '/file-source/' . SourceRoutes::ROUTE_SOURCE_ID_PATTERN . '/{filename<.*>}', name: 'file_source_file_')]
 readonly class FileSourceFileController
 {
     public function __construct(
