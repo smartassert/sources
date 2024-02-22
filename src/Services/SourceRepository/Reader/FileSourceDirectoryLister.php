@@ -9,10 +9,10 @@ use App\Model\DirectoryListing;
 use League\Flysystem\FilesystemException;
 use League\Flysystem\StorageAttributes;
 
-class FileSourceDirectoryLister
+readonly class FileSourceDirectoryLister implements DirectoryListingFactoryInterface
 {
     public function __construct(
-        private readonly FileSourceReader $reader,
+        private FileSourceReader $reader,
     ) {
     }
 

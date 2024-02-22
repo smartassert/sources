@@ -12,6 +12,7 @@ use App\Entity\SourceInterface;
 use App\Enum\EntityType;
 use App\Repository\SerializedSuiteRepository;
 use App\Repository\SourceRepository;
+use App\Services\SourceRepository\Reader\DirectoryListingFactoryInterface;
 use App\Services\SourceRepository\Reader\FileSourceDirectoryLister;
 use App\Tests\Services\ApplicationClient\Client;
 use League\Flysystem\FilesystemException as FsException;
@@ -63,7 +64,7 @@ class FilesystemExceptionHandlingTest extends WebTestCase
         $source = $this->createSource($userId, $sourceId);
         $this->createSourceRepository($source);
 
-        $fileSourceDirectoryLister = \Mockery::mock(FileSourceDirectoryLister::class);
+        $fileSourceDirectoryLister = \Mockery::mock(DirectoryListingFactoryInterface::class);
         $fileSourceDirectoryLister
             ->shouldReceive('list')
             ->andThrow($exception)

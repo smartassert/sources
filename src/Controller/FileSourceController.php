@@ -10,7 +10,7 @@ use App\Exception\StorageExceptionFactory;
 use App\Request\FileSourceRequest;
 use App\Services\Source\FileSourceFactory;
 use App\Services\Source\Mutator;
-use App\Services\SourceRepository\Reader\FileSourceDirectoryLister;
+use App\Services\SourceRepository\Reader\DirectoryListingFactoryInterface;
 use League\Flysystem\FilesystemException;
 use SmartAssert\ServiceRequest\Exception\ErrorResponseException;
 use SmartAssert\ServiceRequest\Exception\ErrorResponseExceptionFactory;
@@ -61,7 +61,7 @@ readonly class FileSourceController
     #[Route(path: '/' . SourceRoutes::ROUTE_SOURCE_ID_PATTERN . '/list/', name: 'list_filenames', methods: ['GET'])]
     public function listFilenames(
         FileSource $source,
-        FileSourceDirectoryLister $lister,
+        DirectoryListingFactoryInterface $lister,
         StorageExceptionFactory $storageExceptionFactory,
     ): Response {
         try {
