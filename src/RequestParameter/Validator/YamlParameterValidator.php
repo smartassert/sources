@@ -18,8 +18,6 @@ readonly class YamlParameterValidator
     }
 
     /**
-     * @return non-empty-string
-     *
      * @throws ErrorResponseException
      */
     public function validate(ParameterInterface $parameter): string
@@ -27,10 +25,6 @@ readonly class YamlParameterValidator
         $content = $parameter->getValue();
         if (!is_string($content)) {
             throw $this->exceptionFactory->createForBadRequest($parameter, 'wrong_type');
-        }
-
-        if ('' === $content) {
-            throw $this->exceptionFactory->createForBadRequest($parameter, 'empty');
         }
 
         $validation = $this->yamlContentValidator->validate($content);
