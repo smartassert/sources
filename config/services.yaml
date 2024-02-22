@@ -130,3 +130,6 @@ services:
     SmartAssert\ServiceRequest\Exception\ErrorResponseExceptionFactory: ~
 
     SmartAssert\ServiceRequest\Parameter\Validator\StringParameterValidator: ~
+
+    App\Services\SourceRepository\Reader\DirectoryListingFactoryInterface:
+        alias: App\Services\SourceRepository\Reader\FileSourceDirectoryLister
