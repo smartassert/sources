@@ -55,17 +55,17 @@ abstract class AbstractListFileSourceFilenamesTest extends AbstractApplicationTe
     /**
      * @dataProvider listSuccessDataProvider
      *
-     * @param non-empty-string[] $filenamesToAdd
-     * @param non-empty-string[] $expected
+     * @param array<array{path: string, content: string}> $fileDataCollection
+     * @param array<mixed>                                $expected
      */
-    public function testListSuccess(array $filenamesToAdd, array $expected): void
+    public function testListSuccess(array $fileDataCollection, array $expected): void
     {
-        foreach ($filenamesToAdd as $filename) {
+        foreach ($fileDataCollection as $fileData) {
             $this->applicationClient->makeAddFileRequest(
                 self::$apiTokens->get(self::USER_1_EMAIL),
                 $this->fileSourceId,
-                $filename,
-                md5((string) rand()),
+                $fileData['path'],
+                $fileData['content'],
             );
         }
 
@@ -84,39 +84,73 @@ abstract class AbstractListFileSourceFilenamesTest extends AbstractApplicationTe
     {
         return [
             'no files' => [
-                'filenamesToAdd' => [],
+                'fileDataCollection' => [],
                 'expected' => [],
             ],
             'single file without directory path' => [
-                'filenamesToAdd' => [
-                    'file.yaml'
+                'fileDataCollection' => [
+                    [
+                        'path' => 'size1.yaml',
+                        'content' => '.',
+                    ],
                 ],
                 'expected' => [
-                    'file.yaml'
+                    [
+                        'path' => 'size1.yaml',
+                        'size' => 1,
+                    ],
                 ],
             ],
             'single file with directory path' => [
-                'filenamesToAdd' => [
-                    'path/to/file.yaml'
+                'fileDataCollection' => [
+                    [
+                        'path' => 'path/to/file.yaml',
+                        'content' => str_repeat('a', 10),
+                    ],
                 ],
                 'expected' => [
-                    'path/to/file.yaml'
+                    [
+                        'path' => 'path/to/file.yaml',
+                        'size' => 10,
+                    ],
                 ],
             ],
             'multiple files' => [
-                'filenamesToAdd' => [
-                    'file1.yaml',
-                    'file2.yaml',
-                    'path/to/file3.yaml',
-                    'another/path/to/file4.yaml',
-                    'file5.yaml',
+                'fileDataCollection' => [
+                    [
+                        'path' => 'empty.yaml',
+                        'content' => '',
+                    ],
+                    [
+                        'path' => 'size1.yaml',
+                        'content' => '.',
+                    ],
+                    [
+                        'path' => 'size32.yaml',
+                        'content' => str_repeat('.', 32),
+                    ],
+                    [
+                        'path' => 'path/to/file3.yaml',
+                        'content' => str_repeat('a', 10),
+                    ],
                 ],
                 'expected' => [
-                    'another/path/to/file4.yaml',
-                    'path/to/file3.yaml',
-                    'file1.yaml',
-                    'file2.yaml',
-                    'file5.yaml',
+                    [
+                        'path' => 'empty.yaml',
+                        'size' => 0,
+                    ],
+                    [
+                        'path' => 'path/to/file3.yaml',
+                        'size' => 10,
+                    ],
+                    [
+                        'path' => 'size1.yaml',
+                        'size' => 1,
+                    ],
+                    [
+                        'path' => 'size32.yaml',
+                        'size' => 32,
+                    ],
                 ],
             ],
         ];

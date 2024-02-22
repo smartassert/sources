@@ -6,6 +6,8 @@ namespace App\Services\SourceRepository\Reader;
 
 use App\Entity\FileSource;
 use App\Model\DirectoryListing;
+use App\Model\File;
+use League\Flysystem\FileAttributes;
 use League\Flysystem\FilesystemException;
 use League\Flysystem\StorageAttributes;
 
@@ -28,20 +30,23 @@ readonly class FileSourceDirectoryLister implements DirectoryListingFactoryInter
 
         $directoryListing = $directoryListing->filter(fn (StorageAttributes $attributes) => $attributes->isFile());
 
-        $paths = [];
+        $files = [];
 
         $directoryPrefix = $source->getDirectoryPath() . '/';
         $directoryPrefixLength = strlen($directoryPrefix);
 
         foreach ($directoryListing as $fileAttributes) {
-            if ($fileAttributes instanceof StorageAttributes && $fileAttributes->isFile()) {
+            if ($fileAttributes instanceof FileAttributes) {
                 $path = substr($fileAttributes->path(), $directoryPrefixLength);
+
                 if ('' !== $path) {
-                    $paths[] = $path;
+                    $files[$path] = new File($path, (int) $fileAttributes->fileSize());
                 }
             }
         }
 
-        return new DirectoryListing($paths);
+        ksort($files);
+
+        return new DirectoryListing($files);
     }
 }
