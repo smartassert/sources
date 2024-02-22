@@ -58,8 +58,8 @@ readonly class FileSourceController
     /**
      * @throws ErrorResponseException
      */
-    #[Route(path: '/' . SourceRoutes::ROUTE_SOURCE_ID_PATTERN . '/list/', name: 'list_filenames', methods: ['GET'])]
-    public function listFilenames(
+    #[Route(path: '/' . SourceRoutes::ROUTE_SOURCE_ID_PATTERN . '/list/', name: 'list', methods: ['GET'])]
+    public function list(
         FileSource $source,
         DirectoryListingFactoryInterface $lister,
         StorageExceptionFactory $storageExceptionFactory,

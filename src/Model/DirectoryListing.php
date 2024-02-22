@@ -4,49 +4,32 @@ declare(strict_types=1);
 
 namespace App\Model;
 
-class DirectoryListing implements \JsonSerializable
+readonly class DirectoryListing implements \JsonSerializable
 {
     /**
-     * @var non-empty-string[]
+     * @var File[]
      */
-    public readonly array $paths;
+    public array $files;
 
     /**
-     * @param non-empty-string[] $paths
+     * @param File[] $files
      */
-    public function __construct(array $paths)
+    public function __construct(array $files)
     {
-        $this->paths = $this->sort($paths);
+        $this->files = $files;
     }
 
     /**
-     * @return non-empty-string[]
+     * @return array<array{path: non-empty-string, size: int}>
      */
     public function jsonSerialize(): array
     {
-        return $this->paths;
-    }
+        $data = [];
 
-    /**
-     * @param non-empty-string[] $paths
-     *
-     * @return non-empty-string[]
-     */
-    private function sort(array $paths): array
-    {
-        sort($paths);
-
-        $rootDirectoryPaths = [];
-        $nonRootDirectoryPaths = [];
-
-        foreach ($paths as $path) {
-            if (!str_contains($path, '/')) {
-                $rootDirectoryPaths[] = $path;
-            } else {
-                $nonRootDirectoryPaths[] = $path;
-            }
+        foreach ($this->files as $file) {
+            $data[] = $file->jsonSerialize();
         }
 
-        return array_merge($nonRootDirectoryPaths, $rootDirectoryPaths);
+        return $data;
     }
 }
