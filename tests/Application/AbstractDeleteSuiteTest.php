@@ -54,7 +54,7 @@ abstract class AbstractDeleteSuiteTest extends AbstractApplicationTest
             (new EntityIdFactory())->create()
         );
 
-        $this->responseAsserter->assertNotFoundResponse($response);
+        $this->responseAsserter->assertForbiddenResponse($response);
     }
 
     /**
