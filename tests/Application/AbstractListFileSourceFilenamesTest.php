@@ -49,7 +49,7 @@ abstract class AbstractListFileSourceFilenamesTest extends AbstractApplicationTe
             $fileSourceId
         );
 
-        self::assertSame(404, $response->getStatusCode());
+        $this->responseAsserter->assertForbiddenResponse($response);
     }
 
     /**
