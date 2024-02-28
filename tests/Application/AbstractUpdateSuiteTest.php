@@ -8,6 +8,7 @@ use App\Entity\Suite;
 use App\Repository\SuiteRepository;
 use App\Request\SuiteRequest;
 use App\Tests\DataProvider\CreateUpdateSuiteDataProviderTrait;
+use Symfony\Component\Uid\Ulid;
 
 abstract class AbstractUpdateSuiteTest extends AbstractSuiteTest
 {
@@ -317,6 +318,21 @@ abstract class AbstractUpdateSuiteTest extends AbstractSuiteTest
             $suiteId,
             [
                 SuiteRequest::PARAMETER_SOURCE_ID => md5((string) rand()),
+                SuiteRequest::PARAMETER_LABEL => md5((string) rand()),
+                SuiteRequest::PARAMETER_TESTS => [],
+            ],
+        );
+
+        $this->responseAsserter->assertForbiddenResponse($response);
+    }
+
+    public function testUpdateSuiteSuiteNotFound(): void
+    {
+        $response = $this->applicationClient->makeUpdateSuiteRequest(
+            self::$apiTokens->get(self::USER_1_EMAIL),
+            (string) new Ulid(),
+            [
+                SuiteRequest::PARAMETER_SOURCE_ID => $this->sourceId,
                 SuiteRequest::PARAMETER_LABEL => md5((string) rand()),
                 SuiteRequest::PARAMETER_TESTS => [],
             ],
