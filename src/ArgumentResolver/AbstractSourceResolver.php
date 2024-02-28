@@ -6,7 +6,6 @@ namespace App\ArgumentResolver;
 
 use App\Controller\SourceRoutes;
 use App\Entity\SourceInterface;
-use App\Exception\EntityNotFoundException;
 use App\Repository\SourceRepository;
 use App\Security\EntityAccessChecker;
 use Symfony\Component\HttpFoundation\Request;
@@ -26,7 +25,6 @@ abstract class AbstractSourceResolver implements ValueResolverInterface
      * @return SourceInterface[]
      *
      * @throws AccessDeniedException
-     * @throws EntityNotFoundException
      */
     public function resolve(Request $request, ArgumentMetadata $argument): iterable
     {
@@ -41,7 +39,7 @@ abstract class AbstractSourceResolver implements ValueResolverInterface
 
         $source = $this->sourceRepository->find($sourceId);
         if (null === $source) {
-            throw new EntityNotFoundException($sourceId, 'Source');
+            throw new AccessDeniedException();
         }
 
         $this->entityAccessChecker->denyAccessUnlessGranted($source);

@@ -206,4 +206,29 @@ abstract class AbstractCreateSerializedSuiteTest extends AbstractApplicationTest
         self::assertSame($firstResponseData['suite_id'], $secondResponseData['suite_id']);
         self::assertSame($firstResponseData['parameters'], $secondResponseData['parameters']);
     }
+
+    public function testSerializeSuiteNotFound(): void
+    {
+        $serializedSuiteId = (new EntityIdFactory())->create();
+
+        $source = SourceOriginFactory::create(
+            type: 'file',
+            userId: self::$users->get(self::USER_1_EMAIL)['id'],
+        );
+        $this->sourceRepository->save($source);
+
+        $suite = SuiteFactory::create(source: $source, tests: []);
+        $this->suiteRepository->save($suite);
+
+        self::assertEquals(0, $this->serializedSuiteRepository->count(['suite' => $suite]));
+
+        $response = $this->applicationClient->makeCreateSerializedSuiteRequest(
+            self::$apiTokens->get(self::USER_1_EMAIL),
+            $serializedSuiteId,
+            (new EntityIdFactory())->create(),
+            []
+        );
+
+        $this->responseAsserter->assertForbiddenResponse($response);
+    }
 }

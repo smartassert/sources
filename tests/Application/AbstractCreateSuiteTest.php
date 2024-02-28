@@ -343,4 +343,17 @@ abstract class AbstractCreateSuiteTest extends AbstractSuiteTest
 
         self::assertSame(200, $secondCreateResponse->getStatusCode());
     }
+
+    public function testCreateSuiteSourceNotFound(): void
+    {
+        $response = $this->applicationClient->makeCreateSuiteRequest(
+            self::$apiTokens->get(self::USER_1_EMAIL),
+            [
+                SuiteRequest::PARAMETER_LABEL => md5((string) rand()),
+                SuiteRequest::PARAMETER_TESTS => [],
+            ],
+        );
+
+        $this->responseAsserter->assertForbiddenResponse($response);
+    }
 }

@@ -6,7 +6,6 @@ namespace App\ArgumentResolver;
 
 use App\Entity\SourceInterface;
 use App\Entity\Suite;
-use App\Exception\EntityNotFoundException;
 use App\Repository\SourceRepository;
 use App\Request\SuiteRequest;
 use App\RequestParameter\Factory;
@@ -34,7 +33,6 @@ readonly class SuiteRequestResolver implements ValueResolverInterface
      * @return SuiteRequest[]
      *
      * @throws AccessDeniedException
-     * @throws EntityNotFoundException
      * @throws ErrorResponseException
      */
     public function resolve(Request $request, ArgumentMetadata $argument): iterable
@@ -48,7 +46,6 @@ readonly class SuiteRequestResolver implements ValueResolverInterface
 
     /**
      * @throws AccessDeniedException
-     * @throws EntityNotFoundException
      */
     private function getSource(Request $request): SourceInterface
     {
@@ -58,7 +55,7 @@ readonly class SuiteRequestResolver implements ValueResolverInterface
         $source = $this->sourceRepository->find($sourceId);
 
         if (null === $source) {
-            throw new EntityNotFoundException($sourceId, 'Source');
+            throw new AccessDeniedException();
         }
 
         $this->entityAccessChecker->denyAccessUnlessGranted($source);

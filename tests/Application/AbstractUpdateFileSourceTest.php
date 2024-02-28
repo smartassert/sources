@@ -16,6 +16,7 @@ use App\Tests\Services\EntityRemover;
 use App\Tests\Services\SourceOriginFactory;
 use App\Tests\Services\SourceRequestTypeMatcher;
 use SmartAssert\TestAuthenticationProviderBundle\UserProvider;
+use Symfony\Component\Uid\Ulid;
 
 abstract class AbstractUpdateFileSourceTest extends AbstractApplicationTest
 {
@@ -327,5 +328,24 @@ abstract class AbstractUpdateFileSourceTest extends AbstractApplicationTest
             (string) json_encode($expectedResponseData),
             $response->getBody()->getContents(),
         );
+    }
+
+    public function testUpdateSourceNotFound(): void
+    {
+        $source = SourceOriginFactory::create(
+            type: 'file',
+            userId: self::$users->get(self::USER_1_EMAIL)['id'],
+            label: 'original label',
+        );
+
+        $this->sourceRepository->save($source);
+
+        $response = $this->applicationClient->makeUpdateFileSourceRequest(
+            self::$apiTokens->get(self::USER_1_EMAIL),
+            (string) new Ulid(),
+            []
+        );
+
+        $this->responseAsserter->assertForbiddenResponse($response);
     }
 }

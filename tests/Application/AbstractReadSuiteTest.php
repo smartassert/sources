@@ -125,4 +125,14 @@ abstract class AbstractReadSuiteTest extends AbstractApplicationTest
             trim($this->fixtureStorage->read($serializedSuiteFixturePath))
         );
     }
+
+    public function testReadSerializedSuiteNotFound(): void
+    {
+        $response = $this->applicationClient->makeReadSerializedSuiteRequest(
+            self::$apiTokens->get(self::USER_1_EMAIL),
+            (new EntityIdFactory())->create(),
+        );
+
+        $this->responseAsserter->assertForbiddenResponse($response);
+    }
 }
