@@ -7,7 +7,6 @@ namespace App\ArgumentResolver;
 use App\Controller\SerializedSuiteRoutes;
 use App\Controller\SuiteRoutes;
 use App\Entity\Suite;
-use App\Exception\EntityNotFoundException;
 use App\Repository\SuiteRepository;
 use App\Request\CreateSerializedSuiteRequest;
 use App\Security\EntityAccessChecker;
@@ -17,11 +16,11 @@ use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
-class CreateSerializedSuiteRequestResolver implements ValueResolverInterface
+readonly class CreateSerializedSuiteRequestResolver implements ValueResolverInterface
 {
     public function __construct(
-        private readonly SuiteRepository $suiteRepository,
-        private readonly EntityAccessChecker $entityAccessChecker,
+        private SuiteRepository $suiteRepository,
+        private EntityAccessChecker $entityAccessChecker,
     ) {
     }
 
@@ -29,7 +28,6 @@ class CreateSerializedSuiteRequestResolver implements ValueResolverInterface
      * @return CreateSerializedSuiteRequest[]
      *
      * @throws AccessDeniedException
-     * @throws EntityNotFoundException
      */
     public function resolve(Request $request, ArgumentMetadata $argument): iterable
     {
@@ -44,7 +42,7 @@ class CreateSerializedSuiteRequestResolver implements ValueResolverInterface
 
         $suite = $this->suiteRepository->find($suiteId);
         if (null === $suite) {
-            throw new EntityNotFoundException($suiteId, 'Suite');
+            throw new AccessDeniedException();
         }
 
         $this->entityAccessChecker->denyAccessUnlessGranted($suite);
