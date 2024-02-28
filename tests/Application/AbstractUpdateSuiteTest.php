@@ -308,6 +308,23 @@ abstract class AbstractUpdateSuiteTest extends AbstractSuiteTest
         self::assertSame(200, $updateResponse->getStatusCode());
     }
 
+    public function testUpdateSuiteSourceNotFound(): void
+    {
+        $suiteId = $this->createSuite($this->sourceId, md5((string) rand()), []);
+
+        $response = $this->applicationClient->makeUpdateSuiteRequest(
+            self::$apiTokens->get(self::USER_1_EMAIL),
+            $suiteId,
+            [
+                SuiteRequest::PARAMETER_SOURCE_ID => md5((string) rand()),
+                SuiteRequest::PARAMETER_LABEL => md5((string) rand()),
+                SuiteRequest::PARAMETER_TESTS => [],
+            ],
+        );
+
+        $this->responseAsserter->assertForbiddenResponse($response);
+    }
+
     /**
      * @param string[] $tests
      */
@@ -324,9 +341,9 @@ abstract class AbstractUpdateSuiteTest extends AbstractSuiteTest
 
         $responseData = json_decode($response->getBody()->getContents(), true);
         \assert(is_array($responseData));
-        $sourceId = $responseData['id'] ?? null;
-        \assert(is_string($sourceId));
+        $suiteId = $responseData['id'] ?? null;
+        \assert(is_string($suiteId));
 
-        return $sourceId;
+        return $suiteId;
     }
 }
