@@ -13,6 +13,7 @@ use App\Tests\Services\SourceOriginFactory;
 use Doctrine\ORM\EntityManagerInterface;
 use League\Flysystem\FilesystemOperator;
 use SmartAssert\TestAuthenticationProviderBundle\UserProvider;
+use Symfony\Component\Uid\Ulid;
 
 abstract class AbstractDeleteSourceTest extends AbstractApplicationTest
 {
@@ -125,5 +126,21 @@ abstract class AbstractDeleteSourceTest extends AbstractApplicationTest
         \assert(is_array($responseData));
 
         self::assertSame((int) $deletedAt->format('U'), $responseData['deleted_at']);
+    }
+
+    public function testDeleteSourceNotFound(): void
+    {
+        $source = SourceOriginFactory::create(
+            type: 'file',
+            userId: self::$users->get(self::USER_1_EMAIL)['id'],
+        );
+        $this->sourceRepository->save($source);
+
+        $response = $this->applicationClient->makeDeleteSourceRequest(
+            self::$apiTokens->get(self::USER_1_EMAIL),
+            (string) new Ulid(),
+        );
+
+        $this->responseAsserter->assertForbiddenResponse($response);
     }
 }
