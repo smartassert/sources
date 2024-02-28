@@ -174,4 +174,14 @@ abstract class AbstractGetSerializedSuiteTest extends AbstractApplicationTest
             ],
         ];
     }
+
+    public function testGetSerializedSuiteNotFound(): void
+    {
+        $response = $this->applicationClient->makeGetSerializedSuiteRequest(
+            self::$apiTokens->get(self::USER_1_EMAIL),
+            (new EntityIdFactory())->create(),
+        );
+
+        $this->responseAsserter->assertForbiddenResponse($response);
+    }
 }
