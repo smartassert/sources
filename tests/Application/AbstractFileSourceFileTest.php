@@ -7,6 +7,7 @@ namespace App\Tests\Application;
 use App\Entity\FileSource;
 use App\Repository\SourceRepository;
 use App\Tests\Services\SourceOriginFactory;
+use Symfony\Component\Uid\Ulid;
 
 abstract class AbstractFileSourceFileTest extends AbstractApplicationTest
 {
@@ -382,5 +383,78 @@ abstract class AbstractFileSourceFileTest extends AbstractApplicationTest
         );
 
         $this->responseAsserter->assertNotFoundResponse($notFoundReadResponse);
+    }
+
+    public function testCreateSourceNotFound(): void
+    {
+        $response = $this->applicationClient->makeAddFileRequest(
+            self::$apiTokens->get(self::USER_1_EMAIL),
+            (string) new Ulid(),
+            self::FILENAME,
+            ''
+        );
+
+        $this->responseAsserter->assertForbiddenResponse($response);
+    }
+
+    public function testUpdateSourceNotFound(): void
+    {
+        $createResponse = $this->applicationClient->makeAddFileRequest(
+            self::$apiTokens->get(self::USER_1_EMAIL),
+            $this->fileSource->getId(),
+            self::FILENAME,
+            ''
+        );
+
+        self::assertSame(200, $createResponse->getStatusCode());
+
+        $response = $this->applicationClient->makeUpdateFileRequest(
+            self::$apiTokens->get(self::USER_1_EMAIL),
+            (string) new Ulid(),
+            self::FILENAME,
+            ''
+        );
+
+        $this->responseAsserter->assertForbiddenResponse($response);
+    }
+
+    public function testReadSourceNotFound(): void
+    {
+        $createResponse = $this->applicationClient->makeAddFileRequest(
+            self::$apiTokens->get(self::USER_1_EMAIL),
+            $this->fileSource->getId(),
+            self::FILENAME,
+            ''
+        );
+
+        self::assertSame(200, $createResponse->getStatusCode());
+
+        $response = $this->applicationClient->makeReadFileRequest(
+            self::$apiTokens->get(self::USER_1_EMAIL),
+            (string) new Ulid(),
+            self::FILENAME
+        );
+
+        $this->responseAsserter->assertForbiddenResponse($response);
+    }
+
+    public function testRemoveSourceNotFound(): void
+    {
+        $createResponse = $this->applicationClient->makeAddFileRequest(
+            self::$apiTokens->get(self::USER_1_EMAIL),
+            $this->fileSource->getId(),
+            self::FILENAME,
+            ''
+        );
+
+        self::assertSame(200, $createResponse->getStatusCode());
+
+        $response = $this->applicationClient->makeRemoveFileRequest(
+            self::$apiTokens->get(self::USER_1_EMAIL),
+            (string) new Ulid(),
+            self::FILENAME
+        );
+
+        $this->responseAsserter->assertForbiddenResponse($response);
     }
 }
