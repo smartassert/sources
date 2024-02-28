@@ -15,6 +15,7 @@ use App\Tests\Services\EntityRemover;
 use App\Tests\Services\SourceOriginFactory;
 use App\Tests\Services\SourceRequestTypeMatcher;
 use SmartAssert\TestAuthenticationProviderBundle\UserProvider;
+use Symfony\Component\Uid\Ulid;
 
 abstract class AbstractUpdateGitSourceTest extends AbstractApplicationTest
 {
@@ -404,5 +405,27 @@ abstract class AbstractUpdateGitSourceTest extends AbstractApplicationTest
             (string) json_encode($expectedResponseData),
             $response->getBody()->getContents(),
         );
+    }
+
+    public function testUpdateSourceNotFound(): void
+    {
+        $source = SourceOriginFactory::create(
+            type: 'git',
+            userId: self::$users->get(self::USER_1_EMAIL)['id'],
+            label: 'original label',
+            hostUrl: 'https://example.com/original.git',
+            path: '/original',
+            credentials: 'credentials',
+        );
+
+        $this->sourceRepository->save($source);
+
+        $response = $this->applicationClient->makeUpdateGitSourceRequest(
+            self::$apiTokens->get(self::USER_1_EMAIL),
+            (string) new Ulid(),
+            []
+        );
+
+        $this->responseAsserter->assertForbiddenResponse($response);
     }
 }
