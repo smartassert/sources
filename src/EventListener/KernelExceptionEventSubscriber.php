@@ -4,11 +4,9 @@ declare(strict_types=1);
 
 namespace App\EventListener;
 
-use App\ErrorResponse\HasHttpStatusCodeInterface;
 use SmartAssert\ServiceRequest\Exception\ErrorResponseException;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 
 readonly class KernelExceptionEventSubscriber implements EventSubscriberInterface
@@ -30,13 +28,6 @@ readonly class KernelExceptionEventSubscriber implements EventSubscriberInterfac
         $throwable = $event->getThrowable();
         if ($throwable instanceof ErrorResponseException) {
             $event->setResponse(new JsonResponse($throwable->error->serialize(), $throwable->getCode()));
-            $event->stopPropagation();
-
-            return;
-        }
-
-        if ($throwable instanceof HasHttpStatusCodeInterface) {
-            $event->setResponse(new Response(null, $throwable->getStatusCode()));
             $event->stopPropagation();
         }
     }
