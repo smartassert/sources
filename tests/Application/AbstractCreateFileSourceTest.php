@@ -111,9 +111,6 @@ abstract class AbstractCreateFileSourceTest extends AbstractApplicationTest
         self::assertSame($firstResponse->getBody()->getContents(), $secondResponse->getBody()->getContents());
     }
 
-    /**
-     * @param array<string, string> $requestParameters
-     */
     public function testCreateWithLabelOfDeletedSource(): void
     {
         $requestParameters = [
