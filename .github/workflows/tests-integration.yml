@@ -31,13 +31,9 @@ jobs:
 #        run: composer integration-pull
 
       - name: Setup integration environment
-#        env:
-#          DATABASE_URL: postgres://postgres:password!@127.0.0.1:5432/sources?charset=UTF-8
         run: |
-          docker compose -f ./tests/build/docker-compose.yml up -d postgres
-          docker compose -f ./tests/build/docker-compose.yml ps
-          composer db-setup
-          composer users-setup
+          composer functional-setup
+          sleep 10
 
 #      - name: Verify integration environment state
 #        env:
