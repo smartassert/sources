@@ -11,6 +11,7 @@ use App\Services\Process\Executor;
 use App\Services\Process\Factory;
 use App\Tests\Mock\Services\Process\MockFactory;
 use App\Tests\Mock\Symfony\Component\Process\MockProcess;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\Exception\RuntimeException;
 use webignition\ObjectReflector\ObjectReflector;
@@ -52,9 +53,7 @@ class ExecutorTest extends TestCase
         $this->executor->execute(new Definition($command));
     }
 
-    /**
-     * @dataProvider executeSuccessDataProvider
-     */
+    #[DataProvider('executeSuccessDataProvider')]
     public function testExecuteSuccess(
         Definition $commandDefinition,
         ?string $cwd,

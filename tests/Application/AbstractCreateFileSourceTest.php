@@ -11,17 +11,17 @@ use App\Request\FileSourceRequest;
 use App\Request\GitSourceRequest;
 use App\Tests\DataProvider\CreateUpdateFileSourceDataProviderTrait;
 use App\Tests\Services\SourceRequestTypeMatcher;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 abstract class AbstractCreateFileSourceTest extends AbstractApplicationTest
 {
     use CreateUpdateFileSourceDataProviderTrait;
 
     /**
-     * @dataProvider createUpdateFileSourceInvalidRequestDataProvider
-     *
      * @param array<string, string> $requestParameters
      * @param array<string, string> $expectedResponseData
      */
+    #[DataProvider('createUpdateFileSourceInvalidRequestDataProvider')]
     public function testCreateInvalidSourceRequest(array $requestParameters, array $expectedResponseData): void
     {
         $response = $this->applicationClient->makeCreateFileSourceRequest(
@@ -39,11 +39,10 @@ abstract class AbstractCreateFileSourceTest extends AbstractApplicationTest
     }
 
     /**
-     * @dataProvider createFileSourceSuccessDataProvider
-     *
      * @param array<string, string> $requestParameters
      * @param array<mixed>          $expected
      */
+    #[DataProvider('createFileSourceSuccessDataProvider')]
     public function testCreateSuccess(array $requestParameters, array $expected): void
     {
         $response = $this->applicationClient->makeCreateFileSourceRequest(
@@ -149,11 +148,10 @@ abstract class AbstractCreateFileSourceTest extends AbstractApplicationTest
     }
 
     /**
-     * @dataProvider createSourceWithNonUniqueLabelDataProvider
-     *
      * @param array<string, string> $targetCreateParameters
      * @param array<string, string> $conflictCreateParameters
      */
+    #[DataProvider('createSourceWithNonUniqueLabelDataProvider')]
     public function testCreateSourceWithNonUniqueLabel(
         string $label,
         array $targetCreateParameters,

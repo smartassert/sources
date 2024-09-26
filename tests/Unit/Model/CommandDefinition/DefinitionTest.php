@@ -6,13 +6,12 @@ namespace App\Tests\Unit\Model\CommandDefinition;
 
 use App\Model\CommandDefinition\Definition;
 use App\Model\CommandDefinition\Option;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class DefinitionTest extends TestCase
 {
-    /**
-     * @dataProvider buildDataProvider
-     */
+    #[DataProvider('buildDataProvider')]
     public function testBuild(Definition $definition, string $expected): void
     {
         self::assertSame($expected, $definition->build());
