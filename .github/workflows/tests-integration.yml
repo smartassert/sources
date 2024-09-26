@@ -27,13 +27,15 @@ jobs:
       - name: Install Composer dependencies
         run: composer install --no-progress --prefer-dist --optimize-autoloader
 
-      - name: Pull images
-        run: composer integration-pull
+#      - name: Pull images
+#        run: composer integration-pull
 
       - name: Setup integration environment
-        env:
-          DATABASE_URL: postgres://postgres:password!@127.0.0.1:5432/sources?charset=UTF-8
-        run: composer integration-debug
+#        env:
+#          DATABASE_URL: postgres://postgres:password!@127.0.0.1:5432/sources?charset=UTF-8
+        run: |
+          composer functional-setup
+          sleep 10
 
 #      - name: Verify integration environment state
 #        env:
