@@ -156,7 +156,8 @@
             "@users-setup"
         ],
         "integration-debug": [
-            "@functional-start",
+            "@integration-build",
+            "@integration-up",
             "sleep 2",
             "@db-setup",
             "@users-setup"
