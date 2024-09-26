@@ -83,7 +83,7 @@ class DirectoryListingFilterTest extends WebTestCase
                 'fixtureSet' => 'txt',
                 'relativePath' => $basePath,
                 'extensions' => ['txt'],
-                'expected' => [
+                'expectedRelativePathNames' => [
                     'directory/file3.txt',
                     'file1.txt',
                     'file2.txt',
@@ -93,13 +93,13 @@ class DirectoryListingFilterTest extends WebTestCase
                 'fixtureSet' => 'txt',
                 'relativePath' => $basePath,
                 'extensions' => ['yml', 'yaml'],
-                'expected' => [],
+                'expectedRelativePathNames' => [],
             ],
             'source: yml_yaml, no extensions' => [
                 'fixtureSet' => 'yml_yaml_valid',
                 'relativePath' => $basePath,
                 'extensions' => [],
-                'expected' => [
+                'expectedRelativePathNames' => [
                     'directory/file3.yml',
                     'file1.yaml',
                     'file2.yml',
@@ -109,7 +109,7 @@ class DirectoryListingFilterTest extends WebTestCase
                 'fixtureSet' => 'yml_yaml_valid',
                 'relativePath' => $basePath,
                 'extensions' => ['yml'],
-                'expected' => [
+                'expectedRelativePathNames' => [
                     'directory/file3.yml',
                     'file2.yml',
                 ],
@@ -118,7 +118,7 @@ class DirectoryListingFilterTest extends WebTestCase
                 'fixtureSet' => 'mixed',
                 'relativePath' => $basePath,
                 'extensions' => ['yaml'],
-                'expected' => [
+                'expectedRelativePathNames' => [
                     'directory/file3.yaml',
                     'file1.yaml',
                 ],

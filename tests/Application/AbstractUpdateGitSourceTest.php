@@ -39,11 +39,11 @@ abstract class AbstractUpdateGitSourceTest extends AbstractApplicationTest
     /**
      * @dataProvider createUpdateGitSourceInvalidRequestDataProvider
      *
-     * @param array<string, string> $payload
+     * @param array<string, string> $requestParameters
      * @param array<mixed>          $expectedResponseData
      */
     public function testUpdateInvalidRequest(
-        array $payload,
+        array $requestParameters,
         array $expectedResponseData
     ): void {
         $source = SourceOriginFactory::create(
@@ -56,7 +56,7 @@ abstract class AbstractUpdateGitSourceTest extends AbstractApplicationTest
         $response = $this->applicationClient->makeUpdateGitSourceRequest(
             self::$apiTokens->get(self::USER_1_EMAIL),
             $source->getId(),
-            $payload
+            $requestParameters
         );
 
         $this->responseAsserter->assertInvalidRequestJsonResponse($response, $expectedResponseData);

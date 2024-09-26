@@ -112,7 +112,36 @@ abstract class AbstractCreateGitSourceTest extends AbstractApplicationTest
     }
 
     /**
-     * @dataProvider createGitSourceSuccessDataProvider
+     * @return array<mixed>
+     */
+    public static function createGitSourceDataProvider(): array
+    {
+        $label = md5((string) rand());
+        $hostUrl = 'https://example.com/' . md5((string) rand()) . '.git';
+        $path = '/' . md5((string) rand());
+        $credentials = md5((string) rand());
+
+        return [
+            'git source, credentials missing' => [
+                'requestParameters' => [
+                    GitSourceRequest::PARAMETER_LABEL => $label,
+                    GitSourceRequest::PARAMETER_HOST_URL => $hostUrl,
+                    GitSourceRequest::PARAMETER_PATH => $path
+                ],
+            ],
+            'git source, credentials present' => [
+                'requestParameters' => [
+                    GitSourceRequest::PARAMETER_LABEL => $label,
+                    GitSourceRequest::PARAMETER_HOST_URL => $hostUrl,
+                    GitSourceRequest::PARAMETER_PATH => $path,
+                    GitSourceRequest::PARAMETER_CREDENTIALS => $credentials,
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider createGitSourceDataProvider
      *
      * @param array<string, string> $requestParameters
      */
@@ -135,7 +164,7 @@ abstract class AbstractCreateGitSourceTest extends AbstractApplicationTest
     }
 
     /**
-     * @dataProvider createGitSourceSuccessDataProvider
+     * @dataProvider createGitSourceDataProvider
      *
      * @param array<string, string> $requestParameters
      */
