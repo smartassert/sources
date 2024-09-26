@@ -43,8 +43,8 @@ jobs:
 #          netcat -vz localhost 9090
 #          sleep 10
 #
-#      - name: Run tests
-#        run: composer test-integration
+      - name: Run tests
+        run: composer test-integration
 #
 #      - name: Dump docker-compose logs
 #        if: always()
