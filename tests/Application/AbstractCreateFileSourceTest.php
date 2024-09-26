@@ -89,13 +89,12 @@ abstract class AbstractCreateFileSourceTest extends AbstractApplicationTest
         ];
     }
 
-    /**
-     * @dataProvider createFileSourceSuccessDataProvider
-     *
-     * @param array<string, string> $requestParameters
-     */
-    public function testCreateIsIdempotent(array $requestParameters): void
+    public function testCreateIsIdempotent(): void
     {
+        $requestParameters = [
+            FileSourceRequest::PARAMETER_LABEL => md5((string) rand()),
+        ];
+
         $firstResponse = $this->applicationClient->makeCreateFileSourceRequest(
             self::$apiTokens->get(self::USER_1_EMAIL),
             $requestParameters
@@ -113,12 +112,14 @@ abstract class AbstractCreateFileSourceTest extends AbstractApplicationTest
     }
 
     /**
-     * @dataProvider createFileSourceSuccessDataProvider
-     *
      * @param array<string, string> $requestParameters
      */
-    public function testCreateWithLabelOfDeletedSource(array $requestParameters): void
+    public function testCreateWithLabelOfDeletedSource(): void
     {
+        $requestParameters = [
+            FileSourceRequest::PARAMETER_LABEL => md5((string) rand()),
+        ];
+
         $firstCreateResponse = $this->applicationClient->makeCreateFileSourceRequest(
             self::$apiTokens->get(self::USER_1_EMAIL),
             $requestParameters
