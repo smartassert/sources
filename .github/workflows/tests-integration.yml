@@ -32,7 +32,7 @@ jobs:
 
       - name: Setup integration environment
         run: |
-          composer integration-debug
+          composer integration-setup
 
 #      - name: Verify integration environment state
 #        env:
