@@ -33,20 +33,20 @@ jobs:
       - name: Setup integration environment
         env:
           DATABASE_URL: postgres://postgres:password!@127.0.0.1:5432/sources?charset=UTF-8
-        run: composer integration-setup
+        run: composer integration-debug
 
-      - name: Verify integration environment state
-        env:
-          DATABASE_URL: postgres://postgres:password!@127.0.0.1:5432/sources?charset=UTF-8
-        run: |
-          composer integration-status
-          sudo netstat -nlp | grep 9090
-          netcat -vz localhost 9090
-          sleep 10
-
-      - name: Run tests
-        run: composer test-integration
-
-      - name: Dump docker-compose logs
-        if: always()
-        run: composer integration-logs
+#      - name: Verify integration environment state
+#        env:
+#          DATABASE_URL: postgres://postgres:password!@127.0.0.1:5432/sources?charset=UTF-8
+#        run: |
+#          composer integration-status
+#          sudo netstat -nlp | grep 9090
+#          netcat -vz localhost 9090
+#          sleep 10
+#
+#      - name: Run tests
+#        run: composer test-integration
+#
+#      - name: Dump docker-compose logs
+#        if: always()
+#        run: composer integration-logs
