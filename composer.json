@@ -156,8 +156,10 @@
             "@users-setup"
         ],
         "integration-debug": [
-            "docker compose -f ./tests/build/docker-compose.yml up -d postgres",
-            "php bin/console doctrine:database:create --if-not-exists -vvv"
+            "@functional-start",
+            "sleep 2",
+            "@db-setup",
+            "@users-setup"
         ]
     },
     "conflict": {
