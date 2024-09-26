@@ -34,6 +34,7 @@ jobs:
 #        env:
 #          DATABASE_URL: postgres://postgres:password!@127.0.0.1:5432/sources?charset=UTF-8
         run: |
+          docker compose -f ./tests/build/docker-compose.yml up -d postgres
           composer db-setup
           composer users-setup
 
