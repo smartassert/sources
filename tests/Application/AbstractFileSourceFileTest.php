@@ -236,59 +236,15 @@ abstract class AbstractFileSourceFileTest extends AbstractApplicationTest
         return [
             'name missing .yaml extension' => [
                 'filename' => 'non-yaml-filename',
-                'expectedResponseData' => [
-                    'class' => 'bad_request',
-                    'parameter' => [
-                        'name' => 'filename',
-                        'value' => 'non-yaml-filename',
-                        'requirements' => [
-                            'data_type' => 'yaml_filename',
-                        ],
-                    ],
-                    'type' => 'invalid',
-                ],
             ],
             'name empty with .yaml extension' => [
                 'filename' => '.yaml',
-                'expectedResponseData' => [
-                    'class' => 'bad_request',
-                    'parameter' => [
-                        'name' => 'filename',
-                        'value' => '.yaml',
-                        'requirements' => [
-                            'data_type' => 'yaml_filename',
-                        ],
-                    ],
-                    'type' => 'invalid',
-                ],
             ],
             'name contains backslash characters' => [
                 'filename' => 'one-two-\-three.yaml',
-                'expectedResponseData' => [
-                    'class' => 'bad_request',
-                    'parameter' => [
-                        'name' => 'filename',
-                        'value' => 'one-two-\-three.yaml',
-                        'requirements' => [
-                            'data_type' => 'yaml_filename',
-                        ],
-                    ],
-                    'type' => 'invalid',
-                ],
             ],
             'name contains space characters' => [
                 'filename' => 'one two three.yaml',
-                'expectedResponseData' => [
-                    'class' => 'bad_request',
-                    'parameter' => [
-                        'name' => 'filename',
-                        'value' => 'one two three.yaml',
-                        'requirements' => [
-                            'data_type' => 'yaml_filename',
-                        ],
-                    ],
-                    'type' => 'invalid',
-                ],
             ],
         ];
     }
