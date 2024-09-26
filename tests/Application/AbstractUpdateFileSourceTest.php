@@ -40,11 +40,11 @@ abstract class AbstractUpdateFileSourceTest extends AbstractApplicationTest
     /**
      * @dataProvider createUpdateFileSourceInvalidRequestDataProvider
      *
-     * @param array<string, string> $payload
+     * @param array<string, string> $requestParameters
      * @param array<mixed>          $expectedResponseData
      */
     public function testUpdateInvalidRequest(
-        array $payload,
+        array $requestParameters,
         array $expectedResponseData
     ): void {
         $source = SourceOriginFactory::create(
@@ -57,7 +57,7 @@ abstract class AbstractUpdateFileSourceTest extends AbstractApplicationTest
         $response = $this->applicationClient->makeUpdateFileSourceRequest(
             self::$apiTokens->get(self::USER_1_EMAIL),
             $source->getId(),
-            $payload
+            $requestParameters
         );
 
         $this->responseAsserter->assertInvalidRequestJsonResponse($response, $expectedResponseData);
