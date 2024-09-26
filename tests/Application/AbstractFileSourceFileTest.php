@@ -135,13 +135,13 @@ abstract class AbstractFileSourceFileTest extends AbstractApplicationTest
                 ],
             ],
             'name contains backslash characters, content non-empty' => [
-                'filename' => 'one-two-\\-three.yaml',
+                'filename' => 'one-two-\-three.yaml',
                 'content' => 'non-empty value',
                 'expectedResponseData' => [
                     'class' => 'bad_request',
                     'parameter' => [
                         'name' => 'filename',
-                        'value' => 'one-two-\\-three.yaml',
+                        'value' => 'one-two-\-three.yaml',
                         'requirements' => [
                             'data_type' => 'yaml_filename',
                         ],
@@ -263,12 +263,12 @@ abstract class AbstractFileSourceFileTest extends AbstractApplicationTest
                 ],
             ],
             'name contains backslash characters' => [
-                'filename' => 'one-two-\\-three.yaml',
+                'filename' => 'one-two-\-three.yaml',
                 'expectedResponseData' => [
                     'class' => 'bad_request',
                     'parameter' => [
                         'name' => 'filename',
-                        'value' => 'one-two-\\-three.yaml',
+                        'value' => 'one-two-\-three.yaml',
                         'requirements' => [
                             'data_type' => 'yaml_filename',
                         ],
