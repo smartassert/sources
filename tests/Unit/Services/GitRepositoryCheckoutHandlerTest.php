@@ -8,13 +8,12 @@ use App\Model\CommandDefinition\Definition;
 use App\Model\ProcessOutput;
 use App\Services\GitRepositoryCheckoutHandler;
 use App\Tests\Mock\Services\Process\MockExecutor;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 class GitRepositoryCheckoutHandlerTest extends WebTestCase
 {
-    /**
-     * @dataProvider checkoutDataProvider
-     */
+    #[DataProvider('checkoutDataProvider')]
     public function testCheckout(string $path, ?string $ref, Definition $expectedCommandDefinition): void
     {
         $executorProcessOutput = new ProcessOutput(0, '', '');

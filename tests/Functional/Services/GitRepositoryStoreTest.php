@@ -23,6 +23,7 @@ use App\Tests\Services\SourceOriginFactory;
 use League\Flysystem\FilesystemOperator;
 use League\Flysystem\FilesystemWriter;
 use League\Flysystem\UnableToDeleteDirectory;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Process\Exception\RuntimeException as SymfonyProcessRuntimeException;
@@ -112,10 +113,9 @@ class GitRepositoryStoreTest extends WebTestCase
     }
 
     /**
-     * @dataProvider initializeThrowsGitActionExceptionDataProvider
-     *
      * @param callable(\Exception|ProcessOutput, null|\Exception|ProcessOutput, RepositoryException): void $assertions
      */
+    #[DataProvider('initializeThrowsGitActionExceptionDataProvider')]
     public function testInitializeThrowsGitActionException(
         \Exception|ProcessOutput $cloneProcessOutcome,
         null|\Exception|ProcessOutput $checkoutProcessOutcome,

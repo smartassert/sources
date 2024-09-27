@@ -9,6 +9,7 @@ use App\Repository\SourceRepository;
 use App\Services\EntityIdFactory;
 use App\Tests\DataProvider\GetSourceDataProviderTrait;
 use Doctrine\ORM\EntityManagerInterface;
+use PHPUnit\Framework\Attributes\DataProvider;
 use SmartAssert\TestAuthenticationProviderBundle\UserProvider;
 
 abstract class AbstractGetSourceTest extends AbstractApplicationTest
@@ -26,11 +27,10 @@ abstract class AbstractGetSourceTest extends AbstractApplicationTest
     }
 
     /**
-     * @dataProvider getSourceDataProvider
-     *
      * @param callable(UserProvider): SourceInterface         $sourceCreator
      * @param callable(SourceInterface $source): array<mixed> $expectedResponseDataCreator
      */
+    #[DataProvider('getSourceDataProvider')]
     public function testGetSuccess(callable $sourceCreator, callable $expectedResponseDataCreator): void
     {
         $sourceRepository = self::getContainer()->get(SourceRepository::class);
@@ -54,11 +54,10 @@ abstract class AbstractGetSourceTest extends AbstractApplicationTest
     }
 
     /**
-     * @dataProvider getSourceDataProvider
-     *
      * @param callable(UserProvider): SourceInterface         $sourceCreator
      * @param callable(SourceInterface $source): array<mixed> $expectedResponseDataCreator
      */
+    #[DataProvider('getSourceDataProvider')]
     public function testGetDeletedSourceSuccess(callable $sourceCreator, callable $expectedResponseDataCreator): void
     {
         $sourceRepository = self::getContainer()->get(SourceRepository::class);

@@ -19,6 +19,7 @@ use League\Flysystem\FilesystemException as FsException;
 use League\Flysystem\FilesystemOperationFailed as FsOpFailed;
 use League\Flysystem\FilesystemOperator;
 use Mockery\MockInterface as MockI;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Psr\Http\Message\ResponseInterface;
 use SmartAssert\SymfonyTestClient\SymfonyClient;
 use SmartAssert\UsersSecurityBundle\Security\Authenticator;
@@ -47,10 +48,9 @@ class FilesystemExceptionHandlingTest extends WebTestCase
     }
 
     /**
-     * @dataProvider exceptionHandlerDataProvider
-     *
      * @param callable(IdentifiedEntity): array<mixed> $expectedResponseDataCreator
      */
+    #[DataProvider('exceptionHandlerDataProvider')]
     public function testListFileSourceFilenamesHandlesThrownFilesystemException(
         \Exception&FsException $exception,
         callable $expectedResponseDataCreator,
@@ -80,10 +80,9 @@ class FilesystemExceptionHandlingTest extends WebTestCase
     }
 
     /**
-     * @dataProvider exceptionHandlerDataProvider
-     *
      * @param callable(IdentifiedEntity): array<mixed> $expectedResponseDataCreator
      */
+    #[DataProvider('exceptionHandlerDataProvider')]
     public function testAddFileSourceFileHandlesThrownFilesystemException(
         \Exception&FsException $exception,
         callable $expectedResponseDataCreator,
@@ -112,10 +111,9 @@ class FilesystemExceptionHandlingTest extends WebTestCase
     }
 
     /**
-     * @dataProvider exceptionHandlerDataProvider
-     *
      * @param callable(IdentifiedEntity): array<mixed> $expectedResponseDataCreator
      */
+    #[DataProvider('exceptionHandlerDataProvider')]
     public function testUpdateFileSourceFileHandlesThrownFilesystemException(
         \Exception&FsException $exception,
         callable $expectedResponseDataCreator,
@@ -144,10 +142,9 @@ class FilesystemExceptionHandlingTest extends WebTestCase
     }
 
     /**
-     * @dataProvider exceptionHandlerDataProvider
-     *
      * @param callable(IdentifiedEntity): array<mixed> $expectedResponseDataCreator
      */
+    #[DataProvider('exceptionHandlerDataProvider')]
     public function testReadFileSourceFileHandlesThrownFilesystemException(
         \Exception&FsException $exception,
         callable $expectedResponseDataCreator,
@@ -175,10 +172,9 @@ class FilesystemExceptionHandlingTest extends WebTestCase
     }
 
     /**
-     * @dataProvider exceptionHandlerDataProvider
-     *
      * @param callable(IdentifiedEntity): array<mixed> $expectedResponseDataCreator
      */
+    #[DataProvider('exceptionHandlerDataProvider')]
     public function testDeleteFileSourceFileHandlesThrownFilesystemException(
         \Exception&FsException $exception,
         callable $expectedResponseDataCreator,
@@ -206,10 +202,9 @@ class FilesystemExceptionHandlingTest extends WebTestCase
     }
 
     /**
-     * @dataProvider exceptionHandlerDataProvider
-     *
      * @param callable(IdentifiedEntity): array<mixed> $expectedResponseDataCreator
      */
+    #[DataProvider('exceptionHandlerDataProvider')]
     public function testReadSerializedSuiteHandlesThrownFilesystemException(
         \Exception&FsException $exception,
         callable $expectedResponseDataCreator,
@@ -264,10 +259,9 @@ class FilesystemExceptionHandlingTest extends WebTestCase
     }
 
     /**
-     * @dataProvider exceptionHandlerDataProvider
-     *
      * @param callable(IdentifiedEntity): array<mixed> $expectedResponseDataCreator
      */
+    #[DataProvider('exceptionHandlerDataProvider')]
     public function testDeleteSourceHandlesThrownFilesystemException(
         \Exception&FsException $exception,
         callable $expectedResponseDataCreator,

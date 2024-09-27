@@ -10,17 +10,17 @@ use App\Repository\SourceRepository;
 use App\Request\GitSourceRequest;
 use App\Tests\DataProvider\CreateUpdateGitSourceDataProviderTrait;
 use App\Tests\Services\SourceRequestTypeMatcher;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 abstract class AbstractCreateGitSourceTest extends AbstractApplicationTest
 {
     use CreateUpdateGitSourceDataProviderTrait;
 
     /**
-     * @dataProvider createUpdateGitSourceInvalidRequestDataProvider
-     *
      * @param array<string, string> $requestParameters
      * @param array<string, string> $expectedResponseData
      */
+    #[DataProvider('createUpdateGitSourceInvalidRequestDataProvider')]
     public function testCreateInvalidSourceRequest(array $requestParameters, array $expectedResponseData): void
     {
         $response = $this->applicationClient->makeCreateGitSourceRequest(
@@ -38,11 +38,10 @@ abstract class AbstractCreateGitSourceTest extends AbstractApplicationTest
     }
 
     /**
-     * @dataProvider createGitSourceSuccessDataProvider
-     *
      * @param array<string, string> $requestParameters
      * @param array<mixed>          $expected
      */
+    #[DataProvider('createGitSourceSuccessDataProvider')]
     public function testCreateSuccess(array $requestParameters, array $expected): void
     {
         $response = $this->applicationClient->makeCreateGitSourceRequest(
@@ -141,10 +140,9 @@ abstract class AbstractCreateGitSourceTest extends AbstractApplicationTest
     }
 
     /**
-     * @dataProvider createGitSourceDataProvider
-     *
      * @param array<string, string> $requestParameters
      */
+    #[DataProvider('createGitSourceDataProvider')]
     public function testCreateIsIdempotent(array $requestParameters): void
     {
         $firstResponse = $this->applicationClient->makeCreateGitSourceRequest(
@@ -164,10 +162,9 @@ abstract class AbstractCreateGitSourceTest extends AbstractApplicationTest
     }
 
     /**
-     * @dataProvider createGitSourceDataProvider
-     *
      * @param array<string, string> $requestParameters
      */
+    #[DataProvider('createGitSourceDataProvider')]
     public function testCreateWithLabelOfDeletedSource(array $requestParameters): void
     {
         $firstCreateResponse = $this->applicationClient->makeCreateGitSourceRequest(
@@ -202,11 +199,10 @@ abstract class AbstractCreateGitSourceTest extends AbstractApplicationTest
     }
 
     /**
-     * @dataProvider createSourceWithNonUniqueLabelDataProvider
-     *
      * @param array<string, string> $targetCreateParameters
      * @param array<string, string> $conflictCreateParameters
      */
+    #[DataProvider('createSourceWithNonUniqueLabelDataProvider')]
     public function testCreateSourceWithNonUniqueLabel(
         string $label,
         array $targetCreateParameters,

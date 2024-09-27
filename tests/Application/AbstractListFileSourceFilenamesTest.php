@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Application;
 
 use App\Request\FileSourceRequest;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\Uid\Ulid;
 
 abstract class AbstractListFileSourceFilenamesTest extends AbstractApplicationTest
@@ -53,11 +54,10 @@ abstract class AbstractListFileSourceFilenamesTest extends AbstractApplicationTe
     }
 
     /**
-     * @dataProvider listSuccessDataProvider
-     *
      * @param array<array{path: string, content: string}> $fileDataCollection
      * @param array<mixed>                                $expected
      */
+    #[DataProvider('listSuccessDataProvider')]
     public function testListSuccess(array $fileDataCollection, array $expected): void
     {
         foreach ($fileDataCollection as $fileData) {

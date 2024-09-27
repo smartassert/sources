@@ -12,6 +12,7 @@ use App\Tests\Services\FileStoreFixtureCreator;
 use App\Tests\Services\SourceOriginFactory;
 use App\Tests\Services\SuiteFactory;
 use League\Flysystem\FilesystemOperator;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 class SuiteSerializerFileSourceTest extends WebTestCase
@@ -48,10 +49,9 @@ class SuiteSerializerFileSourceTest extends WebTestCase
     }
 
     /**
-     * @dataProvider writeSuccessDataProvider
-     *
      * @param array<non-empty-string> $suiteTests
      */
+    #[DataProvider('writeSuccessDataProvider')]
     public function testWriteSuccess(?string $sourceFixture, array $suiteTests, string $expectedFixture): void
     {
         $source = SourceOriginFactory::create(type: 'file');

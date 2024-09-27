@@ -7,6 +7,7 @@ namespace App\Tests\Unit\Exception;
 use App\Exception\ProcessExecutorException;
 use App\Tests\Exception\UnknownSymfonyProcessException;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\Exception\ExceptionInterface;
 use Symfony\Component\Process\Exception\LogicException;
@@ -19,9 +20,7 @@ class ProcessExecutorExceptionTest extends TestCase
 {
     use MockeryPHPUnitIntegration;
 
-    /**
-     * @dataProvider getPropertiesDataProvider
-     */
+    #[DataProvider('getPropertiesDataProvider')]
     public function testGetProperties(
         ProcessExecutorException $exception,
         string $expectedMessage,

@@ -8,16 +8,16 @@ use App\Repository\SourceRepository;
 use App\Repository\SuiteRepository;
 use App\Tests\Services\SourceOriginFactory;
 use App\Tests\Services\SuiteFactory;
+use PHPUnit\Framework\Attributes\DataProvider;
 use SmartAssert\TestAuthenticationProviderBundle\UserProvider;
 
 abstract class AbstractListSuitesTest extends AbstractApplicationTest
 {
     /**
-     * @dataProvider listSuccessDataProvider
-     *
      * @param callable(UserProvider, SourceRepository, SuiteRepository): array<mixed> $suitesCreator
      * @param array<string, array<mixed>>                                             $expectedResponseData
      */
+    #[DataProvider('listSuccessDataProvider')]
     public function testListSuccess(callable $suitesCreator, array $expectedResponseData): void
     {
         $sourceRepository = self::getContainer()->get(SourceRepository::class);

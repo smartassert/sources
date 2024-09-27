@@ -13,6 +13,7 @@ use App\Services\EntityIdFactory;
 use App\Tests\DataProvider\GetSuiteDataProviderTrait;
 use App\Tests\Services\SuiteFactory;
 use Doctrine\ORM\EntityManagerInterface;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 abstract class AbstractDeleteSuiteTest extends AbstractApplicationTest
 {
@@ -58,11 +59,10 @@ abstract class AbstractDeleteSuiteTest extends AbstractApplicationTest
     }
 
     /**
-     * @dataProvider getSuiteDataProvider
-     *
      * @param callable(FileSource): Suite   $suiteCreator
      * @param callable(Suite): array<mixed> $expectedResponseDataCreator
      */
+    #[DataProvider('getSuiteDataProvider')]
     public function testDeleteSuccess(callable $suiteCreator, callable $expectedResponseDataCreator): void
     {
         $suite = $suiteCreator($this->source);

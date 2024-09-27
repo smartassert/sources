@@ -11,6 +11,7 @@ use App\Repository\SuiteRepository;
 use App\Request\FileSourceRequest;
 use App\Services\EntityIdFactory;
 use App\Tests\DataProvider\GetSuiteDataProviderTrait;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 abstract class AbstractGetSuiteTest extends AbstractApplicationTest
 {
@@ -56,11 +57,10 @@ abstract class AbstractGetSuiteTest extends AbstractApplicationTest
     }
 
     /**
-     * @dataProvider getSuiteDataProvider
-     *
      * @param callable(FileSource): Suite   $suiteCreator
      * @param callable(Suite): array<mixed> $expectedResponseDataCreator
      */
+    #[DataProvider('getSuiteDataProvider')]
     public function testGetSuccess(callable $suiteCreator, callable $expectedResponseDataCreator): void
     {
         $suite = $suiteCreator($this->source);

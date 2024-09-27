@@ -8,6 +8,7 @@ use App\Entity\Suite;
 use App\Repository\SuiteRepository;
 use App\Request\SuiteRequest;
 use App\Tests\DataProvider\CreateUpdateSuiteDataProviderTrait;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\Uid\Ulid;
 
 abstract class AbstractUpdateSuiteTest extends AbstractSuiteTest
@@ -24,11 +25,10 @@ abstract class AbstractUpdateSuiteTest extends AbstractSuiteTest
     }
 
     /**
-     * @dataProvider createUpdateSuiteInvalidRequestDataProvider
-     *
      * @param array<mixed> $requestParameters
      * @param array<mixed> $expectedResponseData
      */
+    #[DataProvider('createUpdateSuiteInvalidRequestDataProvider')]
     public function testUpdateInvalidSuiteRequest(array $requestParameters, array $expectedResponseData): void
     {
         $suiteId = $this->createSuite($this->sourceId, md5((string) rand()), []);
@@ -91,12 +91,11 @@ abstract class AbstractUpdateSuiteTest extends AbstractSuiteTest
     }
 
     /**
-     * @dataProvider updateSuccessDataProvider
-     *
      * @param callable(string, string): string                $sourceIdSelector
      * @param callable(string, string): array<string, string> $updateRequestParametersCreator
      * @param string[]                                        $initialSuiteTests
      */
+    #[DataProvider('updateSuccessDataProvider')]
     public function testUpdateSuccess(
         callable $sourceIdSelector,
         string $initialSuiteLabel,
