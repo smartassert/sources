@@ -16,6 +16,7 @@ abstract class AbstractFileSourceFileTest extends AbstractApplicationTest
 
     private FileSource $fileSource;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

@@ -21,6 +21,7 @@ class ProviderTest extends WebTestCase
     private YamlParser $yamlParser;
     private DirectoryListingFilter $listingFilter;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

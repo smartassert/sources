@@ -20,6 +20,7 @@ class ExecutorTest extends TestCase
 {
     private Executor $executor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

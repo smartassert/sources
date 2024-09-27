@@ -23,6 +23,7 @@ abstract class AbstractGetSerializedSuiteTest extends AbstractApplicationTest
     private SerializedSuiteRepository $serializedSuiteRepository;
     private SuiteRepository $suiteRepository;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

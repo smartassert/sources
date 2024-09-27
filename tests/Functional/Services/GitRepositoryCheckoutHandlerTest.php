@@ -14,6 +14,7 @@ class GitRepositoryCheckoutHandlerTest extends WebTestCase
 {
     private GitRepositoryCheckoutHandler $checkoutHandler;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

@@ -20,6 +20,7 @@ abstract class AbstractGetSuiteTest extends AbstractApplicationTest
     private FileSource $source;
     private SuiteRepository $suiteRepository;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

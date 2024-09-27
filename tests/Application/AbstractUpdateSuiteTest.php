@@ -17,6 +17,7 @@ abstract class AbstractUpdateSuiteTest extends AbstractSuiteTest
 
     private string $secondarySourceId;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

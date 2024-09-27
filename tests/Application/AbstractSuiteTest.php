@@ -10,6 +10,7 @@ abstract class AbstractSuiteTest extends AbstractApplicationTest
 {
     protected string $sourceId;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

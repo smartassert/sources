@@ -17,6 +17,7 @@ class ProviderTest extends WebTestCase
 {
     private Provider $provider;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

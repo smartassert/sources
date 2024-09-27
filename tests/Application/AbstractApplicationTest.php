@@ -39,6 +39,7 @@ abstract class AbstractApplicationTest extends WebTestCase
         self::$users = $users;
     }
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

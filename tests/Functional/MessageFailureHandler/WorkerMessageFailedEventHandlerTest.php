@@ -31,6 +31,7 @@ class WorkerMessageFailedEventHandlerTest extends WebTestCase
 
     private WorkerMessageFailedEventHandler $handler;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

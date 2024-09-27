@@ -23,6 +23,7 @@ abstract class AbstractInvalidSuiteUserTest extends AbstractApplicationTest
     private Suite $suite;
     private SerializedSuite $serializedSuite;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();
