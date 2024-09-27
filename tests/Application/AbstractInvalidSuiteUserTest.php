@@ -13,6 +13,7 @@ use App\Repository\SuiteRepository;
 use App\Request\SuiteRequest;
 use App\Services\EntityIdFactory;
 use App\Tests\Services\SourceOriginFactory;
+use App\Tests\Services\StringFactory;
 use App\Tests\Services\SuiteFactory;
 use Symfony\Component\Uid\Ulid;
 
@@ -68,7 +69,7 @@ abstract class AbstractInvalidSuiteUserTest extends AbstractApplicationTest
             $this->suite->id,
             [
                 SuiteRequest::PARAMETER_SOURCE_ID => $this->suite->id,
-                SuiteRequest::PARAMETER_LABEL => md5((string) rand()),
+                SuiteRequest::PARAMETER_LABEL => StringFactory::createRandom(),
                 SuiteRequest::PARAMETER_TESTS => [],
             ]
         );

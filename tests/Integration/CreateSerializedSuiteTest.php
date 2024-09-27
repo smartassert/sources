@@ -9,6 +9,7 @@ use App\Request\FileSourceRequest;
 use App\Request\SuiteRequest;
 use App\Services\DirectoryListingFilter;
 use App\Tests\Application\AbstractCreateSerializedSuiteTest;
+use App\Tests\Services\StringFactory;
 use League\Flysystem\FilesystemOperator;
 use Symfony\Component\Uid\Ulid;
 
@@ -69,7 +70,7 @@ class CreateSerializedSuiteTest extends AbstractCreateSerializedSuiteTest
             self::$apiTokens->get(self::USER_1_EMAIL),
             [
                 SuiteRequest::PARAMETER_SOURCE_ID => $fileSourceId,
-                SuiteRequest::PARAMETER_LABEL => md5((string) rand()),
+                SuiteRequest::PARAMETER_LABEL => StringFactory::createRandom(),
                 SuiteRequest::PARAMETER_TESTS => [
                     'test1.yaml',
                     'test2.yaml',

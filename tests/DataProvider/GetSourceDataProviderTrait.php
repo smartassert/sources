@@ -8,6 +8,7 @@ use App\Entity\FileSource;
 use App\Entity\GitSource;
 use App\Enum\Source\Type;
 use App\Tests\Services\SourceOriginFactory;
+use App\Tests\Services\StringFactory;
 use SmartAssert\TestAuthenticationProviderBundle\UserProvider;
 
 trait GetSourceDataProviderTrait
@@ -23,7 +24,7 @@ trait GetSourceDataProviderTrait
                     return SourceOriginFactory::create(
                         type: 'git',
                         userId: $users->get(self::USER_1_EMAIL)['id'],
-                        credentials: md5((string) rand()),
+                        credentials: StringFactory::createRandom(),
                     );
                 },
                 'expectedResponseDataCreator' => function (GitSource $source) {

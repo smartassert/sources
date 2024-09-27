@@ -18,6 +18,7 @@ use App\Exception\SourceRepositoryReaderNotFoundException;
 use App\Exception\UnableToWriteSerializedSuiteException;
 use App\Model\SourceRepositoryInterface;
 use App\Services\SerializeSuiteExceptionFactory\SerializeSuiteExceptionFactory;
+use App\Tests\Services\StringFactory;
 use League\Flysystem\PathTraversalDetected;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -50,36 +51,36 @@ class SerializeSuiteExceptionFactoryTest extends WebTestCase
      */
     public static function createDataProvider(): array
     {
-        $fileSource = new FileSource(md5((string) rand()), md5((string) rand()));
-        $fileSourceSuite = new Suite(md5((string) rand()));
+        $fileSource = new FileSource(StringFactory::createRandom(), StringFactory::createRandom());
+        $fileSourceSuite = new Suite(StringFactory::createRandom());
         $fileSourceSuite->setSource($fileSource);
 
-        $fileSourceSerializedSuite = new SerializedSuite(md5((string) rand()), $fileSourceSuite, []);
+        $fileSourceSerializedSuite = new SerializedSuite(StringFactory::createRandom(), $fileSourceSuite, []);
 
-        $gitSource = new GitSource(md5((string) rand()), md5((string) rand()));
-        $gitSourcePath = md5((string) rand());
+        $gitSource = new GitSource(StringFactory::createRandom(), StringFactory::createRandom());
+        $gitSourcePath = StringFactory::createRandom();
         $gitSource->setPath($gitSourcePath);
 
-        $gitSourceSuite = new Suite(md5((string) rand()));
+        $gitSourceSuite = new Suite(StringFactory::createRandom());
         $gitSourceSuite->setSource($gitSource);
 
-        $gitSourceSerializedSuite = new SerializedSuite(md5((string) rand()), $gitSourceSuite, []);
+        $gitSourceSerializedSuite = new SerializedSuite(StringFactory::createRandom(), $gitSourceSuite, []);
 
         $noSourceRepositoryCreatorException = new NoSourceRepositoryCreatorException($fileSource);
 
-        $pathTraversalDetectedPath = md5((string) rand());
+        $pathTraversalDetectedPath = StringFactory::createRandom();
         $pathTraversalDetectedException = PathTraversalDetected::forPath($pathTraversalDetectedPath);
 
         $unableToWriteSerializedSuiteException = new UnableToWriteSerializedSuiteException(
-            md5((string) rand()),
-            md5((string) rand()),
+            StringFactory::createRandom(),
+            StringFactory::createRandom(),
             new \Exception(),
         );
 
         $sourceRepository = \Mockery::mock(SourceRepositoryInterface::class);
         $sourceRepository
             ->shouldReceive('getRepositoryPath')
-            ->andReturn(md5((string) rand()))
+            ->andReturn(StringFactory::createRandom())
         ;
 
         $sourceRepositoryReaderNotFoundException = new SourceRepositoryReaderNotFoundException($sourceRepository);
@@ -87,7 +88,7 @@ class SerializeSuiteExceptionFactoryTest extends WebTestCase
         $gitRepositoryCloneException = new GitRepositoryException(
             new GitActionException(
                 GitActionException::ACTION_CLONE,
-                md5((string) rand())
+                StringFactory::createRandom()
             ),
         );
 
@@ -98,7 +99,7 @@ class SerializeSuiteExceptionFactoryTest extends WebTestCase
         $gitRepositoryCheckoutException = new GitRepositoryException(
             new GitActionException(
                 GitActionException::ACTION_CHECKOUT,
-                md5((string) rand())
+                StringFactory::createRandom()
             ),
         );
 

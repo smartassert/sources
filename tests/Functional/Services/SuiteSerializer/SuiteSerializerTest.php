@@ -15,6 +15,7 @@ use App\Services\EntityIdFactory;
 use App\Services\SuiteSerializer;
 use App\Tests\Services\FileStoreFixtureCreator;
 use App\Tests\Services\SourceOriginFactory;
+use App\Tests\Services\StringFactory;
 use App\Tests\Services\SuiteFactory;
 use League\Flysystem\FilesystemOperator;
 use SmartAssert\YamlFile\Exception\Collection\SerializeException;
@@ -57,7 +58,7 @@ class SuiteSerializerTest extends WebTestCase
         $source = \Mockery::mock(SourceInterface::class);
         $source
             ->shouldReceive('getId')
-            ->andReturn(md5((string) rand()))
+            ->andReturn(StringFactory::createRandom())
         ;
         $source
             ->shouldReceive('getType')

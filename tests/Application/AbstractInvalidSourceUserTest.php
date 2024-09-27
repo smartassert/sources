@@ -9,6 +9,7 @@ use App\Entity\GitSource;
 use App\Repository\SourceRepository;
 use App\Request\SuiteRequest;
 use App\Tests\Services\SourceOriginFactory;
+use App\Tests\Services\StringFactory;
 
 abstract class AbstractInvalidSourceUserTest extends AbstractApplicationTest
 {
@@ -111,7 +112,7 @@ abstract class AbstractInvalidSourceUserTest extends AbstractApplicationTest
             self::$apiTokens->get(self::USER_1_EMAIL),
             [
                 SuiteRequest::PARAMETER_SOURCE_ID => $this->fileSource->getId(),
-                SuiteRequest::PARAMETER_LABEL => md5((string) rand()),
+                SuiteRequest::PARAMETER_LABEL => StringFactory::createRandom(),
             ]
         );
 

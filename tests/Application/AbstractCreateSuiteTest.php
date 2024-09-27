@@ -8,6 +8,7 @@ use App\Entity\Suite;
 use App\Repository\SuiteRepository;
 use App\Request\SuiteRequest;
 use App\Tests\DataProvider\CreateUpdateSuiteDataProviderTrait;
+use App\Tests\Services\StringFactory;
 use PHPUnit\Framework\Attributes\DataProvider;
 
 abstract class AbstractCreateSuiteTest extends AbstractSuiteTest
@@ -91,17 +92,17 @@ abstract class AbstractCreateSuiteTest extends AbstractSuiteTest
         return [
             'no tests' => [
                 'requestParameters' => [
-                    SuiteRequest::PARAMETER_LABEL => md5((string) rand()),
+                    SuiteRequest::PARAMETER_LABEL => StringFactory::createRandom(),
                     SuiteRequest::PARAMETER_TESTS => [],
                 ],
             ],
             'has tests' => [
                 'requestParameters' => [
-                    SuiteRequest::PARAMETER_LABEL => md5((string) rand()),
+                    SuiteRequest::PARAMETER_LABEL => StringFactory::createRandom(),
                     SuiteRequest::PARAMETER_TESTS => [
-                        'Test/test' . md5((string) rand()) . '.yaml',
-                        'Test/test' . md5((string) rand()) . '.yaml',
-                        'Test/test' . md5((string) rand()) . '.yaml',
+                        'Test/test' . StringFactory::createRandom() . '.yaml',
+                        'Test/test' . StringFactory::createRandom() . '.yaml',
+                        'Test/test' . StringFactory::createRandom() . '.yaml',
                     ],
                 ],
             ],
@@ -142,7 +143,7 @@ abstract class AbstractCreateSuiteTest extends AbstractSuiteTest
                 'requestParameters' => [
                     SuiteRequest::PARAMETER_LABEL => 'label',
                     SuiteRequest::PARAMETER_TESTS => [
-                        'Test/test' . md5((string) rand()) . '.yaml',
+                        'Test/test' . StringFactory::createRandom() . '.yaml',
                     ],
                 ],
             ],
@@ -158,9 +159,9 @@ abstract class AbstractCreateSuiteTest extends AbstractSuiteTest
     public function testCreateMultipleSuitesForSameSource(): void
     {
         $labels = [
-            md5((string) rand()),
-            md5((string) rand()),
-            md5((string) rand()),
+            StringFactory::createRandom(),
+            StringFactory::createRandom(),
+            StringFactory::createRandom(),
         ];
 
         $createdSuiteCount = 0;
@@ -172,7 +173,7 @@ abstract class AbstractCreateSuiteTest extends AbstractSuiteTest
                     SuiteRequest::PARAMETER_SOURCE_ID => $this->sourceId,
                     SuiteRequest::PARAMETER_LABEL => $label,
                     SuiteRequest::PARAMETER_TESTS => [
-                        'Test/test' . md5((string) rand()) . '.yaml',
+                        'Test/test' . StringFactory::createRandom() . '.yaml',
                     ],
                 ]
             );
@@ -192,7 +193,7 @@ abstract class AbstractCreateSuiteTest extends AbstractSuiteTest
 
     public function testCreateSuiteNonUniqueLabelSameSourceDifferentTests(): void
     {
-        $label = md5((string) rand());
+        $label = StringFactory::createRandom();
 
         $firstResponse = $this->applicationClient->makeCreateSuiteRequest(
             self::$apiTokens->get(self::USER_1_EMAIL),
@@ -200,7 +201,7 @@ abstract class AbstractCreateSuiteTest extends AbstractSuiteTest
                 SuiteRequest::PARAMETER_SOURCE_ID => $this->sourceId,
                 SuiteRequest::PARAMETER_LABEL => $label,
                 SuiteRequest::PARAMETER_TESTS => [
-                    'Test/test' . md5((string) rand()) . '.yaml',
+                    'Test/test' . StringFactory::createRandom() . '.yaml',
                 ],
             ]
         );
@@ -213,7 +214,7 @@ abstract class AbstractCreateSuiteTest extends AbstractSuiteTest
                 SuiteRequest::PARAMETER_SOURCE_ID => $this->sourceId,
                 SuiteRequest::PARAMETER_LABEL => $label,
                 SuiteRequest::PARAMETER_TESTS => [
-                    'Test/test' . md5((string) rand()) . '.yaml',
+                    'Test/test' . StringFactory::createRandom() . '.yaml',
                 ],
             ]
         );
@@ -234,7 +235,7 @@ abstract class AbstractCreateSuiteTest extends AbstractSuiteTest
 
     public function testCreateSuiteNonUniqueLabelDifferentSource(): void
     {
-        $label = md5((string) rand());
+        $label = StringFactory::createRandom();
 
         $firstResponse = $this->applicationClient->makeCreateSuiteRequest(
             self::$apiTokens->get(self::USER_1_EMAIL),
@@ -242,7 +243,7 @@ abstract class AbstractCreateSuiteTest extends AbstractSuiteTest
                 SuiteRequest::PARAMETER_SOURCE_ID => $this->createSource(self::USER_1_EMAIL),
                 SuiteRequest::PARAMETER_LABEL => $label,
                 SuiteRequest::PARAMETER_TESTS => [
-                    'Test/test' . md5((string) rand()) . '.yaml',
+                    'Test/test' . StringFactory::createRandom() . '.yaml',
                 ],
             ]
         );
@@ -255,7 +256,7 @@ abstract class AbstractCreateSuiteTest extends AbstractSuiteTest
                 SuiteRequest::PARAMETER_SOURCE_ID => $this->createSource(self::USER_1_EMAIL),
                 SuiteRequest::PARAMETER_LABEL => $label,
                 SuiteRequest::PARAMETER_TESTS => [
-                    'Test/test' . md5((string) rand()) . '.yaml',
+                    'Test/test' . StringFactory::createRandom() . '.yaml',
                 ],
             ]
         );
@@ -276,7 +277,7 @@ abstract class AbstractCreateSuiteTest extends AbstractSuiteTest
 
     public function testCreateSuiteNonUniqueLabelDifferentUser(): void
     {
-        $label = md5((string) rand());
+        $label = StringFactory::createRandom();
 
         $firstResponse = $this->applicationClient->makeCreateSuiteRequest(
             self::$apiTokens->get(self::USER_1_EMAIL),
@@ -303,7 +304,7 @@ abstract class AbstractCreateSuiteTest extends AbstractSuiteTest
 
     public function testCreateSuiteWithLabelOfDeletedSuite(): void
     {
-        $label = md5((string) rand());
+        $label = StringFactory::createRandom();
 
         $firstCreateResponse = $this->applicationClient->makeCreateSuiteRequest(
             self::$apiTokens->get(self::USER_1_EMAIL),
@@ -311,7 +312,7 @@ abstract class AbstractCreateSuiteTest extends AbstractSuiteTest
                 SuiteRequest::PARAMETER_SOURCE_ID => $this->sourceId,
                 SuiteRequest::PARAMETER_LABEL => $label,
                 SuiteRequest::PARAMETER_TESTS => [
-                    'Test/test' . md5((string) rand()) . '.yaml',
+                    'Test/test' . StringFactory::createRandom() . '.yaml',
                 ],
             ]
         );
@@ -334,7 +335,7 @@ abstract class AbstractCreateSuiteTest extends AbstractSuiteTest
                 SuiteRequest::PARAMETER_SOURCE_ID => $this->sourceId,
                 SuiteRequest::PARAMETER_LABEL => $label,
                 SuiteRequest::PARAMETER_TESTS => [
-                    'Test/test' . md5((string) rand()) . '.yaml',
+                    'Test/test' . StringFactory::createRandom() . '.yaml',
                 ],
             ]
         );
@@ -347,7 +348,7 @@ abstract class AbstractCreateSuiteTest extends AbstractSuiteTest
         $response = $this->applicationClient->makeCreateSuiteRequest(
             self::$apiTokens->get(self::USER_1_EMAIL),
             [
-                SuiteRequest::PARAMETER_LABEL => md5((string) rand()),
+                SuiteRequest::PARAMETER_LABEL => StringFactory::createRandom(),
                 SuiteRequest::PARAMETER_TESTS => [],
             ],
         );

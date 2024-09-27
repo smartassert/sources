@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Application;
 
 use App\Request\FileSourceRequest;
+use App\Tests\Services\StringFactory;
 
 abstract class AbstractSuiteTest extends AbstractApplicationTest
 {
@@ -23,7 +24,7 @@ abstract class AbstractSuiteTest extends AbstractApplicationTest
      */
     protected function createSource(string $userEmail, ?string $label = null): string
     {
-        $label = is_string($label) ? $label : md5((string) rand());
+        $label = is_string($label) ? $label : StringFactory::createRandom();
 
         $createSourceResponse = $this->applicationClient->makeCreateFileSourceRequest(
             self::$apiTokens->get($userEmail),

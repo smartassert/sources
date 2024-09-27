@@ -35,11 +35,11 @@ class SourceOriginFactory
             $source = new GitSource((new EntityIdFactory())->create(), $userId);
         }
 
-        $label = is_string($label) ? $label : md5((string) rand());
+        $label = is_string($label) ? $label : StringFactory::createRandom();
         $source->setLabel($label);
 
         if ($source instanceof GitSource) {
-            $hostUrl = is_string($hostUrl) ? $hostUrl : 'https://example.com/' . md5((string) rand()) . '.git';
+            $hostUrl = is_string($hostUrl) ? $hostUrl : 'https://example.com/' . StringFactory::createRandom() . '.git';
             $source->setHostUrl($hostUrl);
 
             $path = is_string($path) ? $path : '/';

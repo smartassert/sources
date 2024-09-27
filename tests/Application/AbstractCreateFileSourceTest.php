@@ -11,6 +11,7 @@ use App\Request\FileSourceRequest;
 use App\Request\GitSourceRequest;
 use App\Tests\DataProvider\CreateUpdateFileSourceDataProviderTrait;
 use App\Tests\Services\SourceRequestTypeMatcher;
+use App\Tests\Services\StringFactory;
 use PHPUnit\Framework\Attributes\DataProvider;
 
 abstract class AbstractCreateFileSourceTest extends AbstractApplicationTest
@@ -73,7 +74,7 @@ abstract class AbstractCreateFileSourceTest extends AbstractApplicationTest
      */
     public static function createFileSourceSuccessDataProvider(): array
     {
-        $label = md5((string) rand());
+        $label = StringFactory::createRandom();
 
         return [
             'file source' => [
@@ -91,7 +92,7 @@ abstract class AbstractCreateFileSourceTest extends AbstractApplicationTest
     public function testCreateIsIdempotent(): void
     {
         $requestParameters = [
-            FileSourceRequest::PARAMETER_LABEL => md5((string) rand()),
+            FileSourceRequest::PARAMETER_LABEL => StringFactory::createRandom(),
         ];
 
         $firstResponse = $this->applicationClient->makeCreateFileSourceRequest(
@@ -113,7 +114,7 @@ abstract class AbstractCreateFileSourceTest extends AbstractApplicationTest
     public function testCreateWithLabelOfDeletedSource(): void
     {
         $requestParameters = [
-            FileSourceRequest::PARAMETER_LABEL => md5((string) rand()),
+            FileSourceRequest::PARAMETER_LABEL => StringFactory::createRandom(),
         ];
 
         $firstCreateResponse = $this->applicationClient->makeCreateFileSourceRequest(
@@ -195,15 +196,15 @@ abstract class AbstractCreateFileSourceTest extends AbstractApplicationTest
      */
     public static function createSourceWithNonUniqueLabelDataProvider(): array
     {
-        $label = md5((string) rand());
+        $label = StringFactory::createRandom();
 
         return [
             'file source with label of git source' => [
                 'label' => $label,
                 'targetCreateParameters' => [
                     GitSourceRequest::PARAMETER_LABEL => $label,
-                    GitSourceRequest::PARAMETER_HOST_URL => md5((string) rand()),
-                    GitSourceRequest::PARAMETER_PATH => md5((string) rand()),
+                    GitSourceRequest::PARAMETER_HOST_URL => StringFactory::createRandom(),
+                    GitSourceRequest::PARAMETER_PATH => StringFactory::createRandom(),
                 ],
                 'conflictCreateParameters' => [
                     GitSourceRequest::PARAMETER_LABEL => $label,

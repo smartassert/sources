@@ -14,6 +14,7 @@ use App\Tests\DataProvider\CreateUpdateGitSourceDataProviderTrait;
 use App\Tests\Services\EntityRemover;
 use App\Tests\Services\SourceOriginFactory;
 use App\Tests\Services\SourceRequestTypeMatcher;
+use App\Tests\Services\StringFactory;
 use PHPUnit\Framework\Attributes\DataProvider;
 use SmartAssert\TestAuthenticationProviderBundle\UserProvider;
 use Symfony\Component\Uid\Ulid;
@@ -125,42 +126,42 @@ abstract class AbstractUpdateGitSourceTest extends AbstractApplicationTest
      */
     public static function updateNewLabelNotUniqueDataProvider(): array
     {
-        $targetSourceLabel = md5((string) rand());
-        $conflictSourceLabel = md5((string) rand());
+        $targetSourceLabel = StringFactory::createRandom();
+        $conflictSourceLabel = StringFactory::createRandom();
 
         return [
             'git source with label of file source' => [
                 'conflictSourceLabel' => $conflictSourceLabel,
                 'targetCreateParameters' => [
                     GitSourceRequest::PARAMETER_LABEL => $targetSourceLabel,
-                    GitSourceRequest::PARAMETER_HOST_URL => md5((string) rand()),
-                    GitSourceRequest::PARAMETER_PATH => md5((string) rand()),
+                    GitSourceRequest::PARAMETER_HOST_URL => StringFactory::createRandom(),
+                    GitSourceRequest::PARAMETER_PATH => StringFactory::createRandom(),
                 ],
                 'conflictCreateParameters' => [
                     GitSourceRequest::PARAMETER_LABEL => $conflictSourceLabel,
                 ],
                 'updateParameters' => [
                     GitSourceRequest::PARAMETER_LABEL => $conflictSourceLabel,
-                    GitSourceRequest::PARAMETER_HOST_URL => md5((string) rand()),
-                    GitSourceRequest::PARAMETER_PATH => md5((string) rand()),
+                    GitSourceRequest::PARAMETER_HOST_URL => StringFactory::createRandom(),
+                    GitSourceRequest::PARAMETER_PATH => StringFactory::createRandom(),
                 ],
             ],
             'git source with label of git source' => [
                 'conflictSourceLabel' => $conflictSourceLabel,
                 'targetCreateParameters' => [
                     GitSourceRequest::PARAMETER_LABEL => $targetSourceLabel,
-                    GitSourceRequest::PARAMETER_HOST_URL => md5((string) rand()),
-                    GitSourceRequest::PARAMETER_PATH => md5((string) rand()),
+                    GitSourceRequest::PARAMETER_HOST_URL => StringFactory::createRandom(),
+                    GitSourceRequest::PARAMETER_PATH => StringFactory::createRandom(),
                 ],
                 'conflictCreateParameters' => [
                     GitSourceRequest::PARAMETER_LABEL => $conflictSourceLabel,
-                    GitSourceRequest::PARAMETER_HOST_URL => md5((string) rand()),
-                    GitSourceRequest::PARAMETER_PATH => md5((string) rand()),
+                    GitSourceRequest::PARAMETER_HOST_URL => StringFactory::createRandom(),
+                    GitSourceRequest::PARAMETER_PATH => StringFactory::createRandom(),
                 ],
                 'updateParameters' => [
                     GitSourceRequest::PARAMETER_LABEL => $conflictSourceLabel,
-                    GitSourceRequest::PARAMETER_HOST_URL => md5((string) rand()),
-                    GitSourceRequest::PARAMETER_PATH => md5((string) rand()),
+                    GitSourceRequest::PARAMETER_HOST_URL => StringFactory::createRandom(),
+                    GitSourceRequest::PARAMETER_PATH => StringFactory::createRandom(),
                 ],
             ],
         ];
@@ -345,8 +346,8 @@ abstract class AbstractUpdateGitSourceTest extends AbstractApplicationTest
                     );
                 },
                 'additionalUpdateParameters' => [
-                    GitSourceRequest::PARAMETER_HOST_URL => md5((string) rand()),
-                    GitSourceRequest::PARAMETER_PATH => md5((string) rand()),
+                    GitSourceRequest::PARAMETER_HOST_URL => StringFactory::createRandom(),
+                    GitSourceRequest::PARAMETER_PATH => StringFactory::createRandom(),
                 ],
             ],
             'git source using label of deleted git source' => [
@@ -365,8 +366,8 @@ abstract class AbstractUpdateGitSourceTest extends AbstractApplicationTest
                     );
                 },
                 'additionalUpdateParameters' => [
-                    GitSourceRequest::PARAMETER_HOST_URL => md5((string) rand()),
-                    GitSourceRequest::PARAMETER_PATH => md5((string) rand()),
+                    GitSourceRequest::PARAMETER_HOST_URL => StringFactory::createRandom(),
+                    GitSourceRequest::PARAMETER_PATH => StringFactory::createRandom(),
                 ],
             ],
         ];
@@ -386,8 +387,8 @@ abstract class AbstractUpdateGitSourceTest extends AbstractApplicationTest
             $source->getId(),
             [
                 GitSourceRequest::PARAMETER_LABEL => 'new label',
-                GitSourceRequest::PARAMETER_HOST_URL => md5((string) rand()),
-                GitSourceRequest::PARAMETER_PATH => md5((string) rand()),
+                GitSourceRequest::PARAMETER_HOST_URL => StringFactory::createRandom(),
+                GitSourceRequest::PARAMETER_PATH => StringFactory::createRandom(),
             ]
         );
 

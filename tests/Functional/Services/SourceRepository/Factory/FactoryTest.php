@@ -17,6 +17,7 @@ use App\Services\SourceRepository\Factory\FileSourceHandler;
 use App\Services\SourceRepository\Factory\GitSourceHandler;
 use App\Tests\Services\FileStoreFixtureCreator;
 use App\Tests\Services\SourceOriginFactory;
+use App\Tests\Services\StringFactory;
 use League\Flysystem\FilesystemOperator;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
@@ -48,7 +49,7 @@ class FactoryTest extends WebTestCase
 
     public function testCreateForUnknownSource(): void
     {
-        $sourceId = md5((string) rand());
+        $sourceId = StringFactory::createRandom();
         $sourceType = Type::FILE;
 
         $source = \Mockery::mock(SourceInterface::class);

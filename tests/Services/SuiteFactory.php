@@ -23,7 +23,7 @@ class SuiteFactory
 
         $suite->setSource($source);
 
-        $label = is_string($label) ? $label : md5((string) rand());
+        $label = is_string($label) ? $label : StringFactory::createRandom();
         $suite->setLabel($label);
 
         $tests = is_array($tests) ? $tests : [];

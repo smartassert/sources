@@ -8,6 +8,7 @@ use App\Enum\SerializedSuite\State;
 use App\Request\GitSourceRequest;
 use App\Request\SuiteRequest;
 use App\Tests\Application\AbstractApplicationTest;
+use App\Tests\Services\StringFactory;
 use Symfony\Component\Uid\Ulid;
 
 class SerializeSuiteFailureTest extends AbstractApplicationTest
@@ -17,7 +18,7 @@ class SerializeSuiteFailureTest extends AbstractApplicationTest
 
     public function testSerializeSuiteFailure(): void
     {
-        $label = md5((string) rand());
+        $label = StringFactory::createRandom();
         $hostUrlPort = rand(9000, 9999);
         $hostUrl = 'https://app:' . $hostUrlPort . '/repository.git';
         $path = '/';
@@ -38,7 +39,7 @@ class SerializeSuiteFailureTest extends AbstractApplicationTest
             self::$apiTokens->get(self::USER_1_EMAIL),
             [
                 SuiteRequest::PARAMETER_SOURCE_ID => $sourceId,
-                SuiteRequest::PARAMETER_LABEL => md5((string) rand()),
+                SuiteRequest::PARAMETER_LABEL => StringFactory::createRandom(),
                 SuiteRequest::PARAMETER_TESTS => [
                     'test1.yaml',
                     'test2.yaml',
