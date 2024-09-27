@@ -215,6 +215,39 @@ abstract class AbstractFileSourceFileTest extends AbstractApplicationTest
         );
     }
 
+    public function testAddFileToDeletedSource(): void
+    {
+        $initialContent = md5((string) rand());
+
+        $this->fileSource->setDeletedAt(new \DateTimeImmutable());
+
+        $sourceRepository = self::getContainer()->get(SourceRepository::class);
+        \assert($sourceRepository instanceof SourceRepository);
+        $sourceRepository->save($this->fileSource);
+
+        $response = $this->applicationClient->makeAddFileRequest(
+            self::$apiTokens->get(self::USER_1_EMAIL),
+            $this->fileSource->getId(),
+            self::FILENAME,
+            $initialContent
+        );
+
+        self::assertSame(405, $response->getStatusCode());
+
+        $expectedResponseData = [
+            'class' => 'modify_read_only',
+            'entity' => [
+                'id' => $this->fileSource->getId(),
+                'type' => 'file-source',
+            ],
+        ];
+
+        self::assertJsonStringEqualsJsonString(
+            (string) json_encode($expectedResponseData),
+            $response->getBody()->getContents(),
+        );
+    }
+
     #[DataProvider('yamlFileInvalidRequestDataProvider')]
     public function testReadFileInvalidRequest(string $filename): void
     {

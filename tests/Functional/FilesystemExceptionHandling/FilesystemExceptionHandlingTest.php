@@ -507,6 +507,11 @@ class FilesystemExceptionHandlingTest extends WebTestCase
             ->andReturn($sourceId)
         ;
 
+        $source
+            ->shouldReceive('getDeletedAt')
+            ->andReturnNull()
+        ;
+
         return $source;
     }
 
