@@ -17,6 +17,7 @@ use App\Repository\SourceRepository;
 use App\Repository\SuiteRepository;
 use App\Tests\Services\EntityRemover;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
+use PHPUnit\Framework\Attributes\DataProvider;
 use SmartAssert\WorkerMessageFailedEventBundle\ExceptionHandlerInterface;
 use SmartAssert\WorkerMessageFailedEventBundle\WorkerMessageFailedEventHandler;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -44,9 +45,7 @@ class WorkerMessageFailedEventHandlerTest extends WebTestCase
         }
     }
 
-    /**
-     * @dataProvider invokeDoesNotHandleDataProvider
-     */
+    #[DataProvider('invokeDoesNotHandleDataProvider')]
     public function testInvokeDoesNotHandle(WorkerMessageFailedEvent $event): void
     {
         $exceptionCollectionHandler = \Mockery::mock(ExceptionHandlerInterface::class);
@@ -79,10 +78,9 @@ class WorkerMessageFailedEventHandlerTest extends WebTestCase
     }
 
     /**
-     * @dataProvider handleNoSerializedSuiteStateChangeDataProvider
-     *
      * @param callable(SerializedSuite): \Exception[] $handlerFailedExceptionNestedExceptionsCreator
      */
+    #[DataProvider('handleNoSerializedSuiteStateChangeDataProvider')]
     public function testHandleNoSerializedSuiteStateChange(
         callable $handlerFailedExceptionNestedExceptionsCreator
     ): void {

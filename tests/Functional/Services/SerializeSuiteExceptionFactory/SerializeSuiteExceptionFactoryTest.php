@@ -19,6 +19,7 @@ use App\Exception\UnableToWriteSerializedSuiteException;
 use App\Model\SourceRepositoryInterface;
 use App\Services\SerializeSuiteExceptionFactory\SerializeSuiteExceptionFactory;
 use League\Flysystem\PathTraversalDetected;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 class SerializeSuiteExceptionFactoryTest extends WebTestCase
@@ -34,9 +35,7 @@ class SerializeSuiteExceptionFactoryTest extends WebTestCase
         $this->serializeSuiteExceptionFactory = $serializeSuiteExceptionFactory;
     }
 
-    /**
-     * @dataProvider createDataProvider
-     */
+    #[DataProvider('createDataProvider')]
     public function testCreate(
         SerializedSuite $serializedSuite,
         \Throwable $throwable,

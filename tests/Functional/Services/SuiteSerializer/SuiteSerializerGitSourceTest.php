@@ -18,6 +18,7 @@ use App\Tests\Services\SuiteFactory;
 use League\Flysystem\FilesystemOperator;
 use League\Flysystem\FilesystemReader;
 use League\Flysystem\FilesystemWriter;
+use PHPUnit\Framework\Attributes\DataProvider;
 use SmartAssert\WorkerJobSource\JobSourceSerializer;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Yaml\Parser as YamlParser;
@@ -50,9 +51,7 @@ class SuiteSerializerGitSourceTest extends WebTestCase
         $this->fixtureStorage = $fixtureStorage;
     }
 
-    /**
-     * @dataProvider writeSuccessDataProvider
-     */
+    #[DataProvider('writeSuccessDataProvider')]
     public function testWriteSuccess(GitSource $source, string $expectedFixture): void
     {
         $idFactory = new EntityIdFactory();

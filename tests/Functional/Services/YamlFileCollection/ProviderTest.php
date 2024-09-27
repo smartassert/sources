@@ -10,6 +10,7 @@ use App\Services\YamlFileCollection\Provider;
 use App\Tests\Services\FileStoreFixtureCreator;
 use App\Tests\Services\SourceOriginFactory;
 use League\Flysystem\FilesystemOperator;
+use PHPUnit\Framework\Attributes\DataProvider;
 use SmartAssert\YamlFile\YamlFile;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Yaml\Parser as YamlParser;
@@ -38,10 +39,9 @@ class ProviderTest extends WebTestCase
     }
 
     /**
-     * @dataProvider getYamlFilesSuccessDataProvider
-     *
      * @param YamlFile[] $expectedYamlFiles
      */
+    #[DataProvider('getYamlFilesSuccessDataProvider')]
     public function testGetYamlFilesSuccess(string $fixtureSet, string $relativePath, array $expectedYamlFiles): void
     {
         $storage = self::getContainer()->get('file_source.storage');

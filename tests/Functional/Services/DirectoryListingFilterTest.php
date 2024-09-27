@@ -9,6 +9,7 @@ use App\Services\DirectoryListingFilter;
 use App\Tests\Services\FileStoreFixtureCreator;
 use App\Tests\Services\SourceOriginFactory;
 use League\Flysystem\FilesystemOperator;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 class DirectoryListingFilterTest extends WebTestCase
@@ -25,11 +26,10 @@ class DirectoryListingFilterTest extends WebTestCase
     }
 
     /**
-     * @dataProvider listDataProvider
-     *
      * @param string[] $extensions
      * @param string[] $expectedRelativePathNames
      */
+    #[DataProvider('listDataProvider')]
     public function testListSuccess(
         string $fixtureSet,
         string $relativePath,

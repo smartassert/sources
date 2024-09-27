@@ -10,16 +10,16 @@ use App\Entity\SourceInterface;
 use App\Enum\Source\Type;
 use App\Repository\SourceRepository;
 use App\Tests\Services\SourceOriginFactory;
+use PHPUnit\Framework\Attributes\DataProvider;
 use SmartAssert\TestAuthenticationProviderBundle\UserProvider;
 
 abstract class AbstractListSourcesTest extends AbstractApplicationTest
 {
     /**
-     * @dataProvider listSuccessDataProvider
-     *
      * @param callable(UserProvider): SourceInterface[]          $sourcesCreator
      * @param callable(SourceInterface[] $sources): array<mixed> $expectedResponseDataCreator
      */
+    #[DataProvider('listSuccessDataProvider')]
     public function testListSuccess(
         callable $sourcesCreator,
         callable $expectedResponseDataCreator,

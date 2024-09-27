@@ -15,6 +15,7 @@ use App\Tests\DataProvider\CreateUpdateFileSourceDataProviderTrait;
 use App\Tests\Services\EntityRemover;
 use App\Tests\Services\SourceOriginFactory;
 use App\Tests\Services\SourceRequestTypeMatcher;
+use PHPUnit\Framework\Attributes\DataProvider;
 use SmartAssert\TestAuthenticationProviderBundle\UserProvider;
 use Symfony\Component\Uid\Ulid;
 
@@ -38,11 +39,10 @@ abstract class AbstractUpdateFileSourceTest extends AbstractApplicationTest
     }
 
     /**
-     * @dataProvider createUpdateFileSourceInvalidRequestDataProvider
-     *
      * @param array<string, string> $requestParameters
      * @param array<mixed>          $expectedResponseData
      */
+    #[DataProvider('createUpdateFileSourceInvalidRequestDataProvider')]
     public function testUpdateInvalidRequest(
         array $requestParameters,
         array $expectedResponseData
@@ -64,12 +64,11 @@ abstract class AbstractUpdateFileSourceTest extends AbstractApplicationTest
     }
 
     /**
-     * @dataProvider updateNewLabelNotUniqueDataProvider
-     *
      * @param array<string, string> $targetCreateParameters
      * @param array<string, string> $conflictCreateParameters
      * @param array<string, string> $updateParameters
      */
+    #[DataProvider('updateNewLabelNotUniqueDataProvider')]
     public function testUpdateNewLabelNotUnique(
         string $conflictSourceLabel,
         array $targetCreateParameters,
@@ -160,12 +159,11 @@ abstract class AbstractUpdateFileSourceTest extends AbstractApplicationTest
     }
 
     /**
-     * @dataProvider updateSuccessDataProvider
-     *
      * @param callable(UserProvider): SourceInterface $sourceCreator
      * @param array<string, string>                   $payload
      * @param callable(SourceInterface): array<mixed> $expectedResponseDataCreator
      */
+    #[DataProvider('updateSuccessDataProvider')]
     public function testUpdateSuccess(
         callable $sourceCreator,
         array $payload,
@@ -215,12 +213,11 @@ abstract class AbstractUpdateFileSourceTest extends AbstractApplicationTest
     }
 
     /**
-     * @dataProvider updateNewLabelUsedByDeletedSourceDataProvider
-     *
      * @param callable(UserProvider): SourceInterface $targetSourceCreator
      * @param callable(UserProvider): SourceInterface $deletedSourceCreator
      * @param array<string, string>                   $additionalUpdateParameters
      */
+    #[DataProvider('updateNewLabelUsedByDeletedSourceDataProvider')]
     public function testUpdateNewLabelUsedByDeletedSource(
         callable $targetSourceCreator,
         callable $deletedSourceCreator,

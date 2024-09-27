@@ -12,6 +12,7 @@ use App\Tests\Services\EntityRemover;
 use App\Tests\Services\SourceOriginFactory;
 use Doctrine\ORM\EntityManagerInterface;
 use League\Flysystem\FilesystemOperator;
+use PHPUnit\Framework\Attributes\DataProvider;
 use SmartAssert\TestAuthenticationProviderBundle\UserProvider;
 use Symfony\Component\Uid\Ulid;
 
@@ -41,11 +42,10 @@ abstract class AbstractDeleteSourceTest extends AbstractApplicationTest
     }
 
     /**
-     * @dataProvider getSourceDataProvider
-     *
      * @param callable(UserProvider): SourceInterface         $sourceCreator
      * @param callable(SourceInterface $source): array<mixed> $expectedResponseDataCreator
      */
+    #[DataProvider('getSourceDataProvider')]
     public function testDeleteSuccess(callable $sourceCreator, callable $expectedResponseDataCreator): void
     {
         $source = $sourceCreator(self::$users);

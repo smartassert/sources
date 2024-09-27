@@ -8,17 +8,17 @@ use App\Entity\Suite;
 use App\Repository\SuiteRepository;
 use App\Request\SuiteRequest;
 use App\Tests\DataProvider\CreateUpdateSuiteDataProviderTrait;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 abstract class AbstractCreateSuiteTest extends AbstractSuiteTest
 {
     use CreateUpdateSuiteDataProviderTrait;
 
     /**
-     * @dataProvider createUpdateSuiteInvalidRequestDataProvider
-     *
      * @param array<mixed> $requestParameters
      * @param array<mixed> $expectedResponseData
      */
+    #[DataProvider('createUpdateSuiteInvalidRequestDataProvider')]
     public function testCreateInvalidSuiteRequest(array $requestParameters, array $expectedResponseData): void
     {
         $response = $this->applicationClient->makeCreateSuiteRequest(
@@ -41,10 +41,9 @@ abstract class AbstractCreateSuiteTest extends AbstractSuiteTest
     }
 
     /**
-     * @dataProvider createSuccessDataProvider
-     *
      * @param array<string, string> $requestParameters
      */
+    #[DataProvider('createSuccessDataProvider')]
     public function testCreateSuccess(array $requestParameters): void
     {
         $response = $this->applicationClient->makeCreateSuiteRequest(
@@ -110,10 +109,9 @@ abstract class AbstractCreateSuiteTest extends AbstractSuiteTest
     }
 
     /**
-     * @dataProvider createIsIdempotentDataProvider
-     *
      * @param array<mixed> $requestParameters
      */
+    #[DataProvider('createIsIdempotentDataProvider')]
     public function testCreateIsIdempotent(array $requestParameters): void
     {
         $requestParameters = array_merge([SuiteRequest::PARAMETER_SOURCE_ID => $this->sourceId], $requestParameters);

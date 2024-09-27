@@ -14,6 +14,7 @@ use App\Repository\SuiteRepository;
 use App\Services\EntityIdFactory;
 use App\Tests\Services\SourceOriginFactory;
 use App\Tests\Services\SuiteFactory;
+use PHPUnit\Framework\Attributes\DataProvider;
 use SmartAssert\TestAuthenticationProviderBundle\UserProvider;
 
 abstract class AbstractGetSerializedSuiteTest extends AbstractApplicationTest
@@ -40,14 +41,13 @@ abstract class AbstractGetSerializedSuiteTest extends AbstractApplicationTest
     }
 
     /**
-     * @dataProvider serializeSuccessDataProvider
-     *
      * @param callable(UserProvider): SourceInterface $sourceCreator
      * @param callable(SourceInterface): Suite        $suiteCreator
      * @param callable(Suite): SerializedSuite        $serializedSuiteCreator
      * @param array<string, string>                   $payload
      * @param callable(SerializedSuite): array<mixed> $expectedResponseDataCreator
      */
+    #[DataProvider('serializeSuccessDataProvider')]
     public function testGetSuccess(
         callable $sourceCreator,
         callable $suiteCreator,

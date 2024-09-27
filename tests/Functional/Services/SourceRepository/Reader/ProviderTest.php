@@ -10,6 +10,7 @@ use App\Model\SourceRepositoryInterface;
 use App\Model\UserGitRepository;
 use App\Services\SourceRepository\Reader\Provider;
 use League\Flysystem\FilesystemReader;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 class ProviderTest extends WebTestCase
@@ -34,9 +35,7 @@ class ProviderTest extends WebTestCase
         $this->provider->find($sourceRepository);
     }
 
-    /**
-     * @dataProvider findSuccessDataProvider
-     */
+    #[DataProvider('findSuccessDataProvider')]
     public function testFindSuccess(
         SourceRepositoryInterface $sourceRepository,
         string $expectedReaderServiceId,

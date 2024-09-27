@@ -5,14 +5,13 @@ declare(strict_types=1);
 namespace App\Tests\Application;
 
 use App\Services\EntityIdFactory;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 abstract class AbstractUnauthorizedUserTest extends AbstractApplicationTest
 {
     private const FILENAME = 'filename.yaml';
 
-    /**
-     * @dataProvider unauthorizedUserDataProvider
-     */
+    #[DataProvider('unauthorizedUserDataProvider')]
     public function testAddFileUnauthorizedUser(?string $token): void
     {
         $response = $this->applicationClient->makeAddFileRequest(
@@ -25,9 +24,7 @@ abstract class AbstractUnauthorizedUserTest extends AbstractApplicationTest
         $this->responseAsserter->assertUnauthorizedResponse($response);
     }
 
-    /**
-     * @dataProvider unauthorizedUserDataProvider
-     */
+    #[DataProvider('unauthorizedUserDataProvider')]
     public function testRemoveFileUnauthorizedUser(?string $token): void
     {
         $response = $this->applicationClient->makeRemoveFileRequest(
@@ -39,9 +36,7 @@ abstract class AbstractUnauthorizedUserTest extends AbstractApplicationTest
         $this->responseAsserter->assertUnauthorizedResponse($response);
     }
 
-    /**
-     * @dataProvider unauthorizedUserDataProvider
-     */
+    #[DataProvider('unauthorizedUserDataProvider')]
     public function testReadFileUnauthorizedUser(?string $token): void
     {
         $response = $this->applicationClient->makeRemoveFileRequest(
@@ -53,9 +48,7 @@ abstract class AbstractUnauthorizedUserTest extends AbstractApplicationTest
         $this->responseAsserter->assertUnauthorizedResponse($response);
     }
 
-    /**
-     * @dataProvider unauthorizedUserDataProvider
-     */
+    #[DataProvider('unauthorizedUserDataProvider')]
     public function testCreateFileSourceUnauthorizedUser(?string $token): void
     {
         $response = $this->applicationClient->makeCreateFileSourceRequest(
@@ -66,9 +59,7 @@ abstract class AbstractUnauthorizedUserTest extends AbstractApplicationTest
         $this->responseAsserter->assertUnauthorizedResponse($response);
     }
 
-    /**
-     * @dataProvider unauthorizedUserDataProvider
-     */
+    #[DataProvider('unauthorizedUserDataProvider')]
     public function testCreateGitSourceUnauthorizedUser(?string $token): void
     {
         $response = $this->applicationClient->makeCreateGitSourceRequest(
@@ -79,9 +70,7 @@ abstract class AbstractUnauthorizedUserTest extends AbstractApplicationTest
         $this->responseAsserter->assertUnauthorizedResponse($response);
     }
 
-    /**
-     * @dataProvider unauthorizedUserDataProvider
-     */
+    #[DataProvider('unauthorizedUserDataProvider')]
     public function testListUnauthorizedUser(?string $token): void
     {
         $response = $this->applicationClient->makeListSourcesRequest(
@@ -91,9 +80,7 @@ abstract class AbstractUnauthorizedUserTest extends AbstractApplicationTest
         $this->responseAsserter->assertUnauthorizedResponse($response);
     }
 
-    /**
-     * @dataProvider unauthorizedUserDataProvider
-     */
+    #[DataProvider('unauthorizedUserDataProvider')]
     public function testGetSourceUnauthorizedUser(?string $token): void
     {
         $response = $this->applicationClient->makeGetSourceRequest(
@@ -104,9 +91,7 @@ abstract class AbstractUnauthorizedUserTest extends AbstractApplicationTest
         $this->responseAsserter->assertUnauthorizedResponse($response);
     }
 
-    /**
-     * @dataProvider unauthorizedUserDataProvider
-     */
+    #[DataProvider('unauthorizedUserDataProvider')]
     public function testUpdateFileSourceUnauthorizedUser(?string $token): void
     {
         $response = $this->applicationClient->makeUpdateFileSourceRequest(
@@ -118,9 +103,7 @@ abstract class AbstractUnauthorizedUserTest extends AbstractApplicationTest
         $this->responseAsserter->assertUnauthorizedResponse($response);
     }
 
-    /**
-     * @dataProvider unauthorizedUserDataProvider
-     */
+    #[DataProvider('unauthorizedUserDataProvider')]
     public function testUpdateGitSourceUnauthorizedUser(?string $token): void
     {
         $response = $this->applicationClient->makeUpdateGitSourceRequest(
@@ -132,9 +115,7 @@ abstract class AbstractUnauthorizedUserTest extends AbstractApplicationTest
         $this->responseAsserter->assertUnauthorizedResponse($response);
     }
 
-    /**
-     * @dataProvider unauthorizedUserDataProvider
-     */
+    #[DataProvider('unauthorizedUserDataProvider')]
     public function testDeleteSourceUnauthorizedUser(?string $token): void
     {
         $response = $this->applicationClient->makeDeleteSourceRequest(
@@ -145,9 +126,7 @@ abstract class AbstractUnauthorizedUserTest extends AbstractApplicationTest
         $this->responseAsserter->assertUnauthorizedResponse($response);
     }
 
-    /**
-     * @dataProvider unauthorizedUserDataProvider
-     */
+    #[DataProvider('unauthorizedUserDataProvider')]
     public function testCreateSuiteUnauthorizedUser(?string $token): void
     {
         $response = $this->applicationClient->makeCreateSuiteRequest(
@@ -158,9 +137,7 @@ abstract class AbstractUnauthorizedUserTest extends AbstractApplicationTest
         $this->responseAsserter->assertUnauthorizedResponse($response);
     }
 
-    /**
-     * @dataProvider unauthorizedUserDataProvider
-     */
+    #[DataProvider('unauthorizedUserDataProvider')]
     public function testGetSuiteUnauthorizedUser(?string $token): void
     {
         $response = $this->applicationClient->makeGetSuiteRequest(
@@ -171,9 +148,7 @@ abstract class AbstractUnauthorizedUserTest extends AbstractApplicationTest
         $this->responseAsserter->assertUnauthorizedResponse($response);
     }
 
-    /**
-     * @dataProvider unauthorizedUserDataProvider
-     */
+    #[DataProvider('unauthorizedUserDataProvider')]
     public function testListSuitesUnauthorizedUser(?string $token): void
     {
         $response = $this->applicationClient->makeListSuitesRequest($token);
@@ -181,9 +156,7 @@ abstract class AbstractUnauthorizedUserTest extends AbstractApplicationTest
         $this->responseAsserter->assertUnauthorizedResponse($response);
     }
 
-    /**
-     * @dataProvider unauthorizedUserDataProvider
-     */
+    #[DataProvider('unauthorizedUserDataProvider')]
     public function testUpdateSuiteUnauthorizedUser(?string $token): void
     {
         $response = $this->applicationClient->makeUpdateSuiteRequest(
@@ -195,9 +168,7 @@ abstract class AbstractUnauthorizedUserTest extends AbstractApplicationTest
         $this->responseAsserter->assertUnauthorizedResponse($response);
     }
 
-    /**
-     * @dataProvider unauthorizedUserDataProvider
-     */
+    #[DataProvider('unauthorizedUserDataProvider')]
     public function testDeleteSuiteUnauthorizedUser(?string $token): void
     {
         $response = $this->applicationClient->makeDeleteSuiteRequest(
@@ -208,9 +179,7 @@ abstract class AbstractUnauthorizedUserTest extends AbstractApplicationTest
         $this->responseAsserter->assertUnauthorizedResponse($response);
     }
 
-    /**
-     * @dataProvider unauthorizedUserDataProvider
-     */
+    #[DataProvider('unauthorizedUserDataProvider')]
     public function testCreateSerializedSuiteUnauthorizedUser(?string $token): void
     {
         $response = $this->applicationClient->makeCreateSerializedSuiteRequest(
@@ -223,9 +192,7 @@ abstract class AbstractUnauthorizedUserTest extends AbstractApplicationTest
         $this->responseAsserter->assertUnauthorizedResponse($response);
     }
 
-    /**
-     * @dataProvider unauthorizedUserDataProvider
-     */
+    #[DataProvider('unauthorizedUserDataProvider')]
     public function testReadSerializedSuiteUnauthorizedUser(?string $token): void
     {
         $response = $this->applicationClient->makeReadSerializedSuiteRequest(
@@ -236,9 +203,7 @@ abstract class AbstractUnauthorizedUserTest extends AbstractApplicationTest
         $this->responseAsserter->assertUnauthorizedResponse($response);
     }
 
-    /**
-     * @dataProvider unauthorizedUserDataProvider
-     */
+    #[DataProvider('unauthorizedUserDataProvider')]
     public function testGetSerializedSuiteUnauthorizedUser(?string $token): void
     {
         $response = $this->applicationClient->makeGetSerializedSuiteRequest(

@@ -7,6 +7,7 @@ namespace App\Tests\Application;
 use App\Entity\FileSource;
 use App\Repository\SourceRepository;
 use App\Tests\Services\SourceOriginFactory;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\Uid\Ulid;
 
 abstract class AbstractFileSourceFileTest extends AbstractApplicationTest
@@ -32,10 +33,9 @@ abstract class AbstractFileSourceFileTest extends AbstractApplicationTest
     }
 
     /**
-     * @dataProvider storeFileInvalidRequestDataProvider
-     *
      * @param array<mixed> $expectedResponseData
      */
+    #[DataProvider('storeFileInvalidRequestDataProvider')]
     public function testAddFileInvalidRequest(
         string $filename,
         string $content,
@@ -58,10 +58,9 @@ abstract class AbstractFileSourceFileTest extends AbstractApplicationTest
     }
 
     /**
-     * @dataProvider storeFileInvalidRequestDataProvider
-     *
      * @param array<mixed> $expectedResponseData
      */
+    #[DataProvider('storeFileInvalidRequestDataProvider')]
     public function testUpdateFileInvalidRequest(
         string $filename,
         string $content,
@@ -214,9 +213,7 @@ abstract class AbstractFileSourceFileTest extends AbstractApplicationTest
         );
     }
 
-    /**
-     * @dataProvider yamlFileInvalidRequestDataProvider
-     */
+    #[DataProvider('yamlFileInvalidRequestDataProvider')]
     public function testReadFileInvalidRequest(string $filename): void
     {
         $response = $this->applicationClient->makeReadFileRequest(
@@ -260,9 +257,7 @@ abstract class AbstractFileSourceFileTest extends AbstractApplicationTest
         $this->responseAsserter->assertSuccessfulResponseWithNoBody($response);
     }
 
-    /**
-     * @dataProvider yamlFileInvalidRequestDataProvider
-     */
+    #[DataProvider('yamlFileInvalidRequestDataProvider')]
     public function testRemoveFileInvalidFilename(string $filename): void
     {
         $response = $this->applicationClient->makeRemoveFileRequest(

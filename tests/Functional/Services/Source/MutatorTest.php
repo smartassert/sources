@@ -13,6 +13,7 @@ use App\Services\Source\Mutator;
 use App\Tests\Model\UserId;
 use App\Tests\Services\EntityRemover;
 use App\Tests\Services\SourceOriginFactory;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 class MutatorTest extends WebTestCase
@@ -38,9 +39,7 @@ class MutatorTest extends WebTestCase
         }
     }
 
-    /**
-     * @dataProvider updateFileNoChangesDataProvider
-     */
+    #[DataProvider('updateFileNoChangesDataProvider')]
     public function testUpdateFileNoChanges(FileSource $source, FileSourceRequest $request): void
     {
         $this->sourceRepository->save($source);
@@ -68,9 +67,7 @@ class MutatorTest extends WebTestCase
         ];
     }
 
-    /**
-     * @dataProvider updateGitNoChangesDataProvider
-     */
+    #[DataProvider('updateGitNoChangesDataProvider')]
     public function testUpdateGitNoChanges(GitSource $source, GitSourceRequest $request): void
     {
         $this->sourceRepository->save($source);
@@ -106,9 +103,7 @@ class MutatorTest extends WebTestCase
         ];
     }
 
-    /**
-     * @dataProvider updateFileDataProvider
-     */
+    #[DataProvider('updateFileDataProvider')]
     public function testUpdateFile(FileSource $source, FileSourceRequest $request, FileSource $expected): void
     {
         $mutatedSource = $this->mutator->updateFile($source, $request);
@@ -142,9 +137,7 @@ class MutatorTest extends WebTestCase
         ];
     }
 
-    /**
-     * @dataProvider updateGitDataProvider
-     */
+    #[DataProvider('updateGitDataProvider')]
     public function testUpdateGit(GitSource $source, GitSourceRequest $request, GitSource $expected): void
     {
         $mutatedSource = $this->mutator->updateGit($source, $request);
