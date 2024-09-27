@@ -108,6 +108,7 @@ class FilesystemExceptionHandlingTest extends WebTestCase
         );
 
         $expectedResponseData = $expectedResponseDataCreator($source);
+
         $this->assertResponse($response, $expectedResponseData);
     }
 
