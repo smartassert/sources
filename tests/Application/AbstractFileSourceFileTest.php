@@ -7,6 +7,7 @@ namespace App\Tests\Application;
 use App\Entity\FileSource;
 use App\Repository\SourceRepository;
 use App\Tests\Services\SourceOriginFactory;
+use App\Tests\Services\StringFactory;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\Uid\Ulid;
 
@@ -184,7 +185,7 @@ abstract class AbstractFileSourceFileTest extends AbstractApplicationTest
 
     public function testAddFileDuplicateFilename(): void
     {
-        $initialContent = md5((string) rand());
+        $initialContent = StringFactory::createRandom();
 
         $this->applicationClient->makeAddFileRequest(
             self::$apiTokens->get(self::USER_1_EMAIL),

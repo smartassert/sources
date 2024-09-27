@@ -16,6 +16,7 @@ use App\Repository\SerializedSuiteRepository;
 use App\Repository\SourceRepository;
 use App\Repository\SuiteRepository;
 use App\Tests\Services\EntityRemover;
+use App\Tests\Services\StringFactory;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use PHPUnit\Framework\Attributes\DataProvider;
 use SmartAssert\WorkerMessageFailedEventBundle\ExceptionHandlerInterface;
@@ -66,7 +67,7 @@ class WorkerMessageFailedEventHandlerTest extends WebTestCase
             'event will retry' => [
                 'event' => (function () {
                     $event = new WorkerMessageFailedEvent(
-                        new Envelope(new SerializeSuite(md5((string) rand()), [])),
+                        new Envelope(new SerializeSuite(StringFactory::createRandom(), [])),
                         'async',
                         \Mockery::mock(HandlerFailedException::class),
                     );
@@ -109,7 +110,7 @@ class WorkerMessageFailedEventHandlerTest extends WebTestCase
 
     public function testHandleHasSerializedSuiteStateChange(): void
     {
-        $type = md5((string) rand());
+        $type = StringFactory::createRandom();
 
         $handlerFailedExceptionNestedExceptionsCreator = function (SerializedSuite $serializedSuite) use ($type) {
             return [
@@ -141,10 +142,10 @@ class WorkerMessageFailedEventHandlerTest extends WebTestCase
     private function createSerializedSuite(): SerializedSuite
     {
         $source = new GitSource(
-            md5((string) rand()),
-            md5((string) rand())
+            StringFactory::createRandom(),
+            StringFactory::createRandom()
         );
-        $source = $source->setLabel(md5((string) rand()));
+        $source = $source->setLabel(StringFactory::createRandom());
         if ($source instanceof GitSource) {
             $source->setHostUrl('https://example.com/repository.git');
             $source->setPath('/out-of-scope/../../../');
@@ -154,14 +155,14 @@ class WorkerMessageFailedEventHandlerTest extends WebTestCase
         \assert($sourceRepository instanceof SourceRepository);
         $sourceRepository->save($source);
 
-        $suite = new Suite(md5((string) rand()));
+        $suite = new Suite(StringFactory::createRandom());
         $suite->setSource($source);
-        $suite->setLabel(md5((string) rand()));
+        $suite->setLabel(StringFactory::createRandom());
         $suiteRepository = self::getContainer()->get(SuiteRepository::class);
         \assert($suiteRepository instanceof SuiteRepository);
         $suiteRepository->save($suite);
 
-        $serializedSuite = new SerializedSuite(md5((string) rand()), $suite);
+        $serializedSuite = new SerializedSuite(StringFactory::createRandom(), $suite);
         $serializedSuiteRepository = self::getContainer()->get(SerializedSuiteRepository::class);
         \assert($serializedSuiteRepository instanceof SerializedSuiteRepository);
         $serializedSuiteRepository->save($serializedSuite);

@@ -6,6 +6,7 @@ namespace App\Tests\DataProvider;
 
 use App\Entity\AbstractSource;
 use App\Request\SuiteRequest;
+use App\Tests\Services\StringFactory;
 
 trait CreateUpdateSuiteDataProviderTrait
 {
@@ -57,7 +58,7 @@ trait CreateUpdateSuiteDataProviderTrait
             ],
             'invalid yaml filename within singular tests collection' => [
                 'requestParameters' => [
-                    SuiteRequest::PARAMETER_LABEL => md5((string) rand()),
+                    SuiteRequest::PARAMETER_LABEL => StringFactory::createRandom(),
                     SuiteRequest::PARAMETER_TESTS => ['test.txt'],
                 ],
                 'expectedResponseData' => [
@@ -77,7 +78,7 @@ trait CreateUpdateSuiteDataProviderTrait
             ],
             'invalid yaml filename within tests collection' => [
                 'requestParameters' => [
-                    SuiteRequest::PARAMETER_LABEL => md5((string) rand()),
+                    SuiteRequest::PARAMETER_LABEL => StringFactory::createRandom(),
                     SuiteRequest::PARAMETER_TESTS => ['test.yaml', 'test.txt', 'test.yml'],
                 ],
                 'expectedResponseData' => [

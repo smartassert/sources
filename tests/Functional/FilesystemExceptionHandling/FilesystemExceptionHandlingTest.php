@@ -15,6 +15,7 @@ use App\Repository\SourceRepository;
 use App\Services\SourceRepository\Reader\DirectoryListingFactoryInterface;
 use App\Services\SourceRepository\Reader\FileSourceDirectoryLister;
 use App\Tests\Services\ApplicationClient\Client;
+use App\Tests\Services\StringFactory;
 use League\Flysystem\FilesystemException as FsException;
 use League\Flysystem\FilesystemOperationFailed as FsOpFailed;
 use League\Flysystem\FilesystemOperator;
@@ -56,7 +57,7 @@ class FilesystemExceptionHandlingTest extends WebTestCase
         \Exception&FsException $exception,
         callable $expectedResponseDataCreator,
     ): void {
-        $userId = md5((string) rand());
+        $userId = StringFactory::createRandom();
         $sourceId = (string) new Ulid();
         \assert('' !== $sourceId);
 
@@ -88,7 +89,7 @@ class FilesystemExceptionHandlingTest extends WebTestCase
         \Exception&FsException $exception,
         callable $expectedResponseDataCreator,
     ): void {
-        $userId = md5((string) rand());
+        $userId = StringFactory::createRandom();
         $sourceId = (string) new Ulid();
         \assert('' !== $sourceId);
 
@@ -102,8 +103,8 @@ class FilesystemExceptionHandlingTest extends WebTestCase
         $response = $this->applicationClient->makeAddFileRequest(
             'api token',
             $sourceId,
-            md5((string) rand()) . '.yaml',
-            md5((string) rand())
+            StringFactory::createRandom() . '.yaml',
+            StringFactory::createRandom()
         );
 
         $expectedResponseData = $expectedResponseDataCreator($source);
@@ -119,7 +120,7 @@ class FilesystemExceptionHandlingTest extends WebTestCase
         \Exception&FsException $exception,
         callable $expectedResponseDataCreator,
     ): void {
-        $userId = md5((string) rand());
+        $userId = StringFactory::createRandom();
         $sourceId = (string) new Ulid();
         \assert('' !== $sourceId);
 
@@ -133,8 +134,8 @@ class FilesystemExceptionHandlingTest extends WebTestCase
         $response = $this->applicationClient->makeUpdateFileRequest(
             'api token',
             $sourceId,
-            md5((string) rand()) . '.yaml',
-            md5((string) rand())
+            StringFactory::createRandom() . '.yaml',
+            StringFactory::createRandom()
         );
 
         $expectedResponseData = $expectedResponseDataCreator($source);
@@ -150,7 +151,7 @@ class FilesystemExceptionHandlingTest extends WebTestCase
         \Exception&FsException $exception,
         callable $expectedResponseDataCreator,
     ): void {
-        $userId = md5((string) rand());
+        $userId = StringFactory::createRandom();
         $sourceId = (string) new Ulid();
         \assert('' !== $sourceId);
 
@@ -164,7 +165,7 @@ class FilesystemExceptionHandlingTest extends WebTestCase
         $response = $this->applicationClient->makeReadFileRequest(
             'api token',
             $sourceId,
-            md5((string) rand()) . '.yaml'
+            StringFactory::createRandom() . '.yaml'
         );
 
         $expectedResponseData = $expectedResponseDataCreator($source);
@@ -180,7 +181,7 @@ class FilesystemExceptionHandlingTest extends WebTestCase
         \Exception&FsException $exception,
         callable $expectedResponseDataCreator,
     ): void {
-        $userId = md5((string) rand());
+        $userId = StringFactory::createRandom();
         $sourceId = (string) new Ulid();
         \assert('' !== $sourceId);
 
@@ -194,7 +195,7 @@ class FilesystemExceptionHandlingTest extends WebTestCase
         $response = $this->applicationClient->makeRemoveFileRequest(
             'api token',
             $sourceId,
-            md5((string) rand()) . '.yaml'
+            StringFactory::createRandom() . '.yaml'
         );
 
         $expectedResponseData = $expectedResponseDataCreator($source);
@@ -210,7 +211,7 @@ class FilesystemExceptionHandlingTest extends WebTestCase
         \Exception&FsException $exception,
         callable $expectedResponseDataCreator,
     ): void {
-        $userId = md5((string) rand());
+        $userId = StringFactory::createRandom();
         $serializedSuiteId = (string) new Ulid();
         \assert('' !== $serializedSuiteId);
 
@@ -267,7 +268,7 @@ class FilesystemExceptionHandlingTest extends WebTestCase
         \Exception&FsException $exception,
         callable $expectedResponseDataCreator,
     ): void {
-        $userId = md5((string) rand());
+        $userId = StringFactory::createRandom();
         $sourceId = (string) new Ulid();
         \assert('' !== $sourceId);
 
@@ -296,9 +297,9 @@ class FilesystemExceptionHandlingTest extends WebTestCase
      */
     public static function exceptionHandlerDataProvider(): array
     {
-        $message = md5((string) rand());
+        $message = StringFactory::createRandom();
         $code = rand();
-        $location = md5((string) rand());
+        $location = StringFactory::createRandom();
 
         return [
             'generic filesystem error' => [

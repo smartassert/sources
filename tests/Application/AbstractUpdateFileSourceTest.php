@@ -15,6 +15,7 @@ use App\Tests\DataProvider\CreateUpdateFileSourceDataProviderTrait;
 use App\Tests\Services\EntityRemover;
 use App\Tests\Services\SourceOriginFactory;
 use App\Tests\Services\SourceRequestTypeMatcher;
+use App\Tests\Services\StringFactory;
 use PHPUnit\Framework\Attributes\DataProvider;
 use SmartAssert\TestAuthenticationProviderBundle\UserProvider;
 use Symfony\Component\Uid\Ulid;
@@ -126,8 +127,8 @@ abstract class AbstractUpdateFileSourceTest extends AbstractApplicationTest
      */
     public static function updateNewLabelNotUniqueDataProvider(): array
     {
-        $targetSourceLabel = md5((string) rand());
-        $conflictSourceLabel = md5((string) rand());
+        $targetSourceLabel = StringFactory::createRandom();
+        $conflictSourceLabel = StringFactory::createRandom();
 
         return [
             'file source with label of git source' => [
@@ -137,8 +138,8 @@ abstract class AbstractUpdateFileSourceTest extends AbstractApplicationTest
                 ],
                 'conflictCreateParameters' => [
                     GitSourceRequest::PARAMETER_LABEL => $conflictSourceLabel,
-                    GitSourceRequest::PARAMETER_HOST_URL => md5((string) rand()),
-                    GitSourceRequest::PARAMETER_PATH => md5((string) rand()),
+                    GitSourceRequest::PARAMETER_HOST_URL => StringFactory::createRandom(),
+                    GitSourceRequest::PARAMETER_PATH => StringFactory::createRandom(),
                 ],
                 'updateParameters' => [
                     GitSourceRequest::PARAMETER_LABEL => $conflictSourceLabel,

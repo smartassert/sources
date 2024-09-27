@@ -6,6 +6,7 @@ namespace App\Tests\DataProvider;
 
 use App\Entity\FileSource;
 use App\Entity\Suite;
+use App\Tests\Services\StringFactory;
 use App\Tests\Services\SuiteFactory;
 
 trait GetSuiteDataProviderTrait
@@ -15,11 +16,11 @@ trait GetSuiteDataProviderTrait
      */
     public static function getSuiteDataProvider(): array
     {
-        $label = md5((string) rand());
+        $label = StringFactory::createRandom();
         $tests = [
-            md5((string) rand()) . '.yaml',
-            md5((string) rand()) . '.yml',
-            md5((string) rand()) . '.yaml',
+            StringFactory::createRandom() . '.yaml',
+            StringFactory::createRandom() . '.yml',
+            StringFactory::createRandom() . '.yaml',
         ];
 
         return [

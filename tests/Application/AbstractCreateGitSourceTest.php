@@ -10,6 +10,7 @@ use App\Repository\SourceRepository;
 use App\Request\GitSourceRequest;
 use App\Tests\DataProvider\CreateUpdateGitSourceDataProviderTrait;
 use App\Tests\Services\SourceRequestTypeMatcher;
+use App\Tests\Services\StringFactory;
 use PHPUnit\Framework\Attributes\DataProvider;
 
 abstract class AbstractCreateGitSourceTest extends AbstractApplicationTest
@@ -72,10 +73,10 @@ abstract class AbstractCreateGitSourceTest extends AbstractApplicationTest
      */
     public static function createGitSourceSuccessDataProvider(): array
     {
-        $label = md5((string) rand());
-        $hostUrl = 'https://example.com/' . md5((string) rand()) . '.git';
-        $path = '/' . md5((string) rand());
-        $credentials = md5((string) rand());
+        $label = StringFactory::createRandom();
+        $hostUrl = 'https://example.com/' . StringFactory::createRandom() . '.git';
+        $path = '/' . StringFactory::createRandom();
+        $credentials = StringFactory::createRandom();
 
         return [
             'git source, credentials missing' => [
@@ -115,10 +116,10 @@ abstract class AbstractCreateGitSourceTest extends AbstractApplicationTest
      */
     public static function createGitSourceDataProvider(): array
     {
-        $label = md5((string) rand());
-        $hostUrl = 'https://example.com/' . md5((string) rand()) . '.git';
-        $path = '/' . md5((string) rand());
-        $credentials = md5((string) rand());
+        $label = StringFactory::createRandom();
+        $hostUrl = 'https://example.com/' . StringFactory::createRandom() . '.git';
+        $path = '/' . StringFactory::createRandom();
+        $credentials = StringFactory::createRandom();
 
         return [
             'git source, credentials missing' => [
@@ -246,7 +247,7 @@ abstract class AbstractCreateGitSourceTest extends AbstractApplicationTest
      */
     public static function createSourceWithNonUniqueLabelDataProvider(): array
     {
-        $label = md5((string) rand());
+        $label = StringFactory::createRandom();
 
         return [
             'git source with label of file source' => [
@@ -256,21 +257,21 @@ abstract class AbstractCreateGitSourceTest extends AbstractApplicationTest
                 ],
                 'conflictCreateParameters' => [
                     GitSourceRequest::PARAMETER_LABEL => $label,
-                    GitSourceRequest::PARAMETER_HOST_URL => md5((string) rand()),
-                    GitSourceRequest::PARAMETER_PATH => md5((string) rand()),
+                    GitSourceRequest::PARAMETER_HOST_URL => StringFactory::createRandom(),
+                    GitSourceRequest::PARAMETER_PATH => StringFactory::createRandom(),
                 ],
             ],
             'git source with label of git source' => [
                 'label' => $label,
                 'targetCreateParameters' => [
                     GitSourceRequest::PARAMETER_LABEL => $label,
-                    GitSourceRequest::PARAMETER_HOST_URL => md5((string) rand()),
-                    GitSourceRequest::PARAMETER_PATH => md5((string) rand()),
+                    GitSourceRequest::PARAMETER_HOST_URL => StringFactory::createRandom(),
+                    GitSourceRequest::PARAMETER_PATH => StringFactory::createRandom(),
                 ],
                 'conflictCreateParameters' => [
                     GitSourceRequest::PARAMETER_LABEL => $label,
-                    GitSourceRequest::PARAMETER_HOST_URL => md5((string) rand()),
-                    GitSourceRequest::PARAMETER_PATH => md5((string) rand()),
+                    GitSourceRequest::PARAMETER_HOST_URL => StringFactory::createRandom(),
+                    GitSourceRequest::PARAMETER_PATH => StringFactory::createRandom(),
                 ],
             ],
         ];

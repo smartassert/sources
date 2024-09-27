@@ -8,6 +8,7 @@ use App\Entity\SerializedSuite;
 use App\Entity\Suite;
 use App\Enum\SerializedSuite\FailureReason;
 use App\Enum\SerializedSuite\State;
+use App\Tests\Services\StringFactory;
 use PHPUnit\Framework\TestCase;
 
 class SerializedSuiteTest extends TestCase
@@ -15,8 +16,8 @@ class SerializedSuiteTest extends TestCase
     public function testSetPreparationFailedIsIdempotent(): void
     {
         $serializedSuite = new SerializedSuite(
-            md5((string) rand()),
-            new Suite(md5((string) rand())),
+            StringFactory::createRandom(),
+            new Suite(StringFactory::createRandom()),
             []
         );
 
@@ -27,7 +28,7 @@ class SerializedSuiteTest extends TestCase
         self::assertArrayNotHasKey('failure_message', $serializedSuiteData);
 
         $failureReason = FailureReason::GIT_CHECKOUT;
-        $failureMessage = md5((string) rand());
+        $failureMessage = StringFactory::createRandom();
 
         $serializedSuite->setPreparationFailed($failureReason, $failureMessage);
 

@@ -8,6 +8,7 @@ use App\Entity\Suite;
 use App\Repository\SuiteRepository;
 use App\Request\SuiteRequest;
 use App\Tests\DataProvider\CreateUpdateSuiteDataProviderTrait;
+use App\Tests\Services\StringFactory;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\Uid\Ulid;
 
@@ -32,7 +33,7 @@ abstract class AbstractUpdateSuiteTest extends AbstractSuiteTest
     #[DataProvider('createUpdateSuiteInvalidRequestDataProvider')]
     public function testUpdateInvalidSuiteRequest(array $requestParameters, array $expectedResponseData): void
     {
-        $suiteId = $this->createSuite($this->sourceId, md5((string) rand()), []);
+        $suiteId = $this->createSuite($this->sourceId, StringFactory::createRandom(), []);
 
         $response = $this->applicationClient->makeUpdateSuiteRequest(
             self::$apiTokens->get(self::USER_1_EMAIL),
@@ -59,8 +60,8 @@ abstract class AbstractUpdateSuiteTest extends AbstractSuiteTest
         $suiteRepository = self::getContainer()->get(SuiteRepository::class);
         \assert($suiteRepository instanceof SuiteRepository);
 
-        $suiteLabel1 = md5((string) rand());
-        $suiteLabel2 = md5((string) rand());
+        $suiteLabel1 = StringFactory::createRandom();
+        $suiteLabel2 = StringFactory::createRandom();
 
         $suiteId = $this->createSuite($this->sourceId, $suiteLabel1, ['test.yaml']);
         $this->createSuite($this->sourceId, $suiteLabel2, ['test.yaml']);
@@ -143,8 +144,8 @@ abstract class AbstractUpdateSuiteTest extends AbstractSuiteTest
                         SuiteRequest::PARAMETER_SOURCE_ID => $sourceId,
                         SuiteRequest::PARAMETER_LABEL => 'label',
                         SuiteRequest::PARAMETER_TESTS => [
-                            'Test/test' . md5((string) rand()) . '.yaml',
-                            'Test/test' . md5((string) rand()) . '.yaml',
+                            'Test/test' . StringFactory::createRandom() . '.yaml',
+                            'Test/test' . StringFactory::createRandom() . '.yaml',
                         ],
                     ];
                 },
@@ -153,7 +154,7 @@ abstract class AbstractUpdateSuiteTest extends AbstractSuiteTest
                 'sourceIdSelector' => $primarySourceIdSelector,
                 'initialSuiteLabel' => 'label',
                 'initialSuiteTests' => [
-                    'Test/test' . md5((string) rand()) . '.yaml',
+                    'Test/test' . StringFactory::createRandom() . '.yaml',
                 ],
                 'updateRequestParametersCreator' => function (string $sourceId) {
                     return [
@@ -214,11 +215,11 @@ abstract class AbstractUpdateSuiteTest extends AbstractSuiteTest
 
     public function testUpdateIsIdempotent(): void
     {
-        $initialLabel = md5((string) rand());
-        $initialTests = ['Test/test' . md5((string) rand()) . '.yaml'];
+        $initialLabel = StringFactory::createRandom();
+        $initialTests = ['Test/test' . StringFactory::createRandom() . '.yaml'];
 
-        $newLabel = md5((string) rand());
-        $newTests = ['Test/test' . md5((string) rand()) . '.yaml'];
+        $newLabel = StringFactory::createRandom();
+        $newTests = ['Test/test' . StringFactory::createRandom() . '.yaml'];
 
         $suiteId = $this->createSuite($this->sourceId, $initialLabel, $initialTests);
 
@@ -263,7 +264,7 @@ abstract class AbstractUpdateSuiteTest extends AbstractSuiteTest
             $suiteId,
             [
                 SuiteRequest::PARAMETER_SOURCE_ID => $this->sourceId,
-                SuiteRequest::PARAMETER_LABEL => md5((string) rand()),
+                SuiteRequest::PARAMETER_LABEL => StringFactory::createRandom(),
                 SuiteRequest::PARAMETER_TESTS => [],
             ]
         );
@@ -294,7 +295,7 @@ abstract class AbstractUpdateSuiteTest extends AbstractSuiteTest
         \assert($suite instanceof Suite);
         $suiteRepository->delete($suite);
 
-        $suiteId = $this->createSuite($this->sourceId, md5((string) rand()), []);
+        $suiteId = $this->createSuite($this->sourceId, StringFactory::createRandom(), []);
 
         $updateResponse = $this->applicationClient->makeUpdateSuiteRequest(
             self::$apiTokens->get(self::USER_1_EMAIL),
@@ -311,14 +312,14 @@ abstract class AbstractUpdateSuiteTest extends AbstractSuiteTest
 
     public function testUpdateSuiteSourceNotFound(): void
     {
-        $suiteId = $this->createSuite($this->sourceId, md5((string) rand()), []);
+        $suiteId = $this->createSuite($this->sourceId, StringFactory::createRandom(), []);
 
         $response = $this->applicationClient->makeUpdateSuiteRequest(
             self::$apiTokens->get(self::USER_1_EMAIL),
             $suiteId,
             [
-                SuiteRequest::PARAMETER_SOURCE_ID => md5((string) rand()),
-                SuiteRequest::PARAMETER_LABEL => md5((string) rand()),
+                SuiteRequest::PARAMETER_SOURCE_ID => StringFactory::createRandom(),
+                SuiteRequest::PARAMETER_LABEL => StringFactory::createRandom(),
                 SuiteRequest::PARAMETER_TESTS => [],
             ],
         );
@@ -333,7 +334,7 @@ abstract class AbstractUpdateSuiteTest extends AbstractSuiteTest
             (string) new Ulid(),
             [
                 SuiteRequest::PARAMETER_SOURCE_ID => $this->sourceId,
-                SuiteRequest::PARAMETER_LABEL => md5((string) rand()),
+                SuiteRequest::PARAMETER_LABEL => StringFactory::createRandom(),
                 SuiteRequest::PARAMETER_TESTS => [],
             ],
         );
