@@ -36,6 +36,13 @@ readonly class FileSourceFileController
     #[Route(name: 'store', methods: ['POST', 'PUT'])]
     public function store(FileSource $source, AddYamlFileRequest $request, Request $symfonyRequest): Response
     {
+        if (null !== $source->getDeletedAt()) {
+            throw $this->errorResponseExceptionFactory->createForModifyReadOnlyEntity(
+                $source->getIdentifier()->getId(),
+                $source->getIdentifier()->getType(),
+            );
+        }
+
         $yamlFile = $request->file;
         $path = $source->getDirectoryPath() . '/' . $yamlFile->name;
 

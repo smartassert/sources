@@ -108,7 +108,6 @@ class FilesystemExceptionHandlingTest extends WebTestCase
         );
 
         $expectedResponseData = $expectedResponseDataCreator($source);
-
         $this->assertResponse($response, $expectedResponseData);
     }
 
@@ -505,6 +504,11 @@ class FilesystemExceptionHandlingTest extends WebTestCase
         $source
             ->shouldReceive('getId')
             ->andReturn($sourceId)
+        ;
+
+        $source
+            ->shouldReceive('getDeletedAt')
+            ->andReturnNull()
         ;
 
         return $source;
