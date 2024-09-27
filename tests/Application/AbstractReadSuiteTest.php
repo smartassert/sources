@@ -22,6 +22,7 @@ abstract class AbstractReadSuiteTest extends AbstractApplicationTest
     private FilesystemOperator $serializedSuiteStorage;
     private FilesystemOperator $fixtureStorage;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

@@ -24,6 +24,7 @@ class FactoryTest extends WebTestCase
 {
     private Factory $factory;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

@@ -16,6 +16,7 @@ class GitSourceHandlerTest extends WebTestCase
 {
     private GitSourceHandler $handler;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

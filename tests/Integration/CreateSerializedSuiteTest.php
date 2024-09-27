@@ -20,6 +20,7 @@ class CreateSerializedSuiteTest extends AbstractCreateSerializedSuiteTest
     private FilesystemOperator $fixtureStorage;
     private DirectoryListingFilter $listingFilter;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

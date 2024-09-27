@@ -17,6 +17,7 @@ abstract class AbstractInvalidSourceUserTest extends AbstractApplicationTest
     private FileSource $fileSource;
     private GitSource $gitSource;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

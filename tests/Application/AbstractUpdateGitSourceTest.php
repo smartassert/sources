@@ -24,6 +24,7 @@ abstract class AbstractUpdateGitSourceTest extends AbstractApplicationTest
 
     private SourceRepository $sourceRepository;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

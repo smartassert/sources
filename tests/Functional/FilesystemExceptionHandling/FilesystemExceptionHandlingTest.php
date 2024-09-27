@@ -34,6 +34,7 @@ class FilesystemExceptionHandlingTest extends WebTestCase
 {
     private Client $applicationClient;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

@@ -21,6 +21,7 @@ class MutatorTest extends WebTestCase
     private Mutator $mutator;
     private SourceRepository $sourceRepository;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

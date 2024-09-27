@@ -26,6 +26,7 @@ class SerializeSuiteExceptionFactoryTest extends WebTestCase
 {
     private SerializeSuiteExceptionFactory $serializeSuiteExceptionFactory;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

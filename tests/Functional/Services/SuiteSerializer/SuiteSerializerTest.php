@@ -28,6 +28,7 @@ class SuiteSerializerTest extends WebTestCase
     private FilesystemOperator $fileSourceStorage;
     private FilesystemOperator $serializedSuiteStorage;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

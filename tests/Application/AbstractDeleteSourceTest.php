@@ -23,6 +23,7 @@ abstract class AbstractDeleteSourceTest extends AbstractApplicationTest
     private SourceRepository $sourceRepository;
     private EntityManagerInterface $entityManager;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

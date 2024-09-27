@@ -16,6 +16,7 @@ class DirectoryListingFilterTest extends WebTestCase
 {
     private FileStoreFixtureCreator $fixtureCreator;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

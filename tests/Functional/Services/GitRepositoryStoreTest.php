@@ -45,6 +45,7 @@ class GitRepositoryStoreTest extends WebTestCase
     private string $gitRepositoryAbsolutePath;
     private DirectoryListingFilter $listingFilter;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();
