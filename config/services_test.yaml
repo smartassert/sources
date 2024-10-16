@@ -60,9 +60,6 @@ services:
     Symfony\Bridge\PsrHttpMessage\HttpMessageFactoryInterface:
         class: Symfony\Bridge\PsrHttpMessage\Factory\PsrHttpFactory
 
-    App\Tests\Services\ResponseAsserter:
-        public: true
-
     App\Services\SuiteSerializer:
         public: true
         arguments:
