@@ -13,16 +13,6 @@ use Symfony\Component\HttpFoundation\Response;
 
 class ResponseAsserter
 {
-    /**
-     * @param array<mixed> $expectedData
-     */
-    public function assertInvalidRequestJsonResponse(ResponseInterface $response, array $expectedData): void
-    {
-        (new JsonResponseAsserter(Response::HTTP_BAD_REQUEST, $expectedData))
-            ->assert($response)
-        ;
-    }
-
     public function assertSuccessfulResponseWithNoBody(ResponseInterface $response): void
     {
         (new Asserter\Response\ResponseAsserter(Response::HTTP_OK))

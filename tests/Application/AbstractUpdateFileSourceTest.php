@@ -62,7 +62,12 @@ abstract class AbstractUpdateFileSourceTest extends AbstractApplicationTest
             $requestParameters
         );
 
-        $this->responseAsserter->assertInvalidRequestJsonResponse($response, $expectedResponseData);
+        self::assertSame(400, $response->getStatusCode());
+        self::assertSame('application/json', $response->getHeaderLine('content-type'));
+        self::assertJsonStringEqualsJsonString(
+            (string) json_encode($expectedResponseData),
+            $response->getBody()->getContents()
+        );
     }
 
     /**
