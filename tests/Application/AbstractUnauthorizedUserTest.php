@@ -21,7 +21,8 @@ abstract class AbstractUnauthorizedUserTest extends AbstractApplicationTest
             '- content'
         );
 
-        $this->responseAsserter->assertUnauthorizedResponse($response);
+        self::assertSame(401, $response->getStatusCode());
+        self::assertSame('', $response->getBody()->getContents());
     }
 
     #[DataProvider('unauthorizedUserDataProvider')]
@@ -33,7 +34,8 @@ abstract class AbstractUnauthorizedUserTest extends AbstractApplicationTest
             self::FILENAME
         );
 
-        $this->responseAsserter->assertUnauthorizedResponse($response);
+        self::assertSame(401, $response->getStatusCode());
+        self::assertSame('', $response->getBody()->getContents());
     }
 
     #[DataProvider('unauthorizedUserDataProvider')]
@@ -45,7 +47,8 @@ abstract class AbstractUnauthorizedUserTest extends AbstractApplicationTest
             self::FILENAME
         );
 
-        $this->responseAsserter->assertUnauthorizedResponse($response);
+        self::assertSame(401, $response->getStatusCode());
+        self::assertSame('', $response->getBody()->getContents());
     }
 
     #[DataProvider('unauthorizedUserDataProvider')]
@@ -56,7 +59,8 @@ abstract class AbstractUnauthorizedUserTest extends AbstractApplicationTest
             []
         );
 
-        $this->responseAsserter->assertUnauthorizedResponse($response);
+        self::assertSame(401, $response->getStatusCode());
+        self::assertSame('', $response->getBody()->getContents());
     }
 
     #[DataProvider('unauthorizedUserDataProvider')]
@@ -67,7 +71,8 @@ abstract class AbstractUnauthorizedUserTest extends AbstractApplicationTest
             []
         );
 
-        $this->responseAsserter->assertUnauthorizedResponse($response);
+        self::assertSame(401, $response->getStatusCode());
+        self::assertSame('', $response->getBody()->getContents());
     }
 
     #[DataProvider('unauthorizedUserDataProvider')]
@@ -77,7 +82,8 @@ abstract class AbstractUnauthorizedUserTest extends AbstractApplicationTest
             $token,
         );
 
-        $this->responseAsserter->assertUnauthorizedResponse($response);
+        self::assertSame(401, $response->getStatusCode());
+        self::assertSame('', $response->getBody()->getContents());
     }
 
     #[DataProvider('unauthorizedUserDataProvider')]
@@ -88,7 +94,8 @@ abstract class AbstractUnauthorizedUserTest extends AbstractApplicationTest
             (new EntityIdFactory())->create()
         );
 
-        $this->responseAsserter->assertUnauthorizedResponse($response);
+        self::assertSame(401, $response->getStatusCode());
+        self::assertSame('', $response->getBody()->getContents());
     }
 
     #[DataProvider('unauthorizedUserDataProvider')]
@@ -100,7 +107,8 @@ abstract class AbstractUnauthorizedUserTest extends AbstractApplicationTest
             []
         );
 
-        $this->responseAsserter->assertUnauthorizedResponse($response);
+        self::assertSame(401, $response->getStatusCode());
+        self::assertSame('', $response->getBody()->getContents());
     }
 
     #[DataProvider('unauthorizedUserDataProvider')]
@@ -112,7 +120,8 @@ abstract class AbstractUnauthorizedUserTest extends AbstractApplicationTest
             []
         );
 
-        $this->responseAsserter->assertUnauthorizedResponse($response);
+        self::assertSame(401, $response->getStatusCode());
+        self::assertSame('', $response->getBody()->getContents());
     }
 
     #[DataProvider('unauthorizedUserDataProvider')]
@@ -123,7 +132,8 @@ abstract class AbstractUnauthorizedUserTest extends AbstractApplicationTest
             (new EntityIdFactory())->create()
         );
 
-        $this->responseAsserter->assertUnauthorizedResponse($response);
+        self::assertSame(401, $response->getStatusCode());
+        self::assertSame('', $response->getBody()->getContents());
     }
 
     #[DataProvider('unauthorizedUserDataProvider')]
@@ -134,7 +144,8 @@ abstract class AbstractUnauthorizedUserTest extends AbstractApplicationTest
             []
         );
 
-        $this->responseAsserter->assertUnauthorizedResponse($response);
+        self::assertSame(401, $response->getStatusCode());
+        self::assertSame('', $response->getBody()->getContents());
     }
 
     #[DataProvider('unauthorizedUserDataProvider')]
@@ -145,7 +156,8 @@ abstract class AbstractUnauthorizedUserTest extends AbstractApplicationTest
             (new EntityIdFactory())->create()
         );
 
-        $this->responseAsserter->assertUnauthorizedResponse($response);
+        self::assertSame(401, $response->getStatusCode());
+        self::assertSame('', $response->getBody()->getContents());
     }
 
     #[DataProvider('unauthorizedUserDataProvider')]
@@ -153,7 +165,8 @@ abstract class AbstractUnauthorizedUserTest extends AbstractApplicationTest
     {
         $response = $this->applicationClient->makeListSuitesRequest($token);
 
-        $this->responseAsserter->assertUnauthorizedResponse($response);
+        self::assertSame(401, $response->getStatusCode());
+        self::assertSame('', $response->getBody()->getContents());
     }
 
     #[DataProvider('unauthorizedUserDataProvider')]
@@ -165,7 +178,8 @@ abstract class AbstractUnauthorizedUserTest extends AbstractApplicationTest
             []
         );
 
-        $this->responseAsserter->assertUnauthorizedResponse($response);
+        self::assertSame(401, $response->getStatusCode());
+        self::assertSame('', $response->getBody()->getContents());
     }
 
     #[DataProvider('unauthorizedUserDataProvider')]
@@ -176,7 +190,8 @@ abstract class AbstractUnauthorizedUserTest extends AbstractApplicationTest
             (new EntityIdFactory())->create(),
         );
 
-        $this->responseAsserter->assertUnauthorizedResponse($response);
+        self::assertSame(401, $response->getStatusCode());
+        self::assertSame('', $response->getBody()->getContents());
     }
 
     #[DataProvider('unauthorizedUserDataProvider')]
@@ -189,7 +204,8 @@ abstract class AbstractUnauthorizedUserTest extends AbstractApplicationTest
             [],
         );
 
-        $this->responseAsserter->assertUnauthorizedResponse($response);
+        self::assertSame(401, $response->getStatusCode());
+        self::assertSame('', $response->getBody()->getContents());
     }
 
     #[DataProvider('unauthorizedUserDataProvider')]
@@ -200,7 +216,8 @@ abstract class AbstractUnauthorizedUserTest extends AbstractApplicationTest
             (new EntityIdFactory())->create(),
         );
 
-        $this->responseAsserter->assertUnauthorizedResponse($response);
+        self::assertSame(401, $response->getStatusCode());
+        self::assertSame('', $response->getBody()->getContents());
     }
 
     #[DataProvider('unauthorizedUserDataProvider')]
@@ -211,7 +228,8 @@ abstract class AbstractUnauthorizedUserTest extends AbstractApplicationTest
             (new EntityIdFactory())->create(),
         );
 
-        $this->responseAsserter->assertUnauthorizedResponse($response);
+        self::assertSame(401, $response->getStatusCode());
+        self::assertSame('', $response->getBody()->getContents());
     }
 
     /**

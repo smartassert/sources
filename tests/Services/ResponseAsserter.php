@@ -14,13 +14,6 @@ use Symfony\Component\HttpFoundation\Response;
 
 class ResponseAsserter
 {
-    public function assertUnauthorizedResponse(ResponseInterface $response): void
-    {
-        Assert::assertSame(401, $response->getStatusCode());
-        $response->getBody()->rewind();
-        Assert::assertSame('', $response->getBody()->getContents());
-    }
-
     public function assertForbiddenResponse(ResponseInterface $response): void
     {
         Assert::assertSame(403, $response->getStatusCode());
