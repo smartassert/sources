@@ -73,7 +73,7 @@ abstract class AbstractCreateSerializedSuiteTest extends AbstractApplicationTest
         $serializedSuite = $this->serializedSuiteRepository->findOneBy(['suite' => $suite]);
         self::assertInstanceOf(SerializedSuite::class, $serializedSuite);
 
-        self::assertSame(200, $response->getStatusCode());
+        self::assertSame(202, $response->getStatusCode());
         self::assertSame('application/json', $response->getHeaderLine('content-type'));
         self::assertJsonStringEqualsJsonString(
             (string) json_encode([

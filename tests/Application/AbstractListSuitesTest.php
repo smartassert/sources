@@ -44,7 +44,7 @@ abstract class AbstractListSuitesTest extends AbstractApplicationTest
         self::assertSame(200, $response->getStatusCode());
         self::assertSame('application/json', $response->getHeaderLine('content-type'));
         self::assertJsonStringEqualsJsonString(
-            (string) json_encode($expectedResponseData),
+            (string) json_encode(array_values($expectedResponseData)),
             $response->getBody()->getContents()
         );
     }

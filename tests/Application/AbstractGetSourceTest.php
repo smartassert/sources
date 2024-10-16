@@ -48,12 +48,11 @@ abstract class AbstractGetSourceTest extends AbstractApplicationTest
 
         self::assertSame(200, $response->getStatusCode());
         self::assertSame('application/json', $response->getHeaderLine('content-type'));
-        self::assertJsonStringEqualsJsonString(
-            (string) json_encode($expectedResponseData),
-            $response->getBody()->getContents()
-        );
 
-        $responseData = json_decode($response->getBody()->getContents(), true);
+        $responseBody = $response->getBody()->getContents();
+        self::assertJsonStringEqualsJsonString((string) json_encode($expectedResponseData), $responseBody);
+
+        $responseData = json_decode($responseBody, true);
         self::assertIsArray($responseData);
         self::assertArrayNotHasKey('deleted_at', $responseData);
     }
