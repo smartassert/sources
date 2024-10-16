@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Tests\Services;
 
-use App\Tests\Services\Asserter\Response\BodyContentAsserter;
-use App\Tests\Services\Asserter\Response\HeaderAsserter;
 use App\Tests\Services\Asserter\Response\JsonResponseAsserter;
 use App\Tests\Services\Asserter\Response\YamlResponseAsserter;
 use Psr\Http\Message\ResponseInterface;
@@ -13,15 +11,6 @@ use Symfony\Component\HttpFoundation\Response;
 
 class ResponseAsserter
 {
-    public function assertSuccessfulResponseWithNoBody(ResponseInterface $response): void
-    {
-        (new Asserter\Response\ResponseAsserter(Response::HTTP_OK))
-            ->addBodyAsserter(new BodyContentAsserter(''))
-            ->addHeaderAsserter(new HeaderAsserter(['content-type' => '']))
-            ->assert($response)
-        ;
-    }
-
     /**
      * @param array<mixed> $expectedData
      */

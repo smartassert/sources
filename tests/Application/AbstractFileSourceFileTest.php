@@ -289,7 +289,9 @@ abstract class AbstractFileSourceFileTest extends AbstractApplicationTest
             self::FILENAME
         );
 
-        $this->responseAsserter->assertSuccessfulResponseWithNoBody($response);
+        self::assertSame(200, $response->getStatusCode());
+        self::assertSame('', $response->getHeaderLine('content-type'));
+        self::assertSame('', $response->getBody()->getContents());
     }
 
     #[DataProvider('yamlFileInvalidRequestDataProvider')]
@@ -301,7 +303,9 @@ abstract class AbstractFileSourceFileTest extends AbstractApplicationTest
             $filename
         );
 
-        $this->responseAsserter->assertSuccessfulResponseWithNoBody($response);
+        self::assertSame(200, $response->getStatusCode());
+        self::assertSame('', $response->getHeaderLine('content-type'));
+        self::assertSame('', $response->getBody()->getContents());
     }
 
     public function testReadFileNotFound(): void
@@ -327,7 +331,9 @@ abstract class AbstractFileSourceFileTest extends AbstractApplicationTest
             $initialContent
         );
 
-        $this->responseAsserter->assertSuccessfulResponseWithNoBody($addResponse);
+        self::assertSame(200, $addResponse->getStatusCode());
+        self::assertSame('', $addResponse->getHeaderLine('content-type'));
+        self::assertSame('', $addResponse->getBody()->getContents());
 
         $initialReadResponse = $this->applicationClient->makeReadFileRequest(
             self::$apiTokens->get(self::USER_1_EMAIL),
@@ -344,7 +350,9 @@ abstract class AbstractFileSourceFileTest extends AbstractApplicationTest
             $updatedContent
         );
 
-        $this->responseAsserter->assertSuccessfulResponseWithNoBody($updateResponse);
+        self::assertSame(200, $updateResponse->getStatusCode());
+        self::assertSame('', $updateResponse->getHeaderLine('content-type'));
+        self::assertSame('', $updateResponse->getBody()->getContents());
 
         $updatedReadResponse = $this->applicationClient->makeReadFileRequest(
             self::$apiTokens->get(self::USER_1_EMAIL),
@@ -360,7 +368,9 @@ abstract class AbstractFileSourceFileTest extends AbstractApplicationTest
             self::FILENAME
         );
 
-        $this->responseAsserter->assertSuccessfulResponseWithNoBody($removeResponse);
+        self::assertSame(200, $removeResponse->getStatusCode());
+        self::assertSame('', $removeResponse->getHeaderLine('content-type'));
+        self::assertSame('', $removeResponse->getBody()->getContents());
 
         $notFoundReadResponse = $this->applicationClient->makeReadFileRequest(
             self::$apiTokens->get(self::USER_1_EMAIL),

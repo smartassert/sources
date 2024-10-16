@@ -63,7 +63,9 @@ class CreateSerializedSuiteTest extends AbstractCreateSerializedSuiteTest
                 trim($this->fixtureStorage->read($sourceIdentifier . '/' . $sourceFilePath))
             );
 
-            $this->responseAsserter->assertSuccessfulResponseWithNoBody($addFileResponse);
+            self::assertSame(200, $addFileResponse->getStatusCode());
+            self::assertSame('', $addFileResponse->getHeaderLine('content-type'));
+            self::assertSame('', $addFileResponse->getBody()->getContents());
         }
 
         $createSuiteResponse = $this->applicationClient->makeCreateSuiteRequest(
