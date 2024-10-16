@@ -341,7 +341,9 @@ abstract class AbstractFileSourceFileTest extends AbstractApplicationTest
             self::FILENAME
         );
 
-        $this->responseAsserter->assertReadSourceSuccessResponse($initialReadResponse, $initialContent);
+        self::assertSame(200, $initialReadResponse->getStatusCode());
+        self::assertSame('text/x-yaml; charset=utf-8', $initialReadResponse->getHeaderLine('content-type'));
+        self::assertSame($initialContent, $initialReadResponse->getBody()->getContents());
 
         $updateResponse = $this->applicationClient->makeUpdateFileRequest(
             self::$apiTokens->get(self::USER_1_EMAIL),
@@ -360,7 +362,9 @@ abstract class AbstractFileSourceFileTest extends AbstractApplicationTest
             self::FILENAME
         );
 
-        $this->responseAsserter->assertReadSourceSuccessResponse($updatedReadResponse, $updatedContent);
+        self::assertSame(200, $updatedReadResponse->getStatusCode());
+        self::assertSame('text/x-yaml; charset=utf-8', $updatedReadResponse->getHeaderLine('content-type'));
+        self::assertSame($updatedContent, $updatedReadResponse->getBody()->getContents());
 
         $removeResponse = $this->applicationClient->makeRemoveFileRequest(
             self::$apiTokens->get(self::USER_1_EMAIL),

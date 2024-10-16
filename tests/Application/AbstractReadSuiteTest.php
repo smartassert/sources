@@ -121,9 +121,11 @@ abstract class AbstractReadSuiteTest extends AbstractApplicationTest
             $serializedSuite->id
         );
 
-        $this->responseAsserter->assertReadSourceSuccessResponse(
-            $response,
-            trim($this->fixtureStorage->read($serializedSuiteFixturePath))
+        self::assertSame(200, $response->getStatusCode());
+        self::assertSame('text/x-yaml; charset=utf-8', $response->getHeaderLine('content-type'));
+        self::assertSame(
+            trim($this->fixtureStorage->read($serializedSuiteFixturePath)),
+            $response->getBody()->getContents()
         );
     }
 

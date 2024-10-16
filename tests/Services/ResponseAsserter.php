@@ -11,13 +11,6 @@ use Symfony\Component\HttpFoundation\Response;
 
 class ResponseAsserter
 {
-    public function assertReadSourceSuccessResponse(ResponseInterface $response, string $expectedBody): void
-    {
-        (new YamlResponseAsserter(Response::HTTP_OK, $expectedBody))
-            ->assert($response)
-        ;
-    }
-
     /**
      * @param array<mixed> $expectedData
      */
