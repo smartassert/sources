@@ -81,6 +81,8 @@ abstract class AbstractCreateSerializedSuiteTest extends AbstractApplicationTest
                 'suite_id' => $suite->id,
                 'parameters' => $expectedResponseParameters,
                 'state' => State::REQUESTED->value,
+                'is_prepared' => false,
+                'has_end_state' => false,
             ]),
             $response->getBody()->getContents()
         );

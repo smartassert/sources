@@ -118,6 +118,8 @@ class SerializedSuite implements UserHeldEntityInterface, DirectoryLocator, \Jso
             'suite_id' => $this->suite->id,
             'parameters' => $this->parameters,
             'state' => $this->state->value,
+            'is_prepared' => State::PREPARED === $this->state,
+            'has_end_state' => State::PREPARED === $this->state || State::FAILED === $this->state,
         ];
 
         if (State::FAILED === $this->state) {
