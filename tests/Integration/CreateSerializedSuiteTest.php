@@ -86,7 +86,7 @@ class CreateSerializedSuiteTest extends AbstractCreateSerializedSuiteTest
 
         $serializedSuiteId = (string) (new Ulid());
 
-        $createSerializedSuiteResponse = $this->applicationClient->makeCreateSerializedSuiteRequest(
+        $this->applicationClient->makeCreateSerializedSuiteRequest(
             self::$apiTokens->get(self::USER_1_EMAIL),
             $serializedSuiteId,
             $suiteId,
@@ -102,6 +102,11 @@ class CreateSerializedSuiteTest extends AbstractCreateSerializedSuiteTest
 
         $expectedReadResponseBody = trim($this->fixtureStorage->read('SerializedSuite/suite_yaml_entire.yaml'));
 
-        $this->responseAsserter->assertReadSerializedSuiteSuccessResponse($readResponse, $expectedReadResponseBody);
+        self::assertSame(200, $readResponse->getStatusCode());
+        self::assertSame('text/x-yaml; charset=utf-8', $readResponse->getHeaderLine('content-type'));
+        self::assertSame(
+            $expectedReadResponseBody,
+            $readResponse->getBody()->getContents()
+        );
     }
 }
