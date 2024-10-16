@@ -65,7 +65,9 @@ abstract class AbstractCreateGitSourceTest extends AbstractApplicationTest
         $expected['id'] = $source->getId();
         $expected['user_id'] = self::$users->get(self::USER_1_EMAIL)['id'];
 
-        $this->responseAsserter->assertSuccessfulJsonResponse($response, $expected);
+        self::assertSame(200, $response->getStatusCode());
+        self::assertSame('application/json', $response->getHeaderLine('content-type'));
+        self::assertJsonStringEqualsJsonString((string) json_encode($expected), $response->getBody()->getContents());
     }
 
     /**

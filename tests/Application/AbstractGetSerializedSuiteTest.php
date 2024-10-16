@@ -70,9 +70,11 @@ abstract class AbstractGetSerializedSuiteTest extends AbstractApplicationTest
             $serializedSuite->id,
         );
 
-        $this->responseAsserter->assertSuccessfulJsonResponse(
-            $response,
-            $expectedResponseDataCreator($serializedSuite)
+        self::assertSame(200, $response->getStatusCode());
+        self::assertSame('application/json', $response->getHeaderLine('content-type'));
+        self::assertJsonStringEqualsJsonString(
+            (string) json_encode($expectedResponseDataCreator($serializedSuite)),
+            $response->getBody()->getContents()
         );
     }
 

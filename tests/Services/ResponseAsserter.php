@@ -11,16 +11,6 @@ use Symfony\Component\HttpFoundation\Response;
 
 class ResponseAsserter
 {
-    /**
-     * @param array<mixed> $expectedData
-     */
-    public function assertSuccessfulJsonResponse(ResponseInterface $response, array $expectedData): void
-    {
-        (new JsonResponseAsserter(Response::HTTP_OK, $expectedData))
-            ->assert($response)
-        ;
-    }
-
     public function assertReadSourceSuccessResponse(ResponseInterface $response, string $expectedBody): void
     {
         (new YamlResponseAsserter(Response::HTTP_OK, $expectedBody))
