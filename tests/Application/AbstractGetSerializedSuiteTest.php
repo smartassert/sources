@@ -7,6 +7,7 @@ namespace App\Tests\Application;
 use App\Entity\SerializedSuite;
 use App\Entity\SourceInterface;
 use App\Entity\Suite;
+use App\Enum\SerializedSuite\FailureReason;
 use App\Enum\SerializedSuite\State;
 use App\Repository\SerializedSuiteRepository;
 use App\Repository\SourceRepository;
@@ -108,6 +109,8 @@ abstract class AbstractGetSerializedSuiteTest extends AbstractApplicationTest
                         'suite_id' => $serializedSuite->suite->id,
                         'parameters' => [],
                         'state' => State::REQUESTED->value,
+                        'is_prepared' => false,
+                        'has_end_state' => false,
                     ];
                 },
             ],
@@ -141,6 +144,8 @@ abstract class AbstractGetSerializedSuiteTest extends AbstractApplicationTest
                             'key2' => 'value2',
                         ],
                         'state' => State::REQUESTED->value,
+                        'is_prepared' => false,
+                        'has_end_state' => false,
                     ];
                 },
             ],
@@ -172,6 +177,43 @@ abstract class AbstractGetSerializedSuiteTest extends AbstractApplicationTest
                         'suite_id' => $serializedSuite->suite->id,
                         'parameters' => [],
                         'state' => State::PREPARED->value,
+                        'is_prepared' => true,
+                        'has_end_state' => true,
+                    ];
+                },
+            ],
+            'no parameters, state=failed' => [
+                'sourceCreator' => function (UserProvider $users) {
+                    return SourceOriginFactory::create(
+                        type: 'file',
+                        userId: $users->get(self::USER_1_EMAIL)['id'],
+                    );
+                },
+                'suiteCreator' => function (SourceInterface $source) {
+                    return SuiteFactory::create(source: $source, tests: []);
+                },
+                'serializedSuiteCreator' => function (Suite $suite) {
+                    $serializedSuite = new SerializedSuite(
+                        (new EntityIdFactory())->create(),
+                        $suite,
+                        []
+                    );
+
+                    $serializedSuite->setPreparationFailed(FailureReason::GIT_CHECKOUT, 'repository does not exist');
+
+                    return $serializedSuite;
+                },
+                'payload' => [],
+                'expectedResponseDataCreator' => function (SerializedSuite $serializedSuite) {
+                    return [
+                        'id' => $serializedSuite->id,
+                        'suite_id' => $serializedSuite->suite->id,
+                        'parameters' => [],
+                        'state' => State::FAILED->value,
+                        'is_prepared' => false,
+                        'has_end_state' => true,
+                        'failure_reason' => 'git/checkout',
+                        'failure_message' => 'repository does not exist',
                     ];
                 },
             ],
