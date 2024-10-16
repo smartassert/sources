@@ -312,7 +312,7 @@ abstract class AbstractFileSourceFileTest extends AbstractApplicationTest
             self::FILENAME
         );
 
-        $this->responseAsserter->assertNotFoundResponse($response);
+        self::assertSame(404, $response->getStatusCode());
     }
 
     public function testAddReadUpdateRemoveFileSuccess(): void
@@ -368,7 +368,7 @@ abstract class AbstractFileSourceFileTest extends AbstractApplicationTest
             self::FILENAME
         );
 
-        $this->responseAsserter->assertNotFoundResponse($notFoundReadResponse);
+        self::assertSame(404, $notFoundReadResponse->getStatusCode());
     }
 
     public function testCreateSourceNotFound(): void

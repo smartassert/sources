@@ -8,17 +8,11 @@ use App\Tests\Services\Asserter\Response\BodyContentAsserter;
 use App\Tests\Services\Asserter\Response\HeaderAsserter;
 use App\Tests\Services\Asserter\Response\JsonResponseAsserter;
 use App\Tests\Services\Asserter\Response\YamlResponseAsserter;
-use PHPUnit\Framework\Assert;
 use Psr\Http\Message\ResponseInterface;
 use Symfony\Component\HttpFoundation\Response;
 
 class ResponseAsserter
 {
-    public function assertNotFoundResponse(ResponseInterface $response): void
-    {
-        Assert::assertSame(404, $response->getStatusCode());
-    }
-
     /**
      * @param array<mixed> $expectedData
      */
