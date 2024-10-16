@@ -6,7 +6,6 @@ namespace App\Tests\Application;
 
 use App\Tests\Services\ApplicationClient\Client;
 use App\Tests\Services\EntityRemover;
-use App\Tests\Services\ResponseAsserter;
 use SmartAssert\SymfonyTestClient\ClientInterface;
 use SmartAssert\TestAuthenticationProviderBundle\ApiTokenProvider;
 use SmartAssert\TestAuthenticationProviderBundle\UserProvider;
@@ -18,7 +17,6 @@ abstract class AbstractApplicationTest extends WebTestCase
     protected const USER_1_EMAIL = 'user1@example.com';
     protected const USER_2_EMAIL = 'user2@example.com';
 
-    protected ResponseAsserter $responseAsserter;
     protected static KernelBrowser $kernelBrowser;
     protected Client $applicationClient;
     protected static ApiTokenProvider $apiTokens;
@@ -45,10 +43,6 @@ abstract class AbstractApplicationTest extends WebTestCase
         parent::setUp();
 
         $this->applicationClient = new Client($this->getClientAdapter());
-
-        $responseAsserter = self::getContainer()->get(ResponseAsserter::class);
-        \assert($responseAsserter instanceof ResponseAsserter);
-        $this->responseAsserter = $responseAsserter;
 
         $entityRemover = self::getContainer()->get(EntityRemover::class);
         if ($entityRemover instanceof EntityRemover) {

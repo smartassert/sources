@@ -61,7 +61,12 @@ abstract class AbstractUpdateGitSourceTest extends AbstractApplicationTest
             $requestParameters
         );
 
-        $this->responseAsserter->assertInvalidRequestJsonResponse($response, $expectedResponseData);
+        self::assertSame(400, $response->getStatusCode());
+        self::assertSame('application/json', $response->getHeaderLine('content-type'));
+        self::assertJsonStringEqualsJsonString(
+            (string) json_encode($expectedResponseData),
+            $response->getBody()->getContents()
+        );
     }
 
     /**
@@ -189,7 +194,12 @@ abstract class AbstractUpdateGitSourceTest extends AbstractApplicationTest
 
         $expectedResponseData = $expectedResponseDataCreator($source);
 
-        $this->responseAsserter->assertSuccessfulJsonResponse($response, $expectedResponseData);
+        self::assertSame(200, $response->getStatusCode());
+        self::assertSame('application/json', $response->getHeaderLine('content-type'));
+        self::assertJsonStringEqualsJsonString(
+            (string) json_encode($expectedResponseData),
+            $response->getBody()->getContents()
+        );
     }
 
     /**
@@ -425,6 +435,6 @@ abstract class AbstractUpdateGitSourceTest extends AbstractApplicationTest
             []
         );
 
-        $this->responseAsserter->assertForbiddenResponse($response);
+        self::assertSame(403, $response->getStatusCode());
     }
 }

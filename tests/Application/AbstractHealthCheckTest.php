@@ -10,13 +10,15 @@ abstract class AbstractHealthCheckTest extends AbstractApplicationTest
     {
         $response = $this->applicationClient->makeGetHealthCheckRequest();
 
-        $this->responseAsserter->assertSuccessfulJsonResponse(
-            $response,
-            [
+        self::assertSame(200, $response->getStatusCode());
+        self::assertSame('application/json', $response->getHeaderLine('content-type'));
+        self::assertJsonStringEqualsJsonString(
+            (string) json_encode([
                 'database_connection' => true,
                 'database_entities' => true,
                 'message_queue' => true,
-            ]
+            ]),
+            $response->getBody()->getContents()
         );
     }
 }

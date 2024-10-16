@@ -73,14 +73,16 @@ abstract class AbstractCreateSerializedSuiteTest extends AbstractApplicationTest
         $serializedSuite = $this->serializedSuiteRepository->findOneBy(['suite' => $suite]);
         self::assertInstanceOf(SerializedSuite::class, $serializedSuite);
 
-        $this->responseAsserter->assertSerializeSuiteSuccessResponse(
-            $response,
-            [
+        self::assertSame(202, $response->getStatusCode());
+        self::assertSame('application/json', $response->getHeaderLine('content-type'));
+        self::assertJsonStringEqualsJsonString(
+            (string) json_encode([
                 'id' => $serializedSuiteId,
                 'suite_id' => $suite->id,
                 'parameters' => $expectedResponseParameters,
                 'state' => State::REQUESTED->value,
-            ]
+            ]),
+            $response->getBody()->getContents()
         );
     }
 
@@ -230,6 +232,6 @@ abstract class AbstractCreateSerializedSuiteTest extends AbstractApplicationTest
             []
         );
 
-        $this->responseAsserter->assertForbiddenResponse($response);
+        self::assertSame(403, $response->getStatusCode());
     }
 }

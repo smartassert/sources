@@ -51,7 +51,7 @@ abstract class AbstractInvalidSourceUserTest extends AbstractApplicationTest
             '- content'
         );
 
-        $this->responseAsserter->assertForbiddenResponse($response);
+        self::assertSame(403, $response->getStatusCode());
     }
 
     public function testRemoveFileInvalidUser(): void
@@ -62,7 +62,7 @@ abstract class AbstractInvalidSourceUserTest extends AbstractApplicationTest
             self::FILENAME
         );
 
-        $this->responseAsserter->assertForbiddenResponse($response);
+        self::assertSame(403, $response->getStatusCode());
     }
 
     public function testReadFileInvalidUser(): void
@@ -73,7 +73,7 @@ abstract class AbstractInvalidSourceUserTest extends AbstractApplicationTest
             self::FILENAME
         );
 
-        $this->responseAsserter->assertForbiddenResponse($response);
+        self::assertSame(403, $response->getStatusCode());
     }
 
     public function testGetSourceInvalidUser(): void
@@ -83,7 +83,7 @@ abstract class AbstractInvalidSourceUserTest extends AbstractApplicationTest
             $this->fileSource->getId()
         );
 
-        $this->responseAsserter->assertForbiddenResponse($response);
+        self::assertSame(403, $response->getStatusCode());
     }
 
     public function testDeleteSourceInvalidUser(): void
@@ -93,7 +93,7 @@ abstract class AbstractInvalidSourceUserTest extends AbstractApplicationTest
             $this->fileSource->getId()
         );
 
-        $this->responseAsserter->assertForbiddenResponse($response);
+        self::assertSame(403, $response->getStatusCode());
     }
 
     public function testListFileSourceFilenamesInvalidUser(): void
@@ -103,7 +103,7 @@ abstract class AbstractInvalidSourceUserTest extends AbstractApplicationTest
             $this->fileSource->getId()
         );
 
-        $this->responseAsserter->assertForbiddenResponse($response);
+        self::assertSame(403, $response->getStatusCode());
     }
 
     public function testCreateSuiteInvalidUser(): void
@@ -116,6 +116,6 @@ abstract class AbstractInvalidSourceUserTest extends AbstractApplicationTest
             ]
         );
 
-        $this->responseAsserter->assertForbiddenResponse($response);
+        self::assertSame(403, $response->getStatusCode());
     }
 }

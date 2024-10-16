@@ -54,7 +54,7 @@ abstract class AbstractGetSuiteTest extends AbstractApplicationTest
             (new EntityIdFactory())->create()
         );
 
-        $this->responseAsserter->assertForbiddenResponse($response);
+        self::assertSame(403, $response->getStatusCode());
     }
 
     /**
@@ -74,6 +74,11 @@ abstract class AbstractGetSuiteTest extends AbstractApplicationTest
 
         $expectedResponseData = $expectedResponseDataCreator($suite);
 
-        $this->responseAsserter->assertSuccessfulJsonResponse($response, $expectedResponseData);
+        self::assertSame(200, $response->getStatusCode());
+        self::assertSame('application/json', $response->getHeaderLine('content-type'));
+        self::assertJsonStringEqualsJsonString(
+            (string) json_encode($expectedResponseData),
+            $response->getBody()->getContents()
+        );
     }
 }

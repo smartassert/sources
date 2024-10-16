@@ -81,7 +81,9 @@ abstract class AbstractCreateSuiteTest extends AbstractSuiteTest
             ]
         );
 
-        $this->responseAsserter->assertSuccessfulJsonResponse($response, $expected);
+        self::assertSame(200, $response->getStatusCode());
+        self::assertSame('application/json', $response->getHeaderLine('content-type'));
+        self::assertJsonStringEqualsJsonString((string) json_encode($expected), $response->getBody()->getContents());
     }
 
     /**
@@ -353,6 +355,6 @@ abstract class AbstractCreateSuiteTest extends AbstractSuiteTest
             ],
         );
 
-        $this->responseAsserter->assertForbiddenResponse($response);
+        self::assertSame(403, $response->getStatusCode());
     }
 }

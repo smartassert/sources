@@ -41,7 +41,12 @@ abstract class AbstractListSuitesTest extends AbstractApplicationTest
             $expectedResponseData[$label] = $expectedSuiteData;
         }
 
-        $this->responseAsserter->assertSuccessfulJsonResponse($response, array_values($expectedResponseData));
+        self::assertSame(200, $response->getStatusCode());
+        self::assertSame('application/json', $response->getHeaderLine('content-type'));
+        self::assertJsonStringEqualsJsonString(
+            (string) json_encode(array_values($expectedResponseData)),
+            $response->getBody()->getContents()
+        );
     }
 
     /**

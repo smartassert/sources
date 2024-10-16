@@ -23,7 +23,7 @@ abstract class AbstractGetSourceTest extends AbstractApplicationTest
             (new EntityIdFactory())->create()
         );
 
-        $this->responseAsserter->assertForbiddenResponse($response);
+        self::assertSame(403, $response->getStatusCode());
     }
 
     /**
@@ -46,9 +46,13 @@ abstract class AbstractGetSourceTest extends AbstractApplicationTest
 
         $expectedResponseData = $expectedResponseDataCreator($source);
 
-        $this->responseAsserter->assertSuccessfulJsonResponse($response, $expectedResponseData);
+        self::assertSame(200, $response->getStatusCode());
+        self::assertSame('application/json', $response->getHeaderLine('content-type'));
 
-        $responseData = json_decode($response->getBody()->getContents(), true);
+        $responseBody = $response->getBody()->getContents();
+        self::assertJsonStringEqualsJsonString((string) json_encode($expectedResponseData), $responseBody);
+
+        $responseData = json_decode($responseBody, true);
         self::assertIsArray($responseData);
         self::assertArrayNotHasKey('deleted_at', $responseData);
     }
@@ -86,6 +90,11 @@ abstract class AbstractGetSourceTest extends AbstractApplicationTest
 
         $expectedResponseData = $expectedResponseDataCreator($source);
 
-        $this->responseAsserter->assertSuccessfulJsonResponse($response, $expectedResponseData);
+        self::assertSame(200, $response->getStatusCode());
+        self::assertSame('application/json', $response->getHeaderLine('content-type'));
+        self::assertJsonStringEqualsJsonString(
+            (string) json_encode($expectedResponseData),
+            $response->getBody()->getContents()
+        );
     }
 }
