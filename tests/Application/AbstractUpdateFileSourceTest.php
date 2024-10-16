@@ -345,6 +345,6 @@ abstract class AbstractUpdateFileSourceTest extends AbstractApplicationTest
             []
         );
 
-        $this->responseAsserter->assertForbiddenResponse($response);
+        self::assertSame(403, $response->getStatusCode());
     }
 }

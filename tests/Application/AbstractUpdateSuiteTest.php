@@ -324,7 +324,7 @@ abstract class AbstractUpdateSuiteTest extends AbstractSuiteTest
             ],
         );
 
-        $this->responseAsserter->assertForbiddenResponse($response);
+        self::assertSame(403, $response->getStatusCode());
     }
 
     public function testUpdateSuiteSuiteNotFound(): void
@@ -339,7 +339,7 @@ abstract class AbstractUpdateSuiteTest extends AbstractSuiteTest
             ],
         );
 
-        $this->responseAsserter->assertForbiddenResponse($response);
+        self::assertSame(403, $response->getStatusCode());
     }
 
     /**

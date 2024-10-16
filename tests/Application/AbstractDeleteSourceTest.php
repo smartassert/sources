@@ -142,6 +142,6 @@ abstract class AbstractDeleteSourceTest extends AbstractApplicationTest
             (string) new Ulid(),
         );
 
-        $this->responseAsserter->assertForbiddenResponse($response);
+        self::assertSame(403, $response->getStatusCode());
     }
 }

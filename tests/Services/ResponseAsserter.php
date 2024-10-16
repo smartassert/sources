@@ -14,11 +14,6 @@ use Symfony\Component\HttpFoundation\Response;
 
 class ResponseAsserter
 {
-    public function assertForbiddenResponse(ResponseInterface $response): void
-    {
-        Assert::assertSame(403, $response->getStatusCode());
-    }
-
     public function assertNotFoundResponse(ResponseInterface $response): void
     {
         Assert::assertSame(404, $response->getStatusCode());

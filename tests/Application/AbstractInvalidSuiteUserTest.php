@@ -59,7 +59,7 @@ abstract class AbstractInvalidSuiteUserTest extends AbstractApplicationTest
             $this->suite->id,
         );
 
-        $this->responseAsserter->assertForbiddenResponse($response);
+        self::assertSame(403, $response->getStatusCode());
     }
 
     public function testUpdateSuite(): void
@@ -74,7 +74,7 @@ abstract class AbstractInvalidSuiteUserTest extends AbstractApplicationTest
             ]
         );
 
-        $this->responseAsserter->assertForbiddenResponse($response);
+        self::assertSame(403, $response->getStatusCode());
     }
 
     public function testDeleteSuite(): void
@@ -84,7 +84,7 @@ abstract class AbstractInvalidSuiteUserTest extends AbstractApplicationTest
             $this->suite->id,
         );
 
-        $this->responseAsserter->assertForbiddenResponse($response);
+        self::assertSame(403, $response->getStatusCode());
     }
 
     public function testCreateSerializedSuite(): void
@@ -96,7 +96,7 @@ abstract class AbstractInvalidSuiteUserTest extends AbstractApplicationTest
             [],
         );
 
-        $this->responseAsserter->assertForbiddenResponse($response);
+        self::assertSame(403, $response->getStatusCode());
     }
 
     public function testReadSerializedSuite(): void
@@ -106,7 +106,7 @@ abstract class AbstractInvalidSuiteUserTest extends AbstractApplicationTest
             $this->serializedSuite->id,
         );
 
-        $this->responseAsserter->assertForbiddenResponse($response);
+        self::assertSame(403, $response->getStatusCode());
     }
 
     public function testGetSerializedSuite(): void
@@ -116,6 +116,6 @@ abstract class AbstractInvalidSuiteUserTest extends AbstractApplicationTest
             $this->serializedSuite->id,
         );
 
-        $this->responseAsserter->assertForbiddenResponse($response);
+        self::assertSame(403, $response->getStatusCode());
     }
 }

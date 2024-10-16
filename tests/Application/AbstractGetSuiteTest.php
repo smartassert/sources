@@ -54,7 +54,7 @@ abstract class AbstractGetSuiteTest extends AbstractApplicationTest
             (new EntityIdFactory())->create()
         );
 
-        $this->responseAsserter->assertForbiddenResponse($response);
+        self::assertSame(403, $response->getStatusCode());
     }
 
     /**

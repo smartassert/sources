@@ -230,6 +230,6 @@ abstract class AbstractCreateSerializedSuiteTest extends AbstractApplicationTest
             []
         );
 
-        $this->responseAsserter->assertForbiddenResponse($response);
+        self::assertSame(403, $response->getStatusCode());
     }
 }

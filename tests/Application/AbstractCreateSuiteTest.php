@@ -353,6 +353,6 @@ abstract class AbstractCreateSuiteTest extends AbstractSuiteTest
             ],
         );
 
-        $this->responseAsserter->assertForbiddenResponse($response);
+        self::assertSame(403, $response->getStatusCode());
     }
 }

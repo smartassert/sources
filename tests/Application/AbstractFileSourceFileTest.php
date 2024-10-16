@@ -380,7 +380,7 @@ abstract class AbstractFileSourceFileTest extends AbstractApplicationTest
             ''
         );
 
-        $this->responseAsserter->assertForbiddenResponse($response);
+        self::assertSame(403, $response->getStatusCode());
     }
 
     public function testUpdateSourceNotFound(): void
@@ -401,7 +401,7 @@ abstract class AbstractFileSourceFileTest extends AbstractApplicationTest
             ''
         );
 
-        $this->responseAsserter->assertForbiddenResponse($response);
+        self::assertSame(403, $response->getStatusCode());
     }
 
     public function testReadSourceNotFound(): void
@@ -421,7 +421,7 @@ abstract class AbstractFileSourceFileTest extends AbstractApplicationTest
             self::FILENAME
         );
 
-        $this->responseAsserter->assertForbiddenResponse($response);
+        self::assertSame(403, $response->getStatusCode());
     }
 
     public function testRemoveSourceNotFound(): void
@@ -441,6 +441,6 @@ abstract class AbstractFileSourceFileTest extends AbstractApplicationTest
             self::FILENAME
         );
 
-        $this->responseAsserter->assertForbiddenResponse($response);
+        self::assertSame(403, $response->getStatusCode());
     }
 }
