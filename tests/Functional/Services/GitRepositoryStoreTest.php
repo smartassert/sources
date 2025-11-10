@@ -119,7 +119,7 @@ class GitRepositoryStoreTest extends WebTestCase
     #[DataProvider('initializeThrowsGitActionExceptionDataProvider')]
     public function testInitializeThrowsGitActionException(
         \Exception|ProcessOutput $cloneProcessOutcome,
-        null|\Exception|ProcessOutput $checkoutProcessOutcome,
+        \Exception|ProcessOutput|null $checkoutProcessOutcome,
         callable $assertions
     ): void {
         $this->setGitRepositoryClonerOutcome($cloneProcessOutcome);
