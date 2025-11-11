@@ -87,7 +87,12 @@ abstract class AbstractFileSourceFileTest extends AbstractApplicationTest
     /**
      * @return array<mixed>
      */
-    public static function storeFileInvalidRequestDataProvider(): array
+    abstract public static function storeFileInvalidRequestDataProvider(): array;
+
+    /**
+     * @return array<mixed>
+     */
+    public static function storeFileInvalidRequestDefaultDataProvider(): array
     {
         return [
             'name empty, content non-empty' => [
@@ -128,21 +133,6 @@ abstract class AbstractFileSourceFileTest extends AbstractApplicationTest
                     'parameter' => [
                         'name' => 'filename',
                         'value' => '.yaml',
-                        'requirements' => [
-                            'data_type' => 'yaml_filename',
-                        ],
-                    ],
-                    'type' => 'invalid',
-                ],
-            ],
-            'name contains backslash characters, content non-empty' => [
-                'filename' => 'one-two-\-three.yaml',
-                'content' => 'non-empty value',
-                'expectedResponseData' => [
-                    'class' => 'bad_request',
-                    'parameter' => [
-                        'name' => 'filename',
-                        'value' => 'one-two-\-three.yaml',
                         'requirements' => [
                             'data_type' => 'yaml_filename',
                         ],
@@ -263,7 +253,7 @@ abstract class AbstractFileSourceFileTest extends AbstractApplicationTest
     /**
      * @return array<mixed>
      */
-    public static function yamlFileInvalidRequestDataProvider(): array
+    public static function yamlFileInvalidRequestDefaultDataProvider(): array
     {
         return [
             'name missing .yaml extension' => [
@@ -271,9 +261,6 @@ abstract class AbstractFileSourceFileTest extends AbstractApplicationTest
             ],
             'name empty with .yaml extension' => [
                 'filename' => '.yaml',
-            ],
-            'name contains backslash characters' => [
-                'filename' => 'one-two-\-three.yaml',
             ],
             'name contains space characters' => [
                 'filename' => 'one two three.yaml',
@@ -307,6 +294,11 @@ abstract class AbstractFileSourceFileTest extends AbstractApplicationTest
         self::assertSame('', $response->getHeaderLine('content-type'));
         self::assertSame('', $response->getBody()->getContents());
     }
+
+    /**
+     * @return array<mixed>
+     */
+    abstract public static function yamlFileInvalidRequestDataProvider(): array;
 
     public function testReadFileNotFound(): void
     {
