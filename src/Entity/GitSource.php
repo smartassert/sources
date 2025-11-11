@@ -18,9 +18,6 @@ class GitSource extends AbstractSource
     #[ORM\Column(type: 'string', length: self::HOST_URL_MAX_LENGTH)]
     private string $hostUrl;
 
-    /**
-     * @var non-empty-string
-     */
     #[ORM\Column(type: 'string', length: self::PATH_MAX_LENGTH)]
     private string $path = '/';
 
@@ -62,6 +59,7 @@ class GitSource extends AbstractSource
      */
     public function getPath(): string
     {
+        \assert('' !== $this->path);
         return $this->path;
     }
 
