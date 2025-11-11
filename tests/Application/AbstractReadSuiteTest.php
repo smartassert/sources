@@ -74,7 +74,7 @@ abstract class AbstractReadSuiteTest extends AbstractApplicationTest
 
         $response = $this->applicationClient->makeReadSerializedSuiteRequest(
             self::$apiTokens->get(self::USER_1_EMAIL),
-            $serializedSuite->id
+            $serializedSuite->getId()
         );
 
         self::assertSame(404, $response->getStatusCode());
@@ -118,7 +118,7 @@ abstract class AbstractReadSuiteTest extends AbstractApplicationTest
 
         $response = $this->applicationClient->makeReadSerializedSuiteRequest(
             self::$apiTokens->get(self::USER_1_EMAIL),
-            $serializedSuite->id
+            $serializedSuite->getId()
         );
 
         self::assertSame(200, $response->getStatusCode());

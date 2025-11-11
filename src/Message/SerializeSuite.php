@@ -19,7 +19,7 @@ class SerializeSuite
 
     public static function createFromSerializedSuite(SerializedSuite $serializedSuite): self
     {
-        return new SerializeSuite($serializedSuite->id, $serializedSuite->getParameters());
+        return new SerializeSuite($serializedSuite->getId(), $serializedSuite->getParameters());
     }
 
     public function getSuiteId(): string

@@ -17,16 +17,13 @@ class SerializedSuite implements UserHeldEntityInterface, DirectoryLocator, \Jso
 {
     public const ID_LENGTH = 32;
 
-    /**
-     * @var non-empty-string
-     */
-    #[ORM\Id]
-    #[ORM\Column(type: Types::STRING, length: self::ID_LENGTH, unique: true)]
-    public readonly string $id;
-
     #[ORM\ManyToOne(targetEntity: Suite::class)]
     #[ORM\JoinColumn(nullable: false)]
     public readonly Suite $suite;
+
+    #[ORM\Id]
+    #[ORM\Column(type: Types::STRING, length: self::ID_LENGTH, unique: true)]
+    private readonly string $id;
 
     /**
      * @var array<string, string>
@@ -54,6 +51,16 @@ class SerializedSuite implements UserHeldEntityInterface, DirectoryLocator, \Jso
         $this->parameters = $parameters;
         ksort($this->parameters);
         $this->state = State::REQUESTED;
+    }
+
+    /**
+     * @return non-empty-string
+     */
+    public function getId(): string
+    {
+        \assert('' !== $this->id);
+
+        return $this->id;
     }
 
     /**
@@ -97,7 +104,7 @@ class SerializedSuite implements UserHeldEntityInterface, DirectoryLocator, \Jso
         return sprintf(
             '%s/%s',
             $this->getUserId(),
-            $this->id,
+            $this->getId(),
         );
     }
 
@@ -114,7 +121,7 @@ class SerializedSuite implements UserHeldEntityInterface, DirectoryLocator, \Jso
     public function jsonSerialize(): array
     {
         $data = [
-            'id' => $this->id,
+            'id' => $this->getId(),
             'suite_id' => $this->suite->id,
             'parameters' => $this->parameters,
             'state' => $this->state->value,
@@ -136,6 +143,6 @@ class SerializedSuite implements UserHeldEntityInterface, DirectoryLocator, \Jso
 
     public function getIdentifier(): EntityIdentifierInterface
     {
-        return new EntityIdentifier($this->id, EntityType::SERIALIZED_SUITE->value);
+        return new EntityIdentifier($this->getId(), EntityType::SERIALIZED_SUITE->value);
     }
 }

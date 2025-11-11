@@ -176,13 +176,13 @@ class WorkerMessageFailedEventHandlerTest extends WebTestCase
     ): void {
         $handlerFailedException = new HandlerFailedException(
             new Envelope(
-                new SerializeSuite($serializedSuite->id, [])
+                new SerializeSuite($serializedSuite->getId(), [])
             ),
             $handlerFailedExceptionNestedExceptionsCreator($serializedSuite)
         );
 
         $event = new WorkerMessageFailedEvent(
-            new Envelope(new SerializeSuite($serializedSuite->id, [])),
+            new Envelope(new SerializeSuite($serializedSuite->getId(), [])),
             'async',
             $handlerFailedException
         );

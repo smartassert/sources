@@ -103,7 +103,7 @@ abstract class AbstractInvalidSuiteUserTest extends AbstractApplicationTest
     {
         $response = $this->applicationClient->makeReadSerializedSuiteRequest(
             self::$apiTokens->get(self::USER_1_EMAIL),
-            $this->serializedSuite->id,
+            $this->serializedSuite->getId(),
         );
 
         self::assertSame(403, $response->getStatusCode());
@@ -113,7 +113,7 @@ abstract class AbstractInvalidSuiteUserTest extends AbstractApplicationTest
     {
         $response = $this->applicationClient->makeGetSerializedSuiteRequest(
             self::$apiTokens->get(self::USER_1_EMAIL),
-            $this->serializedSuite->id,
+            $this->serializedSuite->getId(),
         );
 
         self::assertSame(403, $response->getStatusCode());
