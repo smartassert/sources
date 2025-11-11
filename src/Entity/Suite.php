@@ -27,10 +27,10 @@ class Suite implements \JsonSerializable, UserHeldEntityInterface, IdentifiedEnt
     private string $label;
 
     /**
-     * @var array<int, non-empty-string>
+     * @var array<string>|null
      */
     #[ORM\Column(type: Types::SIMPLE_ARRAY, nullable: true)]
-    private array $tests;
+    private ?array $tests;
 
     #[ORM\Column(type: Types::DATETIMETZ_IMMUTABLE, nullable: true)]
     private ?\DateTimeImmutable $deletedAt = null;
@@ -115,7 +115,18 @@ class Suite implements \JsonSerializable, UserHeldEntityInterface, IdentifiedEnt
      */
     public function getTests(): array
     {
-        return $this->tests;
+        $tests = [];
+        if (!is_array($this->tests)) {
+            return $tests;
+        }
+
+        foreach ($this->tests as $test) {
+            if ('' !== $test) {
+                $tests[] = $test;
+            }
+        }
+
+        return $tests;
     }
 
     /**
@@ -133,7 +144,7 @@ class Suite implements \JsonSerializable, UserHeldEntityInterface, IdentifiedEnt
             'id' => $this->getId(),
             'source_id' => $this->source->getId(),
             'label' => $this->getLabel(),
-            'tests' => $this->tests,
+            'tests' => $this->getTests(),
         ];
 
         if ($this->getDeletedAt() instanceof \DateTimeInterface) {
