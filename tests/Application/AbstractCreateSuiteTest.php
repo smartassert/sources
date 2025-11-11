@@ -63,11 +63,9 @@ abstract class AbstractCreateSuiteTest extends AbstractSuiteTest
             $suites = $repository->findAll();
         }
 
-        self::assertIsArray($suites);
         self::assertCount(1, $suites);
-
         $suite = $suites[0];
-        self::assertInstanceOf(Suite::class, $suite);
+
         self::assertSame(
             self::$users->get(self::USER_1_EMAIL)['id'],
             $suite->getUserId()

@@ -9,7 +9,6 @@ use App\Exception\SourceRepositoryReaderNotFoundException;
 use App\Model\SourceRepositoryInterface;
 use App\Model\UserGitRepository;
 use App\Services\SourceRepository\Reader\Provider;
-use League\Flysystem\FilesystemReader;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
@@ -43,7 +42,6 @@ class ProviderTest extends WebTestCase
     ): void {
         $reader = $this->provider->find($sourceRepository);
 
-        self::assertInstanceOf(FilesystemReader::class, $reader);
         self::assertSame(
             self::getContainer()->get($expectedReaderServiceId),
             $reader

@@ -12,11 +12,6 @@ use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
- * @method null|SourceInterface find($id, $lockMode = null, $lockVersion = null)
- * @method null|SourceInterface findOneBy(array $criteria, array $orderBy = null)
- * @method SourceInterface[]    findAll()
- * @method SourceInterface[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
- *
  * @extends ServiceEntityRepository<SourceInterface>
  */
 class SourceRepository extends ServiceEntityRepository

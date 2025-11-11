@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Tests\Application;
 
-use App\Entity\SourceInterface;
 use App\Enum\Source\Type;
 use App\Repository\SourceRepository;
 use App\Request\FileSourceRequest;
@@ -57,11 +56,8 @@ abstract class AbstractCreateFileSourceTest extends AbstractApplicationTest
             $sources = $sourceRepository->findAll();
         }
 
-        self::assertIsArray($sources);
         self::assertCount(1, $sources);
-
         $source = $sources[0];
-        self::assertInstanceOf(SourceInterface::class, $source);
 
         $expected['id'] = $source->getId();
         $expected['user_id'] = self::$users->get(self::USER_1_EMAIL)['id'];

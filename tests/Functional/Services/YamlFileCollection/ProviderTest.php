@@ -60,6 +60,7 @@ class ProviderTest extends WebTestCase
 
             self::assertInstanceOf(YamlFile::class, $yamlFile);
 
+            \assert(is_int($index));
             $expectedYamlFile = $expectedYamlFiles[$index] ?? null;
             self::assertInstanceOf(YamlFile::class, $expectedYamlFile);
 

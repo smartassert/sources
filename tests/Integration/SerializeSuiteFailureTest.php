@@ -50,10 +50,11 @@ class SerializeSuiteFailureTest extends AbstractApplicationTest
         $createSuiteResponseData = json_decode($createSuiteResponse->getBody()->getContents(), true);
         \assert(is_array($createSuiteResponseData));
         $suiteId = $createSuiteResponseData['id'] ?? null;
+        \assert(is_string($suiteId));
 
         $serializedSuiteId = (string) (new Ulid());
 
-        $createSerializedSuiteResponse = $this->applicationClient->makeCreateSerializedSuiteRequest(
+        $this->applicationClient->makeCreateSerializedSuiteRequest(
             self::$apiTokens->get(self::USER_1_EMAIL),
             $serializedSuiteId,
             $suiteId,

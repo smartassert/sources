@@ -14,11 +14,6 @@ use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * @extends ServiceEntityRepository<Suite>
- *
- * @method null|Suite find($id, $lockMode = null, $lockVersion = null)
- * @method null|Suite findOneBy(array $criteria, array $orderBy = null)
- * @method Suite[]    findAll()
- * @method Suite[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
 class SuiteRepository extends ServiceEntityRepository
 {

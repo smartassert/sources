@@ -92,6 +92,7 @@ abstract class AbstractUpdateFileSourceTest extends AbstractApplicationTest
         $targetCreateResponseData = json_decode($targetCreateResponse->getBody()->getContents(), true);
         \assert(is_array($targetCreateResponseData));
         $sourceId = $targetCreateResponseData['id'] ?? null;
+        \assert(is_string($sourceId));
 
         if (SourceRequestTypeMatcher::matchesGitSourceRequest($targetCreateParameters)) {
             $conflictCreateResponse = $this->applicationClient->makeCreateGitSourceRequest(

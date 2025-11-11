@@ -39,7 +39,7 @@ class SerializedSuiteTest extends TestCase
 
         $serializedSuite->setPreparationFailed(FailureReason::GIT_CLONE, $failureMessage);
 
-        self::assertSame(State::FAILED, $serializedSuite->getState());
+        self::assertSame(State::FAILED->value, $serializedSuite->getState()->value);
         $serializedSuiteData = $serializedSuite->jsonSerialize();
         self::assertSame($failureReason->value, $serializedSuiteData['failure_reason'] ?? null);
         self::assertSame($failureMessage, $serializedSuiteData['failure_message'] ?? null);
