@@ -68,7 +68,7 @@ abstract class AbstractGetSerializedSuiteTest extends AbstractApplicationTest
 
         $response = $this->applicationClient->makeGetSerializedSuiteRequest(
             self::$apiTokens->get(self::USER_1_EMAIL),
-            $serializedSuite->id,
+            $serializedSuite->getId(),
         );
 
         self::assertSame(200, $response->getStatusCode());
@@ -105,7 +105,7 @@ abstract class AbstractGetSerializedSuiteTest extends AbstractApplicationTest
                 'payload' => [],
                 'expectedResponseDataCreator' => function (SerializedSuite $serializedSuite) {
                     return [
-                        'id' => $serializedSuite->id,
+                        'id' => $serializedSuite->getId(),
                         'suite_id' => $serializedSuite->suite->id,
                         'parameters' => [],
                         'state' => State::REQUESTED->value,
@@ -137,7 +137,7 @@ abstract class AbstractGetSerializedSuiteTest extends AbstractApplicationTest
                 'payload' => [],
                 'expectedResponseDataCreator' => function (SerializedSuite $serializedSuite) {
                     return [
-                        'id' => $serializedSuite->id,
+                        'id' => $serializedSuite->getId(),
                         'suite_id' => $serializedSuite->suite->id,
                         'parameters' => [
                             'key1' => 'value1',
@@ -173,7 +173,7 @@ abstract class AbstractGetSerializedSuiteTest extends AbstractApplicationTest
                 'payload' => [],
                 'expectedResponseDataCreator' => function (SerializedSuite $serializedSuite) {
                     return [
-                        'id' => $serializedSuite->id,
+                        'id' => $serializedSuite->getId(),
                         'suite_id' => $serializedSuite->suite->id,
                         'parameters' => [],
                         'state' => State::PREPARED->value,
@@ -206,7 +206,7 @@ abstract class AbstractGetSerializedSuiteTest extends AbstractApplicationTest
                 'payload' => [],
                 'expectedResponseDataCreator' => function (SerializedSuite $serializedSuite) {
                     return [
-                        'id' => $serializedSuite->id,
+                        'id' => $serializedSuite->getId(),
                         'suite_id' => $serializedSuite->suite->id,
                         'parameters' => [],
                         'state' => State::FAILED->value,
