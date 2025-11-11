@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Services\Source;
 
 use App\Entity\FileSource;
-use App\Exception\EmptyEntityIdException;
 use App\Request\FileSourceRequest;
 use App\Services\EntityIdFactory;
 use SmartAssert\ServiceRequest\Exception\ErrorResponseException;
@@ -20,7 +19,6 @@ readonly class FileSourceFactory
     }
 
     /**
-     * @throws EmptyEntityIdException
      * @throws ErrorResponseException
      */
     public function create(User $user, FileSourceRequest $request): FileSource

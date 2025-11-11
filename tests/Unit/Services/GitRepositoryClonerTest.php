@@ -10,7 +10,6 @@ use App\Model\ProcessOutput;
 use App\Services\EntityIdFactory;
 use App\Services\GitRepositoryCloner;
 use App\Tests\Mock\Services\Process\MockExecutor;
-use App\Tests\Model\UserId;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 class GitRepositoryClonerTest extends WebTestCase
@@ -18,7 +17,7 @@ class GitRepositoryClonerTest extends WebTestCase
     public function testClone(): void
     {
         $url = 'https://user:password@example.com/repository.git';
-        $path = '/' . UserId::create() . '/' . (new EntityIdFactory())->create();
+        $path = '/' . (new EntityIdFactory())->create() . '/' . (new EntityIdFactory())->create();
 
         $expectedCommandDefinition = (new Definition('git clone'))
             ->withOptions([

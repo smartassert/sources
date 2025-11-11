@@ -7,7 +7,6 @@ namespace App\Tests\Services;
 use App\Entity\FileSource;
 use App\Entity\GitSource;
 use App\Services\EntityIdFactory;
-use App\Tests\Model\UserId;
 
 class SourceOriginFactory
 {
@@ -27,7 +26,7 @@ class SourceOriginFactory
         ?string $credentials = null,
         ?\DateTimeImmutable $deletedAt = null,
     ): FileSource|GitSource {
-        $userId = is_string($userId) ? $userId : UserId::create();
+        $userId = is_string($userId) ? $userId : (new EntityIdFactory())->create();
 
         if ('file' === $type) {
             $source = new FileSource((new EntityIdFactory())->create(), $userId);

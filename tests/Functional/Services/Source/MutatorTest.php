@@ -9,8 +9,8 @@ use App\Entity\GitSource;
 use App\Repository\SourceRepository;
 use App\Request\FileSourceRequest;
 use App\Request\GitSourceRequest;
+use App\Services\EntityIdFactory;
 use App\Services\Source\Mutator;
-use App\Tests\Model\UserId;
 use App\Tests\Services\EntityRemover;
 use App\Tests\Services\SourceOriginFactory;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -55,7 +55,7 @@ class MutatorTest extends WebTestCase
      */
     public static function updateFileNoChangesDataProvider(): array
     {
-        $userId = UserId::create();
+        $userId = (new EntityIdFactory())->create();
         $label = 'file source label';
         $fileSource = SourceOriginFactory::create(type: 'file', userId: $userId, label: $label);
         $fileSource->setLabel($label);
@@ -83,7 +83,7 @@ class MutatorTest extends WebTestCase
      */
     public static function updateGitNoChangesDataProvider(): array
     {
-        $userId = UserId::create();
+        $userId = (new EntityIdFactory())->create();
         $label = 'git source label';
         $hostUrl = 'https://example.com/repository.git';
         $path = '/path';
@@ -117,7 +117,7 @@ class MutatorTest extends WebTestCase
      */
     public static function updateFileDataProvider(): array
     {
-        $userId = UserId::create();
+        $userId = (new EntityIdFactory())->create();
         $label = 'file source label';
         $newLabel = 'new file source label';
         $originalFileSource = SourceOriginFactory::create(type: 'file', userId: $userId, label: $label);
@@ -151,7 +151,7 @@ class MutatorTest extends WebTestCase
      */
     public static function updateGitDataProvider(): array
     {
-        $userId = UserId::create();
+        $userId = (new EntityIdFactory())->create();
         $label = 'label';
         $hostUrl = 'https://example.com/repository.git';
         $path = '/path';
