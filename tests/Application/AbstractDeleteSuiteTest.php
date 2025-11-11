@@ -68,11 +68,11 @@ abstract class AbstractDeleteSuiteTest extends AbstractApplicationTest
     {
         $suite = $suiteCreator($this->source);
         $this->suiteRepository->save($suite);
-        $suiteId = $suite->id;
+        $suiteId = $suite->getId();
 
         $response = $this->applicationClient->makeDeleteSuiteRequest(
             self::$apiTokens->get(self::USER_1_EMAIL),
-            $suite->id,
+            $suite->getId(),
         );
 
         $entityManager = self::getContainer()->get(EntityManagerInterface::class);
@@ -103,7 +103,7 @@ abstract class AbstractDeleteSuiteTest extends AbstractApplicationTest
 
         $response = $this->applicationClient->makeDeleteSuiteRequest(
             self::$apiTokens->get(self::USER_1_EMAIL),
-            $suite->id
+            $suite->getId()
         );
 
         $responseData = json_decode($response->getBody()->getContents(), true);

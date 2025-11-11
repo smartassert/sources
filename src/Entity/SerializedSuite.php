@@ -122,7 +122,7 @@ class SerializedSuite implements UserHeldEntityInterface, DirectoryLocator, \Jso
     {
         $data = [
             'id' => $this->getId(),
-            'suite_id' => $this->suite->id,
+            'suite_id' => $this->suite->getId(),
             'parameters' => $this->parameters,
             'state' => $this->state->value,
             'is_prepared' => State::PREPARED === $this->state,

@@ -25,7 +25,7 @@ readonly class Mutator
     public function update(Suite $suite, SuiteRequest $request): Suite
     {
         $foundSuite = $this->repository->findOneBySourceOwnerAndLabel($request->source, $request->label);
-        if ($foundSuite instanceof Suite && $foundSuite->id !== $suite->id) {
+        if ($foundSuite instanceof Suite && $foundSuite->getId() !== $suite->getId()) {
             throw $this->exceptionFactory->createForDuplicateObject(new Parameter('label', $request->getLabel()));
         }
 

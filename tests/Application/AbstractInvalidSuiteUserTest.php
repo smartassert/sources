@@ -56,7 +56,7 @@ abstract class AbstractInvalidSuiteUserTest extends AbstractApplicationTest
     {
         $response = $this->applicationClient->makeGetSuiteRequest(
             self::$apiTokens->get(self::USER_1_EMAIL),
-            $this->suite->id,
+            $this->suite->getId(),
         );
 
         self::assertSame(403, $response->getStatusCode());
@@ -66,9 +66,9 @@ abstract class AbstractInvalidSuiteUserTest extends AbstractApplicationTest
     {
         $response = $this->applicationClient->makeUpdateSuiteRequest(
             self::$apiTokens->get(self::USER_1_EMAIL),
-            $this->suite->id,
+            $this->suite->getId(),
             [
-                SuiteRequest::PARAMETER_SOURCE_ID => $this->suite->id,
+                SuiteRequest::PARAMETER_SOURCE_ID => $this->suite->getId(),
                 SuiteRequest::PARAMETER_LABEL => StringFactory::createRandom(),
                 SuiteRequest::PARAMETER_TESTS => [],
             ]
@@ -81,7 +81,7 @@ abstract class AbstractInvalidSuiteUserTest extends AbstractApplicationTest
     {
         $response = $this->applicationClient->makeDeleteSuiteRequest(
             self::$apiTokens->get(self::USER_1_EMAIL),
-            $this->suite->id,
+            $this->suite->getId(),
         );
 
         self::assertSame(403, $response->getStatusCode());
@@ -92,7 +92,7 @@ abstract class AbstractInvalidSuiteUserTest extends AbstractApplicationTest
         $response = $this->applicationClient->makeCreateSerializedSuiteRequest(
             self::$apiTokens->get(self::USER_1_EMAIL),
             (string) new Ulid(),
-            $this->suite->id,
+            $this->suite->getId(),
             [],
         );
 

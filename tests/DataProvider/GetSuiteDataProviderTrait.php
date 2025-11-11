@@ -30,7 +30,7 @@ trait GetSuiteDataProviderTrait
                 },
                 'expectedResponseDataCreator' => function (Suite $suite) use ($label, $tests) {
                     $data = [
-                        'id' => $suite->id,
+                        'id' => $suite->getId(),
                         'source_id' => $suite->getSource()->getId(),
                         'label' => $label,
                         'tests' => $tests,

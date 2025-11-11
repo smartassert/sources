@@ -126,7 +126,7 @@ class Suite implements \JsonSerializable, UserHeldEntityInterface, IdentifiedEnt
     public function jsonSerialize(): array
     {
         $data = [
-            'id' => $this->id,
+            'id' => $this->getId(),
             'source_id' => $this->source->getId(),
             'label' => $this->label,
             'tests' => $this->tests,
@@ -145,6 +145,6 @@ class Suite implements \JsonSerializable, UserHeldEntityInterface, IdentifiedEnt
 
     public function getIdentifier(): EntityIdentifierInterface
     {
-        return new EntityIdentifier($this->id, EntityType::SUITE->value);
+        return new EntityIdentifier($this->getId(), EntityType::SUITE->value);
     }
 }
