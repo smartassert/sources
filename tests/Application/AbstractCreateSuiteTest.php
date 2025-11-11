@@ -76,7 +76,7 @@ abstract class AbstractCreateSuiteTest extends AbstractSuiteTest
         $expected = array_merge(
             $requestParameters,
             [
-                'id' => $suite->id,
+                'id' => $suite->getId(),
                 'source_id' => $this->sourceId,
             ]
         );

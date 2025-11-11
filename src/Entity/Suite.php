@@ -15,12 +15,9 @@ class Suite implements \JsonSerializable, UserHeldEntityInterface, IdentifiedEnt
     public const ID_LENGTH = 32;
     public const LABEL_MAX_LENGTH = 255;
 
-    /**
-     * @var non-empty-string
-     */
     #[ORM\Id]
     #[ORM\Column(type: Types::STRING, length: self::ID_LENGTH, unique: true)]
-    public readonly string $id;
+    private readonly string $id;
 
     #[ORM\ManyToOne(targetEntity: AbstractSource::class, cascade: ['persist'])]
     #[ORM\JoinColumn(nullable: false)]
@@ -47,6 +44,16 @@ class Suite implements \JsonSerializable, UserHeldEntityInterface, IdentifiedEnt
     public function __construct(string $id)
     {
         $this->id = $id;
+    }
+
+    /**
+     * @return non-empty-string
+     */
+    public function getId(): string
+    {
+        \assert('' !== $this->id);
+
+        return $this->id;
     }
 
     /**
@@ -116,7 +123,7 @@ class Suite implements \JsonSerializable, UserHeldEntityInterface, IdentifiedEnt
     public function jsonSerialize(): array
     {
         $data = [
-            'id' => $this->id,
+            'id' => $this->getId(),
             'source_id' => $this->source->getId(),
             'label' => $this->label,
             'tests' => $this->tests,
@@ -135,6 +142,6 @@ class Suite implements \JsonSerializable, UserHeldEntityInterface, IdentifiedEnt
 
     public function getIdentifier(): EntityIdentifierInterface
     {
-        return new EntityIdentifier($this->id, EntityType::SUITE->value);
+        return new EntityIdentifier($this->getId(), EntityType::SUITE->value);
     }
 }

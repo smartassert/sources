@@ -66,7 +66,7 @@ abstract class AbstractCreateSerializedSuiteTest extends AbstractApplicationTest
         $response = $this->applicationClient->makeCreateSerializedSuiteRequest(
             self::$apiTokens->get(self::USER_1_EMAIL),
             $serializedSuiteId,
-            $suite->id,
+            $suite->getId(),
             $payload
         );
 
@@ -78,7 +78,7 @@ abstract class AbstractCreateSerializedSuiteTest extends AbstractApplicationTest
         self::assertJsonStringEqualsJsonString(
             (string) json_encode([
                 'id' => $serializedSuiteId,
-                'suite_id' => $suite->id,
+                'suite_id' => $suite->getId(),
                 'parameters' => $expectedResponseParameters,
                 'state' => State::REQUESTED->value,
                 'is_prepared' => false,
@@ -190,7 +190,7 @@ abstract class AbstractCreateSerializedSuiteTest extends AbstractApplicationTest
         $firstResponse = $this->applicationClient->makeCreateSerializedSuiteRequest(
             self::$apiTokens->get(self::USER_1_EMAIL),
             $serializedSuiteId,
-            $suite->id,
+            $suite->getId(),
             []
         );
 
@@ -200,7 +200,7 @@ abstract class AbstractCreateSerializedSuiteTest extends AbstractApplicationTest
         $secondResponse = $this->applicationClient->makeCreateSerializedSuiteRequest(
             self::$apiTokens->get(self::USER_1_EMAIL),
             $serializedSuiteId,
-            $suite->id,
+            $suite->getId(),
             []
         );
 

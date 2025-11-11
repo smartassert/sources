@@ -96,7 +96,7 @@ abstract class AbstractListSuitesTest extends AbstractApplicationTest
 
                     return [
                         'source one suite one' => [
-                            'id' => $suite->id,
+                            'id' => $suite->getId(),
                             'source_id' => $source->getId(),
                         ],
                     ];
@@ -148,11 +148,11 @@ abstract class AbstractListSuitesTest extends AbstractApplicationTest
 
                     return [
                         'source one suite one' => [
-                            'id' => $suite1->id,
+                            'id' => $suite1->getId(),
                             'source_id' => $source1->getId(),
                         ],
                         'source two suite one' => [
-                            'id' => $suite2->id,
+                            'id' => $suite2->getId(),
                             'source_id' => $source2->getId(),
                         ],
                     ];
@@ -221,15 +221,15 @@ abstract class AbstractListSuitesTest extends AbstractApplicationTest
 
                     return [
                         'zebra' => [
-                            'id' => $zebraSuite->id,
+                            'id' => $zebraSuite->getId(),
                             'source_id' => $zebraSource->getId(),
                         ],
                         'apple' => [
-                            'id' => $appleSuite->id,
+                            'id' => $appleSuite->getId(),
                             'source_id' => $appleAndBatSource->getId(),
                         ],
                         'bat' => [
-                            'id' => $batSuite->id,
+                            'id' => $batSuite->getId(),
                             'source_id' => $appleAndBatSource->getId(),
                         ],
                     ];

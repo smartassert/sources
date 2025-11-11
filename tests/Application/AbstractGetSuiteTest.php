@@ -69,7 +69,7 @@ abstract class AbstractGetSuiteTest extends AbstractApplicationTest
 
         $response = $this->applicationClient->makeGetSuiteRequest(
             self::$apiTokens->get(self::USER_1_EMAIL),
-            $suite->id,
+            $suite->getId(),
         );
 
         $expectedResponseData = $expectedResponseDataCreator($suite);
