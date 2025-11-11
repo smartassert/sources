@@ -15,9 +15,6 @@ class GitSource extends AbstractSource
     public const PATH_MAX_LENGTH = 255;
     public const CREDENTIALS_MAX_LENGTH = 255;
 
-    /**
-     * @var non-empty-string
-     */
     #[ORM\Column(type: 'string', length: self::HOST_URL_MAX_LENGTH)]
     private string $hostUrl;
 
@@ -35,6 +32,7 @@ class GitSource extends AbstractSource
      */
     public function getHostUrl(): string
     {
+        \assert('' !== $this->hostUrl);
         return $this->hostUrl;
     }
 
