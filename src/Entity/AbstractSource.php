@@ -24,9 +24,6 @@ abstract class AbstractSource implements SourceInterface, \JsonSerializable, Ide
     public const TYPE_DISCRIMINATOR_LENGTH = 32;
     public const LABEL_MAX_LENGTH = 255;
 
-    /**
-     * @var non-empty-string
-     */
     #[ORM\Id]
     #[ORM\Column(type: 'string', length: self::ID_LENGTH, unique: true)]
     protected string $id;
@@ -61,6 +58,7 @@ abstract class AbstractSource implements SourceInterface, \JsonSerializable, Ide
      */
     public function getId(): string
     {
+        \assert('' !== $this->id);
         return $this->id;
     }
 
