@@ -15,12 +15,9 @@ class Suite implements \JsonSerializable, UserHeldEntityInterface, IdentifiedEnt
     public const ID_LENGTH = 32;
     public const LABEL_MAX_LENGTH = 255;
 
-    /**
-     * @var non-empty-string
-     */
     #[ORM\Id]
     #[ORM\Column(type: Types::STRING, length: self::ID_LENGTH, unique: true)]
-    public readonly string $id;
+    private readonly string $id;
 
     #[ORM\ManyToOne(targetEntity: AbstractSource::class, cascade: ['persist'])]
     #[ORM\JoinColumn(nullable: false)]
