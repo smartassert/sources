@@ -28,9 +28,6 @@ abstract class AbstractSource implements SourceInterface, \JsonSerializable, Ide
     #[ORM\Column(type: 'string', length: self::ID_LENGTH, unique: true)]
     protected string $id;
 
-    /**
-     * @var non-empty-string
-     */
     #[ORM\Column(type: 'string', length: 32)]
     private string $userId;
 
@@ -67,6 +64,7 @@ abstract class AbstractSource implements SourceInterface, \JsonSerializable, Ide
      */
     public function getUserId(): string
     {
+        \assert('' !== $this->userId);
         return $this->userId;
     }
 
