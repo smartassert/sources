@@ -50,6 +50,16 @@ class Suite implements \JsonSerializable, UserHeldEntityInterface, IdentifiedEnt
     }
 
     /**
+     * @return non-empty-string
+     */
+    public function getId(): string
+    {
+        \assert('' !== $this->id);
+
+        return $this->id;
+    }
+
+    /**
      * @param non-empty-string $label
      */
     public function setLabel(string $label): self
