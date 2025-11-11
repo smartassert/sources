@@ -100,4 +100,21 @@ class SuiteRepository extends ServiceEntityRepository
 
         return null;
     }
+
+    /**
+     * @param non-empty-string   $label
+     * @param non-empty-string[] $tests
+     */
+    public function findOneBySourceAndLabelAndTests(SourceInterface $source, string $label, array $tests): ?Suite
+    {
+        $suites = $this->findBy(['source' => $source, 'label' => $label, 'deletedAt' => null]);
+
+        foreach ($suites as $suite) {
+            if ($suite->getTests() === $tests) {
+                return $suite;
+            }
+        }
+
+        return null;
+    }
 }

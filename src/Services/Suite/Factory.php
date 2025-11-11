@@ -31,12 +31,7 @@ readonly class Factory
             $testsComparator = null;
         }
 
-        $suite = $this->repository->findOneBy([
-            'source' => $request->source,
-            'label' => $request->label,
-            'tests' => $testsComparator,
-            'deletedAt' => null,
-        ]);
+        $suite = $this->repository->findOneBySourceAndLabelAndTests($request->source, $request->label, $request->tests);
 
         if (null === $suite) {
             $suite = $this->mutator->update(
