@@ -106,6 +106,6 @@ class GitSource extends AbstractSource
 
     public function getIdentifier(): EntityIdentifierInterface
     {
-        return new EntityIdentifier($this->id, EntityType::GIT_SOURCE->value);
+        return new EntityIdentifier($this->getId(), EntityType::GIT_SOURCE->value);
     }
 }
