@@ -1,5 +1,3 @@
-includes:
-  - vendor/phpstan/phpstan/conf/bleedingEdge.neon
 parameters:
   treatPhpDocTypesAsCertain: false
   level: 9
