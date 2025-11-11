@@ -15,15 +15,9 @@ class GitSource extends AbstractSource
     public const PATH_MAX_LENGTH = 255;
     public const CREDENTIALS_MAX_LENGTH = 255;
 
-    /**
-     * @var non-empty-string
-     */
     #[ORM\Column(type: 'string', length: self::HOST_URL_MAX_LENGTH)]
     private string $hostUrl;
 
-    /**
-     * @var non-empty-string
-     */
     #[ORM\Column(type: 'string', length: self::PATH_MAX_LENGTH)]
     private string $path = '/';
 
@@ -35,6 +29,8 @@ class GitSource extends AbstractSource
      */
     public function getHostUrl(): string
     {
+        \assert('' !== $this->hostUrl);
+
         return $this->hostUrl;
     }
 
@@ -64,6 +60,8 @@ class GitSource extends AbstractSource
      */
     public function getPath(): string
     {
+        \assert('' !== $this->path);
+
         return $this->path;
     }
 
@@ -106,6 +104,6 @@ class GitSource extends AbstractSource
 
     public function getIdentifier(): EntityIdentifierInterface
     {
-        return new EntityIdentifier($this->id, EntityType::GIT_SOURCE->value);
+        return new EntityIdentifier($this->getId(), EntityType::GIT_SOURCE->value);
     }
 }

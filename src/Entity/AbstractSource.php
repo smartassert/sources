@@ -24,25 +24,16 @@ abstract class AbstractSource implements SourceInterface, \JsonSerializable, Ide
     public const TYPE_DISCRIMINATOR_LENGTH = 32;
     public const LABEL_MAX_LENGTH = 255;
 
-    /**
-     * @var non-empty-string
-     */
     #[ORM\Id]
     #[ORM\Column(type: 'string', length: self::ID_LENGTH, unique: true)]
     protected string $id;
 
-    /**
-     * @var non-empty-string
-     */
     #[ORM\Column(type: 'string', length: 32)]
     private string $userId;
 
     #[ORM\Column(type: Types::DATETIMETZ_IMMUTABLE, nullable: true)]
     private ?\DateTimeImmutable $deletedAt = null;
 
-    /**
-     * @var non-empty-string
-     */
     #[ORM\Column(type: 'string', length: self::LABEL_MAX_LENGTH)]
     private string $label;
 
@@ -61,6 +52,8 @@ abstract class AbstractSource implements SourceInterface, \JsonSerializable, Ide
      */
     public function getId(): string
     {
+        \assert('' !== $this->id);
+
         return $this->id;
     }
 
@@ -69,6 +62,8 @@ abstract class AbstractSource implements SourceInterface, \JsonSerializable, Ide
      */
     public function getUserId(): string
     {
+        \assert('' !== $this->userId);
+
         return $this->userId;
     }
 
@@ -89,6 +84,8 @@ abstract class AbstractSource implements SourceInterface, \JsonSerializable, Ide
      */
     public function getLabel(): string
     {
+        \assert('' !== $this->label);
+
         return $this->label;
     }
 

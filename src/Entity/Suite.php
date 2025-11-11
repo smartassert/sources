@@ -23,17 +23,14 @@ class Suite implements \JsonSerializable, UserHeldEntityInterface, IdentifiedEnt
     #[ORM\JoinColumn(nullable: false)]
     private SourceInterface $source;
 
-    /**
-     * @var non-empty-string
-     */
     #[ORM\Column(type: Types::STRING, length: self::LABEL_MAX_LENGTH)]
     private string $label;
 
     /**
-     * @var array<int, non-empty-string>
+     * @var null|array<string>
      */
     #[ORM\Column(type: Types::SIMPLE_ARRAY, nullable: true)]
-    private array $tests;
+    private ?array $tests;
 
     #[ORM\Column(type: Types::DATETIMETZ_IMMUTABLE, nullable: true)]
     private ?\DateTimeImmutable $deletedAt = null;
@@ -108,7 +105,18 @@ class Suite implements \JsonSerializable, UserHeldEntityInterface, IdentifiedEnt
      */
     public function getTests(): array
     {
-        return $this->tests;
+        $tests = [];
+        if (!is_array($this->tests)) {
+            return $tests;
+        }
+
+        foreach ($this->tests as $test) {
+            if ('' !== $test) {
+                $tests[] = $test;
+            }
+        }
+
+        return $tests;
     }
 
     /**
@@ -125,8 +133,8 @@ class Suite implements \JsonSerializable, UserHeldEntityInterface, IdentifiedEnt
         $data = [
             'id' => $this->getId(),
             'source_id' => $this->source->getId(),
-            'label' => $this->label,
-            'tests' => $this->tests,
+            'label' => $this->getLabel(),
+            'tests' => $this->getTests(),
         ];
 
         if ($this->getDeletedAt() instanceof \DateTimeInterface) {
@@ -143,5 +151,15 @@ class Suite implements \JsonSerializable, UserHeldEntityInterface, IdentifiedEnt
     public function getIdentifier(): EntityIdentifierInterface
     {
         return new EntityIdentifier($this->getId(), EntityType::SUITE->value);
+    }
+
+    /**
+     * @return non-empty-string
+     */
+    private function getLabel(): string
+    {
+        \assert('' !== $this->label);
+
+        return $this->label;
     }
 }
