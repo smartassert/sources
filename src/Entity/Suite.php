@@ -23,9 +23,6 @@ class Suite implements \JsonSerializable, UserHeldEntityInterface, IdentifiedEnt
     #[ORM\JoinColumn(nullable: false)]
     private SourceInterface $source;
 
-    /**
-     * @var non-empty-string
-     */
     #[ORM\Column(type: Types::STRING, length: self::LABEL_MAX_LENGTH)]
     private string $label;
 
@@ -54,6 +51,16 @@ class Suite implements \JsonSerializable, UserHeldEntityInterface, IdentifiedEnt
         \assert('' !== $this->id);
 
         return $this->id;
+    }
+
+    /**
+     * @return non-empty-string
+     */
+    private function getLabel(): string
+    {
+        \assert('' !== $this->label);
+
+        return $this->label;
     }
 
     /**
@@ -125,7 +132,7 @@ class Suite implements \JsonSerializable, UserHeldEntityInterface, IdentifiedEnt
         $data = [
             'id' => $this->getId(),
             'source_id' => $this->source->getId(),
-            'label' => $this->label,
+            'label' => $this->getLabel(),
             'tests' => $this->tests,
         ];
 
