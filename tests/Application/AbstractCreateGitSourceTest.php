@@ -114,35 +114,6 @@ abstract class AbstractCreateGitSourceTest extends AbstractApplicationTest
     }
 
     /**
-     * @return array<mixed>
-     */
-    public static function createGitSourceDataProvider(): array
-    {
-        $label = StringFactory::createRandom();
-        $hostUrl = 'https://example.com/' . StringFactory::createRandom() . '.git';
-        $path = '/' . StringFactory::createRandom();
-        $credentials = StringFactory::createRandom();
-
-        return [
-            'git source, credentials missing' => [
-                'requestParameters' => [
-                    GitSourceRequest::PARAMETER_LABEL => $label,
-                    GitSourceRequest::PARAMETER_HOST_URL => $hostUrl,
-                    GitSourceRequest::PARAMETER_PATH => $path
-                ],
-            ],
-            'git source, credentials present' => [
-                'requestParameters' => [
-                    GitSourceRequest::PARAMETER_LABEL => $label,
-                    GitSourceRequest::PARAMETER_HOST_URL => $hostUrl,
-                    GitSourceRequest::PARAMETER_PATH => $path,
-                    GitSourceRequest::PARAMETER_CREDENTIALS => $credentials,
-                ],
-            ],
-        ];
-    }
-
-    /**
      * @param array<string, string> $requestParameters
      */
     #[DataProvider('createGitSourceDataProvider')]
@@ -199,6 +170,35 @@ abstract class AbstractCreateGitSourceTest extends AbstractApplicationTest
         $secondCreateResponseData = json_decode($secondCreateResponse->getBody()->getContents(), true);
         \assert(is_array($secondCreateResponseData));
         self::assertNotSame($sourceId, $secondCreateResponseData['id']);
+    }
+
+    /**
+     * @return array<mixed>
+     */
+    public static function createGitSourceDataProvider(): array
+    {
+        $label = StringFactory::createRandom();
+        $hostUrl = 'https://example.com/' . StringFactory::createRandom() . '.git';
+        $path = '/' . StringFactory::createRandom();
+        $credentials = StringFactory::createRandom();
+
+        return [
+            'git source, credentials missing' => [
+                'requestParameters' => [
+                    GitSourceRequest::PARAMETER_LABEL => $label,
+                    GitSourceRequest::PARAMETER_HOST_URL => $hostUrl,
+                    GitSourceRequest::PARAMETER_PATH => $path
+                ],
+            ],
+            'git source, credentials present' => [
+                'requestParameters' => [
+                    GitSourceRequest::PARAMETER_LABEL => $label,
+                    GitSourceRequest::PARAMETER_HOST_URL => $hostUrl,
+                    GitSourceRequest::PARAMETER_PATH => $path,
+                    GitSourceRequest::PARAMETER_CREDENTIALS => $credentials,
+                ],
+            ],
+        ];
     }
 
     /**
