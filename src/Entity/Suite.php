@@ -27,7 +27,7 @@ class Suite implements \JsonSerializable, UserHeldEntityInterface, IdentifiedEnt
     private string $label;
 
     /**
-     * @var array<string>|null
+     * @var null|array<string>
      */
     #[ORM\Column(type: Types::SIMPLE_ARRAY, nullable: true)]
     private ?array $tests;
@@ -51,16 +51,6 @@ class Suite implements \JsonSerializable, UserHeldEntityInterface, IdentifiedEnt
         \assert('' !== $this->id);
 
         return $this->id;
-    }
-
-    /**
-     * @return non-empty-string
-     */
-    private function getLabel(): string
-    {
-        \assert('' !== $this->label);
-
-        return $this->label;
     }
 
     /**
@@ -161,5 +151,15 @@ class Suite implements \JsonSerializable, UserHeldEntityInterface, IdentifiedEnt
     public function getIdentifier(): EntityIdentifierInterface
     {
         return new EntityIdentifier($this->getId(), EntityType::SUITE->value);
+    }
+
+    /**
+     * @return non-empty-string
+     */
+    private function getLabel(): string
+    {
+        \assert('' !== $this->label);
+
+        return $this->label;
     }
 }

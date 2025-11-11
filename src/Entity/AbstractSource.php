@@ -53,6 +53,7 @@ abstract class AbstractSource implements SourceInterface, \JsonSerializable, Ide
     public function getId(): string
     {
         \assert('' !== $this->id);
+
         return $this->id;
     }
 
@@ -62,6 +63,7 @@ abstract class AbstractSource implements SourceInterface, \JsonSerializable, Ide
     public function getUserId(): string
     {
         \assert('' !== $this->userId);
+
         return $this->userId;
     }
 
@@ -83,6 +85,7 @@ abstract class AbstractSource implements SourceInterface, \JsonSerializable, Ide
     public function getLabel(): string
     {
         \assert('' !== $this->label);
+
         return $this->label;
     }
 

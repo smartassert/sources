@@ -30,6 +30,7 @@ class GitSource extends AbstractSource
     public function getHostUrl(): string
     {
         \assert('' !== $this->hostUrl);
+
         return $this->hostUrl;
     }
 
@@ -60,6 +61,7 @@ class GitSource extends AbstractSource
     public function getPath(): string
     {
         \assert('' !== $this->path);
+
         return $this->path;
     }
 
