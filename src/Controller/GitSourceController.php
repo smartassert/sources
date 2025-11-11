@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use App\Entity\GitSource;
-use App\Exception\EmptyEntityIdException;
 use App\Request\GitSourceRequest;
 use App\Services\Source\GitSourceFactory;
 use App\Services\Source\Mutator;
@@ -27,7 +26,6 @@ readonly class GitSourceController
     }
 
     /**
-     * @throws EmptyEntityIdException
      * @throws ErrorResponseException
      */
     #[Route(name: 'create', methods: ['POST'])]

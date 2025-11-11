@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use App\Entity\Suite;
-use App\Exception\EmptyEntityIdException;
 use App\Repository\SuiteRepository;
 use App\Request\SuiteRequest;
 use App\Services\Suite\Factory;
@@ -28,7 +27,6 @@ readonly class SuiteController
     }
 
     /**
-     * @throws EmptyEntityIdException
      * @throws ErrorResponseException
      */
     #[Route(SuiteRoutes::ROUTE_SUITE_BASE, name: 'suite_create', methods: ['POST'])]

@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Entity\GitSource;
-use App\Exception\EmptyEntityIdException;
 use App\Model\UserGitRepository;
 
 class UserGitRepositoryFactory
@@ -15,9 +14,6 @@ class UserGitRepositoryFactory
     ) {
     }
 
-    /**
-     * @throws EmptyEntityIdException
-     */
     public function create(GitSource $source): UserGitRepository
     {
         return new UserGitRepository($this->entityIdFactory->create(), $source);

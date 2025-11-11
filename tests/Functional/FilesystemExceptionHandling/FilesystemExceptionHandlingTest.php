@@ -59,7 +59,6 @@ class FilesystemExceptionHandlingTest extends WebTestCase
     ): void {
         $userId = StringFactory::createRandom();
         $sourceId = (string) new Ulid();
-        \assert('' !== $sourceId);
 
         $this->mockAuthenticator($userId);
 
@@ -91,7 +90,6 @@ class FilesystemExceptionHandlingTest extends WebTestCase
     ): void {
         $userId = StringFactory::createRandom();
         $sourceId = (string) new Ulid();
-        \assert('' !== $sourceId);
 
         $this->mockAuthenticator($userId);
 
@@ -122,7 +120,6 @@ class FilesystemExceptionHandlingTest extends WebTestCase
     ): void {
         $userId = StringFactory::createRandom();
         $sourceId = (string) new Ulid();
-        \assert('' !== $sourceId);
 
         $this->mockAuthenticator($userId);
 
@@ -153,7 +150,6 @@ class FilesystemExceptionHandlingTest extends WebTestCase
     ): void {
         $userId = StringFactory::createRandom();
         $sourceId = (string) new Ulid();
-        \assert('' !== $sourceId);
 
         $this->mockAuthenticator($userId);
 
@@ -183,7 +179,6 @@ class FilesystemExceptionHandlingTest extends WebTestCase
     ): void {
         $userId = StringFactory::createRandom();
         $sourceId = (string) new Ulid();
-        \assert('' !== $sourceId);
 
         $this->mockAuthenticator($userId);
 
@@ -213,7 +208,6 @@ class FilesystemExceptionHandlingTest extends WebTestCase
     ): void {
         $userId = StringFactory::createRandom();
         $serializedSuiteId = (string) new Ulid();
-        \assert('' !== $serializedSuiteId);
 
         $this->mockAuthenticator($userId);
 
@@ -270,7 +264,6 @@ class FilesystemExceptionHandlingTest extends WebTestCase
     ): void {
         $userId = StringFactory::createRandom();
         $sourceId = (string) new Ulid();
-        \assert('' !== $sourceId);
 
         $this->mockAuthenticator($userId);
 

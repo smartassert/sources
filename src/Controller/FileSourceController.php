@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use App\Entity\FileSource;
-use App\Exception\EmptyEntityIdException;
 use App\Exception\StorageExceptionFactory;
 use App\Request\FileSourceRequest;
 use App\Services\Source\FileSourceFactory;
@@ -30,7 +29,6 @@ readonly class FileSourceController
     }
 
     /**
-     * @throws EmptyEntityIdException
      * @throws ErrorResponseException
      */
     #[Route(name: 'create', methods: ['POST'])]
