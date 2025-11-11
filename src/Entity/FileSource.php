@@ -39,6 +39,6 @@ class FileSource extends AbstractSource implements DirectoryLocatorInterface, So
 
     public function getIdentifier(): EntityIdentifierInterface
     {
-        return new EntityIdentifier($this->id, EntityType::FILE_SOURCE->value);
+        return new EntityIdentifier($this->getId(), EntityType::FILE_SOURCE->value);
     }
 }
