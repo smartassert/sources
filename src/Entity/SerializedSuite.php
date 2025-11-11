@@ -57,6 +57,16 @@ class SerializedSuite implements UserHeldEntityInterface, DirectoryLocator, \Jso
     }
 
     /**
+     * @return non-empty-string
+     */
+    public function getId(): string
+    {
+        \assert('' !== $this->id);
+
+        return $this->id;
+    }
+
+    /**
      * @return array<string, string>
      */
     public function getParameters(): array
