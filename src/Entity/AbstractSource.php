@@ -34,9 +34,6 @@ abstract class AbstractSource implements SourceInterface, \JsonSerializable, Ide
     #[ORM\Column(type: Types::DATETIMETZ_IMMUTABLE, nullable: true)]
     private ?\DateTimeImmutable $deletedAt = null;
 
-    /**
-     * @var non-empty-string
-     */
     #[ORM\Column(type: 'string', length: self::LABEL_MAX_LENGTH)]
     private string $label;
 
@@ -85,6 +82,7 @@ abstract class AbstractSource implements SourceInterface, \JsonSerializable, Ide
      */
     public function getLabel(): string
     {
+        \assert('' !== $this->label);
         return $this->label;
     }
 
