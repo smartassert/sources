@@ -47,6 +47,7 @@ class CreateSerializedSuiteTest extends AbstractCreateSerializedSuiteTest
         $createSourceResponseData = json_decode($createSourceResponse->getBody()->getContents(), true);
         \assert(is_array($createSourceResponseData));
         $fileSourceId = $createSourceResponseData['id'] ?? null;
+        \assert(is_string($fileSourceId));
 
         $sourceIdentifier = 'Source/yaml_valid';
 
@@ -83,6 +84,7 @@ class CreateSerializedSuiteTest extends AbstractCreateSerializedSuiteTest
         $createSuiteResponseData = json_decode($createSuiteResponse->getBody()->getContents(), true);
         \assert(is_array($createSuiteResponseData));
         $suiteId = $createSuiteResponseData['id'] ?? null;
+        \assert(is_string($suiteId));
 
         $serializedSuiteId = (string) (new Ulid());
 

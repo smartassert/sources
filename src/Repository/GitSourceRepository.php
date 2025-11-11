@@ -9,11 +9,6 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @method null|GitSource find($id, $lockMode = null, $lockVersion = null)
- * @method null|GitSource findOneBy(array $criteria, array $orderBy = null)
- * @method GitSource[]    findAll()
- * @method GitSource[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
- *
  * @extends ServiceEntityRepository<GitSource>
  */
 class GitSourceRepository extends ServiceEntityRepository

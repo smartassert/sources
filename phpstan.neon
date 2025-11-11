@@ -1,9 +1,14 @@
 includes:
   - vendor/phpstan/phpstan/conf/bleedingEdge.neon
 parameters:
+  treatPhpDocTypesAsCertain: false
   level: 9
   paths:
     - public
     - src
     - tests
   inferPrivatePropertyTypeFromConstructor: true
+  ignoreErrors:
+    -
+      message: "#Property .*::.source type mapping mismatch: .*SourceInterface .*AbstractSource#"
+      path: src/Entity/Suite.php

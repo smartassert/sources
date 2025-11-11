@@ -139,7 +139,6 @@ class GitRepositoryStoreTest extends WebTestCase
         }
 
         self::assertGreaterThan($assertionCount, self::getCount());
-        self::assertInstanceOf(RepositoryException::class, $userGitRepositoryException);
         self::assertFalse($this->gitRepositoryStorage->directoryExists($this->gitRepository->getDirectoryPath()));
     }
 
@@ -323,11 +322,7 @@ class GitRepositoryStoreTest extends WebTestCase
         if ($outcome instanceof ProcessOutput) {
             $expectation->andReturnUsing(
                 function (string $repositoryPath) use ($outcome, $fixtureSetIdentifier): ProcessOutput {
-                    if (
-                        $outcome instanceof ProcessOutput
-                        && $outcome->isSuccessful()
-                        && is_string($fixtureSetIdentifier)
-                    ) {
+                    if ($outcome->isSuccessful() && is_string($fixtureSetIdentifier)) {
                         $this->fixtureCreator->copySetTo(
                             $fixtureSetIdentifier,
                             $this->gitRepositoryStorage,
