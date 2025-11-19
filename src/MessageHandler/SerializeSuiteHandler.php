@@ -20,8 +20,7 @@ class SerializeSuiteHandler
         private readonly SerializedSuiteRepository $serializedSuiteRepository,
         private readonly SuiteSerializer $suiteSerializer,
         private readonly SerializeSuiteExceptionFactory $serializeSuiteExceptionFactory,
-    ) {
-    }
+    ) {}
 
     /**
      * @throws SerializeSuiteException

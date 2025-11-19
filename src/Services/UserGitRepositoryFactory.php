@@ -11,8 +11,7 @@ class UserGitRepositoryFactory
 {
     public function __construct(
         private readonly EntityIdFactory $entityIdFactory,
-    ) {
-    }
+    ) {}
 
     public function create(GitSource $source): UserGitRepository
     {

@@ -18,8 +18,7 @@ abstract class AbstractSourceResolver implements ValueResolverInterface
     public function __construct(
         private readonly SourceRepository $sourceRepository,
         private readonly EntityAccessChecker $entityAccessChecker,
-    ) {
-    }
+    ) {}
 
     /**
      * @return SourceInterface[]

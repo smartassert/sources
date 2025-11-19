@@ -19,8 +19,7 @@ readonly class GitSourceRequestResolver implements ValueResolverInterface
     public function __construct(
         private StringParameterValidator $parameterValidator,
         private Factory $parameterFactory,
-    ) {
-    }
+    ) {}
 
     /**
      * @return GitSourceRequest[]

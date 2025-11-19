@@ -13,8 +13,7 @@ class FileStoreFixtureCreator
     public function __construct(
         private FilesystemReader $fixturesReader,
         private DirectoryListingFilter $listingFilter,
-    ) {
-    }
+    ) {}
 
     public function copySetTo(
         string $originRelativePath,

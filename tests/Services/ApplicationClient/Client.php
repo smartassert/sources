@@ -11,8 +11,7 @@ class Client
 {
     public function __construct(
         private ClientInterface $client,
-    ) {
-    }
+    ) {}
 
     public function makeAddFileRequest(
         ?string $authenticationToken,

@@ -20,8 +20,7 @@ class GitRepositoryStore
         private GitRepositoryCheckoutHandler $checkoutHandler,
         private UserGitRepositoryFactory $gitRepositoryFactory,
         private string $gitRepositoryBasePath,
-    ) {
-    }
+    ) {}
 
     /**
      * @throws GitRepositoryException

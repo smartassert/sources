@@ -21,8 +21,7 @@ readonly class CreateSerializedSuiteRequestResolver implements ValueResolverInte
     public function __construct(
         private SuiteRepository $suiteRepository,
         private EntityAccessChecker $entityAccessChecker,
-    ) {
-    }
+    ) {}
 
     /**
      * @return CreateSerializedSuiteRequest[]

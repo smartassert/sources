@@ -18,8 +18,7 @@ readonly class SuiteResolver implements ValueResolverInterface
     public function __construct(
         private SuiteRepository $suiteRepository,
         private EntityAccessChecker $entityAccessChecker,
-    ) {
-    }
+    ) {}
 
     /**
      * @return Suite[]

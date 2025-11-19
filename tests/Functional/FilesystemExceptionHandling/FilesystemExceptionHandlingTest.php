@@ -296,7 +296,7 @@ class FilesystemExceptionHandlingTest extends WebTestCase
 
         return [
             'generic filesystem error' => [
-                'exception' => new class ($message, $code) extends \Exception implements FsException {
+                'exception' => new class($message, $code) extends \Exception implements FsException {
                     public function __construct(string $message, int $code)
                     {
                         parent::__construct($message, $code);
@@ -313,7 +313,7 @@ class FilesystemExceptionHandlingTest extends WebTestCase
                 },
             ],
             'read failed, no known location' => [
-                'exception' => new class ($message, $code) extends \Exception implements FsOpFailed {
+                'exception' => new class($message, $code) extends \Exception implements FsOpFailed {
                     public function __construct(string $message, int $code)
                     {
                         parent::__construct($message, $code);
@@ -335,7 +335,7 @@ class FilesystemExceptionHandlingTest extends WebTestCase
                 },
             ],
             'write failed, no known location' => [
-                'exception' => new class ($message, $code) extends \Exception implements FsOpFailed {
+                'exception' => new class($message, $code) extends \Exception implements FsOpFailed {
                     public function __construct(string $message, int $code)
                     {
                         parent::__construct($message, $code);
@@ -357,7 +357,7 @@ class FilesystemExceptionHandlingTest extends WebTestCase
                 },
             ],
             'write failed, known location' => [
-                'exception' => new class ($location, $message, $code) extends \Exception implements FsOpFailed {
+                'exception' => new class($location, $message, $code) extends \Exception implements FsOpFailed {
                     public function __construct(private readonly string $location, string $message, int $code)
                     {
                         parent::__construct($message, $code);

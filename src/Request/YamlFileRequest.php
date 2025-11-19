@@ -10,6 +10,5 @@ class YamlFileRequest
 {
     public function __construct(
         public readonly Filename $filename,
-    ) {
-    }
+    ) {}
 }

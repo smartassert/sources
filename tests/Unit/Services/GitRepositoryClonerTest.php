@@ -21,7 +21,7 @@ class GitRepositoryClonerTest extends WebTestCase
 
         $expectedCommandDefinition = (new Definition('git clone'))
             ->withOptions([
-                Option::createLong('no-checkout')
+                Option::createLong('no-checkout'),
             ])->withArguments([$url, $path])
         ;
 

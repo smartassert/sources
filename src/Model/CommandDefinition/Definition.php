@@ -18,8 +18,7 @@ class Definition implements \Stringable
 
     public function __construct(
         private string $command
-    ) {
-    }
+    ) {}
 
     public function __toString(): string
     {

@@ -15,8 +15,7 @@ class Provider
      */
     public function __construct(
         private array $readers,
-    ) {
-    }
+    ) {}
 
     /**
      * @throws SourceRepositoryReaderNotFoundException

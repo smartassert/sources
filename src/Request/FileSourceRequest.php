@@ -13,8 +13,7 @@ class FileSourceRequest implements LabelledObjectRequestInterface
      */
     public function __construct(
         public readonly string $label,
-    ) {
-    }
+    ) {}
 
     public function getLabel(): string
     {

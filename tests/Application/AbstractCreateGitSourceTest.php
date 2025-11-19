@@ -81,7 +81,7 @@ abstract class AbstractCreateGitSourceTest extends AbstractApplicationTest
                 'requestParameters' => [
                     GitSourceRequest::PARAMETER_LABEL => $label,
                     GitSourceRequest::PARAMETER_HOST_URL => $hostUrl,
-                    GitSourceRequest::PARAMETER_PATH => $path
+                    GitSourceRequest::PARAMETER_PATH => $path,
                 ],
                 'expected' => [
                     'type' => Type::GIT->value,
@@ -183,7 +183,7 @@ abstract class AbstractCreateGitSourceTest extends AbstractApplicationTest
                 'requestParameters' => [
                     GitSourceRequest::PARAMETER_LABEL => $label,
                     GitSourceRequest::PARAMETER_HOST_URL => $hostUrl,
-                    GitSourceRequest::PARAMETER_PATH => $path
+                    GitSourceRequest::PARAMETER_PATH => $path,
                 ],
             ],
             'git source, credentials present' => [

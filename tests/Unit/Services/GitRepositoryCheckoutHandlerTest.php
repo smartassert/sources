@@ -40,12 +40,12 @@ class GitRepositoryCheckoutHandlerTest extends WebTestCase
             'without ref' => [
                 'path' => '/path/to/repository',
                 'ref' => null,
-                'expectedCommandDefinition' => new Definition('git checkout')
+                'expectedCommandDefinition' => new Definition('git checkout'),
             ],
             'with ref' => [
                 'path' => '/path/to/repository',
                 'ref' => 'ref',
-                'expectedCommandDefinition' => new Definition('git checkout ref')
+                'expectedCommandDefinition' => new Definition('git checkout ref'),
             ],
         ];
     }

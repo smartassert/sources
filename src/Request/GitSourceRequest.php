@@ -21,8 +21,7 @@ class GitSourceRequest implements LabelledObjectRequestInterface
         public readonly string $hostUrl,
         public readonly string $path,
         public readonly string $credentials,
-    ) {
-    }
+    ) {}
 
     public function getLabel(): string
     {

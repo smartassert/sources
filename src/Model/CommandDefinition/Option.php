@@ -9,8 +9,7 @@ class Option implements \Stringable
     public function __construct(
         private string $name,
         private bool $isShort,
-    ) {
-    }
+    ) {}
 
     public function __toString(): string
     {

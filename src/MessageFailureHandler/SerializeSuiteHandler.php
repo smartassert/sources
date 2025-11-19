@@ -13,8 +13,7 @@ class SerializeSuiteHandler implements ExceptionHandlerInterface
 {
     public function __construct(
         private readonly SerializedSuiteRepository $serializedSuiteRepository,
-    ) {
-    }
+    ) {}
 
     public function handle(Envelope $envelope, \Throwable $throwable): void
     {

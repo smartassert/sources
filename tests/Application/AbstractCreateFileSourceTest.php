@@ -77,7 +77,7 @@ abstract class AbstractCreateFileSourceTest extends AbstractApplicationTest
         return [
             'file source' => [
                 'requestParameters' => [
-                    FileSourceRequest::PARAMETER_LABEL => $label
+                    FileSourceRequest::PARAMETER_LABEL => $label,
                 ],
                 'expected' => [
                     'type' => Type::FILE->value,

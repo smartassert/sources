@@ -12,8 +12,7 @@ readonly class File implements \JsonSerializable
     public function __construct(
         private string $path,
         private int $size,
-    ) {
-    }
+    ) {}
 
     /**
      * @return array{path: non-empty-string, size: int}

@@ -15,8 +15,7 @@ class GitRepositoryCloner
 {
     public function __construct(
         private Executor $processExecutor
-    ) {
-    }
+    ) {}
 
     /**
      * @throws GitActionException

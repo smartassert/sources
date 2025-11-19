@@ -17,8 +17,7 @@ readonly class GitSourceFactory
         private EntityIdFactory $entityIdFactory,
         private GitSourceRepository $gitSourceRepository,
         private Mutator $sourceMutator,
-    ) {
-    }
+    ) {}
 
     /**
      * @throws ErrorResponseException

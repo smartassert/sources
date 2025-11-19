@@ -19,8 +19,7 @@ readonly class StoreYamlFileRequestValidator implements EventSubscriberInterface
         private YamlFilenameParameterValidator $yamlFilenameParameterValidator,
         private YamlParameterValidator $yamlParameterValidator,
         private Factory $parameterFactory,
-    ) {
-    }
+    ) {}
 
     /**
      * @return array<class-string, array<mixed>>

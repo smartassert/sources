@@ -14,8 +14,7 @@ class GitRepositoryCheckoutHandler
 {
     public function __construct(
         private Executor $processExecutor
-    ) {
-    }
+    ) {}
 
     /**
      * @throws GitActionException

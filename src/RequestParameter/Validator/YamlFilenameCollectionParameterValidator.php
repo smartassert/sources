@@ -15,8 +15,7 @@ readonly class YamlFilenameCollectionParameterValidator
     public function __construct(
         private YamlFilenameValidator $yamlFilenameValidator,
         private ErrorResponseExceptionFactory $exceptionFactory,
-    ) {
-    }
+    ) {}
 
     /**
      * @return non-empty-string[]

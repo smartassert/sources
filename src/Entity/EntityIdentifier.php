@@ -13,8 +13,7 @@ readonly class EntityIdentifier implements EntityIdentifierInterface
     public function __construct(
         private string $id,
         private string $type,
-    ) {
-    }
+    ) {}
 
     public function getId(): string
     {

@@ -25,8 +25,7 @@ readonly class FileSourceController
         private FileSourceFactory $sourceFactory,
         private Mutator $sourceMutator,
         private ErrorResponseExceptionFactory $exceptionFactory,
-    ) {
-    }
+    ) {}
 
     /**
      * @throws ErrorResponseException

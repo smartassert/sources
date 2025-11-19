@@ -26,8 +26,7 @@ readonly class SuiteRequestResolver implements ValueResolverInterface
         private StringParameterValidator $parameterValidator,
         private YamlFilenameCollectionParameterValidator $yamlFilenameCollectionParameterValidator,
         private Factory $parameterFactory,
-    ) {
-    }
+    ) {}
 
     /**
      * @return SuiteRequest[]

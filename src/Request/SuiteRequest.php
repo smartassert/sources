@@ -20,8 +20,7 @@ class SuiteRequest implements LabelledObjectRequestInterface
         public readonly SourceInterface $source,
         public readonly string $label,
         public readonly array $tests,
-    ) {
-    }
+    ) {}
 
     public function getLabel(): string
     {

@@ -14,8 +14,7 @@ class SerializeSuite
     public function __construct(
         private readonly string $suiteId,
         private readonly array $parameters,
-    ) {
-    }
+    ) {}
 
     public static function createFromSerializedSuite(SerializedSuite $serializedSuite): self
     {

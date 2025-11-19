@@ -18,8 +18,7 @@ class Mutator
     public function __construct(
         private readonly SourceRepository $sourceRepository,
         private readonly ErrorResponseExceptionFactory $exceptionFactory,
-    ) {
-    }
+    ) {}
 
     /**
      * @throws ErrorResponseException

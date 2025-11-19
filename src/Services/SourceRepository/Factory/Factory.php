@@ -17,8 +17,7 @@ class Factory
      */
     public function __construct(
         private readonly array $handlers,
-    ) {
-    }
+    ) {}
 
     /**
      * @param array<string, string> $parameters

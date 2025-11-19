@@ -16,6 +16,5 @@ class CreateSerializedSuiteRequest
         public readonly string $id,
         public readonly Suite $suite,
         public readonly array $runParameters,
-    ) {
-    }
+    ) {}
 }

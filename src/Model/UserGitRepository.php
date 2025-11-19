@@ -11,8 +11,7 @@ class UserGitRepository implements DirectoryLocatorInterface, SourceRepositoryIn
     public function __construct(
         private readonly string $id,
         private readonly GitSource $source
-    ) {
-    }
+    ) {}
 
     public function getId(): string
     {

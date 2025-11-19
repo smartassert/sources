@@ -27,8 +27,7 @@ readonly class FileSourceFileController
         private FilesystemReader $fileSourceReader,
         private ErrorResponseExceptionFactory $errorResponseExceptionFactory,
         private StorageExceptionFactory $storageExceptionFactory,
-    ) {
-    }
+    ) {}
 
     /**
      * @throws ErrorResponseException

@@ -6,6 +6,4 @@ namespace App\Tests\Exception;
 
 use Symfony\Component\Process\Exception\ExceptionInterface;
 
-class UnknownSymfonyProcessException extends \Exception implements ExceptionInterface
-{
-}
+class UnknownSymfonyProcessException extends \Exception implements ExceptionInterface {}
