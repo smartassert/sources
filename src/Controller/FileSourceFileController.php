@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
-use App\Entity\FileSource;
+use App\Entity\FileSourceInterface;
 use App\Exception\StorageExceptionFactory;
 use App\Request\AddYamlFileRequest;
 use App\Response\EmptyResponse;
@@ -33,7 +33,7 @@ readonly class FileSourceFileController
      * @throws ErrorResponseException
      */
     #[Route(name: 'store', methods: ['POST', 'PUT'])]
-    public function store(FileSource $source, AddYamlFileRequest $request, Request $symfonyRequest): Response
+    public function store(FileSourceInterface $source, AddYamlFileRequest $request, Request $symfonyRequest): Response
     {
         if (null !== $source->getDeletedAt()) {
             throw $this->errorResponseExceptionFactory->createForModifyReadOnlyEntity(
@@ -66,7 +66,7 @@ readonly class FileSourceFileController
      * @throws ErrorResponseException
      */
     #[Route(name: 'read', methods: ['GET'])]
-    public function read(FileSource $source, string $filename): Response
+    public function read(FileSourceInterface $source, string $filename): Response
     {
         $location = $source->getDirectoryPath() . '/' . $filename;
 
@@ -87,7 +87,7 @@ readonly class FileSourceFileController
      * @throws ErrorResponseException
      */
     #[Route(name: 'remove', methods: ['DELETE'])]
-    public function remove(FileSource $source, string $filename): Response
+    public function remove(FileSourceInterface $source, string $filename): Response
     {
         try {
             $this->fileSourceWriter->delete($source->getDirectoryPath() . '/' . $filename);

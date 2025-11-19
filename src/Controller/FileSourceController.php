@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
-use App\Entity\FileSource;
+use App\Entity\FileSourceInterface;
 use App\Exception\StorageExceptionFactory;
 use App\Request\FileSourceRequest;
 use App\Services\Source\FileSourceFactory;
@@ -40,7 +40,7 @@ readonly class FileSourceController
      * @throws ErrorResponseException
      */
     #[Route(path: '/' . SourceRoutes::ROUTE_SOURCE_ID_PATTERN, name: 'update', methods: ['PUT'])]
-    public function update(FileSource $source, FileSourceRequest $request): Response
+    public function update(FileSourceInterface $source, FileSourceRequest $request): Response
     {
         if (null !== $source->getDeletedAt()) {
             throw $this->exceptionFactory->createForModifyReadOnlyEntity(
@@ -57,7 +57,7 @@ readonly class FileSourceController
      */
     #[Route(path: '/' . SourceRoutes::ROUTE_SOURCE_ID_PATTERN . '/list/', name: 'list', methods: ['GET'])]
     public function list(
-        FileSource $source,
+        FileSourceInterface $source,
         DirectoryListingFactoryInterface $lister,
         StorageExceptionFactory $storageExceptionFactory,
     ): Response {
