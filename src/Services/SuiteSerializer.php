@@ -45,7 +45,7 @@ class SuiteSerializer
      */
     public function write(SerializedSuite $serializedSuite): ?string
     {
-        $suite = $serializedSuite->suite;
+        $suite = $serializedSuite->getSuite();
         $source = $suite->getSource();
 
         $sourceRepository = $this->sourceRepositoryFactory->create($source, $serializedSuite->getParameters());

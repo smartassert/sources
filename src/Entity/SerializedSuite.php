@@ -19,7 +19,7 @@ class SerializedSuite implements UserHeldEntityInterface, DirectoryLocator, \Jso
 
     #[ORM\ManyToOne(targetEntity: Suite::class)]
     #[ORM\JoinColumn(nullable: false)]
-    public readonly Suite $suite;
+    private readonly Suite $suite;
 
     #[ORM\Id]
     #[ORM\Column(type: Types::STRING, length: self::ID_LENGTH, unique: true)]
@@ -85,7 +85,7 @@ class SerializedSuite implements UserHeldEntityInterface, DirectoryLocator, \Jso
 
     public function getUserId(): string
     {
-        return $this->suite->getUserId();
+        return $this->getSuite()->getUserId();
     }
 
     public function setPreparationFailed(FailureReason $failureReason, string $failureMessage): self
@@ -108,6 +108,11 @@ class SerializedSuite implements UserHeldEntityInterface, DirectoryLocator, \Jso
         );
     }
 
+    public function getSuite(): Suite
+    {
+        return $this->suite;
+    }
+
     /**
      * @return array{
      *     "id": string,
@@ -122,7 +127,7 @@ class SerializedSuite implements UserHeldEntityInterface, DirectoryLocator, \Jso
     {
         $data = [
             'id' => $this->getId(),
-            'suite_id' => $this->suite->getId(),
+            'suite_id' => $this->getSuite()->getId(),
             'parameters' => $this->parameters,
             'state' => $this->state->value,
             'is_prepared' => State::PREPARED === $this->state,

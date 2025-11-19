@@ -18,7 +18,7 @@ class PathTraversalDetectedHandler implements ExceptionHandlerInterface
             return null;
         }
 
-        $suite = $serializedSuite->suite;
+        $suite = $serializedSuite->getSuite();
         $source = $suite->getSource();
 
         if (!$source instanceof GitSourceInterface) {

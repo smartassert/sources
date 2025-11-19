@@ -106,7 +106,7 @@ abstract class AbstractGetSerializedSuiteTest extends AbstractApplicationTest
                 'expectedResponseDataCreator' => function (SerializedSuite $serializedSuite) {
                     return [
                         'id' => $serializedSuite->getId(),
-                        'suite_id' => $serializedSuite->suite->getId(),
+                        'suite_id' => $serializedSuite->getSuite()->getId(),
                         'parameters' => [],
                         'state' => State::REQUESTED->value,
                         'is_prepared' => false,
@@ -138,7 +138,7 @@ abstract class AbstractGetSerializedSuiteTest extends AbstractApplicationTest
                 'expectedResponseDataCreator' => function (SerializedSuite $serializedSuite) {
                     return [
                         'id' => $serializedSuite->getId(),
-                        'suite_id' => $serializedSuite->suite->getId(),
+                        'suite_id' => $serializedSuite->getSuite()->getId(),
                         'parameters' => [
                             'key1' => 'value1',
                             'key2' => 'value2',
@@ -174,7 +174,7 @@ abstract class AbstractGetSerializedSuiteTest extends AbstractApplicationTest
                 'expectedResponseDataCreator' => function (SerializedSuite $serializedSuite) {
                     return [
                         'id' => $serializedSuite->getId(),
-                        'suite_id' => $serializedSuite->suite->getId(),
+                        'suite_id' => $serializedSuite->getSuite()->getId(),
                         'parameters' => [],
                         'state' => State::PREPARED->value,
                         'is_prepared' => true,
@@ -207,7 +207,7 @@ abstract class AbstractGetSerializedSuiteTest extends AbstractApplicationTest
                 'expectedResponseDataCreator' => function (SerializedSuite $serializedSuite) {
                     return [
                         'id' => $serializedSuite->getId(),
-                        'suite_id' => $serializedSuite->suite->getId(),
+                        'suite_id' => $serializedSuite->getSuite()->getId(),
                         'parameters' => [],
                         'state' => State::FAILED->value,
                         'is_prepared' => false,
