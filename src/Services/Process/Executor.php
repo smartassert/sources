@@ -13,8 +13,7 @@ class Executor
 {
     public function __construct(
         private Factory $factory,
-    ) {
-    }
+    ) {}
 
     /**
      * @throws ProcessExecutorException

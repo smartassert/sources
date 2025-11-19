@@ -15,8 +15,7 @@ readonly class FileSourceFactory
     public function __construct(
         private EntityIdFactory $entityIdFactory,
         private Mutator $sourceMutator,
-    ) {
-    }
+    ) {}
 
     /**
      * @throws ErrorResponseException

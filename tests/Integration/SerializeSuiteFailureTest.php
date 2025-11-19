@@ -28,7 +28,7 @@ class SerializeSuiteFailureTest extends AbstractApplicationTest
             [
                 GitSourceRequest::PARAMETER_LABEL => $label,
                 GitSourceRequest::PARAMETER_HOST_URL => $hostUrl,
-                GitSourceRequest::PARAMETER_PATH => $path
+                GitSourceRequest::PARAMETER_PATH => $path,
             ]
         );
 

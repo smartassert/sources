@@ -84,17 +84,17 @@ class SuiteSerializerFileSourceTest extends WebTestCase
             'empty source, empty manifest' => [
                 'sourceFixture' => null,
                 'suiteTests' => [],
-                'expectedFixture' => 'SerializedSuite/empty.yaml'
+                'expectedFixture' => 'SerializedSuite/empty.yaml',
             ],
             'empty source, non-empty manifest' => [
                 'sourceFixture' => null,
                 'suiteTests' => ['test1.yaml', 'test2.yaml'],
-                'expectedFixture' => 'SerializedSuite/empty_source_non-empty_manifest.yaml'
+                'expectedFixture' => 'SerializedSuite/empty_source_non-empty_manifest.yaml',
             ],
             'no yaml files' => [
                 'sourceFixture' => 'Source/txt',
                 'suiteTests' => [],
-                'expectedFixture' => 'SerializedSuite/empty.yaml'
+                'expectedFixture' => 'SerializedSuite/empty.yaml',
             ],
             'complete' => [
                 'sourceFixture' => 'Source/yml_yaml_valid',

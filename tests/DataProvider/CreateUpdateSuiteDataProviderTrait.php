@@ -30,7 +30,7 @@ trait CreateUpdateSuiteDataProviderTrait
                             'size' => [
                                 'minimum' => 1,
                                 'maximum' => 255,
-                            ]
+                            ],
                         ],
                     ],
                     'type' => 'wrong_size',
@@ -50,7 +50,7 @@ trait CreateUpdateSuiteDataProviderTrait
                             'size' => [
                                 'minimum' => 1,
                                 'maximum' => 255,
-                            ]
+                            ],
                         ],
                     ],
                     'type' => 'wrong_size',
@@ -70,7 +70,7 @@ trait CreateUpdateSuiteDataProviderTrait
                             'test.txt',
                         ],
                         'requirements' => [
-                            'data_type' => 'yaml_filename_collection'
+                            'data_type' => 'yaml_filename_collection',
                         ],
                     ],
                     'type' => 'invalid',
@@ -92,7 +92,7 @@ trait CreateUpdateSuiteDataProviderTrait
                             'test.yml',
                         ],
                         'requirements' => [
-                            'data_type' => 'yaml_filename_collection'
+                            'data_type' => 'yaml_filename_collection',
                         ],
                     ],
                     'type' => 'invalid',

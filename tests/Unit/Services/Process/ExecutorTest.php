@@ -86,7 +86,7 @@ class ExecutorTest extends TestCase
                             ->getMock()
                     )
                     ->getMock(),
-                'expectedOutput' => new ProcessOutput(0, 'process output', '')
+                'expectedOutput' => new ProcessOutput(0, 'process output', ''),
             ],
             'command with cwd exits with no errors' => [
                 'commandDefinition' => new Definition('./command'),
@@ -102,7 +102,7 @@ class ExecutorTest extends TestCase
                             ->getMock()
                     )
                     ->getMock(),
-                'expectedOutput' => new ProcessOutput(0, 'process output', '')
+                'expectedOutput' => new ProcessOutput(0, 'process output', ''),
             ],
             'command exits with error' => [
                 'commandDefinition' => new Definition('./command'),
@@ -118,7 +118,7 @@ class ExecutorTest extends TestCase
                             ->getMock()
                     )
                     ->getMock(),
-                'expectedOutput' => new ProcessOutput(1, 'process output', 'process error output')
+                'expectedOutput' => new ProcessOutput(1, 'process output', 'process error output'),
             ],
         ];
     }

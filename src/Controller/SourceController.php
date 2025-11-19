@@ -22,8 +22,7 @@ readonly class SourceController
 {
     public function __construct(
         private SourceRepository $repository,
-    ) {
-    }
+    ) {}
 
     #[Route('/sources', name: 'source_list', methods: ['GET'])]
     public function list(UserInterface $user): JsonResponse

@@ -10,8 +10,7 @@ class ProcessOutput
         private int $exitCode,
         private string $output,
         private string $errorOutput
-    ) {
-    }
+    ) {}
 
     public function getExitCode(): int
     {

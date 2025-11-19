@@ -25,7 +25,7 @@ abstract class AbstractListFileSourceFilenamesTest extends AbstractApplicationTe
         $createFileSourceResponse = $this->applicationClient->makeCreateFileSourceRequest(
             self::$apiTokens->get(self::USER_1_EMAIL),
             [
-                FileSourceRequest::PARAMETER_LABEL => $label
+                FileSourceRequest::PARAMETER_LABEL => $label,
             ]
         );
 

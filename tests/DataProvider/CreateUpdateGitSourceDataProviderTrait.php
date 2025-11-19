@@ -36,7 +36,7 @@ trait CreateUpdateGitSourceDataProviderTrait
                             'size' => [
                                 'minimum' => 1,
                                 'maximum' => 255,
-                            ]
+                            ],
                         ],
                     ],
                     'type' => 'wrong_size',
@@ -56,7 +56,7 @@ trait CreateUpdateGitSourceDataProviderTrait
                             'size' => [
                                 'minimum' => 1,
                                 'maximum' => 255,
-                            ]
+                            ],
                         ],
                     ],
                     'type' => 'wrong_size',
@@ -77,7 +77,7 @@ trait CreateUpdateGitSourceDataProviderTrait
                             'size' => [
                                 'minimum' => 1,
                                 'maximum' => 255,
-                            ]
+                            ],
                         ],
                     ],
                     'type' => 'wrong_size',
@@ -99,7 +99,7 @@ trait CreateUpdateGitSourceDataProviderTrait
                             'size' => [
                                 'minimum' => 1,
                                 'maximum' => 255,
-                            ]
+                            ],
                         ],
                     ],
                     'type' => 'wrong_size',
@@ -120,7 +120,7 @@ trait CreateUpdateGitSourceDataProviderTrait
                             'size' => [
                                 'minimum' => 1,
                                 'maximum' => 255,
-                            ]
+                            ],
                         ],
                     ],
                     'type' => 'wrong_size',
@@ -142,7 +142,7 @@ trait CreateUpdateGitSourceDataProviderTrait
                             'size' => [
                                 'minimum' => 1,
                                 'maximum' => 255,
-                            ]
+                            ],
                         ],
                     ],
                     'type' => 'wrong_size',
@@ -165,7 +165,7 @@ trait CreateUpdateGitSourceDataProviderTrait
                             'size' => [
                                 'minimum' => 0,
                                 'maximum' => 255,
-                            ]
+                            ],
                         ],
                     ],
                     'type' => 'wrong_size',

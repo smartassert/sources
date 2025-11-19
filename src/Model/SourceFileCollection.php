@@ -15,8 +15,7 @@ class SourceFileCollection implements \IteratorAggregate
     public function __construct(
         private array $paths,
         public readonly string $pathPrefix,
-    ) {
-    }
+    ) {}
 
     /**
      * @return \Traversable<int|string, string>

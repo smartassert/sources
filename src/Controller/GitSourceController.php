@@ -22,8 +22,7 @@ readonly class GitSourceController
         private GitSourceFactory $gitSourceFactory,
         private Mutator $mutator,
         private ErrorResponseExceptionFactory $exceptionFactory,
-    ) {
-    }
+    ) {}
 
     /**
      * @throws ErrorResponseException

@@ -31,7 +31,7 @@ class DefinitionTest extends TestCase
                 'definition' => (new Definition('./command'))
                     ->withOptions([
                         Option::createShort('s'),
-                        Option::createLong('long')
+                        Option::createLong('long'),
                     ]),
                 'expected' => './command -s --long',
             ],
@@ -55,7 +55,7 @@ class DefinitionTest extends TestCase
                 'definition' => (new Definition('./command'))
                     ->withOptions([
                         Option::createShort('s'),
-                        Option::createLong('long')
+                        Option::createLong('long'),
                     ])->withArguments([
                         'one',
                         'two',

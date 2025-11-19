@@ -12,8 +12,7 @@ class EntityAccessChecker
 {
     public function __construct(
         private readonly AuthorizationCheckerInterface $authorizationChecker,
-    ) {
-    }
+    ) {}
 
     /**
      * @throws AccessDeniedException

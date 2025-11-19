@@ -23,8 +23,7 @@ readonly class SuiteController
         private SuiteRepository $repository,
         private Mutator $mutator,
         private ErrorResponseExceptionFactory $exceptionFactory,
-    ) {
-    }
+    ) {}
 
     /**
      * @throws ErrorResponseException

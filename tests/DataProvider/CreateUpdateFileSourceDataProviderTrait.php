@@ -29,7 +29,7 @@ trait CreateUpdateFileSourceDataProviderTrait
                             'size' => [
                                 'minimum' => 1,
                                 'maximum' => 255,
-                            ]
+                            ],
                         ],
                     ],
                     'type' => 'wrong_size',
@@ -49,7 +49,7 @@ trait CreateUpdateFileSourceDataProviderTrait
                             'size' => [
                                 'minimum' => 1,
                                 'maximum' => 255,
-                            ]
+                            ],
                         ],
                     ],
                     'type' => 'wrong_size',

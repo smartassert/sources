@@ -17,8 +17,7 @@ class GitSourceHandler implements CreatorInterface, DestructorInterface
 {
     public function __construct(
         private GitRepositoryStore $gitRepositoryStore,
-    ) {
-    }
+    ) {}
 
     public function createsFor(SourceInterface $source): bool
     {

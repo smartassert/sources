@@ -73,7 +73,7 @@ class GitSource extends AbstractSource
     public function getRunParameterNames(): array
     {
         return [
-            'ref'
+            'ref',
         ];
     }
 
@@ -93,7 +93,7 @@ class GitSource extends AbstractSource
         return array_merge(parent::jsonSerialize(), [
             'host_url' => $this->hostUrl,
             'path' => $this->path,
-            'has_credentials' => '' !== $this->credentials
+            'has_credentials' => '' !== $this->credentials,
         ]);
     }
 

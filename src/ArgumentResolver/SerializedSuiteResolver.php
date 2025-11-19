@@ -18,8 +18,7 @@ readonly class SerializedSuiteResolver implements ValueResolverInterface
     public function __construct(
         private SerializedSuiteRepository $serializedSuiteRepository,
         private EntityAccessChecker $entityAccessChecker,
-    ) {
-    }
+    ) {}
 
     /**
      * @return SerializedSuite[]

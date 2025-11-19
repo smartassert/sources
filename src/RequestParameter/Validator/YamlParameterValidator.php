@@ -14,8 +14,7 @@ readonly class YamlParameterValidator
     public function __construct(
         private ContentValidator $yamlContentValidator,
         private ErrorResponseExceptionFactory $exceptionFactory,
-    ) {
-    }
+    ) {}
 
     /**
      * @throws ErrorResponseException

@@ -15,8 +15,7 @@ readonly class FileSourceDirectoryLister implements DirectoryListingFactoryInter
 {
     public function __construct(
         private FileSourceReader $reader,
-    ) {
-    }
+    ) {}
 
     /**
      * @throws FilesystemException

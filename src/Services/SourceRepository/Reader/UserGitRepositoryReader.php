@@ -12,8 +12,7 @@ class UserGitRepositoryReader implements ReaderInterface
 {
     public function __construct(
         private FilesystemReader $reader,
-    ) {
-    }
+    ) {}
 
     public function handles(SourceRepositoryInterface $sourceRepository): bool
     {

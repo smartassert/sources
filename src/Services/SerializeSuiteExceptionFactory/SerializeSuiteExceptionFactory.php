@@ -15,8 +15,7 @@ class SerializeSuiteExceptionFactory
      */
     public function __construct(
         private readonly iterable $handlers,
-    ) {
-    }
+    ) {}
 
     public function create(SerializedSuite $serializedSuite, \Throwable $throwable): SerializeSuiteException
     {

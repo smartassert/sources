@@ -56,8 +56,7 @@ abstract class AbstractListSuitesTest extends AbstractApplicationTest
     {
         return [
             'no suites' => [
-                'suitesCreator' => function () {
-                },
+                'suitesCreator' => function () {},
                 'expectedResponseData' => [],
             ],
             'no user suites' => [
@@ -162,13 +161,13 @@ abstract class AbstractListSuitesTest extends AbstractApplicationTest
                         'label' => 'source one suite one',
                         'tests' => [
                             'source_one_suite_one/test1.yaml',
-                            'source_one_suite_one/test2.yaml'
+                            'source_one_suite_one/test2.yaml',
                         ],
                     ],
                     'source two suite one' => [
                         'label' => 'source two suite one',
                         'tests' => [
-                            'source_two_suite_one/test1.yaml'
+                            'source_two_suite_one/test1.yaml',
                         ],
                     ],
                 ],

@@ -16,8 +16,7 @@ readonly class Factory
         private SuiteRepository $repository,
         private EntityIdFactory $entityIdFactory,
         private Mutator $mutator,
-    ) {
-    }
+    ) {}
 
     /**
      * @throws ErrorResponseException

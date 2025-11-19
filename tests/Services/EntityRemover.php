@@ -16,8 +16,7 @@ class EntityRemover
         private readonly SourceRepository $sourceRepository,
         private readonly SuiteRepository $suiteRepository,
         private readonly SerializedSuiteRepository $serializedSuiteRepository,
-    ) {
-    }
+    ) {}
 
     public function removeAll(): void
     {

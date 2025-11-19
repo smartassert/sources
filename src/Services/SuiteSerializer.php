@@ -34,8 +34,7 @@ class SuiteSerializer
         private readonly JobSourceSerializer $jobSourceSerializer,
         private readonly YamlParser $yamlParser,
         private readonly DirectoryListingFilter $listingFilter,
-    ) {
-    }
+    ) {}
 
     /**
      * @throws SourceRepositoryCreationException
