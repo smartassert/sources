@@ -116,7 +116,7 @@ class WorkerMessageFailedEventHandlerTest extends WebTestCase
             return [
                 new SerializeSuiteException(
                     $serializedSuite,
-                    new NoSourceRepositoryCreatorException($serializedSuite->suite->getSource()),
+                    new NoSourceRepositoryCreatorException($serializedSuite->getSuite()->getSource()),
                     FailureReason::UNSERIALIZABLE_SOURCE_TYPE,
                     $type
                 ),
