@@ -18,6 +18,8 @@ interface GitSourceInterface extends SourceInterface
 
     public function getCredentials(): string;
 
+    public function getIdentifier(): EntityIdentifierInterface;
+
     /**
      * @param non-empty-string $label
      */
