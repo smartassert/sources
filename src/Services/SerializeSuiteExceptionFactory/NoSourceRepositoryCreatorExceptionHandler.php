@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace App\Services\SerializeSuiteExceptionFactory;
 
-use App\Entity\SerializedSuite;
+use App\Entity\SerializedSuiteInterface;
 use App\Enum\SerializedSuite\FailureReason;
 use App\Exception\MessageHandler\SerializeSuiteException;
 use App\Exception\NoSourceRepositoryCreatorException;
 
 class NoSourceRepositoryCreatorExceptionHandler implements ExceptionHandlerInterface
 {
-    public function handle(SerializedSuite $serializedSuite, \Throwable $throwable): ?SerializeSuiteException
+    public function handle(SerializedSuiteInterface $serializedSuite, \Throwable $throwable): ?SerializeSuiteException
     {
         if (!$throwable instanceof NoSourceRepositoryCreatorException) {
             return null;

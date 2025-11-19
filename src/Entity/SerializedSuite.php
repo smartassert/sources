@@ -88,7 +88,7 @@ class SerializedSuite implements SerializedSuiteInterface, DirectoryLocator, \Js
         return $this->getSuite()->getUserId();
     }
 
-    public function setPreparationFailed(FailureReason $failureReason, string $failureMessage): self
+    public function setPreparationFailed(FailureReason $failureReason, string $failureMessage): static
     {
         if (State::FAILED !== $this->state) {
             $this->state = State::FAILED;

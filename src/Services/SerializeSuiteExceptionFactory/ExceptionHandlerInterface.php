@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace App\Services\SerializeSuiteExceptionFactory;
 
-use App\Entity\SerializedSuite;
+use App\Entity\SerializedSuiteInterface;
 use App\Exception\MessageHandler\SerializeSuiteException;
 
 interface ExceptionHandlerInterface
 {
-    public function handle(SerializedSuite $serializedSuite, \Throwable $throwable): ?SerializeSuiteException;
+    public function handle(SerializedSuiteInterface $serializedSuite, \Throwable $throwable): ?SerializeSuiteException;
 }
