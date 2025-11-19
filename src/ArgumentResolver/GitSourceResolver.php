@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace App\ArgumentResolver;
 
-use App\Entity\GitSource;
+use App\Entity\GitSourceInterface;
 
 class GitSourceResolver extends AbstractSourceResolver
 {
     protected function supportsArgumentType(string $type): bool
     {
-        return GitSource::class === $type;
+        return GitSourceInterface::class === $type;
     }
 }

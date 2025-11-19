@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
-use App\Entity\GitSource;
+use App\Entity\GitSourceInterface;
 use App\Request\GitSourceRequest;
 use App\Services\Source\GitSourceFactory;
 use App\Services\Source\Mutator;
@@ -37,7 +37,7 @@ readonly class GitSourceController
      * @throws ErrorResponseException
      */
     #[Route(path: '/' . SourceRoutes::ROUTE_SOURCE_ID_PATTERN, name: 'update', methods: ['PUT'])]
-    public function update(GitSource $source, GitSourceRequest $request): Response
+    public function update(GitSourceInterface $source, GitSourceRequest $request): Response
     {
         if (null !== $source->getDeletedAt()) {
             throw $this->exceptionFactory->createForModifyReadOnlyEntity(
