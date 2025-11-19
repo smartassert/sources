@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services\SerializeSuiteExceptionFactory;
 
-use App\Entity\GitSource;
+use App\Entity\GitSourceInterface;
 use App\Entity\SerializedSuite;
 use App\Enum\SerializedSuite\FailureReason;
 use App\Exception\MessageHandler\SerializeSuiteException;
@@ -21,7 +21,7 @@ class PathTraversalDetectedHandler implements ExceptionHandlerInterface
         $suite = $serializedSuite->suite;
         $source = $suite->getSource();
 
-        if (!$source instanceof GitSource) {
+        if (!$source instanceof GitSourceInterface) {
             return null;
         }
 

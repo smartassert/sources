@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Services\Source;
 
 use App\Entity\GitSource;
+use App\Entity\GitSourceInterface;
 use App\Repository\GitSourceRepository;
 use App\Request\GitSourceRequest;
 use App\Services\EntityIdFactory;
@@ -22,7 +23,7 @@ readonly class GitSourceFactory
     /**
      * @throws ErrorResponseException
      */
-    public function create(User $user, GitSourceRequest $request): GitSource
+    public function create(User $user, GitSourceRequest $request): GitSourceInterface
     {
         $source = $this->gitSourceRepository->findOneBy([
             'userId' => $user->getUserIdentifier(),
@@ -32,7 +33,7 @@ readonly class GitSourceFactory
             'path' => $request->path,
         ]);
 
-        if ($source instanceof GitSource) {
+        if ($source instanceof GitSourceInterface) {
             return $source;
         }
 
