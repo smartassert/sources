@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Message;
 
-use App\Entity\SerializedSuite;
+use App\Entity\SerializedSuiteInterface;
 
 class SerializeSuite
 {
@@ -16,7 +16,7 @@ class SerializeSuite
         private readonly array $parameters,
     ) {}
 
-    public static function createFromSerializedSuite(SerializedSuite $serializedSuite): self
+    public static function createFromSerializedSuite(SerializedSuiteInterface $serializedSuite): self
     {
         return new SerializeSuite($serializedSuite->getId(), $serializedSuite->getParameters());
     }

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Repository;
 
 use App\Entity\SerializedSuite;
+use App\Entity\SerializedSuiteInterface;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -18,7 +19,7 @@ class SerializedSuiteRepository extends ServiceEntityRepository
         parent::__construct($registry, SerializedSuite::class);
     }
 
-    public function save(SerializedSuite $entity): void
+    public function save(SerializedSuiteInterface $entity): void
     {
         $this->getEntityManager()->persist($entity);
         $this->getEntityManager()->flush();

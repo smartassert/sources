@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services\SerializeSuiteExceptionFactory;
 
-use App\Entity\SerializedSuite;
+use App\Entity\SerializedSuiteInterface;
 use App\Enum\SerializedSuite\FailureReason;
 use App\Exception\MessageHandler\SerializeSuiteException;
 
@@ -17,7 +17,7 @@ class SerializeSuiteExceptionFactory
         private readonly iterable $handlers,
     ) {}
 
-    public function create(SerializedSuite $serializedSuite, \Throwable $throwable): SerializeSuiteException
+    public function create(SerializedSuiteInterface $serializedSuite, \Throwable $throwable): SerializeSuiteException
     {
         $exception = null;
         foreach ($this->handlers as $handler) {

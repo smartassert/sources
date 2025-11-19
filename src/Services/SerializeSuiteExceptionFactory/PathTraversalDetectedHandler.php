@@ -5,14 +5,14 @@ declare(strict_types=1);
 namespace App\Services\SerializeSuiteExceptionFactory;
 
 use App\Entity\GitSourceInterface;
-use App\Entity\SerializedSuite;
+use App\Entity\SerializedSuiteInterface;
 use App\Enum\SerializedSuite\FailureReason;
 use App\Exception\MessageHandler\SerializeSuiteException;
 use League\Flysystem\PathTraversalDetected;
 
 class PathTraversalDetectedHandler implements ExceptionHandlerInterface
 {
-    public function handle(SerializedSuite $serializedSuite, \Throwable $throwable): ?SerializeSuiteException
+    public function handle(SerializedSuiteInterface $serializedSuite, \Throwable $throwable): ?SerializeSuiteException
     {
         if (!$throwable instanceof PathTraversalDetected) {
             return null;

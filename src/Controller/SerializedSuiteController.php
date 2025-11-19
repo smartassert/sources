@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use App\Entity\SerializedSuite;
+use App\Entity\SerializedSuiteInterface;
 use App\Exception\SerializedSuiteSourceDoesNotExistException;
 use App\Exception\StorageExceptionFactory;
 use App\Message\SerializeSuite;
@@ -47,7 +48,7 @@ class SerializedSuiteController
      */
     #[Route(SerializedSuiteRoutes::ROUTE_SERIALIZED_SUITE . '/read', name: 'serialized_suite_read', methods: ['GET'])]
     public function read(
-        SerializedSuite $serializedSuite,
+        SerializedSuiteInterface $serializedSuite,
         SuiteSerializer $suiteSerializer,
         ErrorResponseExceptionFactory $exceptionFactory,
         StorageExceptionFactory $storageExceptionFactory,
@@ -64,7 +65,7 @@ class SerializedSuiteController
     }
 
     #[Route(SerializedSuiteRoutes::ROUTE_SERIALIZED_SUITE, name: 'serialized_suite_get', methods: ['GET'])]
-    public function get(SerializedSuite $serializedSuite): Response
+    public function get(SerializedSuiteInterface $serializedSuite): Response
     {
         return new JsonResponse($serializedSuite);
     }
