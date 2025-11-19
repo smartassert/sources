@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
-use App\Entity\Suite;
+use App\Entity\SuiteInterface;
 use App\Repository\SuiteRepository;
 use App\Request\SuiteRequest;
 use App\Services\Suite\Factory;
@@ -35,7 +35,7 @@ readonly class SuiteController
     }
 
     #[Route(SuiteRoutes::ROUTE_SUITE, name: 'suite_get', methods: ['GET'])]
-    public function get(Suite $suite): Response
+    public function get(SuiteInterface $suite): Response
     {
         return new JsonResponse($suite);
     }
@@ -52,7 +52,7 @@ readonly class SuiteController
      * @throws ErrorResponseException
      */
     #[Route(SuiteRoutes::ROUTE_SUITE, name: 'suite_update', methods: ['PUT'])]
-    public function update(Suite $suite, SuiteRequest $request): Response
+    public function update(SuiteInterface $suite, SuiteRequest $request): Response
     {
         if (null !== $suite->getDeletedAt()) {
             throw $this->exceptionFactory->createForModifyReadOnlyEntity(
@@ -65,7 +65,7 @@ readonly class SuiteController
     }
 
     #[Route(SuiteRoutes::ROUTE_SUITE, name: 'suite_delete', methods: ['DELETE'])]
-    public function delete(Suite $suite): Response
+    public function delete(SuiteInterface $suite): Response
     {
         if (null === $suite->getDeletedAt()) {
             $this->repository->delete($suite);

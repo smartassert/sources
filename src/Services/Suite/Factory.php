@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Services\Suite;
 
 use App\Entity\Suite;
+use App\Entity\SuiteInterface;
 use App\Repository\SuiteRepository;
 use App\Request\SuiteRequest;
 use App\Services\EntityIdFactory;
@@ -21,7 +22,7 @@ readonly class Factory
     /**
      * @throws ErrorResponseException
      */
-    public function create(SuiteRequest $request): Suite
+    public function create(SuiteRequest $request): SuiteInterface
     {
         $testsComparator = $request->tests;
         if ([] === $testsComparator) {
