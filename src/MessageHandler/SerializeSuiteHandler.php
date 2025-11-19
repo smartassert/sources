@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\MessageHandler;
 
-use App\Entity\SerializedSuite;
+use App\Entity\SerializedSuiteInterface;
 use App\Enum\SerializedSuite\State;
 use App\Exception\MessageHandler\SerializeSuiteException;
 use App\Message\SerializeSuite;
@@ -29,7 +29,7 @@ class SerializeSuiteHandler
     {
         $serializedSuite = $this->serializedSuiteRepository->find($message->getSuiteId());
         if (
-            !$serializedSuite instanceof SerializedSuite
+            !$serializedSuite instanceof SerializedSuiteInterface
             || !in_array($serializedSuite->getState(), [State::REQUESTED, State::PREPARING_HALTED])
         ) {
             return;
