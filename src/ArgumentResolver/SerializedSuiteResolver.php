@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\ArgumentResolver;
 
 use App\Controller\SerializedSuiteRoutes;
-use App\Entity\SerializedSuite;
+use App\Entity\SerializedSuiteInterface;
 use App\Repository\SerializedSuiteRepository;
 use App\Security\EntityAccessChecker;
 use Symfony\Component\HttpFoundation\Request;
@@ -21,13 +21,13 @@ readonly class SerializedSuiteResolver implements ValueResolverInterface
     ) {}
 
     /**
-     * @return SerializedSuite[]
+     * @return SerializedSuiteInterface[]
      *
      * @throws AccessDeniedException
      */
     public function resolve(Request $request, ArgumentMetadata $argument): iterable
     {
-        if (SerializedSuite::class !== $argument->getType()) {
+        if (SerializedSuiteInterface::class !== $argument->getType()) {
             return [];
         }
 
