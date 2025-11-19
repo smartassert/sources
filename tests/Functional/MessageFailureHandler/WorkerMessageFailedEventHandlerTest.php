@@ -146,10 +146,8 @@ class WorkerMessageFailedEventHandlerTest extends WebTestCase
             StringFactory::createRandom()
         );
         $source = $source->setLabel(StringFactory::createRandom());
-        if ($source instanceof GitSource) {
-            $source->setHostUrl('https://example.com/repository.git');
-            $source->setPath('/out-of-scope/../../../');
-        }
+        $source->setHostUrl('https://example.com/repository.git');
+        $source->setPath('/out-of-scope/../../../');
 
         $sourceRepository = self::getContainer()->get(SourceRepository::class);
         \assert($sourceRepository instanceof SourceRepository);
