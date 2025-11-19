@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Services\Source;
 
 use App\Entity\FileSourceInterface;
-use App\Entity\GitSource;
+use App\Entity\GitSourceInterface;
 use App\Repository\SourceRepository;
 use App\Request\FileSourceRequest;
 use App\Request\GitSourceRequest;
@@ -29,7 +29,7 @@ class Mutator
             $this->createFindCriteria($source->getUserId(), $request->label)
         );
 
-        if ($existingSource instanceof GitSource) {
+        if ($existingSource instanceof GitSourceInterface) {
             throw $this->exceptionFactory->createForDuplicateObject(new Parameter('label', $request->getLabel()));
         }
 
@@ -53,7 +53,7 @@ class Mutator
     /**
      * @throws ErrorResponseException
      */
-    public function updateGit(GitSource $source, GitSourceRequest $request): GitSource
+    public function updateGit(GitSourceInterface $source, GitSourceRequest $request): GitSourceInterface
     {
         $existingSource = $this->sourceRepository->findOneBy(
             $this->createFindCriteria($source->getUserId(), $request->label)
@@ -61,7 +61,7 @@ class Mutator
 
         if (
             $existingSource instanceof FileSourceInterface
-            || ($existingSource instanceof GitSource && $existingSource->getId() !== $source->getId())
+            || ($existingSource instanceof GitSourceInterface && $existingSource->getId() !== $source->getId())
         ) {
             throw $this->exceptionFactory->createForDuplicateObject(new Parameter('label', $request->getLabel()));
         }

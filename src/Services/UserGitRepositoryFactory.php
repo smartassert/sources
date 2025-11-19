@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use App\Entity\GitSource;
+use App\Entity\GitSourceInterface;
 use App\Model\UserGitRepository;
 
 class UserGitRepositoryFactory
@@ -13,7 +13,7 @@ class UserGitRepositoryFactory
         private readonly EntityIdFactory $entityIdFactory,
     ) {}
 
-    public function create(GitSource $source): UserGitRepository
+    public function create(GitSourceInterface $source): UserGitRepository
     {
         return new UserGitRepository($this->entityIdFactory->create(), $source);
     }

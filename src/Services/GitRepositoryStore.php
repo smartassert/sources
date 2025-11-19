@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use App\Entity\GitSource;
+use App\Entity\GitSourceInterface;
 use App\Exception\GitActionException;
 use App\Exception\GitRepositoryException;
 use App\Model\UserGitRepository;
@@ -25,7 +25,7 @@ class GitRepositoryStore
     /**
      * @throws GitRepositoryException
      */
-    public function initialize(GitSource $source, ?string $ref): UserGitRepository
+    public function initialize(GitSourceInterface $source, ?string $ref): UserGitRepository
     {
         $gitRepository = $this->gitRepositoryFactory->create($source);
         $relativePath = $gitRepository->getDirectoryPath();
@@ -60,7 +60,7 @@ class GitRepositoryStore
         $this->gitRepositoryWriter->deleteDirectory($gitRepository->getDirectoryPath());
     }
 
-    private function createRepositoryUrl(GitSource $source): string
+    private function createRepositoryUrl(GitSourceInterface $source): string
     {
         $url = $source->getHostUrl();
 
