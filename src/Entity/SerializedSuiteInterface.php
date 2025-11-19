@@ -21,4 +21,6 @@ interface SerializedSuiteInterface extends UserHeldEntityInterface, IdentifiedEn
     public function setPreparationFailed(FailureReason $failureReason, string $failureMessage): static;
 
     public function getSuite(): Suite;
+
+    public function getDirectoryPath(): string;
 }

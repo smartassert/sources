@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use App\Entity\SerializedSuite;
+use App\Entity\SerializedSuiteInterface;
 use App\Exception\NoSourceRepositoryCreatorException;
 use App\Exception\SerializedSuiteSourceDoesNotExistException;
 use App\Exception\SourceRepositoryCreationException;
@@ -43,7 +43,7 @@ class SuiteSerializer
      * @throws NoSourceRepositoryCreatorException
      * @throws UnableToWriteSerializedSuiteException
      */
-    public function write(SerializedSuite $serializedSuite): ?string
+    public function write(SerializedSuiteInterface $serializedSuite): ?string
     {
         $suite = $serializedSuite->getSuite();
         $source = $suite->getSource();
@@ -81,7 +81,7 @@ class SuiteSerializer
      * @throws FilesystemException
      * @throws SerializedSuiteSourceDoesNotExistException
      */
-    public function read(SerializedSuite $serializedSuite): string
+    public function read(SerializedSuiteInterface $serializedSuite): string
     {
         $path = $serializedSuite->getDirectoryPath() . '/' . self::SERIALIZED_FILENAME;
 
