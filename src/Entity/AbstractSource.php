@@ -92,7 +92,7 @@ abstract class AbstractSource implements SourceInterface, \JsonSerializable, Ide
     /**
      * @param non-empty-string $label
      */
-    public function setLabel(string $label): self
+    public function setLabel(string $label): static
     {
         $this->label = $label;
 

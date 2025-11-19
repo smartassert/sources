@@ -6,12 +6,12 @@ namespace App\Entity;
 
 use App\Enum\EntityType;
 use App\Enum\Source\Type;
-use App\Model\DirectoryLocatorInterface;
+use App\Model\DirectoryLocatorInterface as DirectoryLocator;
 use App\Model\SourceRepositoryInterface;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity]
-class FileSource extends AbstractSource implements DirectoryLocatorInterface, SourceRepositoryInterface
+class FileSource extends AbstractSource implements DirectoryLocator, SourceRepositoryInterface, FileSourceInterface
 {
     public function getRunParameterNames(): array
     {

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services\SourceRepository\Reader;
 
-use App\Entity\FileSource;
+use App\Entity\FileSourceInterface;
 use App\Model\DirectoryListing;
 use App\Model\File;
 use League\Flysystem\FileAttributes;
@@ -20,7 +20,7 @@ readonly class FileSourceDirectoryLister implements DirectoryListingFactoryInter
     /**
      * @throws FilesystemException
      */
-    public function list(FileSource $source): DirectoryListing
+    public function list(FileSourceInterface $source): DirectoryListing
     {
         $directoryListing = $this->reader->getReader()->listContents(
             location: $source->getDirectoryPath(),

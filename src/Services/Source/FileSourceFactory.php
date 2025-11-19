@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Services\Source;
 
 use App\Entity\FileSource;
+use App\Entity\FileSourceInterface;
 use App\Request\FileSourceRequest;
 use App\Services\EntityIdFactory;
 use SmartAssert\ServiceRequest\Exception\ErrorResponseException;
@@ -20,7 +21,7 @@ readonly class FileSourceFactory
     /**
      * @throws ErrorResponseException
      */
-    public function create(User $user, FileSourceRequest $request): FileSource
+    public function create(User $user, FileSourceRequest $request): FileSourceInterface
     {
         return $this->sourceMutator->updateFile(
             new FileSource($this->entityIdFactory->create(), $user->getUserIdentifier()),
