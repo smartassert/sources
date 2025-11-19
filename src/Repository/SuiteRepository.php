@@ -6,6 +6,7 @@ namespace App\Repository;
 
 use App\Entity\SourceInterface;
 use App\Entity\Suite;
+use App\Entity\SuiteInterface;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Query\Parameter;
@@ -22,13 +23,13 @@ class SuiteRepository extends ServiceEntityRepository
         parent::__construct($registry, Suite::class);
     }
 
-    public function save(Suite $entity): void
+    public function save(SuiteInterface $entity): void
     {
         $this->getEntityManager()->persist($entity);
         $this->getEntityManager()->flush();
     }
 
-    public function delete(Suite $entity): void
+    public function delete(SuiteInterface $entity): void
     {
         $entity->setDeletedAt(new \DateTimeImmutable());
 
@@ -36,7 +37,7 @@ class SuiteRepository extends ServiceEntityRepository
     }
 
     /**
-     * @return Suite[]
+     * @return SuiteInterface[]
      */
     public function findForUser(UserInterface $user): array
     {

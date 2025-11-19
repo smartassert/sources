@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\ArgumentResolver;
 
 use App\Controller\SuiteRoutes;
-use App\Entity\Suite;
+use App\Entity\SuiteInterface;
 use App\Repository\SuiteRepository;
 use App\Security\EntityAccessChecker;
 use Symfony\Component\HttpFoundation\Request;
@@ -21,13 +21,13 @@ readonly class SuiteResolver implements ValueResolverInterface
     ) {}
 
     /**
-     * @return Suite[]
+     * @return SuiteInterface[]
      *
      * @throws AccessDeniedException
      */
     public function resolve(Request $request, ArgumentMetadata $argument): iterable
     {
-        if (Suite::class !== $argument->getType()) {
+        if (SuiteInterface::class !== $argument->getType()) {
             return [];
         }
 

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services\Suite;
 
-use App\Entity\Suite;
+use App\Entity\SuiteInterface;
 use App\Repository\SuiteRepository;
 use App\Request\SuiteRequest;
 use SmartAssert\ServiceRequest\Exception\ErrorResponseException;
@@ -21,10 +21,10 @@ readonly class Mutator
     /**
      * @throws ErrorResponseException
      */
-    public function update(Suite $suite, SuiteRequest $request): Suite
+    public function update(SuiteInterface $suite, SuiteRequest $request): SuiteInterface
     {
         $foundSuite = $this->repository->findOneBySourceOwnerAndLabel($request->source, $request->label);
-        if ($foundSuite instanceof Suite && $foundSuite->getId() !== $suite->getId()) {
+        if ($foundSuite instanceof SuiteInterface && $foundSuite->getId() !== $suite->getId()) {
             throw $this->exceptionFactory->createForDuplicateObject(new Parameter('label', $request->getLabel()));
         }
 
