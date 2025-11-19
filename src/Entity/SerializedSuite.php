@@ -13,7 +13,7 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: SerializedSuiteRepository::class)]
-class SerializedSuite implements UserHeldEntityInterface, DirectoryLocator, \JsonSerializable, IdentifiedEntityInterface
+class SerializedSuite implements SerializedSuiteInterface, DirectoryLocator, \JsonSerializable
 {
     public const ID_LENGTH = 32;
 
