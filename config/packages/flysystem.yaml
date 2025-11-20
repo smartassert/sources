@@ -17,3 +17,11 @@ flysystem:
             options:
                 client: 'app.services.remote_storage.client'
                 bucket: '%env(REMOTE_STORAGE_SERIALIZED_SUITE_BUCKET)%'
+
+when@test:
+    flysystem:
+        storages:
+            test_fixtures.storage:
+                adapter: 'local'
+                options:
+                    directory: '%fixtures_base_path%'
