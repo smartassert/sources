@@ -21,11 +21,6 @@ interface GitSourceInterface extends SourceInterface
     public function getIdentifier(): EntityIdentifierInterface;
 
     /**
-     * @param non-empty-string $label
-     */
-    public function setLabel(string $label): static;
-
-    /**
      * @param non-empty-string $hostUrl
      */
     public function setHostUrl(string $hostUrl): void;
