@@ -10,3 +10,12 @@ framework:
 
         routing:
             '*': async
+
+when@test:
+    framework:
+        messenger:
+            transports:
+                async: 'in-memory://'
+
+            routing:
+                '*': async
