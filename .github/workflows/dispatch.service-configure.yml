@@ -59,7 +59,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Set env.service_env_vars
         run: echo "service_env_vars=$(jq -R . < ./build/instance-manager/env.json | tr -d '\n' | sed 's/""//g')" >> "$GITHUB_ENV"
