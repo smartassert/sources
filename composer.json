@@ -18,24 +18,24 @@
         "psr/http-message": "^1.0",
         "smartassert/health-check-bundle": "^8.1",
         "smartassert/service-request": "^1.4",
-        "smartassert/users-security-bundle": "^11.1",
+        "smartassert/users-security-bundle": "^12.0",
         "smartassert/worker-job-source": "^6.0",
-        "smartassert/worker-message-failed-event-bundle": "^3.0",
+        "smartassert/worker-message-failed-event-bundle": "^4.0",
         "smartassert/yaml-file": "^9.0",
-        "symfony/console": "7.4.*",
-        "symfony/doctrine-messenger": "7.4.*",
-        "symfony/dotenv": "7.4.*",
-        "symfony/finder": "7.4.*",
+        "symfony/console": "8.0.*",
+        "symfony/doctrine-messenger": "8.0.*",
+        "symfony/dotenv": "8.0.*",
+        "symfony/finder": "8.0.*",
         "symfony/flex": "^2",
-        "symfony/framework-bundle": "7.4.*",
-        "symfony/messenger": "7.4.*",
-        "symfony/monolog-bundle": "^3.7",
-        "symfony/process": "7.4.*",
-        "symfony/runtime": "7.4.*",
-        "symfony/security-bundle": "7.4.*",
-        "symfony/string": "7.4.*",
-        "symfony/uid": "7.4.*",
-        "symfony/yaml": "7.4.*"
+        "symfony/framework-bundle": "8.0.*",
+        "symfony/messenger": "8.0.*",
+        "symfony/monolog-bundle": "^4.0",
+        "symfony/process": "8.0.*",
+        "symfony/runtime": "8.0.*",
+        "symfony/security-bundle": "8.0.*",
+        "symfony/string": "8.0.*",
+        "symfony/uid": "8.0.*",
+        "symfony/yaml": "8.0.*"
     },
     "require-dev": {
         "friendsofphp/php-cs-fixer": "^3.89",
@@ -48,14 +48,14 @@
         "phpstan/phpstan-phpunit": "^2.0",
         "phpstan/phpstan-symfony": "^2.0",
         "phpunit/phpunit": "^12",
-        "smartassert/symfony-test-client": "^2.1",
-        "smartassert/test-authenticaton-provider-bundle": "^5.0",
+        "smartassert/symfony-test-client": "^3.0",
+        "smartassert/test-authenticaton-provider-bundle": "^6.0",
         "squizlabs/php_codesniffer": "^4.0",
-        "symfony/browser-kit": "7.4.*",
-        "symfony/expression-language": "7.4.*",
+        "symfony/browser-kit": "8.0.*",
+        "symfony/expression-language": "8.0.*",
         "symfony/maker-bundle": "^1.36",
-        "symfony/phpunit-bridge": "7.4.*",
-        "symfony/psr-http-message-bridge": "7.4.*",
+        "symfony/phpunit-bridge": "8.0.*",
+        "symfony/psr-http-message-bridge": "8.0.*",
         "webignition/object-reflector": "^1.0"
     },
     "config": {
@@ -174,7 +174,7 @@
     "extra": {
         "symfony": {
             "allow-contrib": false,
-            "require": "7.4.*"
+            "require": "8.0.*"
         }
     }
 }
