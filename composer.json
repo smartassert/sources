@@ -94,10 +94,20 @@
             "assets:install %PUBLIC_DIR%": "symfony-cmd"
         },
         "post-install-cmd": [
+            "@patch-doctrine-migrations-bundle-for-symfony-8",
             "@auto-scripts"
         ],
         "post-update-cmd": [
+            "@patch-doctrine-migrations-bundle-for-symfony-8",
             "@auto-scripts"
+        ],
+        "patch-doctrine-migrations-bundle-for-symfony-8": [
+            "sed -i 's/exception = null): void/exception = null)/g' vendor/doctrine/doctrine-migrations-bundle/src/Collector/MigrationsCollector.php",
+            "sed -i 's/exception = null)/exception = null): void/g' vendor/doctrine/doctrine-migrations-bundle/src/Collector/MigrationsCollector.php",
+            "sed -i 's/public function getName(): string/public function getName()/g' vendor/doctrine/doctrine-migrations-bundle/src/Collector/MigrationsCollector.php",
+            "sed -i 's/public function getName()/public function getName(): string/g' vendor/doctrine/doctrine-migrations-bundle/src/Collector/MigrationsCollector.php",
+            "sed -i 's/public function reset(): void/public function reset()/g' vendor/doctrine/doctrine-migrations-bundle/src/Collector/MigrationsCollector.php",
+            "sed -i 's/public function reset()/public function reset(): void/g' vendor/doctrine/doctrine-migrations-bundle/src/Collector/MigrationsCollector.php"
         ],
         "db-setup": [
             "php bin/console doctrine:database:create --if-not-exists --quiet",
