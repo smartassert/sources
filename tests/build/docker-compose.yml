@@ -31,7 +31,7 @@ services:
       - ./users-service/caddy/Caddyfile:/etc/caddy/Caddyfile
 
   s3-mock:
-    image: adobe/s3mock:2.4.14
+    image: adobe/s3mock:4.11.0
     container_name: s3-mock
     ports:
       - "9090:9090"
