@@ -125,13 +125,20 @@ class SerializedSuite implements SerializedSuiteInterface, DirectoryLocator, \Js
      */
     public function jsonSerialize(): array
     {
+        $hasEndState = State::PREPARED === $this->state || State::FAILED === $this->state;
+        $isPrepared = State::PREPARED === $this->state;
+
         $data = [
             'id' => $this->getId(),
             'suite_id' => $this->getSuite()->getId(),
             'parameters' => $this->parameters,
             'state' => $this->state->value,
-            'is_prepared' => State::PREPARED === $this->state,
-            'has_end_state' => State::PREPARED === $this->state || State::FAILED === $this->state,
+            'is_prepared' => $isPrepared,
+            'has_end_state' => $hasEndState,
+            'meta_state' => [
+                'ended' => $hasEndState,
+                'succeeded' => $isPrepared,
+            ],
         ];
 
         if (State::FAILED === $this->state) {
