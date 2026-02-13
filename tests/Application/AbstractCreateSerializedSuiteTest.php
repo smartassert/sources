@@ -83,6 +83,10 @@ abstract class AbstractCreateSerializedSuiteTest extends AbstractApplicationTest
                 'state' => State::REQUESTED->value,
                 'is_prepared' => false,
                 'has_end_state' => false,
+                'meta_state' => [
+                    'ended' => false,
+                    'succeeded' => false,
+                ],
             ]),
             $response->getBody()->getContents()
         );

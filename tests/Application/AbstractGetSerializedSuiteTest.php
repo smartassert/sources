@@ -46,7 +46,6 @@ abstract class AbstractGetSerializedSuiteTest extends AbstractApplicationTest
      * @param callable(UserProvider): SourceInterface $sourceCreator
      * @param callable(SourceInterface): Suite        $suiteCreator
      * @param callable(Suite): SerializedSuite        $serializedSuiteCreator
-     * @param array<string, string>                   $payload
      * @param callable(SerializedSuite): array<mixed> $expectedResponseDataCreator
      */
     #[DataProvider('serializeSuccessDataProvider')]
@@ -54,7 +53,6 @@ abstract class AbstractGetSerializedSuiteTest extends AbstractApplicationTest
         callable $sourceCreator,
         callable $suiteCreator,
         callable $serializedSuiteCreator,
-        array $payload,
         callable $expectedResponseDataCreator,
     ): void {
         $source = $sourceCreator(self::$users);
@@ -102,7 +100,6 @@ abstract class AbstractGetSerializedSuiteTest extends AbstractApplicationTest
                         []
                     );
                 },
-                'payload' => [],
                 'expectedResponseDataCreator' => function (SerializedSuite $serializedSuite) {
                     return [
                         'id' => $serializedSuite->getId(),
@@ -111,6 +108,10 @@ abstract class AbstractGetSerializedSuiteTest extends AbstractApplicationTest
                         'state' => State::REQUESTED->value,
                         'is_prepared' => false,
                         'has_end_state' => false,
+                        'meta_state' => [
+                            'ended' => false,
+                            'succeeded' => false,
+                        ],
                     ];
                 },
             ],
@@ -134,7 +135,6 @@ abstract class AbstractGetSerializedSuiteTest extends AbstractApplicationTest
                         ]
                     );
                 },
-                'payload' => [],
                 'expectedResponseDataCreator' => function (SerializedSuite $serializedSuite) {
                     return [
                         'id' => $serializedSuite->getId(),
@@ -146,6 +146,10 @@ abstract class AbstractGetSerializedSuiteTest extends AbstractApplicationTest
                         'state' => State::REQUESTED->value,
                         'is_prepared' => false,
                         'has_end_state' => false,
+                        'meta_state' => [
+                            'ended' => false,
+                            'succeeded' => false,
+                        ],
                     ];
                 },
             ],
@@ -170,7 +174,6 @@ abstract class AbstractGetSerializedSuiteTest extends AbstractApplicationTest
 
                     return $serializedSuite;
                 },
-                'payload' => [],
                 'expectedResponseDataCreator' => function (SerializedSuite $serializedSuite) {
                     return [
                         'id' => $serializedSuite->getId(),
@@ -179,6 +182,10 @@ abstract class AbstractGetSerializedSuiteTest extends AbstractApplicationTest
                         'state' => State::PREPARED->value,
                         'is_prepared' => true,
                         'has_end_state' => true,
+                        'meta_state' => [
+                            'ended' => true,
+                            'succeeded' => true,
+                        ],
                     ];
                 },
             ],
@@ -203,7 +210,6 @@ abstract class AbstractGetSerializedSuiteTest extends AbstractApplicationTest
 
                     return $serializedSuite;
                 },
-                'payload' => [],
                 'expectedResponseDataCreator' => function (SerializedSuite $serializedSuite) {
                     return [
                         'id' => $serializedSuite->getId(),
@@ -214,6 +220,10 @@ abstract class AbstractGetSerializedSuiteTest extends AbstractApplicationTest
                         'has_end_state' => true,
                         'failure_reason' => 'git/checkout',
                         'failure_message' => 'repository does not exist',
+                        'meta_state' => [
+                            'ended' => true,
+                            'succeeded' => false,
+                        ],
                     ];
                 },
             ],
