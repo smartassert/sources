@@ -73,6 +73,8 @@ class SerializeSuiteFailureTest extends AbstractApplicationTest
             true
         );
         \assert(is_array($getSerializedSuiteResponseData));
+        \assert(is_string($getSerializedSuiteResponseData['failure_message']));
+
         self::assertSame('failed', $getSerializedSuiteResponseData['state']);
         self::assertSame('git/clone', $getSerializedSuiteResponseData['failure_reason']);
         self::assertStringContainsString(
