@@ -136,6 +136,7 @@ class SerializedSuite implements SerializedSuiteInterface, DirectoryLocator, \Js
             'is_prepared' => $isPrepared,
             'has_end_state' => $hasEndState,
             'meta_state' => [
+                'pending' => State::REQUESTED === $this->state,
                 'ended' => $hasEndState,
                 'succeeded' => $isPrepared,
             ],

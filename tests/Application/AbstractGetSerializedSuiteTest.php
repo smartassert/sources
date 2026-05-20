@@ -109,6 +109,7 @@ abstract class AbstractGetSerializedSuiteTest extends AbstractApplicationTest
                         'is_prepared' => false,
                         'has_end_state' => false,
                         'meta_state' => [
+                            'pending' => true,
                             'ended' => false,
                             'succeeded' => false,
                         ],
@@ -147,6 +148,7 @@ abstract class AbstractGetSerializedSuiteTest extends AbstractApplicationTest
                         'is_prepared' => false,
                         'has_end_state' => false,
                         'meta_state' => [
+                            'pending' => true,
                             'ended' => false,
                             'succeeded' => false,
                         ],
@@ -183,6 +185,7 @@ abstract class AbstractGetSerializedSuiteTest extends AbstractApplicationTest
                         'is_prepared' => true,
                         'has_end_state' => true,
                         'meta_state' => [
+                            'pending' => false,
                             'ended' => true,
                             'succeeded' => true,
                         ],
@@ -221,6 +224,7 @@ abstract class AbstractGetSerializedSuiteTest extends AbstractApplicationTest
                         'failure_reason' => 'git/checkout',
                         'failure_message' => 'repository does not exist',
                         'meta_state' => [
+                            'pending' => false,
                             'ended' => true,
                             'succeeded' => false,
                         ],

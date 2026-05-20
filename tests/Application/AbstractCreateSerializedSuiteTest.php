@@ -84,6 +84,7 @@ abstract class AbstractCreateSerializedSuiteTest extends AbstractApplicationTest
                 'is_prepared' => false,
                 'has_end_state' => false,
                 'meta_state' => [
+                    'pending' => true,
                     'ended' => false,
                     'succeeded' => false,
                 ],
