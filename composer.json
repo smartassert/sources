@@ -19,7 +19,7 @@
         "smartassert/health-check-bundle": "^8.1",
         "smartassert/service-request": "^1.4",
         "smartassert/users-security-bundle": "^12.0",
-        "smartassert/worker-job-source": "^7.0",
+        "smartassert/worker-job-source": "^8.0",
         "smartassert/worker-message-failed-event-bundle": "^4.0",
         "smartassert/yaml-file": "^9.0",
         "symfony/console": "8.0.*",
