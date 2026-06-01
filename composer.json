@@ -22,7 +22,7 @@
         "smartassert/worker-job-source": "^8.0",
         "smartassert/worker-message-failed-event-bundle": "^4.0",
         "smartassert/yaml-file": "^9.0",
-        "symfony/console": "8.0.*",
+        "symfony/console": "8.1.*",
         "symfony/doctrine-messenger": "8.0.*",
         "symfony/dotenv": "8.0.*",
         "symfony/finder": "8.0.*",
