@@ -24,3 +24,5 @@ composer.lock
 /.phpcs-cache
 /phpcs.xml
 ###< squizlabs/php_codesniffer ###
+
+config/reference.php
