@@ -63,7 +63,7 @@ class FactoryTest extends WebTestCase
         ;
 
         self::expectException(NoSourceRepositoryCreatorException::class);
-        self::expectExceptionMessage(sprintf(
+        self::expectExceptionMessageIsOrContains(sprintf(
             'No source repository creator is available for source "%s" of type "%s"',
             $sourceId,
             $sourceType->value,
