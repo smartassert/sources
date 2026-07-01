@@ -22,20 +22,20 @@
         "smartassert/worker-job-source": "^8.0",
         "smartassert/worker-message-failed-event-bundle": "^4.0",
         "smartassert/yaml-file": "^9.0",
-        "symfony/console": "8.0.*",
-        "symfony/doctrine-messenger": "8.0.*",
-        "symfony/dotenv": "8.0.*",
-        "symfony/finder": "8.0.*",
+        "symfony/console": "8.1.*",
+        "symfony/doctrine-messenger": "8.1.*",
+        "symfony/dotenv": "8.1.*",
+        "symfony/finder": "8.1.*",
         "symfony/flex": "^2",
-        "symfony/framework-bundle": "8.0.*",
-        "symfony/messenger": "8.0.*",
+        "symfony/framework-bundle": "8.1.*",
+        "symfony/messenger": "8.1.*",
         "symfony/monolog-bundle": "^4.0",
-        "symfony/process": "8.0.*",
-        "symfony/runtime": "8.0.*",
-        "symfony/security-bundle": "8.0.*",
-        "symfony/string": "8.0.*",
-        "symfony/uid": "8.0.*",
-        "symfony/yaml": "8.0.*"
+        "symfony/process": "8.1.*",
+        "symfony/runtime": "8.1.*",
+        "symfony/security-bundle": "8.1.*",
+        "symfony/string": "8.1.*",
+        "symfony/uid": "8.1.*",
+        "symfony/yaml": "8.1.*"
     },
     "require-dev": {
         "friendsofphp/php-cs-fixer": "dev-master#32c1c3f8fb65051f27a2d295e9c467b7ebe9de11",
@@ -51,11 +51,11 @@
         "smartassert/symfony-test-client": "^3.0",
         "smartassert/test-authenticaton-provider-bundle": "^6.0",
         "squizlabs/php_codesniffer": "^4.0",
-        "symfony/browser-kit": "8.0.*",
-        "symfony/expression-language": "8.0.*",
+        "symfony/browser-kit": "8.1.*",
+        "symfony/expression-language": "8.1.*",
         "symfony/maker-bundle": "^1.36",
-        "symfony/phpunit-bridge": "8.0.*",
-        "symfony/psr-http-message-bridge": "8.0.*",
+        "symfony/phpunit-bridge": "8.1.*",
+        "symfony/psr-http-message-bridge": "8.1.*",
         "webignition/object-reflector": "^1.0"
     },
     "config": {
@@ -164,7 +164,7 @@
     "extra": {
         "symfony": {
             "allow-contrib": false,
-            "require": "8.0.*"
+            "require": "8.1.*"
         }
     }
 }
