@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
+use App\Entity\MutableSerializedSuiteInterface as MutableSerializedSuite;
 use App\Enum\EntityType;
 use App\Enum\SerializedSuite\FailureReason;
 use App\Enum\SerializedSuite\State;
@@ -13,7 +14,7 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: SerializedSuiteRepository::class)]
-class SerializedSuite implements SerializedSuiteInterface, DirectoryLocator, \JsonSerializable
+class SerializedSuite implements SerializedSuiteInterface, MutableSerializedSuite, DirectoryLocator, \JsonSerializable
 {
     public const ID_LENGTH = 32;
 
@@ -71,7 +72,7 @@ class SerializedSuite implements SerializedSuiteInterface, DirectoryLocator, \Js
         return $this->parameters;
     }
 
-    public function setState(State $state): self
+    public function setState(State $state): static
     {
         $this->state = $state;
 

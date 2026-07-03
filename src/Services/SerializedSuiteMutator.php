@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Entity\MutableSerializedSuiteInterface;
 use App\Event\SerializedSuiteCreatedEvent;
 use App\Event\SerializedSuitePreparationFailedEvent;
+use App\Event\SerializedSuiteStateChangedEvent;
 use App\Repository\SerializedSuiteRepository;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -27,6 +29,9 @@ readonly class SerializedSuiteMutator implements EventSubscriberInterface
             SerializedSuitePreparationFailedEvent::class => [
                 ['setPreparationFailed', 100],
             ],
+            SerializedSuiteStateChangedEvent::class => [
+                ['setState', 1000],
+            ],
         ];
     }
 
@@ -38,8 +43,18 @@ readonly class SerializedSuiteMutator implements EventSubscriberInterface
     public function setPreparationFailed(SerializedSuitePreparationFailedEvent $event): void
     {
         $serializedSuite = $event->serializedSuite;
-        $serializedSuite = $serializedSuite->setPreparationFailed($event->failureReason, $event->failureMessage);
+        if ($serializedSuite instanceof MutableSerializedSuiteInterface) {
+            $this->serializedSuiteRepository->save(
+                $serializedSuite->setPreparationFailed($event->failureReason, $event->failureMessage)
+            );
+        }
+    }
 
-        $this->serializedSuiteRepository->save($serializedSuite);
+    public function setState(SerializedSuiteStateChangedEvent $event): void
+    {
+        $serializedSuite = $event->serializedSuite;
+        if ($serializedSuite instanceof MutableSerializedSuiteInterface) {
+            $this->serializedSuiteRepository->save($serializedSuite->setState($event->newState));
+        }
     }
 }
