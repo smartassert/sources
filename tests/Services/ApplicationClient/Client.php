@@ -285,6 +285,7 @@ class Client
         ?string $authenticationToken,
         string $serializedSuiteId,
         string $suiteId,
+        string $notifyUrl,
         array $payload
     ): ResponseInterface {
         $headers = array_merge(
@@ -293,6 +294,8 @@ class Client
                 'content-type' => 'application/x-www-form-urlencoded',
             ]
         );
+
+        $payload['notify_url'] = $notifyUrl;
 
         return $this->client->makeRequest(
             'POST',

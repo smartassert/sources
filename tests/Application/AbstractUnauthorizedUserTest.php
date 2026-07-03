@@ -201,6 +201,7 @@ abstract class AbstractUnauthorizedUserTest extends AbstractApplicationTest
             $token,
             (new EntityIdFactory())->create(),
             (new EntityIdFactory())->create(),
+            'https://example.com/notify',
             [],
         );
 
