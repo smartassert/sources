@@ -69,7 +69,7 @@ abstract class AbstractReadSuiteTest extends AbstractApplicationTest
         $suite->setTests(['test1.yaml']);
         $suiteRepository->save($suite);
 
-        $serializedSuite = new SerializedSuite($idFactory->create(), $suite);
+        $serializedSuite = new SerializedSuite($idFactory->create(), $suite, 'https://example.com/nofity');
         $serializedSuiteRepository->save($serializedSuite);
 
         $response = $this->applicationClient->makeReadSerializedSuiteRequest(
@@ -107,7 +107,7 @@ abstract class AbstractReadSuiteTest extends AbstractApplicationTest
         $suite->setTests(['test1.yaml', 'test2.yaml']);
         $suiteRepository->save($suite);
 
-        $serializedSuite = new SerializedSuite($idFactory->create(), $suite);
+        $serializedSuite = new SerializedSuite($idFactory->create(), $suite, 'https://example.com/nofity');
         $serializedSuiteRepository->save($serializedSuite);
 
         $this->fixtureCreator->copyTo(

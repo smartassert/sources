@@ -57,7 +57,12 @@ class SuiteSerializerFileSourceTest extends WebTestCase
     {
         $source = SourceOriginFactory::create(type: 'file');
         $suite = SuiteFactory::create(source: $source, tests: $suiteTests);
-        $serializedSuite = new SerializedSuite((new EntityIdFactory())->create(), $suite, []);
+        $serializedSuite = new SerializedSuite(
+            new EntityIdFactory()->create(),
+            $suite,
+            'https://example.com/nofity',
+            [],
+        );
 
         $source = $serializedSuite->getSuite()->getSource();
         \assert($source instanceof FileSource);

@@ -58,7 +58,12 @@ class SuiteSerializerGitSourceTest extends WebTestCase
         $idFactory = new EntityIdFactory();
 
         $suite = SuiteFactory::create(source: $source, tests: ['test1.yaml', 'test2.yaml']);
-        $serializedSuite = new SerializedSuite($idFactory->create(), $suite, []);
+        $serializedSuite = new SerializedSuite(
+            $idFactory->create(),
+            $suite,
+            'https://example.com/nofity',
+            [],
+        );
         $sourceRepository = new UserGitRepository($idFactory->create(), $source);
 
         $sourceRepositoryFactory = \Mockery::mock(SourceRepositoryFactory::class);
