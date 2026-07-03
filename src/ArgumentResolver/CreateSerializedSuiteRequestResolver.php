@@ -51,10 +51,16 @@ readonly class CreateSerializedSuiteRequestResolver implements ValueResolverInte
             throw new BadRequestHttpException('Serialized suite id cannot be empty.');
         }
 
+        $notifyUrl = $request->request->get('notify_url');
+        if (!is_string($notifyUrl) || '' === $notifyUrl) {
+            throw new BadRequestHttpException('Notify url cannot be empty.');
+        }
+
         return [new CreateSerializedSuiteRequest(
             $serializedSuiteId,
             $suite,
-            $this->createRunParameters($suite, $request)
+            $this->createRunParameters($suite, $request),
+            $notifyUrl,
         )];
     }
 

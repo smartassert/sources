@@ -92,6 +92,7 @@ class CreateSerializedSuiteTest extends AbstractCreateSerializedSuiteTest
             self::$apiTokens->get(self::USER_1_EMAIL),
             $serializedSuiteId,
             $suiteId,
+            'https://example.com/notify',
             []
         );
 
