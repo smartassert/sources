@@ -38,7 +38,7 @@ class SerializedSuiteController
             $serializedSuite = new SerializedSuite(
                 $request->id,
                 $request->suite,
-                'https://example.com/notify',
+                $request->notifyUrl,
                 $request->runParameters
             );
 

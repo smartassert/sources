@@ -100,6 +100,7 @@ abstract class AbstractCreateSerializedSuiteTest extends AbstractApplicationTest
             ]),
             $response->getBody()->getContents()
         );
+        self::assertSame($notifyUrl, $serializedSuite->getNotifyUrl());
     }
 
     /**
@@ -118,7 +119,7 @@ abstract class AbstractCreateSerializedSuiteTest extends AbstractApplicationTest
                 'suiteCreator' => function (SourceInterface $source) {
                     return SuiteFactory::create(source: $source, tests: []);
                 },
-                'notifyUrl' => 'https://example.com/notify',
+                'notifyUrl' => 'https://example.com/notify/' . rand(),
                 'payload' => [],
                 'expectedResponseParameters' => [],
             ],
@@ -132,10 +133,8 @@ abstract class AbstractCreateSerializedSuiteTest extends AbstractApplicationTest
                 'suiteCreator' => function (SourceInterface $source) {
                     return SuiteFactory::create(source: $source, tests: ['test.yaml']);
                 },
-                'notifyUrl' => 'https://example.com/notify',
-                'payload' => [
-                    'notify_url' => 'https://example.com/notify',
-                ],
+                'notifyUrl' => 'https://example.com/notify/' . rand(),
+                'payload' => [],
                 'expectedResponseParameters' => [],
             ],
             'git' => [
@@ -148,7 +147,7 @@ abstract class AbstractCreateSerializedSuiteTest extends AbstractApplicationTest
                 'suiteCreator' => function (SourceInterface $source) {
                     return SuiteFactory::create(source: $source, tests: ['test.yaml']);
                 },
-                'notifyUrl' => 'https://example.com/notify',
+                'notifyUrl' => 'https://example.com/notify/' . rand(),
                 'payload' => [],
                 'expectedResponseParameters' => [],
             ],
@@ -162,7 +161,7 @@ abstract class AbstractCreateSerializedSuiteTest extends AbstractApplicationTest
                 'suiteCreator' => function (SourceInterface $source) {
                     return SuiteFactory::create(source: $source, tests: ['test.yaml']);
                 },
-                'notifyUrl' => 'https://example.com/notify',
+                'notifyUrl' => 'https://example.com/notify/' . rand(),
                 'payload' => [
                     'ref' => 'v1.1',
                 ],
@@ -180,7 +179,7 @@ abstract class AbstractCreateSerializedSuiteTest extends AbstractApplicationTest
                 'suiteCreator' => function (SourceInterface $source) {
                     return SuiteFactory::create(source: $source, tests: ['test.yaml']);
                 },
-                'notifyUrl' => 'https://example.com/notify',
+                'notifyUrl' => 'https://example.com/notify/' . rand(),
                 'payload' => [
                     'ref' => 'v1.1',
                     'ignored1' => 'value',
