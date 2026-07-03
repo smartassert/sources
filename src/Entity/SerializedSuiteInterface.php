@@ -4,7 +4,27 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
-interface SerializedSuiteInterface extends UserHeldEntityInterface, IdentifiedEntityInterface
+use App\Enum\SerializedSuite\FailureReason;
+use App\Enum\SerializedSuite\State;
+
+/**
+ * @phpstan-type SerializedSerializedSuite array{
+ *     id: string,
+ *     suite_id: string,
+ *     parameters: array<string, string>,
+ *     state: value-of<State>,
+ *     is_prepared: bool,
+ *     has_end_state: bool,
+ *     meta_state: array{
+ *         pending: bool,
+ *         ended: bool,
+ *         succeeded: bool
+ *     },
+ *     failure_reason?: value-of<FailureReason>,
+ *     failure_message?: string
+ * }
+ */
+interface SerializedSuiteInterface extends UserHeldEntityInterface, IdentifiedEntityInterface, \JsonSerializable
 {
     /**
      * @return non-empty-string
@@ -19,4 +39,9 @@ interface SerializedSuiteInterface extends UserHeldEntityInterface, IdentifiedEn
     public function getSuite(): Suite;
 
     public function getDirectoryPath(): string;
+
+    /**
+     * @return SerializedSerializedSuite
+     */
+    public function jsonSerialize(): array;
 }
