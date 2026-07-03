@@ -68,7 +68,12 @@ class SuiteSerializerTest extends WebTestCase
         $suite = new Suite($idFactory->create());
         $suite->setSource($source);
 
-        $serializedSuite = new SerializedSuite($idFactory->create(), $suite, []);
+        $serializedSuite = new SerializedSuite(
+            $idFactory->create(),
+            $suite,
+            'https://example.com/nofity',
+            [],
+        );
 
         try {
             $this->suiteSerializer->write($serializedSuite);
@@ -84,7 +89,12 @@ class SuiteSerializerTest extends WebTestCase
         \assert($source instanceof FileSource);
 
         $suite = SuiteFactory::create($source);
-        $serializedSuite = new SerializedSuite((new EntityIdFactory())->create(), $suite, []);
+        $serializedSuite = new SerializedSuite(
+            new EntityIdFactory()->create(),
+            $suite,
+            'https://example.com/nofity',
+            [],
+        );
 
         $this->fixtureCreator->copySetTo(
             'Source/yml_yaml_invalid',
@@ -114,7 +124,12 @@ class SuiteSerializerTest extends WebTestCase
     {
         $source = SourceOriginFactory::create(type: 'file');
         $suite = SuiteFactory::create($source);
-        $serializedSuite = new SerializedSuite((new EntityIdFactory())->create(), $suite, []);
+        $serializedSuite = new SerializedSuite(
+            new EntityIdFactory()->create(),
+            $suite,
+            'https://example.com/nofity',
+            [],
+        );
 
         $this->fixtureCreator->copyTo(
             'SerializedSuite/suite_yml_yaml_entire.yaml',

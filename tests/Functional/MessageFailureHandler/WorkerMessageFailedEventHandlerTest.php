@@ -160,7 +160,7 @@ class WorkerMessageFailedEventHandlerTest extends WebTestCase
         \assert($suiteRepository instanceof SuiteRepository);
         $suiteRepository->save($suite);
 
-        $serializedSuite = new SerializedSuite(StringFactory::createRandom(), $suite);
+        $serializedSuite = new SerializedSuite(StringFactory::createRandom(), $suite, 'https://example.com/nofity');
         $serializedSuiteRepository = self::getContainer()->get(SerializedSuiteRepository::class);
         \assert($serializedSuiteRepository instanceof SerializedSuiteRepository);
         $serializedSuiteRepository->save($serializedSuite);

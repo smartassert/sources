@@ -97,6 +97,7 @@ abstract class AbstractGetSerializedSuiteTest extends AbstractApplicationTest
                     return new SerializedSuite(
                         (new EntityIdFactory())->create(),
                         $suite,
+                        'https://example.com/nofity',
                         []
                     );
                 },
@@ -135,6 +136,7 @@ abstract class AbstractGetSerializedSuiteTest extends AbstractApplicationTest
                     return new SerializedSuite(
                         (new EntityIdFactory())->create(),
                         $suite,
+                        'https://example.com/nofity',
                         [
                             'key1' => 'value1',
                             'key2' => 'value2',
@@ -179,6 +181,7 @@ abstract class AbstractGetSerializedSuiteTest extends AbstractApplicationTest
                     $serializedSuite = new SerializedSuite(
                         (new EntityIdFactory())->create(),
                         $suite,
+                        'https://example.com/nofity',
                         []
                     );
 
@@ -222,6 +225,7 @@ abstract class AbstractGetSerializedSuiteTest extends AbstractApplicationTest
                     $serializedSuite = new SerializedSuite(
                         (new EntityIdFactory())->create(),
                         $suite,
+                        'https://example.com/nofity',
                         []
                     );
 

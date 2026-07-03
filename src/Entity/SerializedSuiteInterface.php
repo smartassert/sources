@@ -46,4 +46,6 @@ interface SerializedSuiteInterface extends UserHeldEntityInterface, IdentifiedEn
      * @return SerializedSerializedSuite
      */
     public function jsonSerialize(): array;
+
+    public function getNotifyUrl(): string;
 }

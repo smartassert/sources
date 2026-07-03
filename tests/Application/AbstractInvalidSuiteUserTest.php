@@ -44,6 +44,7 @@ abstract class AbstractInvalidSuiteUserTest extends AbstractApplicationTest
         $this->serializedSuite = new SerializedSuite(
             (new EntityIdFactory())->create(),
             $this->suite,
+            'https://example.com/nofity',
             []
         );
 

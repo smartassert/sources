@@ -41,14 +41,23 @@ class SerializedSuite implements SerializedSuiteInterface, MutableSerializedSuit
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $failureMessage = null;
 
+    #[ORM\Column]
+    private string $notifyUrl;
+
     /**
      * @param non-empty-string      $id
+     * @param non-empty-string      $notifyUrl
      * @param array<string, string> $parameters
      */
-    public function __construct(string $id, Suite $suite, array $parameters = [])
-    {
+    public function __construct(
+        string $id,
+        Suite $suite,
+        string $notifyUrl,
+        array $parameters = [],
+    ) {
         $this->id = $id;
         $this->suite = $suite;
+        $this->notifyUrl = $notifyUrl;
         $this->parameters = $parameters;
         ksort($this->parameters);
         $this->state = State::REQUESTED;
@@ -160,5 +169,10 @@ class SerializedSuite implements SerializedSuiteInterface, MutableSerializedSuit
     public function getIdentifier(): EntityIdentifierInterface
     {
         return new EntityIdentifier($this->getId(), EntityType::SERIALIZED_SUITE->value);
+    }
+
+    public function getNotifyUrl(): string
+    {
+        return $this->notifyUrl;
     }
 }
