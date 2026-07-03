@@ -6,9 +6,9 @@ namespace App\Controller;
 
 use App\Entity\SerializedSuite;
 use App\Entity\SerializedSuiteInterface;
+use App\Event\SerializedSuiteCreatedEvent;
 use App\Exception\SerializedSuiteSourceDoesNotExistException;
 use App\Exception\StorageExceptionFactory;
-use App\Message\SerializeSuite;
 use App\Repository\SerializedSuiteRepository;
 use App\Request\CreateSerializedSuiteRequest;
 use App\Response\YamlResponse;
@@ -16,9 +16,9 @@ use App\Services\SuiteSerializer;
 use League\Flysystem\FilesystemException;
 use SmartAssert\ServiceRequest\Exception\ErrorResponseException;
 use SmartAssert\ServiceRequest\Exception\ErrorResponseExceptionFactory;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Routing\Attribute\Route;
 
 class SerializedSuiteController
@@ -31,13 +31,12 @@ class SerializedSuiteController
     public function create(
         CreateSerializedSuiteRequest $request,
         SerializedSuiteRepository $repository,
-        MessageBusInterface $messageBus,
+        EventDispatcherInterface $eventDispatcher,
     ): Response {
         $serializedSuite = $repository->find($request->id);
         if (null === $serializedSuite) {
             $serializedSuite = new SerializedSuite($request->id, $request->suite, $request->runParameters);
-            $repository->save($serializedSuite);
-            $messageBus->dispatch(SerializeSuite::createFromSerializedSuite($serializedSuite));
+            $eventDispatcher->dispatch(new SerializedSuiteCreatedEvent($serializedSuite));
         }
 
         return new JsonResponse($serializedSuite, 202);
