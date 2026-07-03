@@ -58,6 +58,7 @@ class SerializeSuiteFailureTest extends AbstractApplicationTest
             self::$apiTokens->get(self::USER_1_EMAIL),
             $serializedSuiteId,
             $suiteId,
+            'https://example.com/notify',
             []
         );
 

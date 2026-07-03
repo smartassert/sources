@@ -6,15 +6,17 @@ namespace App\Request;
 
 use App\Entity\Suite;
 
-class CreateSerializedSuiteRequest
+readonly class CreateSerializedSuiteRequest
 {
     /**
      * @param non-empty-string                $id
      * @param array<non-empty-string, string> $runParameters
+     * @param non-empty-string                $notifyUrl
      */
     public function __construct(
-        public readonly string $id,
-        public readonly Suite $suite,
-        public readonly array $runParameters,
+        public string $id,
+        public Suite $suite,
+        public array $runParameters,
+        public string $notifyUrl,
     ) {}
 }
