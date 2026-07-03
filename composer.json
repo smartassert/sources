@@ -28,13 +28,16 @@
         "symfony/finder": "8.1.*",
         "symfony/flex": "^2",
         "symfony/framework-bundle": "8.1.*",
+        "symfony/http-client": "8.1.*",
         "symfony/messenger": "8.1.*",
         "symfony/monolog-bundle": "^4.0",
         "symfony/process": "8.1.*",
         "symfony/runtime": "8.1.*",
         "symfony/security-bundle": "8.1.*",
+        "symfony/serializer": "8.1.*",
         "symfony/string": "8.1.*",
         "symfony/uid": "8.1.*",
+        "symfony/webhook": "8.1.*",
         "symfony/yaml": "8.1.*"
     },
     "require-dev": {
