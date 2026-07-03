@@ -19,4 +19,6 @@ interface SerializedSuiteInterface extends UserHeldEntityInterface, IdentifiedEn
     public function getSuite(): Suite;
 
     public function getDirectoryPath(): string;
+
+    public function getNotifyUrl(): string;
 }

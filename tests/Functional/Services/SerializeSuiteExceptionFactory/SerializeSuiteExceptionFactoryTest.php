@@ -55,7 +55,12 @@ class SerializeSuiteExceptionFactoryTest extends WebTestCase
         $fileSourceSuite = new Suite(StringFactory::createRandom());
         $fileSourceSuite->setSource($fileSource);
 
-        $fileSourceSerializedSuite = new SerializedSuite(StringFactory::createRandom(), $fileSourceSuite, []);
+        $fileSourceSerializedSuite = new SerializedSuite(
+            StringFactory::createRandom(),
+            $fileSourceSuite,
+            'https://example.com/nofity',
+            [],
+        );
 
         $gitSource = new GitSource(StringFactory::createRandom(), StringFactory::createRandom());
         $gitSourcePath = StringFactory::createRandom();
@@ -64,7 +69,12 @@ class SerializeSuiteExceptionFactoryTest extends WebTestCase
         $gitSourceSuite = new Suite(StringFactory::createRandom());
         $gitSourceSuite->setSource($gitSource);
 
-        $gitSourceSerializedSuite = new SerializedSuite(StringFactory::createRandom(), $gitSourceSuite, []);
+        $gitSourceSerializedSuite = new SerializedSuite(
+            StringFactory::createRandom(),
+            $gitSourceSuite,
+            'https://example.com/nofity',
+            [],
+        );
 
         $noSourceRepositoryCreatorException = new NoSourceRepositoryCreatorException($fileSource);
 
