@@ -166,6 +166,11 @@ class SerializedSuite implements SerializedSuiteInterface, MutableSerializedSuit
         return $data;
     }
 
+    public function toArray(): array
+    {
+        return $this->jsonSerialize();
+    }
+
     public function getIdentifier(): EntityIdentifierInterface
     {
         return new EntityIdentifier($this->getId(), EntityType::SERIALIZED_SUITE->value);
