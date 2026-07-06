@@ -113,6 +113,11 @@ abstract class AbstractGetSerializedSuiteTest extends AbstractApplicationTest
                             'ended' => false,
                             'succeeded' => false,
                         ],
+                        'previous_states' => [],
+                        'next_states' => [
+                            State::PREPARING_RUNNING->value,
+                            State::PREPARING_HALTED->value,
+                        ],
                     ];
                 },
             ],
@@ -152,6 +157,11 @@ abstract class AbstractGetSerializedSuiteTest extends AbstractApplicationTest
                             'ended' => false,
                             'succeeded' => false,
                         ],
+                        'previous_states' => [],
+                        'next_states' => [
+                            State::PREPARING_RUNNING->value,
+                            State::PREPARING_HALTED->value,
+                        ],
                     ];
                 },
             ],
@@ -189,6 +199,12 @@ abstract class AbstractGetSerializedSuiteTest extends AbstractApplicationTest
                             'ended' => true,
                             'succeeded' => true,
                         ],
+                        'previous_states' => [
+                            State::REQUESTED->value,
+                            State::PREPARING_RUNNING->value,
+                            State::PREPARING_HALTED->value,
+                        ],
+                        'next_states' => [],
                     ];
                 },
             ],
@@ -228,6 +244,12 @@ abstract class AbstractGetSerializedSuiteTest extends AbstractApplicationTest
                             'ended' => true,
                             'succeeded' => false,
                         ],
+                        'previous_states' => [
+                            State::REQUESTED->value,
+                            State::PREPARING_RUNNING->value,
+                            State::PREPARING_HALTED->value,
+                        ],
+                        'next_states' => [],
                     ];
                 },
             ],

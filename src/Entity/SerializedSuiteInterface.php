@@ -21,7 +21,9 @@ use App\Enum\SerializedSuite\State;
  *         succeeded: bool
  *     },
  *     failure_reason?: value-of<FailureReason>,
- *     failure_message?: string
+ *     failure_message?: string,
+ *     previous_states: value-of<State>[],
+ *     next_states: value-of<State>[]
  * }
  */
 interface SerializedSuiteInterface extends UserHeldEntityInterface, IdentifiedEntityInterface, \JsonSerializable
