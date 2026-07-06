@@ -1,0 +1,52 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\MessageDispatcher;
+
+use App\Event\SerializedSuiteStateChangedEvent;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Messenger\Exception\ExceptionInterface as MessengerExceptionInterface;
+use Symfony\Component\Messenger\MessageBusInterface;
+use Symfony\Component\RemoteEvent\RemoteEvent;
+use Symfony\Component\Uid\Ulid;
+use Symfony\Component\Webhook\Messenger\SendWebhookMessage;
+use Symfony\Component\Webhook\Subscriber;
+
+readonly class SendWebhookMessageDispatcher implements EventSubscriberInterface
+{
+    public function __construct(
+        private MessageBusInterface $messageBus,
+        private string $secret,
+    ) {}
+
+    /**
+     * @return array<class-string, array<mixed>>
+     */
+    public static function getSubscribedEvents(): array
+    {
+        return [
+            SerializedSuiteStateChangedEvent::class => [
+                ['dispatch', 0],
+            ],
+        ];
+    }
+
+    /**
+     * @throws MessengerExceptionInterface
+     */
+    public function dispatch(SerializedSuiteStateChangedEvent $event): void
+    {
+        $subscriber = new Subscriber($event->serializedSuite->getNotifyUrl(), $this->secret);
+
+        $remoteEvent = new RemoteEvent(
+            name: 'serialized_suite.state_changed',
+            id: (string) new Ulid(),
+            payload: $event->serializedSuite->toArray(),
+        );
+
+        $this->messageBus->dispatch(
+            new SendWebhookMessage($subscriber, $remoteEvent),
+        );
+    }
+}
