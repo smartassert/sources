@@ -88,6 +88,11 @@ abstract class AbstractCreateSerializedSuiteTest extends AbstractApplicationTest
                     'ended' => false,
                     'succeeded' => false,
                 ],
+                'previous_states' => [],
+                'next_states' => [
+                    State::PREPARING_RUNNING->value,
+                    State::PREPARING_HALTED->value,
+                ],
             ]),
             $response->getBody()->getContents()
         );

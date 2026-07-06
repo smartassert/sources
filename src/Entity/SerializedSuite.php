@@ -119,6 +119,16 @@ class SerializedSuite implements SerializedSuiteInterface, MutableSerializedSuit
         $hasEndState = State::PREPARED === $this->state || State::FAILED === $this->state;
         $isPrepared = State::PREPARED === $this->state;
 
+        $previousStates = [];
+        foreach ($this->state->getPreviousStates() as $previousState) {
+            $previousStates[] = $previousState->value;
+        }
+
+        $nextStates = [];
+        foreach ($this->state->getNextStates() as $nextState) {
+            $nextStates[] = $nextState->value;
+        }
+
         $data = [
             'id' => $this->getId(),
             'suite_id' => $this->getSuite()->getId(),
@@ -131,6 +141,8 @@ class SerializedSuite implements SerializedSuiteInterface, MutableSerializedSuit
                 'ended' => $hasEndState,
                 'succeeded' => $isPrepared,
             ],
+            'previous_states' => $previousStates,
+            'next_states' => $nextStates,
         ];
 
         if (State::FAILED === $this->state) {
