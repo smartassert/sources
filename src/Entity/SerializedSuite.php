@@ -14,7 +14,7 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: SerializedSuiteRepository::class)]
-class SerializedSuite implements SerializedSuiteInterface, MutableSerializedSuite, DirectoryLocator, \JsonSerializable
+class SerializedSuite implements SerializedSuiteInterface, MutableSerializedSuite, DirectoryLocator
 {
     public const ID_LENGTH = 32;
 
@@ -114,16 +114,6 @@ class SerializedSuite implements SerializedSuiteInterface, MutableSerializedSuit
         return $this->suite;
     }
 
-    /**
-     * @return array{
-     *     "id": string,
-     *     "suite_id": string,
-     *     "parameters": array<string, string>,
-     *     "state": value-of<State>,
-     *     "failure_reason"?: value-of<FailureReason>,
-     *     "failure_message"?: string
-     * }
-     */
     public function jsonSerialize(): array
     {
         $hasEndState = State::PREPARED === $this->state || State::FAILED === $this->state;
