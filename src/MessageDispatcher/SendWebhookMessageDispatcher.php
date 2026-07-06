@@ -37,7 +37,12 @@ readonly class SendWebhookMessageDispatcher implements EventSubscriberInterface
      */
     public function dispatch(SerializedSuiteStateChangedEvent $event): void
     {
-        $subscriber = new Subscriber($event->serializedSuite->getNotifyUrl(), $this->secret);
+        $notifyUrl = $event->serializedSuite->getNotifyUrl();
+        if (null === $notifyUrl) {
+            return;
+        }
+
+        $subscriber = new Subscriber($notifyUrl, $this->secret);
 
         $remoteEvent = new RemoteEvent(
             name: 'serialized_suite.state_changed',

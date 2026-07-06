@@ -53,7 +53,7 @@ readonly class CreateSerializedSuiteRequestResolver implements ValueResolverInte
 
         $notifyUrl = $request->request->get('notify_url');
         if (!is_string($notifyUrl) || '' === $notifyUrl) {
-            throw new BadRequestHttpException('Notify url cannot be empty.');
+            $notifyUrl = null;
         }
 
         return [new CreateSerializedSuiteRequest(
