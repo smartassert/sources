@@ -51,6 +51,7 @@
         "phpstan/phpstan-phpunit": "^2.0",
         "phpstan/phpstan-symfony": "^2.0",
         "phpunit/phpunit": "^13.2",
+        "smartassert/callback-receiver-log-reader": "^0.1.0",
         "smartassert/symfony-test-client": "^3.0",
         "smartassert/test-authenticaton-provider-bundle": "^6.0",
         "squizlabs/php_codesniffer": "^4.0",
