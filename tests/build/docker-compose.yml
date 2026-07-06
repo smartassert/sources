@@ -40,6 +40,10 @@ services:
       - initialBuckets=file_source_bucket,serialized_suite_bucket
     restart: unless-stopped
 
+  callback-receiver:
+    image: mendhak/http-https-echo:19
+    container_name: callback-receiver
+
   caddy-app:
     image: caddy:2.4.5-alpine
     container_name: caddy-app
