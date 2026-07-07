@@ -51,10 +51,11 @@ abstract class AbstractCreateSerializedSuiteTest extends AbstractApplicationTest
     public function testSerializeSuccess(
         callable $sourceCreator,
         callable $suiteCreator,
+        ?string $notifyUrl,
         array $payload,
         array $expectedResponseParameters,
     ): void {
-        $serializedSuiteId = (new EntityIdFactory())->create();
+        $serializedSuiteId = new EntityIdFactory()->create();
         $source = $sourceCreator(self::$users);
         $this->sourceRepository->save($source);
 
@@ -63,10 +64,15 @@ abstract class AbstractCreateSerializedSuiteTest extends AbstractApplicationTest
 
         self::assertEquals(0, $this->serializedSuiteRepository->count(['suite' => $suite]));
 
+        if (is_string($notifyUrl)) {
+            $payload['notify_url'] = $notifyUrl;
+        }
+
         $response = $this->applicationClient->makeCreateSerializedSuiteRequest(
             self::$apiTokens->get(self::USER_1_EMAIL),
             $serializedSuiteId,
             $suite->getId(),
+            $notifyUrl,
             $payload
         );
 
@@ -96,6 +102,7 @@ abstract class AbstractCreateSerializedSuiteTest extends AbstractApplicationTest
             ]),
             $response->getBody()->getContents()
         );
+        self::assertSame($notifyUrl, $serializedSuite->getNotifyUrl());
     }
 
     /**
@@ -104,7 +111,7 @@ abstract class AbstractCreateSerializedSuiteTest extends AbstractApplicationTest
     public static function serializeSuccessDataProvider(): array
     {
         return [
-            'file, empty tests' => [
+            'file, empty tests, empty notify URL' => [
                 'sourceCreator' => function (UserProvider $users) {
                     return SourceOriginFactory::create(
                         type: 'file',
@@ -114,6 +121,7 @@ abstract class AbstractCreateSerializedSuiteTest extends AbstractApplicationTest
                 'suiteCreator' => function (SourceInterface $source) {
                     return SuiteFactory::create(source: $source, tests: []);
                 },
+                'notifyUrl' => null,
                 'payload' => [],
                 'expectedResponseParameters' => [],
             ],
@@ -127,6 +135,7 @@ abstract class AbstractCreateSerializedSuiteTest extends AbstractApplicationTest
                 'suiteCreator' => function (SourceInterface $source) {
                     return SuiteFactory::create(source: $source, tests: ['test.yaml']);
                 },
+                'notifyUrl' => 'https://example.com/notify/' . rand(),
                 'payload' => [],
                 'expectedResponseParameters' => [],
             ],
@@ -140,6 +149,7 @@ abstract class AbstractCreateSerializedSuiteTest extends AbstractApplicationTest
                 'suiteCreator' => function (SourceInterface $source) {
                     return SuiteFactory::create(source: $source, tests: ['test.yaml']);
                 },
+                'notifyUrl' => 'https://example.com/notify/' . rand(),
                 'payload' => [],
                 'expectedResponseParameters' => [],
             ],
@@ -153,6 +163,7 @@ abstract class AbstractCreateSerializedSuiteTest extends AbstractApplicationTest
                 'suiteCreator' => function (SourceInterface $source) {
                     return SuiteFactory::create(source: $source, tests: ['test.yaml']);
                 },
+                'notifyUrl' => 'https://example.com/notify/' . rand(),
                 'payload' => [
                     'ref' => 'v1.1',
                 ],
@@ -170,6 +181,7 @@ abstract class AbstractCreateSerializedSuiteTest extends AbstractApplicationTest
                 'suiteCreator' => function (SourceInterface $source) {
                     return SuiteFactory::create(source: $source, tests: ['test.yaml']);
                 },
+                'notifyUrl' => 'https://example.com/notify/' . rand(),
                 'payload' => [
                     'ref' => 'v1.1',
                     'ignored1' => 'value',
@@ -201,7 +213,8 @@ abstract class AbstractCreateSerializedSuiteTest extends AbstractApplicationTest
             self::$apiTokens->get(self::USER_1_EMAIL),
             $serializedSuiteId,
             $suite->getId(),
-            []
+            'https://example.com/notify',
+            [],
         );
 
         $firstResponseData = json_decode($firstResponse->getBody()->getContents(), true);
@@ -211,7 +224,8 @@ abstract class AbstractCreateSerializedSuiteTest extends AbstractApplicationTest
             self::$apiTokens->get(self::USER_1_EMAIL),
             $serializedSuiteId,
             $suite->getId(),
-            []
+            'https://example.com/notify',
+            [],
         );
 
         $secondResponseData = json_decode($secondResponse->getBody()->getContents(), true);
@@ -240,8 +254,9 @@ abstract class AbstractCreateSerializedSuiteTest extends AbstractApplicationTest
         $response = $this->applicationClient->makeCreateSerializedSuiteRequest(
             self::$apiTokens->get(self::USER_1_EMAIL),
             $serializedSuiteId,
-            (new EntityIdFactory())->create(),
-            []
+            new EntityIdFactory()->create(),
+            'https://example.com/notify',
+            [],
         );
 
         self::assertSame(403, $response->getStatusCode());

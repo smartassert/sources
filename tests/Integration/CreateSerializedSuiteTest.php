@@ -11,6 +11,10 @@ use App\Services\DirectoryListingFilter;
 use App\Tests\Application\AbstractCreateSerializedSuiteTest;
 use App\Tests\Services\StringFactory;
 use League\Flysystem\FilesystemOperator;
+use PHPUnit\Framework\Attributes\Depends;
+use Psr\Http\Message\RequestInterface;
+use SmartAssert\CallbackReceiverLogReader\Parser;
+use Symfony\Component\Process\Process;
 use Symfony\Component\Uid\Ulid;
 
 class CreateSerializedSuiteTest extends AbstractCreateSerializedSuiteTest
@@ -92,6 +96,7 @@ class CreateSerializedSuiteTest extends AbstractCreateSerializedSuiteTest
             self::$apiTokens->get(self::USER_1_EMAIL),
             $serializedSuiteId,
             $suiteId,
+            'http://callback-receiver:8080',
             []
         );
 
@@ -110,5 +115,34 @@ class CreateSerializedSuiteTest extends AbstractCreateSerializedSuiteTest
             $expectedReadResponseBody,
             $readResponse->getBody()->getContents()
         );
+    }
+
+    #[Depends('testSerializeSuite')]
+    public function testVerifyDispatchedStateChangeRemoteEvents(): void
+    {
+        $process = Process::fromShellCommandline('docker logs callback-receiver');
+        $process->run();
+
+        $output = $process->getOutput();
+        $parser = new Parser();
+
+        $requests = $parser->parse($output, 2);
+
+        $this->assertDispatchedStageChangeRemoteEvent($requests[0], 'preparing/running');
+        $this->assertDispatchedStageChangeRemoteEvent($requests[1], 'prepared');
+    }
+
+    private function assertDispatchedStageChangeRemoteEvent(RequestInterface $request, string $expectedState): void
+    {
+        self::assertSame('/', (string) $request->getUri());
+        self::assertSame('callback-receiver:8080', $request->getHeaderLine('host'));
+        self::assertSame('serialized_suite.state_changed', $request->getHeaderLine('webhook-event'));
+        self::assertTrue($request->hasHeader('webhook-id'));
+        self::assertTrue($request->hasHeader('webhook-signature'));
+        self::assertSame('application/json', $request->getHeaderLine('content-type'));
+
+        $data = json_decode($request->getBody()->getContents(), true);
+        self::assertIsArray($data);
+        self::assertSame($expectedState, $data['state']);
     }
 }

@@ -35,7 +35,13 @@ class SerializedSuiteController
     ): Response {
         $serializedSuite = $repository->find($request->id);
         if (null === $serializedSuite) {
-            $serializedSuite = new SerializedSuite($request->id, $request->suite, $request->runParameters);
+            $serializedSuite = new SerializedSuite(
+                $request->id,
+                $request->suite,
+                $request->notifyUrl,
+                $request->runParameters
+            );
+
             $eventDispatcher->dispatch(new SerializedSuiteCreatedEvent($serializedSuite));
         }
 

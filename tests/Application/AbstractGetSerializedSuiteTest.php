@@ -94,11 +94,7 @@ abstract class AbstractGetSerializedSuiteTest extends AbstractApplicationTest
                     return SuiteFactory::create(source: $source, tests: []);
                 },
                 'serializedSuiteCreator' => function (Suite $suite) {
-                    return new SerializedSuite(
-                        (new EntityIdFactory())->create(),
-                        $suite,
-                        []
-                    );
+                    return new SerializedSuite(new EntityIdFactory()->create(), $suite);
                 },
                 'expectedResponseDataCreator' => function (SerializedSuite $serializedSuite) {
                     return [
@@ -135,6 +131,7 @@ abstract class AbstractGetSerializedSuiteTest extends AbstractApplicationTest
                     return new SerializedSuite(
                         (new EntityIdFactory())->create(),
                         $suite,
+                        null,
                         [
                             'key1' => 'value1',
                             'key2' => 'value2',
@@ -179,6 +176,7 @@ abstract class AbstractGetSerializedSuiteTest extends AbstractApplicationTest
                     $serializedSuite = new SerializedSuite(
                         (new EntityIdFactory())->create(),
                         $suite,
+                        'https://example.com/nofity',
                         []
                     );
 
@@ -222,6 +220,7 @@ abstract class AbstractGetSerializedSuiteTest extends AbstractApplicationTest
                     $serializedSuite = new SerializedSuite(
                         (new EntityIdFactory())->create(),
                         $suite,
+                        'https://example.com/nofity',
                         []
                     );
 
