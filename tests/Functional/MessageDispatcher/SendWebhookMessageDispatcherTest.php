@@ -82,7 +82,7 @@ class SendWebhookMessageDispatcherTest extends WebTestCase
         return [
             'default' => [
                 'serializedSuite' => $serializedSuite,
-                'expectedRemoteEventName' => 'serialized_suite.state_changed',
+                'expectedRemoteEventName' => 'sources.serialized_suite.state_changed',
                 'expectedRemoteEventPayload' => $serializedSuite->toArray(),
             ],
         ];

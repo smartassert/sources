@@ -45,7 +45,7 @@ readonly class SendWebhookMessageDispatcher implements EventSubscriberInterface
         $subscriber = new Subscriber($notifyUrl, $this->secret);
 
         $remoteEvent = new RemoteEvent(
-            name: 'serialized_suite.state_changed',
+            name: 'sources.serialized_suite.state_changed',
             id: (string) new Ulid(),
             payload: $event->serializedSuite->toArray(),
         );
