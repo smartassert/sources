@@ -285,7 +285,7 @@ class Client
         ?string $authenticationToken,
         string $serializedSuiteId,
         string $suiteId,
-        string $notifyUrl,
+        ?string $notifyUrl,
         array $payload
     ): ResponseInterface {
         $headers = array_merge(
@@ -295,7 +295,9 @@ class Client
             ]
         );
 
-        $payload['notify_url'] = $notifyUrl;
+        if (is_string($notifyUrl)) {
+            $payload['notify_url'] = $notifyUrl;
+        }
 
         return $this->client->makeRequest(
             'POST',
