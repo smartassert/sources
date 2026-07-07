@@ -136,7 +136,7 @@ class CreateSerializedSuiteTest extends AbstractCreateSerializedSuiteTest
     {
         self::assertSame('/', (string) $request->getUri());
         self::assertSame('callback-receiver:8080', $request->getHeaderLine('host'));
-        self::assertSame('serialized_suite.state_changed', $request->getHeaderLine('webhook-event'));
+        self::assertSame('sources.serialized_suite.state_changed', $request->getHeaderLine('webhook-event'));
         self::assertTrue($request->hasHeader('webhook-id'));
         self::assertTrue($request->hasHeader('webhook-signature'));
         self::assertSame('application/json', $request->getHeaderLine('content-type'));
