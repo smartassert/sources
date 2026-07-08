@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Integration;
 
 use App\Enum\SerializedSuite\State;
+use App\Event\SerializedSuiteStateChangedEvent;
 use App\Request\FileSourceRequest;
 use App\Request\SuiteRequest;
 use App\Services\DirectoryListingFilter;
@@ -134,9 +135,12 @@ class CreateSerializedSuiteTest extends AbstractCreateSerializedSuiteTest
 
     private function assertDispatchedStageChangeRemoteEvent(RequestInterface $request, string $expectedState): void
     {
-        self::assertSame('/', (string) $request->getUri());
+        self::assertSame('/sources.serialized_suite.state_changed', (string) $request->getUri());
         self::assertSame('callback-receiver:8080', $request->getHeaderLine('host'));
-        self::assertSame('sources.serialized_suite.state_changed', $request->getHeaderLine('webhook-event'));
+        self::assertSame(
+            SerializedSuiteStateChangedEvent::REMOTE_EVENT_NAME,
+            $request->getHeaderLine('webhook-event')
+        );
         self::assertTrue($request->hasHeader('webhook-id'));
         self::assertTrue($request->hasHeader('webhook-signature'));
         self::assertSame('application/json', $request->getHeaderLine('content-type'));
