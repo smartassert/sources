@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\MessageDispatcher;
 
+use App\Event\NotifiableEventInterface;
 use App\Event\SerializedSuiteStateChangedEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Messenger\Exception\ExceptionInterface as MessengerExceptionInterface;
@@ -35,21 +36,19 @@ readonly class SendWebhookMessageDispatcher implements EventSubscriberInterface
     /**
      * @throws MessengerExceptionInterface
      */
-    public function dispatch(SerializedSuiteStateChangedEvent $event): void
+    public function dispatch(NotifiableEventInterface $event): void
     {
-        $notifyBaseUrl = $event->serializedSuite->getNotifyUrl();
-        if (null === $notifyBaseUrl) {
+        $notifyUrl = $event->getNotifyUrl();
+        if (null === $notifyUrl) {
             return;
         }
-
-        $notifyUrl = trim($notifyBaseUrl, '/') . '/' . $event->getRemoteEventName();
 
         $subscriber = new Subscriber($notifyUrl, $this->secret);
 
         $remoteEvent = new RemoteEvent(
             name: $event->getRemoteEventName(),
             id: (string) new Ulid(),
-            payload: $event->serializedSuite->toArray(),
+            payload: $event->getPayload(),
         );
 
         $this->messageBus->dispatch(
