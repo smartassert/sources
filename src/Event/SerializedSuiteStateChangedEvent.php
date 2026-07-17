@@ -17,8 +17,23 @@ class SerializedSuiteStateChangedEvent extends Event implements NotifiableEventI
         public readonly State $newState,
     ) {}
 
+    public function getNotifyUrl(): ?string
+    {
+        $baseUrl = $this->serializedSuite->getNotifyUrl();
+        if (null === $baseUrl) {
+            return null;
+        }
+
+        return rtrim($baseUrl, '/') . '/' . $this->getRemoteEventName();
+    }
+
     public function getRemoteEventName(): string
     {
         return self::REMOTE_EVENT_NAME;
+    }
+
+    public function getPayload(): array
+    {
+        return $this->serializedSuite->toArray();
     }
 }
