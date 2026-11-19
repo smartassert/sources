@@ -23,9 +23,7 @@ class DirectoryLister
 
             if ($item instanceof \SplFileInfo && $item->isDir() && !$directoryIterator->isDot()) {
                 $children = $directoryIterator->getChildren();
-                if ($children instanceof \RecursiveDirectoryIterator) {
-                    $pathNames = array_merge($pathNames, $this->list($children, $basePath));
-                }
+                $pathNames = array_merge($pathNames, $this->list($children, $basePath));
             }
         }
 
