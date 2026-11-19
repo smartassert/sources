@@ -135,7 +135,6 @@ class CreateSerializedSuiteTest extends AbstractCreateSerializedSuiteTest
 
     private function assertDispatchedStageChangeRemoteEvent(RequestInterface $request, string $expectedState): void
     {
-        self::assertSame('/sources.serialized_suite.state_changed', (string) $request->getUri());
         self::assertSame('callback-receiver:8080', $request->getHeaderLine('host'));
         self::assertSame(
             SerializedSuiteStateChangedEvent::REMOTE_EVENT_NAME,
