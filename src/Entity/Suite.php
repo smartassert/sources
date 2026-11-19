@@ -29,7 +29,7 @@ class Suite implements SuiteInterface, \JsonSerializable
     /**
      * @var null|array<string>
      */
-    #[ORM\Column(type: Types::SIMPLE_ARRAY, nullable: true)]
+    #[ORM\Column(type: Types::JSON, nullable: true)]
     private ?array $tests;
 
     #[ORM\Column(type: Types::DATETIMETZ_IMMUTABLE, nullable: true)]

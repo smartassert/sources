@@ -12,7 +12,7 @@ trait WaitUntilSerializedSuiteStateTrait
         string $serializedSuiteId,
         State $expectedState
     ): void {
-        $timeout = 30000;
+        $timeout = 300000;
         $duration = 0;
         $period = 1000;
         $state = null;

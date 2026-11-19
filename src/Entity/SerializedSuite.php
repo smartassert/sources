@@ -29,7 +29,7 @@ class SerializedSuite implements SerializedSuiteInterface, MutableSerializedSuit
     /**
      * @var array<string, string>
      */
-    #[ORM\Column(type: Types::JSON, nullable: true)]
+    #[ORM\Column(type: Types::JSON)]
     private array $parameters;
 
     #[ORM\Column(type: Types::STRING, enumType: State::class)]

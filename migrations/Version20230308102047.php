@@ -21,7 +21,7 @@ final class Version20230308102047 extends AbstractMigration
             CREATE TABLE serialized_suite (
                 id VARCHAR(32) NOT NULL, 
                 suite_id VARCHAR(32) NOT NULL, 
-                parameters JSON DEFAULT NULL, 
+                parameters JSON NOT NULL, 
                 state VARCHAR(255) NOT NULL, 
                 failure_reason VARCHAR(255) DEFAULT NULL, 
                 failure_message TEXT DEFAULT NULL, 
