@@ -56,10 +56,7 @@ class SendWebhookMessageDispatcherTest extends WebTestCase
         self::assertInstanceOf(SendWebhookMessage::class, $message);
 
         $subscriber = $message->getSubscriber();
-        self::assertSame(
-            $serializedSuite->getNotifyUrl() . '/' . $expectedRemoteEventName,
-            $subscriber->getUrl()
-        );
+        self::assertSame($serializedSuite->getNotifyUrl(), $subscriber->getUrl());
         self::assertSame(
             $this->getContainer()->getParameter('notify_secret'),
             $subscriber->getSecret()
